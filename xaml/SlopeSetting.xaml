@@ -1,0 +1,16 @@
+﻿<Window x:Class="TuringAndCorbusier.xaml.SlopeSetting"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TuringAndCorbusier.xaml"
+             mc:Ignorable="d" 
+             Height="70" Width="150" WindowStyle="None" SizeToContent="WidthAndHeight">
+    <Grid Background="#33FFFFFF" SnapsToDevicePixels="True">
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="25" Margin="45,18,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="55" KeyDown="textBox_KeyDown"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="14,21,0,0" TextWrapping="Wrap" Text="높이 " VerticalAlignment="Top" Width="46"/>
+        <TextBlock x:Name="title" HorizontalAlignment="Left" Margin="14,0,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="105,21,0,0" TextWrapping="Wrap" Text="m " VerticalAlignment="Top" Width="27"/>
+        <TextBlock x:Name="title_Copy" HorizontalAlignment="Left" Margin="70,0,0,0" TextWrapping="Wrap" Text="높이 정보" VerticalAlignment="Top"/>
+    </Grid>
+</Window>

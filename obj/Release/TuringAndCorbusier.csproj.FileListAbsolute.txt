@@ -1,0 +1,243 @@
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\TuringAndCorbusier.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\TuringAndCorbusier.pdb
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\Grasshopper.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\RhinoWindows.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\GH_IO.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\GH_Util.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\QWhale.Syntax.Parsers.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\QWhale.Editor.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\Mono.Cecil.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\QWhale.Syntax.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\QWhale.Common.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\Grasshopper.pdb
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\Grasshopper.xml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\bin\GH_IO.xml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\showme.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\xmlBuildingReport.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\xmlcover.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\xmlRegulationCheck.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\xmlUnitReport.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\Corbusier.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\EditProjectPropertyWindow.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\errorMessage.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\FindForm.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\MenuWindow.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\ModelingComplexity.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\NewProjectWindow.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\Page2.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\Page3.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\plotAreaError.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\realReportBase.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\ReportNavigation.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\Turing.g.cs
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\TuringAndCorbusier_MarkupCompile.cache
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\TuringAndCorbusier_MarkupCompile.lref
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\showme.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\xmlBuildingReport.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\xmlcover.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\xmlRegulationCheck.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\xmlUnitReport.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\Corbusier.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\EditProjectPropertyWindow.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\errorMessage.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\FindForm.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\MenuWindow.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\ModelingComplexity.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\NewProjectWindow.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\Page2.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\Page3.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\plotAreaError.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\realReportBase.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\Reports\ReportNavigation.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\xaml\Turing.baml
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\TuringAndCorbusier.g.resources
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\TuringAndCorbusier.Properties.Resources.resources
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\TuringAndCorbusier.csproj.GenerateResource.Cache
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\TuringAndCorbusier.dll
+C:\Users\user\Desktop\160601TuringAndCorbusier (2)\TuringAndCorbusier\obj\Release\TuringAndCorbusier.pdb
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\TuringAndCorbusier.dll.config
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\TuringAndCorbusier.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\TuringAndCorbusier.pdb
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\Grasshopper.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\RhinoWindows.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\GH_IO.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\GH_Util.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\QWhale.Syntax.Parsers.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\QWhale.Editor.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\Mono.Cecil.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\QWhale.Syntax.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\QWhale.Common.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\Grasshopper.pdb
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\Grasshopper.xml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\bin\GH_IO.xml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\showme.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\xmlBuildingReport.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\xmlcover.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\xmlRegulationCheck.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\xmlUnitReport.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\Corbusier.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\EditProjectPropertyWindow.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\errorMessage.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\FindForm.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\MenuWindow.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\ModelingComplexity.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\NewProjectWindow.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\Page2.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\Page3.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\plotAreaError.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\realReportBase.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\ReportNavigation.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\Turing.g.cs
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\TuringAndCorbusier_MarkupCompile.cache
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\TuringAndCorbusier_MarkupCompile.lref
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\showme.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\xmlBuildingReport.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\xmlcover.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\xmlRegulationCheck.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\xmlUnitReport.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\Corbusier.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\EditProjectPropertyWindow.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\errorMessage.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\FindForm.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\MenuWindow.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\ModelingComplexity.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\NewProjectWindow.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\Page2.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\Page3.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\plotAreaError.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\realReportBase.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\Reports\ReportNavigation.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\xaml\Turing.baml
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\TuringAndCorbusier.g.resources
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\TuringAndCorbusier.Properties.Resources.resources
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\TuringAndCorbusier.csproj.GenerateResource.Cache
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\TuringAndCorbusier.dll
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\TuringAndCorbusier.pdb
+C:\Users\user\Desktop\160606TuringAndCorbusier합본\TuringAndCorbusier\obj\Release\TuringAndCorbusier.csprojResolveAssemblyReference.cache
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\TuringAndCorbusier.dll.config
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\TuringAndCorbusier.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\TuringAndCorbusier.pdb
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\Grasshopper.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\RhinoWindows.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\GH_IO.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\GH_Util.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\QWhale.Syntax.Parsers.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\QWhale.Editor.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\Mono.Cecil.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\QWhale.Syntax.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\QWhale.Common.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\Grasshopper.pdb
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\Grasshopper.xml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\bin\GH_IO.xml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\TuringAndCorbusier.csprojResolveAssemblyReference.cache
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\showme.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\xmlBuildingReport.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\xmlcover.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\xmlRegulationCheck.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\xmlUnitReport.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\Corbusier.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\EditProjectPropertyWindow.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\errorMessage.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\FindForm.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\MenuWindow.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\ModelingComplexity.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\NewProjectWindow.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\Page2.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\Page3.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\plotAreaError.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\realReportBase.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\ReportNavigation.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\Turing.g.cs
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\TuringAndCorbusier_MarkupCompile.cache
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\TuringAndCorbusier_MarkupCompile.lref
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\showme.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\xmlBuildingReport.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\xmlcover.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\xmlRegulationCheck.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\xmlUnitReport.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\Corbusier.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\EditProjectPropertyWindow.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\errorMessage.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\FindForm.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\MenuWindow.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\ModelingComplexity.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\NewProjectWindow.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\Page2.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\Page3.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\plotAreaError.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\realReportBase.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\Reports\ReportNavigation.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\xaml\Turing.baml
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\TuringAndCorbusier.g.resources
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\TuringAndCorbusier.Properties.Resources.resources
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\TuringAndCorbusier.csproj.GenerateResource.Cache
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\TuringAndCorbusier.dll
+C:\Users\user\Desktop\160608TuringAndCorbusier\TuringAndCorbusier\obj\Release\TuringAndCorbusier.pdb
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\TuringAndCorbusier.dll.config
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\TuringAndCorbusier.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\TuringAndCorbusier.pdb
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\Grasshopper.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\Oracle.ManagedDataAccess.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\PdfSharp-WPF.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\PdfSharp.Xps.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\RhinoWindows.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\GH_IO.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\GH_Util.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\QWhale.Syntax.Parsers.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\QWhale.Editor.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\Mono.Cecil.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\QWhale.Syntax.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\QWhale.Common.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\Grasshopper.pdb
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\Grasshopper.xml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\PdfSharp-WPF.xml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\PdfSharp.Xps.xml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\bin\GH_IO.xml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\TuringAndCorbusier.csprojResolveAssemblyReference.cache
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\showme.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\typicalPlan.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\xmlBuildingReport.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\xmlcover.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\xmlRegulationCheck.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\xmlUnitReport.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\Corbusier.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\EditProjectPropertyWindow.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\errorMessage.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\FindForm.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\MenuWindow.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\ModelingComplexity.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\NewProjectWindow.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\Page2.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\Page3.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\plotAreaError.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\realReportBase.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\ReportNavigation.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\SlopeSetting.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\Turing.g.cs
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\TuringAndCorbusier_MarkupCompile.cache
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\TuringAndCorbusier_MarkupCompile.lref
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\showme.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\typicalPlan.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\xmlBuildingReport.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\xmlcover.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\xmlRegulationCheck.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\xmlUnitReport.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\Corbusier.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\EditProjectPropertyWindow.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\errorMessage.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\FindForm.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\MenuWindow.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\ModelingComplexity.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\NewProjectWindow.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\Page2.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\Page3.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\plotAreaError.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\realReportBase.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\Reports\ReportNavigation.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\SlopeSetting.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\xaml\Turing.baml
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\TuringAndCorbusier.g.resources
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\TuringAndCorbusier.Properties.Resources.resources
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\TuringAndCorbusier.csproj.GenerateResource.Cache
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\TuringAndCorbusier.dll
+C:\Users\use\Desktop\160628TuringAndCorbusier - 셋업제외\160627TuringAndCorbusier - 셋업제외\TuringAndCorbusier\obj\Release\TuringAndCorbusier.pdb
