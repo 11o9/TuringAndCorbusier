@@ -1,0 +1,305 @@
+﻿<UserControl x:Class="TuringAndCorbusier.Turing"
+             Name="mainWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TuringAndCorbusier"
+             mc:Ignorable="d" 
+            d:DesignHeight="720" d:DesignWidth="300" HorizontalAlignment="Center">
+    <UserControl.Resources>
+        <Style x:Key="MyButtonStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                            BorderThickness="0"
+                            Padding="0,0" 
+                            BorderBrush="DarkGray" 
+                            CornerRadius="5" 
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#ffcccccc"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#ff999999"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="MyButtonStyle1" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                            BorderThickness="0"
+                            Padding="0,0" 
+                            BorderBrush="DarkGray" 
+                            CornerRadius="5" 
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#ffcccccc"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#ff999999"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="MyButtonStyle2" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                            BorderThickness="0"
+                            Padding="0" 
+                            BorderBrush="DarkGray" 
+                            CornerRadius="0" 
+                            Background="{TemplateBinding Background}" Margin="0,0,0,0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="stackPannelButtonStyle1" TargetType="{x:Type Button}">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Background" Value="#FFFFFFFF"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" 
+        					BorderThickness="0"
+        					Padding="0,0" 
+        					CornerRadius="3" 
+        					Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FF787878" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FFA8A8A8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="FontFamily" Value="Noto Sans CJK KR Regular regular"/>
+        </Style>
+
+
+        <Style x:Key="stackPannelButtonStyle2" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Background" Value="#FFEFEFEF"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                            BorderThickness="0"
+                            Padding="0" 
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#ffcccccc"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#ff999999"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="textBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="FontFamily" Value="Noto Sans CJK KR Regular Regular"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="2.5"/>
+        </Style>
+
+        <Style x:Key="MyButtonStyle3" TargetType="{x:Type Button}">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" 
+        					BorderThickness="0"
+        					Padding="0,0" 
+        					CornerRadius="3" 
+        					Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FF787878" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FFA8A8A8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="FontFamily" Value="Noto Sans CJK KR Regular regular"/>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+        <Rectangle x:Name="backGround" Fill="#FF202020" Margin="-2,0,2,0" Grid.RowSpan="2" Loaded="backGround_Loaded" />
+
+        <Button x:Name="button"  Click="Menu_Click" Style="{StaticResource MyButtonStyle}" Margin="17,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="20" Width="56" RenderTransformOrigin="0.8,0.68" MouseEnter="button_MouseEnter" >
+
+            <Grid x:Name="outerGrid" >
+                <Grid.RowDefinitions>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="18"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border x:Name="border1" Height="18" VerticalAlignment="Center" HorizontalAlignment="Left" Width="18" Margin="0,0,0,0" Grid.RowSpan="2" Grid.ColumnSpan="2">
+                    <Grid x:Name="grid" RenderTransformOrigin="0,0" HorizontalAlignment="Right">
+                        <Canvas x:Name="Layer_1" Width="16" Height="15" Canvas.Left="0" Canvas.Top="0" Grid.Column="2" Margin="0,0,0,0" Grid.RowSpan="2">
+                            <Path x:Name="Line" Width="10" Height="1" Canvas.Left="3" Canvas.Top="4" Stretch="Fill" StrokeThickness="1" StrokeStartLineCap="Square" StrokeEndLineCap="Square" StrokeLineJoin="Round" Stroke="#FFffffff" Data="F1 M 0,0 L 1,0"/>
+                            <Path x:Name="Line_0" Width="10" Height="1" Canvas.Left="3" Canvas.Top="7" Stretch="Fill" StrokeThickness="1" StrokeStartLineCap="Square" StrokeEndLineCap="Square" StrokeLineJoin="Round" Stroke="#ffffffff" Data="F1 M 43.3333,53.3333L 190,53.3333"/>
+                            <Path x:Name="Line_1" Width="10" Height="1" Canvas.Left="3" Canvas.Top="10" Stretch="Fill" StrokeThickness="1" StrokeStartLineCap="Square" StrokeEndLineCap="Square" StrokeLineJoin="Round" Stroke="#FFffffff" Data="F1 M 43.3333,173.333L 190,173.333"/>
+                            <Path x:Name="Path_1" Width="16" Height="15" Canvas.Left="0" Canvas.Top="0" Stretch="Fill" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Stroke="#FFffffff" Data="F1 M 223.333,200.667C 223.333,209.503 216.169,216.667 207.333,216.667L 26,216.667C 17.164,216.667 10,209.503 10,200.667L 10,26C 10,17.164 17.164,9.99997 26,9.99997L 207.333,9.99997C 216.169,9.99997 223.333,17.164 223.333,26L 223.333,200.667 Z "/>
+                        </Canvas>
+                    </Grid>
+                </Border>
+
+                <Border HorizontalAlignment="Left"  Margin="0,0,0,0" Grid.Column="2" VerticalAlignment="Center" Grid.RowSpan="2">
+                    <TextBlock x:Name="calculateStart" FontSize="12" Foreground="#ffffffff" FontFamily="Noto Sans cjk kr medium" TextAlignment="Left" Margin="0,0,0,0" Text="Menu" Height="17">
+                    </TextBlock>
+                </Border>
+            </Grid>
+        </Button>
+
+        <Grid Margin="17,34,19,0" Height="125" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+
+            <Rectangle Fill="#ff606060" Opacity="1" Height="122" VerticalAlignment="Top" Grid.ColumnSpan="3" Margin="-1,2,1,0"/>
+
+            <TextBlock FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" HorizontalAlignment="Right" Margin="0,13,65,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Text="프로젝트 명" FontSize="10.667" Width="64" />
+            <TextBlock  Text="주소" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,48,65,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" FontSize="10.667" HorizontalAlignment="Right" Width="64" />
+            <TextBlock Text="대지면적" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,83,65,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" FontSize="10.667" HorizontalAlignment="Right" Width="64" />
+
+            <TextBlock x:Name="ProjectName" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="-60,11,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="프로젝트1" FontSize="13.333" Height="20" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" />
+            <TextBlock x:Name="ProjectAddress" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="-60,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="용산구 이태원동 99-6, 2층" Height="20" FontSize="13.333" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"  />
+            <TextBlock x:Name="ProjectArea" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="-60,81,0,0" TextWrapping="Wrap" FontSize="13.333" Text="8000m2" Height="20"  VerticalAlignment="Top" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"  />
+
+
+        </Grid>
+
+        <Button x:Name="Calculate" Style="{StaticResource MyButtonStyle3}" Content="대지 입력" FontSize="17" Margin="17,169,19,0" FontFamily="Noto Sans CJK KR Regular" Background="#FF353535" Foreground="White" Height="34" VerticalAlignment="Top" />
+
+        <Rectangle Fill="#FF2B2B2B" Margin="17,218,34,163">
+
+        </Rectangle>
+
+        <ScrollViewer Margin="17,233,17,163" Foreground="White">
+            <StackPanel x:Name="stackPanel">
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+        <Rectangle Margin="17,213,17,0" Fill="#ff606060" Height="20" VerticalAlignment="Top"/>
+
+        <Grid Margin="17,213,34,0" x:Name="namingGrid" Height="20" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="배치 타입" FontFamily="Noto Sans CJK KR Regular" Foreground="#ffffffff" TextAlignment="Center" Padding="3" Grid.Column="0" FontSize="9.333"/>
+            <TextBlock Text="용적률" FontFamily="Noto Sans CJK KR Regular" Foreground="#ffffffff" TextAlignment="Center" Padding="3" Grid.Column="1" FontSize="9.333"/>
+            <TextBlock Text="건폐율" FontFamily="Noto Sans CJK KR Regular" Foreground="#ffffffff" TextAlignment="Center" Padding="3" Grid.Column="2" FontSize="9.333"/>
+        </Grid>
+
+        <Grid Margin="17,0,17,15" Height="140" VerticalAlignment="Bottom" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="Btn_Load" Style="{StaticResource MyButtonStyle}" Content="불러오기"  Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Column="0" FontSize="13.333" Click="Btn_Load_Click" />
+                <Button x:Name="Btn_Save" Style="{StaticResource MyButtonStyle}" Content="저장하기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Column="1" FontSize="13.333" Click="Btn_Save_Click" />
+            </Grid>
+           
+            <Button x:Name="Btn_Export3D" Style="{StaticResource MyButtonStyle}" Content="3D모델링 내보내기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="2" FontSize="13.333" Click="Btn_Export3D_Click" />
+            <Button x:Name="Btn_ExportReport" Style="{StaticResource MyButtonStyle}" Content="설계 보고서 내보내기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="4" FontSize="13.333" Click="Btn_ExportReport_Click" />
+            <Button x:Name="Btn_SendToServer" Style="{StaticResource MyButtonStyle}" Content="서버에 업로드" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="6" FontSize="13.333" Click="Btn_SendToServer_Click" />
+            <Button x:Name="Btn_Lawline" Style="{StaticResource MyButtonStyle}" Content="전체 법규선 보기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="8" FontSize="13.333" Click="Btn_Lawline_Click" />
+            <Grid Grid.Row="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="Btn_LawBoundary" Style="{StaticResource MyButtonStyle}" Content="대지" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="0" FontSize="13.333" Click="Btn_LawBoundary_Click"  Height="15"/>
+                <Button x:Name="Btn_LawNorth" Style="{StaticResource MyButtonStyle}" Content="정북" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="1" FontSize="13.333" Click="Btn_LawNorth_Click"  Height="15"/>
+                <Button x:Name="Btn_LawNear" Style="{StaticResource MyButtonStyle}" Content="공지" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="2" FontSize="13.333" Click="Btn_LawNear_Click"  Height="15"/>
+
+                <Button x:Name="Btn_LawLighting" Style="{StaticResource MyButtonStyle}" Content="채광" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="3" FontSize="13.333" Click="Btn_LawLighting_Click"  Height="15"/>
+                <Button x:Name="Btn_LawApart" Style="{StaticResource MyButtonStyle}" Content="인동" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="4" FontSize="13.333" Click="Btn_LawApart_Click"  Height="15"/>
+
+
+            </Grid>
+            
+        </Grid>
+        <Button x:Name="TestButton" Content="Button" HorizontalAlignment="Left" Margin="202,10,0,0" VerticalAlignment="Top" Width="75" Click="TestButton_Click" Visibility="Hidden"/>
+        <Button x:Name="BirdEye" Content="BirdEye" HorizontalAlignment="Left" Margin="202,6,0,0" VerticalAlignment="Top" Width="75" Click="BirdEye_Click" Visibility="Hidden"/>
+    </Grid>
+</UserControl>

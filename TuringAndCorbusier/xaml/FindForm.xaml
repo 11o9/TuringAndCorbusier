@@ -1,0 +1,19 @@
+﻿<Window x:Class="TuringAndCorbusier.xaml.FindForm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TuringAndCorbusier.xaml"
+             mc:Ignorable="d" Height="194.059" Width="194.176" WindowStyle="ToolWindow" Topmost="True">
+    <Canvas HorizontalAlignment="Left" Height="71" VerticalAlignment="Top" Width="174">
+        <Grid Canvas.Top="-1">
+
+            <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Height="25" Margin="10,10,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="comboBox_SelectionChanged"/>
+            <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.52,-0.318" Click="button_Click"/>
+            <Button x:Name="button_Copy" Content="Button" HorizontalAlignment="Left" Margin="90,40,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.52,-0.318" Click="button_Copy_Click"/>
+
+
+        </Grid>
+        <Button x:Name="button_Copy1" Click="button_Copy1_Click"  Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Width="76" RenderTransformOrigin="0.52,-0.318"  Canvas.Left="12" Canvas.Top="106"/>
+    </Canvas>
+</Window>

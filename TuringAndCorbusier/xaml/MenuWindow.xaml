@@ -1,0 +1,88 @@
+﻿<Window x:Class="TuringAndCorbusier.MenuWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TuringAndCorbusier"
+             mc:Ignorable="d"
+             Height="126" Width="180" ResizeMode="NoResize"  AllowsTransparency="True" WindowStyle="None" ShowInTaskbar="False" MouseLeave="Window_MouseLeave" Topmost="True">
+
+    <Window.Resources>
+        <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
+        <Style x:Key="MyButtonStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                            BorderThickness="0"
+                            Padding="4,2" 
+                            BorderBrush="DarkGray" 
+                            CornerRadius="3" 
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FF787878" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FFA8A8A8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="FontFamily" Value="Noto Sans CJK KR Regular regular"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Margin="0,0,0,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="8*"/>
+        </Grid.ColumnDefinitions>
+
+        <Rectangle Fill="White" Stroke="DimGray" StrokeThickness="2" Grid.ColumnSpan="2" />
+
+        <Button x:Name="NewProject" Style="{StaticResource MyButtonStyle}" HorizontalAlignment="Left" Height="28" Margin="10,11,0,0" VerticalAlignment="Top" Width="160" Click="NewProject_Click" Grid.ColumnSpan="2">
+            <Grid Width="150">
+                <Path x:Name="Path_29" Width="19" Height="19" Stretch="Fill" StrokeLineJoin="Round" Stroke="#FF040707" Data="F1 M 77.9349,53.1185L 77.9336,59.5706L 65.0336,59.5706L 65.0336,46.6705L 71.4856,46.6705L 77.9349,53.1185 Z " Margin="0.937,1.875,0,0" StrokeThickness="2"  VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                <Path x:Name="Path_30" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Fill" StrokeLineJoin="Round" Stroke="#FF040707" Data="F1 M 71.4844,46.6694L 71.4831,53.12L 77.9337,53.12" Margin="10,2,130.063,12.375"/>
+                <TextBlock FontFamily="noto sans cjk kr regular" Margin="30,3,10,2"><Run Text="설계"/><Run Text=" 기본정보"/><Run Text=" 입력"/></TextBlock>
+            </Grid>
+        </Button>
+
+        <Path Stroke="Black" StrokeThickness="1" Data="M10,44 L170,44" Grid.ColumnSpan="2" />
+
+        <Button x:Name="RhinoUi_Show" Style="{StaticResource MyButtonStyle}" HorizontalAlignment="Left" Height="28" Margin="10,49,0,0" VerticalAlignment="Top" Width="160" Click="RhinoUI_Show_Click" Grid.ColumnSpan="2">
+            <Grid Width="150">
+
+                <Path x:Name="Path" Width="6.61735" Height="14.7987" Canvas.Left="12.8229" Canvas.Top="5.65361" Stretch="Fill" Fill="#FF707070" Data="F1 M 12.8589,5.65361C 18.3203,5.66695 19.4443,10.2256 19.4403,12.1283C 19.435,14.0309 18.9576,15.1029 18.3669,16.035C 17.7363,16.8069 17.1216,17.2656 16.599,17.5909C 16.0776,17.9149 15.651,18.1043 15.4003,18.3416L 15.3949,20.4523L 15.4003,18.3416L 15.3949,20.4523L 12.8229,20.4469" Margin="10,3.165,133.382,6.035"/>
+                <Path x:Name="Line" Height="1.34265" Canvas.Left="10.0881" Canvas.Top="22.311" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="#FF231F20" Data="F1 M 14.8641,22.9869L 10.7548,22.9776" Margin="6.779,20.657,137.403,2"/>
+                <Path x:Name="Line_1" Height="1.34001" Canvas.Left="10.6348" Canvas.Top="23.9933" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="#FF231F20" Data="F1 M 14.3095,24.6667L 11.3015,24.66" Margin="7.622,22.964,138.055,-0.305"/>
+                <Path x:Name="Path_2" Width="15.9241" Height="17.5374" Canvas.Left="4.87451" Canvas.Top="4.21079" Stretch="Fill" StrokeThickness="2" StrokeLineJoin="Round" Stroke="#FF000000" Data="F1 M 12.8172,20.4095L 15.4025,20.4148L 15.4079,18.2961L 15.4025,20.4148L 15.4079,18.2961C 15.9132,17.8108 17.1199,17.5242 18.3932,15.9681C 18.9812,15.0362 19.4599,13.9642 19.4652,12.0495C 19.4705,10.1348 18.3439,5.55748 12.8532,5.54415C 7.36388,5.5308 6.21322,10.1028 6.20789,12.0175C 6.20255,13.9308 6.67722,15.0055 7.26255,15.9401C 8.52788,17.5028 9.73188,17.7961 10.2345,18.2828L 10.2292,20.4028L 10.2345,18.2828L 10.2292,20.4028L 12.8172,20.4095 Z " Margin="2.204,2.038,131.871,4.424"/>
+                <Path x:Name="Line_4" Canvas.Left="9.89437e-006" Canvas.Top="9.42161" Stretch="Fill" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeThickness="1" StrokeLineJoin="Round" Stroke="#FF040707" Data="F1 M 3.31468,10.6003L 0.666677,10.0883" Margin="-3.116,4.966,148.676,16.688"/>
+                <Path x:Name="Line_5" Canvas.Left="8.85574" Canvas.Top="-0.359456" Stretch="Fill" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeThickness="1" StrokeLineJoin="Round" Stroke="#FF040707" Data="F1 M 10.2157,2.92322L 9.52241,0.307211" Margin="4.612,-3.244,143.32,23.545"/>
+                <Path x:Name="Line_6" Canvas.Left="3.09655" Canvas.Top="3.09867" Stretch="Fill" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeThickness="1" StrokeLineJoin="Round" Stroke="#FF040707" Data="F1 M 5.73655,5.61068L 3.76321,3.76534" Margin="-0.458,0,147.068,20.988"/>
+
+                <TextBlock FontFamily="noto sans cjk kr regular" Margin="30,3,0,2" Text="3D 모델링 파일 열기"/>
+
+            </Grid>
+        </Button>
+
+
+
+        <Path Stroke="Black" StrokeThickness="1" Data="M10,82 L170,82" Grid.ColumnSpan="2" />
+
+        <Button x:Name="LoDDDDd" Style="{StaticResource MyButtonStyle}" HorizontalAlignment="Left" Margin="10,86,0,0" Width="160" Height="28" VerticalAlignment="Top" Grid.ColumnSpan="2" Click="LoDDDDd_Click">
+            <Grid Width="150">
+                <Path x:Name="Path_56" Width="19" Height="19" Canvas.Left="64.2031" Canvas.Top="179.294" Stretch="Fill" StrokeThickness="2" StrokeLineJoin="Miter" Stroke="#FF040707" Data="F1 M 77.9896,185.406C 78.1309,186.18 78.1283,186.97 77.9909,187.737L 75.9043,187.74C 75.7989,188.138 75.6416,188.518 75.4336,188.874L 76.9069,190.352C 76.4616,190.992 75.9056,191.552 75.2616,191.997L 73.7856,190.526C 73.4309,190.73 73.0456,190.889 72.6496,190.994L 72.6469,193.081C 71.8789,193.22 71.0869,193.218 70.3176,193.081L 70.3163,190.993C 69.9189,190.889 69.5363,190.732 69.1829,190.524L 67.7043,191.997C 67.0616,191.554 66.5043,190.994 66.0563,190.349L 67.5336,188.876C 67.3256,188.516 67.1683,188.138 67.0629,187.738L 64.9749,187.74C 64.8349,186.966 64.8349,186.177 64.9736,185.405L 67.0629,185.406C 67.1669,185.009 67.3269,184.629 67.5323,184.272L 66.0576,182.794C 66.5043,182.154 67.0643,181.594 67.7029,181.144L 69.1816,182.622C 69.5376,182.417 69.9203,182.258 70.3163,182.152L 70.3176,180.061C 71.0896,179.926 71.8789,179.928 72.6469,180.065L 72.6496,182.153C 73.0483,182.258 73.4296,182.414 73.7843,182.622L 75.2603,181.144C 75.9029,181.594 76.4616,182.152 76.9083,182.797L 75.4336,184.27C 75.6416,184.629 75.7976,185.006 75.9056,185.409L 77.9896,185.406 Z " Margin="0.25,3,130.75,2"/>
+                <Path x:Name="Path_57" Width="7" Height="7" Canvas.Left="68.9529" Canvas.Top="184.041" Stretch="Fill" StrokeLineJoin="Round" Stroke="#FF040707" Data="F1 M 73.3476,186.573C 73.3476,185.544 72.5129,184.708 71.4836,184.708C 70.4543,184.708 69.6196,185.544 69.6196,186.573C 69.6196,187.601 70.4543,188.436 71.4836,188.436C 72.5129,188.436 73.3476,187.601 73.3476,186.573 Z " Margin="6.25,9,136.75,8"/>
+                <TextBlock Text="프로그램 설정" FontFamily="noto sans cjk kr regular" Margin="30,3,35,2"/>
+            </Grid>
+        </Button>
+
+    </Grid>
+</Window>
