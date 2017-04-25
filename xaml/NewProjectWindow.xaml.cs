@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using Reports;
 using TuringAndCorbusier.Datastructure_Settings;
-
+using TuringAndCorbusier.xaml.ViewModels;
 namespace TuringAndCorbusier
 {
     /// <summary>
@@ -23,6 +23,11 @@ namespace TuringAndCorbusier
 
     public partial class NewProjectWindow : Window
     {
+
+        NewProjectInput newProjectInput = null;
+        //수정중
+
+
         enum ButtonState
         {
             None = 0,
@@ -146,17 +151,12 @@ namespace TuringAndCorbusier
         {
             InitializeComponent();
 
-
-            
-
-
             if (TuringAndCorbusierPlugIn.InstanceClass.page1Settings != null)
             {
                 projectName.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName;
                 address.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.Address;
                 manualPlotArea.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea.ToString();
                 
-
                 switch (TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotType)
                 {
                     case "제 1종 일반 주거지역":
@@ -178,14 +178,7 @@ namespace TuringAndCorbusier
                 maxBuildingCoverage.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage.ToString();
                 maxFloorAreaRatio.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio.ToString();
                 maxFloors.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors.ToString();
-
-               
-
             }
-
-            
-
-
             else
             {
                 LastClickedPlotType = -1;
@@ -380,7 +373,7 @@ namespace TuringAndCorbusier
 
             RhinoDoc.ActiveDoc.Views.Redraw();
             //RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(Rhino.RhinoDoc.ActiveDoc.Layers.Find("Default", true), true);
-            TuringAndCorbusierPlugIn.InstanceClass.plot = new TuringAndCorbusier.Plot(scaledBoundary);
+            TuringAndCorbusierPlugIn.InstanceClass.plot = new Plot(scaledBoundary);
             TuringAndCorbusierPlugIn.InstanceClass.plot.PlotType = this.plotType2;
         }
 

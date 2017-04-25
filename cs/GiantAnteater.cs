@@ -20,10 +20,6 @@ namespace TuringAndCorbusier
 
             //Initialize Minimum and Maximum value
 
-
-
-
-
             double[] tempMaxInput = ag.MaxInput.Clone() as double[];
             double[] tempMinInput = ag.MinInput.Clone() as double[];
 
@@ -32,6 +28,23 @@ namespace TuringAndCorbusier
             tempMinInput[0] = 3;
             tempMaxInput[1] = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors;
             tempMinInput[1] = 3;
+
+
+            Queue<ParameterSet> startingParameters = new Queue<ParameterSet>();
+            while (startingParameters.Count > 0)
+            {
+                ParameterSet startingParameter = startingParameters.Dequeue();
+                
+                //do something
+                
+                //get initial genes
+                //evaluate && fit
+                //
+            }
+                
+
+
+         
 
             //create initial genes
             Random myRandom = new Random((int)DateTime.Now.Ticks);
@@ -160,6 +173,8 @@ namespace TuringAndCorbusier
                 Rhino.RhinoApp.Wait();
             }
             ApartmentGeneratorOutput bestOutput = ag.generator(plot, bestGene, target);
+
+
 
             return new ApartmentGeneratorOutput[] { bestOutput }.ToList();
 

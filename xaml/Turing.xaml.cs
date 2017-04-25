@@ -102,7 +102,8 @@ namespace TuringAndCorbusier
                     }
                     catch (System.Exception ex)
                     {
-                        MessageBox.Show(ex.ToString());
+                        //MessageBox.Show(ex.ToString());
+                        RhinoApp.WriteLine(ex.ToString());
                     }
                 }
             }

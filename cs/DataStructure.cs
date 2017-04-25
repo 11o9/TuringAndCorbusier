@@ -2652,6 +2652,10 @@ namespace TuringAndCorbusier
             int isP4 = Convert.ToInt32(tempLibrary[8]);
 
             r.Close();
+            r.Dispose();
+
+            fs.Close();
+            fs.Dispose();
 
             this.xLengthA = sampleXLengthA;
             this.xLengthB = sampleXLengthB;

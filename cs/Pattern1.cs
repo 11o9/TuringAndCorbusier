@@ -5,12 +5,14 @@ using System.Text;
 using Rhino.Geometry;
 using System.Collections;
 using Rhino.Collections;
-
-
+using System.Threading.Tasks;
+using System.Threading;
 namespace TuringAndCorbusier
 {
     class AG1 : ApartmentmentGeneratorBase
     {
+
+     
         public override ApartmentGeneratorOutput generator(Plot plot, ParameterSet parameterSet, Target target)
         {
             ///////////////////////////////////////////////
@@ -662,6 +664,9 @@ namespace TuringAndCorbusier
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         private double[] GAparameterset = { 0.2, 0.03, 4, 50, 7, 3, 1 }; //원본
                                                                          //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
+
+
+        
 
 
         //private double[] GAparameterset = { 0.2, 0.03, 1, 100, 5, 3, 1 };

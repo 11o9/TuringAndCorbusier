@@ -10,9 +10,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TuringAndCorbusier</RootNamespace>
     <AssemblyName>TuringAndCorbusier</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug32|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,6 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
@@ -92,11 +94,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="cs\DataManager.cs" />
-    <Compile Include="cs\Egg.cs" />
     <Compile Include="cs\FinalizeApartmentGeneratorOutput.cs" />
     <Compile Include="cs\KDG.cs" />
     <Compile Include="cs\LoadManager.cs" />
     <Compile Include="cs\ParkingLineMaker.cs" />
+    <Compile Include="cs\Prediction.cs" />
     <Compile Include="cs\RegulationCheck.cs" />
     <Compile Include="cs\SectionDrawer.cs" />
     <Compile Include="cs\TypicalPlan.cs" />
@@ -203,6 +205,7 @@
     <Compile Include="xaml\UnitTypeSetting.xaml.cs">
       <DependentUpon>UnitTypeSetting.xaml</DependentUpon>
     </Compile>
+    <Compile Include="xaml\ViewModels\NewProjectInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Reports\section.xaml">
@@ -363,9 +366,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="xaml\ViewModels\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -384,6 +385,7 @@ Erase "$(TargetPath)"</PostBuildEvent>
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files (x86)\Rhinoceros 5\System\Rhino4.exe</StartProgram>
     <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <FallbackCulture>en-US</FallbackCulture>
@@ -394,5 +396,6 @@ Erase "$(TargetPath)"</PostBuildEvent>
     </StartArguments>
     <StartAction>Program</StartAction>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
 </Project>
