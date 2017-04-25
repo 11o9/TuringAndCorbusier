@@ -15,7 +15,7 @@ namespace Reports
     /// </summary>
     public partial class xmlBuildingReport
     {
-        public xmlBuildingReport(ApartmentGeneratorOutput AGoutput)
+        public xmlBuildingReport(Apartment AGoutput)
         {
             InitializeComponent();
 
@@ -52,7 +52,7 @@ namespace Reports
         }
 
 
-        private string buildingScaleForReport(ApartmentGeneratorOutput AGoutput)
+        private string buildingScaleForReport(Apartment AGoutput)
         {
             return "지상 1층부터 지상 " + (AGoutput.ParameterSet.Stories + 1).ToString() + "층";
         }

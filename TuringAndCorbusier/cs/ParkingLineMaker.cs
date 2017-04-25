@@ -9,7 +9,7 @@ namespace TuringAndCorbusier
     public class ParkingLineMaker
     {
 
-        public static List<List<ParkingLine>> parkingLineMaker(string AgType, List<List<CoreProperties>> cores, Plot plot, double ApartmentWidth, Curve CenterCurve, out List<ParkingLotType> parkingLotType, out List<Curve> roadCenterCurve, out double angle)
+        public static List<List<ParkingLine>> parkingLineMaker(string AgType, List<List<Core>> cores, Plot plot, double ApartmentWidth, Curve CenterCurve, out List<ParkingLotType> parkingLotType, out List<Curve> roadCenterCurve, out double angle)
         {
             roadCenterCurve = new List<Curve>();
             parkingLotType = new List<ParkingLotType>();
@@ -19,9 +19,9 @@ namespace TuringAndCorbusier
             {
                 List<Curve> coreBoundary = new List<Curve>();
 
-                foreach (List<CoreProperties> i in cores)
+                foreach (List<Core> i in cores)
                 {
-                    foreach (CoreProperties j in i)
+                    foreach (Core j in i)
                     {
                         coreBoundary.Add(GetCoreBoundary(j));
                     }
@@ -29,16 +29,16 @@ namespace TuringAndCorbusier
 
                 if (AgType == "PT-1" || AgType == "PT-3")
                 {
-                    List<List<CoreProperties>> tempCoreProperties = new List<List<CoreProperties>>(cores);
+                    List<List<Core>> tempCore = new List<List<Core>>(cores);
 
                     if (AgType == "PT-3")
-                        tempCoreProperties = AlignCoreProperties_PT3(cores);
+                        tempCore = AlignCore_PT3(cores);
 
                     List<double> outDist;
                     Curve outFirstCurve;
                     double coreDepth;
                     double tempAngle = 0;
-                    ParkingLotBaseLineMaker_XDirection(tempCoreProperties, plot.Boundary, out outDist, out outFirstCurve, out coreDepth, out tempAngle);
+                    ParkingLotBaseLineMaker_XDirection(tempCore, plot.Boundary, out outDist, out outFirstCurve, out coreDepth, out tempAngle);
 
                     List<Curve> tempRoadCenter = new List<Curve>();
                     List<ParkingLotType> tempParkingLotType = new List<ParkingLotType>();
@@ -70,15 +70,15 @@ namespace TuringAndCorbusier
 
         }
 
-        public static List<List<ParkingLine>> parkingLineMaker(string AgType, List<List<CoreProperties>> cores, Plot plot, double ApartmentWidth, Curve CenterCurve)
+        public static List<List<ParkingLine>> parkingLineMaker(string AgType, List<List<Core>> cores, Plot plot, double ApartmentWidth, Curve CenterCurve)
         {
             try
             {
                 List<Curve> coreBoundary = new List<Curve>();
 
-                foreach (List<CoreProperties> i in cores)
+                foreach (List<Core> i in cores)
                 {
-                    foreach (CoreProperties j in i)
+                    foreach (Core j in i)
                     {
                         coreBoundary.Add(GetCoreBoundary(j));
                     }
@@ -86,16 +86,16 @@ namespace TuringAndCorbusier
 
                 if (AgType == "PT-1" || AgType == "PT-3")
                 {
-                    List<List<CoreProperties>> tempCoreProperties = new List<List<CoreProperties>>(cores);
+                    List<List<Core>> tempCore = new List<List<Core>>(cores);
 
                     if (AgType == "PT-3")
-                        tempCoreProperties = AlignCoreProperties_PT3(cores);
+                        tempCore = AlignCore_PT3(cores);
 
                     List<double> outDist;
                     Curve outFirstCurve;
                     double coreDepth;
                     double Angle;
-                    ParkingLotBaseLineMaker_XDirection(tempCoreProperties, plot.Boundary, out outDist, out outFirstCurve, out coreDepth, out Angle);
+                    ParkingLotBaseLineMaker_XDirection(tempCore, plot.Boundary, out outDist, out outFirstCurve, out coreDepth, out Angle);
 
                     List<List<ParkingLine>> tempParkingLines = parkingLineMaker_PT1_PT3(cores, outDist, coreDepth, outFirstCurve, plot);
                     
@@ -120,7 +120,7 @@ namespace TuringAndCorbusier
 
         }
 
-        private static List<List<ParkingLine>> parkingLineMaker_PT1_PT3(List<List<CoreProperties>> coreProperties, List<double> distance, double coreDepth, Curve firstLine, Plot plot, out List<ParkingLotType> parkingType, out List<Curve> roadCenter)
+        private static List<List<ParkingLine>> parkingLineMaker_PT1_PT3(List<List<Core>> core, List<double> distance, double coreDepth, Curve firstLine, Plot plot, out List<ParkingLotType> parkingType, out List<Curve> roadCenter)
         {
             List<ParkingLine> parkingLots = new List<ParkingLine>();
 
@@ -263,11 +263,11 @@ namespace TuringAndCorbusier
 
             List<Curve> coreBoundaryList = new List<Curve>();
 
-            for (int i = 0; i < coreProperties.Count(); i++)
+            for (int i = 0; i < core.Count(); i++)
             {
-                for (int j = 0; j < coreProperties[i].Count(); j++)
+                for (int j = 0; j < core[i].Count(); j++)
                 {
-                    coreBoundaryList.Add(GetCoreBoundary(coreProperties[i][j]));
+                    coreBoundaryList.Add(GetCoreBoundary(core[i][j]));
                 }
             }
 
@@ -293,7 +293,7 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        private static List<List<ParkingLine>> parkingLineMaker_PT4(List<List<CoreProperties>> coreProperties, double apartmentWidth, Curve CenterCurve, Plot plot, out List<ParkingLotType> parkingLotType)
+        private static List<List<ParkingLine>> parkingLineMaker_PT4(List<List<Core>> core, double apartmentWidth, Curve CenterCurve, Plot plot, out List<ParkingLotType> parkingLotType)
         {
 
             Curve newCenter = alignOpendCurveOrientation(CenterCurve);
@@ -384,11 +384,11 @@ namespace TuringAndCorbusier
 
             List<Curve> coreBoundaries = new List<Curve>();
 
-            for (int i = 0; i < coreProperties.Count(); i++)
+            for (int i = 0; i < core.Count(); i++)
             {
-                for (int j = 0; j < coreProperties[i].Count(); j++)
+                for (int j = 0; j < core[i].Count(); j++)
                 {
-                    coreBoundaries.Add(GetCoreBoundary(coreProperties[i][j]));
+                    coreBoundaries.Add(GetCoreBoundary(core[i][j]));
                 }
             }
 
@@ -671,7 +671,7 @@ namespace TuringAndCorbusier
             return Curve.JoinCurves(outputSegments)[0];
         }
 
-        private static List<List<ParkingLine>> parkingLineMaker_PT1_PT3(List<List<CoreProperties>> coreProperties, List<double> distance, double coreDepth, Curve firstLine, Plot plot)
+        private static List<List<ParkingLine>> parkingLineMaker_PT1_PT3(List<List<Core>> core, List<double> distance, double coreDepth, Curve firstLine, Plot plot)
         {
             List<ParkingLine> parkingLots = new List<ParkingLine>();
 
@@ -828,11 +828,11 @@ namespace TuringAndCorbusier
 
             List<Curve> coreBoundaryList = new List<Curve>();
 
-            for (int i = 0; i < coreProperties.Count(); i++)
+            for (int i = 0; i < core.Count(); i++)
             {
-                for (int j = 0; j < coreProperties[i].Count(); j++)
+                for (int j = 0; j < core[i].Count(); j++)
                 {
-                    coreBoundaryList.Add(GetCoreBoundary(coreProperties[i][j]));
+                    coreBoundaryList.Add(GetCoreBoundary(core[i][j]));
                 }
             }
 
@@ -853,12 +853,12 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        private static List<Curve> MergeHouseholdProperties(List<HouseholdProperties> inputHouseholdProperties)
+        private static List<Curve> MergeHousehold(List<Household> inputHousehold)
         {
             List<Brep> householdPropertyBrep = new List<Brep>();
 
-            for (int i = 0; i < inputHouseholdProperties.Count(); i++)
-                householdPropertyBrep.Add(Brep.CreatePlanarBreps(inputHouseholdProperties[i].GetOutline())[0]);
+            for (int i = 0; i < inputHousehold.Count(); i++)
+                householdPropertyBrep.Add(Brep.CreatePlanarBreps(inputHousehold[i].GetOutline())[0]);
 
             householdPropertyBrep = Brep.JoinBreps(householdPropertyBrep, 0).ToList();
 
@@ -1206,14 +1206,14 @@ namespace TuringAndCorbusier
             return curveFromIntervals(newCurve, tempReverseIntersection);
         }
 
-        private static Curve GetCoreBoundary(CoreProperties coreProperties)
+        private static Curve GetCoreBoundary(Core core)
         {
-            Point3d firstPoint = coreProperties.Origin - coreProperties.YDirection * Consts.exWallThickness - coreProperties.XDirection * Consts.exWallThickness;
-            Point3d secondPoint = firstPoint + coreProperties.XDirection * (coreProperties.CoreType.GetWidth() + 2 * Consts.exWallThickness);
-            Point3d thirdPoint = secondPoint + coreProperties.YDirection * (coreProperties.CoreType.GetDepth() + 2 * Consts.exWallThickness);
-            Point3d fourthPoint = firstPoint + coreProperties.YDirection * (coreProperties.CoreType.GetDepth() + 2 * Consts.exWallThickness);
+            Point3d firstPoint = core.Origin - core.YDirection * Consts.exWallThickness - core.XDirection * Consts.exWallThickness;
+            Point3d secondPoint = firstPoint + core.XDirection * (core.CoreType.GetWidth() + 2 * Consts.exWallThickness);
+            Point3d thirdPoint = secondPoint + core.YDirection * (core.CoreType.GetDepth() + 2 * Consts.exWallThickness);
+            Point3d fourthPoint = firstPoint + core.YDirection * (core.CoreType.GetDepth() + 2 * Consts.exWallThickness);
 
-            Point3d[] pointSet = { coreProperties.Origin, secondPoint, thirdPoint, fourthPoint, coreProperties.Origin };
+            Point3d[] pointSet = { core.Origin, secondPoint, thirdPoint, fourthPoint, core.Origin };
 
             return new PolylineCurve(pointSet);
         }
@@ -1328,83 +1328,83 @@ namespace TuringAndCorbusier
             return angle;
         }
 
-        private static List<List<CoreProperties>> AlignCoreProperties_PT3(List<List<CoreProperties>> coreProperties)
+        private static List<List<Core>> AlignCore_PT3(List<List<Core>> core)
         {
-            List<List<CoreProperties>> output = new List<List<CoreProperties>>();
+            List<List<Core>> output = new List<List<Core>>();
 
-            for (int i = 0; i < coreProperties.Count(); i++)
+            for (int i = 0; i < core.Count(); i++)
             {
-                output.Add(new List<CoreProperties>());
+                output.Add(new List<Core>());
             }
 
-            CoreProperties baseCoreProperties = coreProperties[0][0];
+            Core baseCore = core[0][0];
             bool isBaseAllocated = false;
 
-            for (int i = 0; i < coreProperties.Count(); i++)
+            for (int i = 0; i < core.Count(); i++)
             {
-                for (int j = 0; j < coreProperties[i].Count(); j++)
+                for (int j = 0; j < core[i].Count(); j++)
                 {
-                    if (coreProperties[i][j] != null && isBaseAllocated == false)
+                    if (core[i][j] != null && isBaseAllocated == false)
                     {
-                        CoreProperties tempCoreProperties = coreProperties[i][j];
+                        Core tempCore = core[i][j];
 
-                        Vector3d newXDirection = tempCoreProperties.XDirection;
-                        Vector3d newYDirection = tempCoreProperties.YDirection;
-                        Point3d newOrigin = tempCoreProperties.Origin;
+                        Vector3d newXDirection = tempCore.XDirection;
+                        Vector3d newYDirection = tempCore.YDirection;
+                        Point3d newOrigin = tempCore.Origin;
 
                         bool tempIfSomethingIsChanged = false;
 
                         if (getAngle(newXDirection, newYDirection) != Math.PI * 0.5)
                         {
                             newYDirection.Reverse();
-                            newOrigin.Transform(Transform.Translation(tempCoreProperties.YDirection * tempCoreProperties.CoreType.GetDepth()));
+                            newOrigin.Transform(Transform.Translation(tempCore.YDirection * tempCore.CoreType.GetDepth()));
                             tempIfSomethingIsChanged = true;
                         }
 
                         if (tempIfSomethingIsChanged == true)
                         {
-                            baseCoreProperties = new CoreProperties(newOrigin, newXDirection, newYDirection, tempCoreProperties.CoreType, tempCoreProperties.Stories, tempCoreProperties.CoreInterpenetration);
-                            output[i].Add(baseCoreProperties);
+                            baseCore = new Core(newOrigin, newXDirection, newYDirection, tempCore.CoreType, tempCore.Stories, tempCore.CoreInterpenetration);
+                            output[i].Add(baseCore);
                             isBaseAllocated = true;
                         }
                         else
                         {
-                            baseCoreProperties = coreProperties[i][j];
-                            output[i].Add(baseCoreProperties);
+                            baseCore = core[i][j];
+                            output[i].Add(baseCore);
                             isBaseAllocated = true;
                         }
                     }
                     else
                     {
-                        CoreProperties tempCoreProperties = coreProperties[i][j];
+                        Core tempCore = core[i][j];
 
-                        Vector3d newXDirection = tempCoreProperties.XDirection;
-                        Vector3d newYDirection = tempCoreProperties.YDirection;
-                        Point3d newOrigin = tempCoreProperties.Origin;
+                        Vector3d newXDirection = tempCore.XDirection;
+                        Vector3d newYDirection = tempCore.YDirection;
+                        Point3d newOrigin = tempCore.Origin;
 
                         bool tempIfSomethingIsChanged = false;
 
-                        if (baseCoreProperties.XDirection.IsParallelTo(tempCoreProperties.XDirection) == -1)
+                        if (baseCore.XDirection.IsParallelTo(tempCore.XDirection) == -1)
                         {
                             newXDirection.Reverse();
-                            newOrigin.Transform(Transform.Translation(tempCoreProperties.XDirection * tempCoreProperties.CoreType.GetWidth()));
+                            newOrigin.Transform(Transform.Translation(tempCore.XDirection * tempCore.CoreType.GetWidth()));
                             tempIfSomethingIsChanged = true;
                         }
 
-                        if (baseCoreProperties.YDirection.IsParallelTo(tempCoreProperties.YDirection) == -1)
+                        if (baseCore.YDirection.IsParallelTo(tempCore.YDirection) == -1)
                         {
                             newYDirection.Reverse();
-                            newOrigin.Transform(Transform.Translation(tempCoreProperties.YDirection * tempCoreProperties.CoreType.GetDepth()));
+                            newOrigin.Transform(Transform.Translation(tempCore.YDirection * tempCore.CoreType.GetDepth()));
                             tempIfSomethingIsChanged = true;
                         }
 
                         if (tempIfSomethingIsChanged)
                         {
-                            output[i].Add(new CoreProperties(newOrigin, newXDirection, newYDirection, tempCoreProperties.CoreType, tempCoreProperties.Stories, tempCoreProperties.CoreInterpenetration));
+                            output[i].Add(new Core(newOrigin, newXDirection, newYDirection, tempCore.CoreType, tempCore.Stories, tempCore.CoreInterpenetration));
                         }
                         else
                         {
-                            output[i].Add(coreProperties[i][j]);
+                            output[i].Add(core[i][j]);
                         }
                     }
                 }
@@ -1467,7 +1467,7 @@ namespace TuringAndCorbusier
             return vectorDistance.Min();
         }
 
-        private static void ParkingLotBaseLineMaker_XDirection(List<List<CoreProperties>> cores, Curve Boundary, out List<double> distance, out Curve firstCurve, out double coreDepth, out double Angle)
+        private static void ParkingLotBaseLineMaker_XDirection(List<List<Core>> cores, Curve Boundary, out List<double> distance, out Curve firstCurve, out double coreDepth, out double Angle)
         {
             Rhino.Collections.RhinoList<LineSD> unExtendedOutput = new Rhino.Collections.RhinoList<LineSD>();
             List<Vector3d> Yvector = new List<Vector3d>();

@@ -21,7 +21,7 @@ namespace Reports
 
         }
 
-        public xmlUnitReport(HouseholdProperties houseHoldProperty, string typeString, double coreArea, double parkingLotArea, double publicFacilityArea, double serviceArea, int numOfThisType)
+        public xmlUnitReport(Household houseHoldProperty, string typeString, double coreArea, double parkingLotArea, double publicFacilityArea, double serviceArea, int numOfThisType)
         {
             InitializeComponent();
 
@@ -64,7 +64,7 @@ namespace Reports
         {
             try
             {
-                HouseholdProperties tempHouseHoldProperties = value.ToHouseholdProperties();
+                Household tempHouseHoldProperties = value.ToHousehold();
                 tempHouseHoldProperties.XDirection = Vector3d.XAxis;
                 tempHouseHoldProperties.YDirection = Vector3d.YAxis;
 

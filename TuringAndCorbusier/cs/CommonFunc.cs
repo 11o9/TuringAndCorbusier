@@ -16,7 +16,7 @@ namespace TuringAndCorbusier
 
     class CommonFunc
     {
-        public static List<Curve> ApartDistance(ApartmentGeneratorOutput output, out string log)
+        public static List<Curve> ApartDistance(Apartment output, out string log)
         {
             List<Curve> crvs = new List<Curve>();
             string dim = "";
@@ -35,7 +35,7 @@ namespace TuringAndCorbusier
                 Curve back2 = back.DuplicateCurve();
 
                 //height(total)
-                var d2 = output.HouseholdProperties.Last()[0][0].Origin.Z + Consts.FloorHeight;
+                var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight;
                 //height(except pil)
                 var d3 = d2 * 0.8;
                 front2.Translate(v * d3);
@@ -55,7 +55,7 @@ namespace TuringAndCorbusier
             }
 
             log = dim;
-            //foreach (var top in output.HouseholdProperties.Last())
+            //foreach (var top in output.Household.Last())
             //{
             //    foreach (var tophhp in top)
             //    {
@@ -82,7 +82,7 @@ namespace TuringAndCorbusier
             return crvs;
            
         }
-        public static List<Curve> JoinRegulation(Plot plot, double stories, ApartmentGeneratorOutput output)
+        public static List<Curve> JoinRegulation(Plot plot, double stories, Apartment output)
         {
             Regulation reg = new Regulation(stories);
             var result = JoinRegulations(reg.byLightingCurve(plot,output.ParameterSet.Parameters[3]), reg.fromNorthCurve(plot), reg.fromSurroundingsCurve(plot));
@@ -122,7 +122,7 @@ namespace TuringAndCorbusier
             return result;
         }
 
-        public static List<Curve> LawLines(Plot plot, double stories, ApartmentGeneratorOutput output)
+        public static List<Curve> LawLines(Plot plot, double stories, Apartment output)
         {
             //#region AreaPrint
 
@@ -141,7 +141,7 @@ namespace TuringAndCorbusier
             #region regacy                                              
             //Regulation tempreg = new Regulation(stories);
             //double eyelevel = 1500;
-            //foreach (var hhp2 in output.HouseholdProperties)
+            //foreach (var hhp2 in output.Household)
             //{
             //    foreach (var hhp1 in hhp2)
             //    {
@@ -183,14 +183,14 @@ namespace TuringAndCorbusier
             List<Line> lightingEdgeFront = new List<Line>();
             List<Line> lightingEdgeBack = new List<Line>();
 
-            for (int i = 0; i < output.HouseholdProperties.Last().Count; i++)
+            for (int i = 0; i < output.Household.Last().Count; i++)
             {
-                for (int j = 0; j < output.HouseholdProperties.Last()[i].Count; j++)
+                for (int j = 0; j < output.Household.Last()[i].Count; j++)
                 {
-                    var front = output.HouseholdProperties.Last()[i][j].LightingEdge[0];
+                    var front = output.Household.Last()[i][j].LightingEdge[0];
                     lightingEdgeFront.Add(front);
 
-                    var back = output.HouseholdProperties.Last()[i][j].LightingEdge[1];
+                    var back = output.Household.Last()[i][j].LightingEdge[1];
                     lightingEdgeBack.Add(back);
                 }
             }
@@ -200,7 +200,7 @@ namespace TuringAndCorbusier
             if (lightingEdgeFront.Count == 0 || lightingEdgeBack.Count == 0)
                 return new List<Curve>();
 
-            double height = output.HouseholdProperties.Count * Consts.FloorHeight;
+            double height = output.Household.Count * Consts.FloorHeight;
             double posz = height + Consts.PilotiHeight;
             double distance = height * (plot.isSpecialCase ? 0.25 : 0.5);
 
@@ -302,7 +302,7 @@ namespace TuringAndCorbusier
             }
         }
 
-        public static string GetApartmentType(ApartmentGeneratorOutput agOutput)
+        public static string GetApartmentType(Apartment agOutput)
         {
             if (agOutput.AGtype == "PT-1")
                 return "판상형";
@@ -373,23 +373,23 @@ namespace TuringAndCorbusier
             return (area < 0 ? -area : area);
         }
 
-        public static double GetBuildingCoverage_outSideAGOutput(List<List<List<HouseholdProperties>>> householdProperties, List<List<CoreProperties>> coreProperties, Plot plot)
+        public static double GetBuildingCoverage_outSideAGOutput(List<List<List<Household>>> household, List<List<Core>> core, Plot plot)
         {
             double ExclusiveAreaSum = 0;
 
-            foreach (List<List<HouseholdProperties>> i in householdProperties)
+            foreach (List<List<Household>> i in household)
             {
 
-                foreach (HouseholdProperties k in i[0])
+                foreach (Household k in i[0])
                 {
                     ExclusiveAreaSum += k.GetExclusiveArea();
                 }
 
             }
 
-            foreach (List<CoreProperties> i in coreProperties)
+            foreach (List<Core> i in core)
             {
-                foreach (CoreProperties j in i)
+                foreach (Core j in i)
                 {
                     ExclusiveAreaSum += j.GetArea();
                 }
@@ -398,15 +398,15 @@ namespace TuringAndCorbusier
             return ExclusiveAreaSum / plot.GetArea() * 100;
         }
 
-        //public static double GetGrossArea_outSideAGOutput(List<List<List<HouseholdProperties>>> householdProperties, List<List<CoreProperties>> coreProperties, Plot plot)
+        //public static double GetGrossArea_outSideAGOutput(List<List<List<Household>>> household, List<List<Core>> core, Plot plot)
         // {
         //     double ExclusiveAreaSum = 0;
 
-        //     foreach (List<List<HouseholdProperties>> i in householdProperties)
+        //     foreach (List<List<Household>> i in household)
         //     {
-        //         foreach (List<HouseholdProperties> j in i)
+        //         foreach (List<Household> j in i)
         //         {
-        //             foreach (HouseholdProperties k in j)
+        //             foreach (Household k in j)
         //             {
 
 
@@ -418,9 +418,9 @@ namespace TuringAndCorbusier
         //         }
         //     }
 
-        //     foreach (List<CoreProperties> i in coreProperties)
+        //     foreach (List<Core> i in core)
         //     {
-        //         foreach (CoreProperties j in i)
+        //         foreach (Core j in i)
         //         {
         //             double dkdk = j.GetArea();
         //             ExclusiveAreaSum += j.GetArea() * (j.Stories + 1);
@@ -431,15 +431,15 @@ namespace TuringAndCorbusier
         //     return ExclusiveAreaSum / plot.GetArea() * 100;
         // }
 
-        //public static double GetGrossArea_outSideAGOutput(List<List<List<HouseholdProperties>>> householdProperties, List<List<CoreProperties>> coreProperties, List<HouseholdProperties> publicFacilitires, List<HouseholdProperties> commercialFacilities , Plot plot)
+        //public static double GetGrossArea_outSideAGOutput(List<List<List<Household>>> household, List<List<Core>> core, List<Household> publicFacilitires, List<Household> commercialFacilities , Plot plot)
         //{
         //    double ExclusiveAreaSum = 0;
 
-        //    foreach(List<List<HouseholdProperties>> i in householdProperties)
+        //    foreach(List<List<Household>> i in household)
         //    {
-        //        foreach(List<HouseholdProperties> j in i)
+        //        foreach(List<Household> j in i)
         //        {
-        //            foreach(HouseholdProperties k in j)
+        //            foreach(Household k in j)
         //            {
         //                ExclusiveAreaSum += k.GetExclusiveArea();
         //                ExclusiveAreaSum += k.GetWallArea();
@@ -447,19 +447,19 @@ namespace TuringAndCorbusier
         //        }
         //    }
 
-        //    foreach(HouseholdProperties i in publicFacilitires)
+        //    foreach(Household i in publicFacilitires)
         //    {
         //        ExclusiveAreaSum += i.GetExclusiveArea();
         //    }
 
-        //    foreach(HouseholdProperties i in commercialFacilities)
+        //    foreach(Household i in commercialFacilities)
         //    {
         //        ExclusiveAreaSum += i.GetExclusiveArea();
         //    }
 
-        //    foreach(List<CoreProperties> i in coreProperties)
+        //    foreach(List<Core> i in core)
         //    {
-        //        foreach(CoreProperties j in i)
+        //        foreach(Core j in i)
         //        {
         //            ExclusiveAreaSum += j.GetArea() * (j.Stories + 1);
         //        }
@@ -468,10 +468,10 @@ namespace TuringAndCorbusier
         //    return ExclusiveAreaSum / plot.GetArea() * 100;
         //}
 
-        public static int toplevel(List<List<CoreProperties>> coreProperties)
+        public static int toplevel(List<List<Core>> core)
         {
             int result = 0;
-            foreach (var i in coreProperties)
+            foreach (var i in core)
             {
                 foreach (var j in i)
                 {
@@ -485,13 +485,13 @@ namespace TuringAndCorbusier
         }
 
 
-        private static int householdPropertyCounter(List<List<List<HouseholdProperties>>> ObjectToCount)
+        private static int householdPropertyCounter(List<List<List<Household>>> ObjectToCount)
         {
             int output = 0;
 
-            foreach (List<List<HouseholdProperties>> i in ObjectToCount)
+            foreach (List<List<Household>> i in ObjectToCount)
             {
-                foreach (List<HouseholdProperties> j in i)
+                foreach (List<Household> j in i)
                 {
                     output += j.Count();
                 }
@@ -510,25 +510,25 @@ namespace TuringAndCorbusier
         }
         class Floor
         {
-            List<HouseholdProperties> hhps = new List<HouseholdProperties>();
-            public Floor(List<HouseholdProperties> hhps)
+            List<Household> hhps = new List<Household>();
+            public Floor(List<Household> hhps)
             {
                 this.hhps = hhps;
             }
         }
 
-        public static void reduceFloorAreaRatio_Mixref (ref List<List<List<HouseholdProperties>>> householdProperties_Original, ref List<List<CoreProperties>> coreProperties_Original, ref double currentFloorAreaRatio, Plot plot, double legalFloorAreaRatio, bool overload)
+        public static void reduceFloorAreaRatio_Mixref (ref List<List<List<Household>>> household_Original, ref List<List<Core>> core_Original, ref double currentFloorAreaRatio, Plot plot, double legalFloorAreaRatio, bool overload)
         {
             //기존 L<L<L<hhp>>> = 동(층(호)))
 
             //계산시 복도형 - 동/층/호 순서로.
             List<Dong> dongs = new List<Dong>();
 
-            for (int i = 0; i < householdProperties_Original.Count; i++)
+            for (int i = 0; i < household_Original.Count; i++)
             {
                 //동 하나씩
-                var dong = householdProperties_Original[i];
-                var dongcore = coreProperties_Original[i];
+                var dong = household_Original[i];
+                var dongcore = core_Original[i];
 
                 var firstfloor = dong[0];
                 var hocount = firstfloor.Count;
@@ -540,9 +540,9 @@ namespace TuringAndCorbusier
                 dongs.Add(temp);
                 
             }
-            double tempfar = grossArea(householdProperties_Original, coreProperties_Original) / plot.GetArea() * 100;
+            double tempfar = grossArea(household_Original, core_Original) / plot.GetArea() * 100;
 
-            //WriteLog(householdProperties_Original);
+            //WriteLog(household_Original);
 
             while ( tempfar > legalFloorAreaRatio)
             {
@@ -574,14 +574,14 @@ namespace TuringAndCorbusier
 
                 dongs[minindex].RemoveDedicates();
                
-                tempfar = grossArea(householdProperties_Original, coreProperties_Original) / plot.GetArea() * 100;
-                //WriteLog(householdProperties_Original);
+                tempfar = grossArea(household_Original, core_Original) / plot.GetArea() * 100;
+                //WriteLog(household_Original);
             }
 
             
         }
 
-        public static void WriteLog(List<List<List<HouseholdProperties>>> hhps)
+        public static void WriteLog(List<List<List<Household>>> hhps)
         {
             Rhino.RhinoApp.WriteLine("현재 hhp 개요");
             Rhino.RhinoApp.WriteLine();
@@ -622,24 +622,24 @@ namespace TuringAndCorbusier
 
         class Dong
         {
-            List<List<HouseholdProperties>> units = new List<List<HouseholdProperties>>();
-            List<CoreProperties> cores = new List<CoreProperties>();
-            List<HouseholdProperties> dedicates = new List<HouseholdProperties>();
-            List<CoreProperties> dedicatescore = new List<CoreProperties>();
+            List<List<Household>> units = new List<List<Household>>();
+            List<Core> cores = new List<Core>();
+            List<Household> dedicates = new List<Household>();
+            List<Core> dedicatescore = new List<Core>();
 
 
-            public Dong(List<List<HouseholdProperties>> hhps, List<CoreProperties> cps)
+            public Dong(List<List<Household>> hhps, List<Core> cps)
             {
                 units = hhps;
                 cores = cps;
             }
 
-            public List<HouseholdProperties> FirstFloor { get { return units[0]; } }
+            public List<Household> FirstFloor { get { return units[0]; } }
             public int HoCount { get { return FirstFloor.Count; } }
             public int[] FloorsCount { get { return units.Select(n => n.Count).ToArray(); } }
-            public List<HouseholdProperties> Dedicates { get { dedicates = GetDedicates(); return dedicates; } }
+            public List<Household> Dedicates { get { dedicates = GetDedicates(); return dedicates; } }
             public bool isCorridorType { get { return isCorridor(); } }
-            public List<HouseholdProperties> LastFloor { get { return units.Last(); } }
+            public List<Household> LastFloor { get { return units.Last(); } }
             bool isCorridor()
             {
                 if (cores.Count == 0)
@@ -680,22 +680,22 @@ namespace TuringAndCorbusier
                 }
                
             }
-            List<HouseholdProperties> GetDedicates()
+            List<Household> GetDedicates()
             {
 
-                List<HouseholdProperties> resultdedicates = new List<HouseholdProperties>();
+                List<Household> resultdedicates = new List<Household>();
                 if (isCorridor())
                 {   //3층 이하라면 안깎음
                     if (units.Count < 3 || cores.Count == 1)
                     {
-                        return new List<HouseholdProperties>();
+                        return new List<Household>();
                     }
                     //3층 이상이면 깎음
                     else
                     {
                         //[첫 코어] [마지막 코어] 사이의 유닛 제외, 외곽유닛부터 ,
                         //사이의유닛구하기
-                        List<HouseholdProperties> outside = new List<HouseholdProperties>();
+                        List<Household> outside = new List<Household>();
 
                         int firstmeet = -1;
                         int lastmeet = -1;
@@ -778,21 +778,21 @@ namespace TuringAndCorbusier
                                 }//inrange
                             }//firstfloorunitsloop
                         }//floorloop
-                        return new List<HouseholdProperties>();
+                        return new List<Household>();
                     }//unitcount > 3
                    
                 }//ifcorridor?
                 else
                 {
                     //min / max
-                    List<List<HouseholdProperties>> byrow = new List<List<HouseholdProperties>>();
+                    List<List<Household>> byrow = new List<List<Household>>();
                     for (int i = 0; i < FirstFloor.Count; i++)
                     {
                         //제 1 열 
                         var rowtempX = Math.Round(FirstFloor[i].Origin.X);
                         var rowtempY = Math.Round(FirstFloor[i].Origin.Y);
-                        List<HouseholdProperties> temprow = new List<HouseholdProperties>();
-                        List<HouseholdProperties> wholehhps = new List<HouseholdProperties>();
+                        List<Household> temprow = new List<Household>();
+                        List<Household> wholehhps = new List<Household>();
                         units.ForEach(n => wholehhps.AddRange(n));
 
                         foreach (var hhp in wholehhps)
@@ -835,7 +835,7 @@ namespace TuringAndCorbusier
                     //우선순위  //옆칸과 다름   3 < floor < max , max , 3 
 
                     if(byrow.Count == 0)
-                        return new List<HouseholdProperties>();
+                        return new List<Household>();
 
                     for (int i = 0; i < byrow.Count / 2; i++)
                     {
@@ -913,14 +913,14 @@ namespace TuringAndCorbusier
 
                  
                 }
-                return new List<HouseholdProperties>();
+                return new List<Household>();
             }
-            //List<CoreProperties> GetDedicores()
+            //List<Core> GetDedicores()
             //{
             //    shit!
             //}
         }
-        public static void reduceFloorAreaRatio_Vertical(ref List<List<List<HouseholdProperties>>> householdProperties_Original, ref List<List<CoreProperties>> coreProperties_Original, ref double currentFloorAreaRatio, Plot plot, double legalFloorAreaRatio, bool overload)
+        public static void reduceFloorAreaRatio_Vertical(ref List<List<List<Household>>> household_Original, ref List<List<Core>> core_Original, ref double currentFloorAreaRatio, Plot plot, double legalFloorAreaRatio, bool overload)
         {
             //목표 줄일 면적
 
@@ -928,24 +928,24 @@ namespace TuringAndCorbusier
             //areaToReduce *= plot.GetArea();
             //double tempAreaToReduce = areaToReduce;
             //int floor = 0;
-            //List<HouseholdProperties> namungo = new List<HouseholdProperties>();
-            //List<HouseholdProperties> toRemove = new List<HouseholdProperties>();
+            //List<Household> namungo = new List<Household>();
+            //List<Household> toRemove = new List<Household>();
             //while (tempAreaToReduce > plot.GetArea() / 100)
             //{
             //    floor++;
-            //    if (householdProperties_Original.Max(n => n.Count) < floor)
+            //    if (household_Original.Max(n => n.Count) < floor)
             //        break;
             //    // 층 모든 유닛 모음
-            //    List<HouseholdProperties> topfloorunits = new List<HouseholdProperties>();
+            //    List<Household> topfloorunits = new List<Household>();
 
 
 
-            //    for (int i = 0; i < householdProperties_Original.Count; i++)
+            //    for (int i = 0; i < household_Original.Count; i++)
             //    {
             //        //해당 층 유닛 수 / 코어 수 = offsets...일단 좌우부터 ㄱ
-            //        if (householdProperties_Original[i].Count - floor < 0)
+            //        if (household_Original[i].Count - floor < 0)
             //            continue;
-            //        var tempfloorunits = householdProperties_Original[i][householdProperties_Original[i].Count - floor];
+            //        var tempfloorunits = household_Original[i][household_Original[i].Count - floor];
             //        topfloorunits = tempfloorunits;
 
             //        //for (int j = 0; j < tempfloorunits.Count; j++)
@@ -971,7 +971,7 @@ namespace TuringAndCorbusier
             //    topfloorunits = topfloorunits.OrderBy(n => n.ExclusiveArea).ToList();
 
 
-            //    List<HouseholdProperties> notthese = new List<HouseholdProperties>();
+            //    List<Household> notthese = new List<Household>();
 
             //    foreach (var tfu in topfloorunits)
             //    {
@@ -1044,7 +1044,7 @@ namespace TuringAndCorbusier
             ////제거
             //foreach (var p in toRemove)
             //{
-            //    householdProperties_Original.ForEach(n => n.ForEach(m => m.Remove(p)));
+            //    household_Original.ForEach(n => n.ForEach(m => m.Remove(p)));
             //}
 
             ////정렬
@@ -1052,19 +1052,19 @@ namespace TuringAndCorbusier
 
 
             ////동 별로
-            ////for (int i = 0; i < householdProperties_Original.Count; i++)
+            ////for (int i = 0; i < household_Original.Count; i++)
             ////{
             ////    //현재저장된층
-            ////    List<HouseholdProperties> tempfloorhhps = new List<HouseholdProperties>();
+            ////    List<Household> tempfloorhhps = new List<Household>();
 
             ////    //동의 꼭대기층부터 순차적으로
-            ////    for (int j = householdProperties_Original[i].Count - 1; j > 1; j--)
+            ////    for (int j = household_Original[i].Count - 1; j > 1; j--)
             ////    {
             ////        //처음이면
             ////        if (tempfloorhhps == null)
             ////        {
-            ////            tempfloorhhps = new List<HouseholdProperties>(householdProperties_Original[i][j]);
-            ////            householdProperties_Original[i][j].Clear();
+            ////            tempfloorhhps = new List<Household>(household_Original[i][j]);
+            ////            household_Original[i][j].Clear();
             ////            continue;
             ////        }
             ////        //다 때려박음
@@ -1073,17 +1073,17 @@ namespace TuringAndCorbusier
             ////        //아니면
             ////        else
             ////        {
-            ////            List<HouseholdProperties> nomore = new List<HouseholdProperties>();
+            ////            List<Household> nomore = new List<Household>();
             ////            //현재층 hhps마다
             ////            foreach (var temphhps in tempfloorhhps)
             ////            {
             ////                //아래층에 무엇인가 있는지 체크
-            ////                foreach (var nexthhps in householdProperties_Original[i][j])
+            ////                foreach (var nexthhps in household_Original[i][j])
             ////                {
             ////                    if (temphhps.Origin.X == nexthhps.Origin.X && temphhps.Origin.Y == nexthhps.Origin.Y)
             ////                    {
             ////                        //아래층이 있는녀석 -> 현재에서 제거, 해당층리스트에 넣어줌
-            ////                        householdProperties_Original[i][j + 1].Add(temphhps);
+            ////                        household_Original[i][j + 1].Add(temphhps);
             ////                        nomore.Add(temphhps);
 
             ////                        break;
@@ -1094,20 +1094,20 @@ namespace TuringAndCorbusier
             ////        }
 
             ////        //아래층없는애들 하나씩 움직임
-            ////        tempfloorhhps = tempfloorhhps.Select(n => new HouseholdProperties(n, Consts.FloorHeight)).ToList();
-            ////        tempfloorhhps.AddRange(new List<HouseholdProperties>(householdProperties_Original[i][j]));
+            ////        tempfloorhhps = tempfloorhhps.Select(n => new Household(n, Consts.FloorHeight)).ToList();
+            ////        tempfloorhhps.AddRange(new List<Household>(household_Original[i][j]));
 
             ////    }
             ////}
 
 
-            //for (int i = 0; i < householdProperties_Original.Count; i++)
+            //for (int i = 0; i < household_Original.Count; i++)
             //{
             //    //동에 소속된 hhps
-            //    var tempBuildinghhps = householdProperties_Original[i];
+            //    var tempBuildinghhps = household_Original[i];
 
             //    //동에 소속된 core
-            //    var tempBuildingcps = coreProperties_Original[i];
+            //    var tempBuildingcps = core_Original[i];
 
             //    //각 동 별로 가까운 hhps (1~n) 가 없다면 core 삭제 ( 0 ~ n+1)
             //    int cpscount = tempBuildingcps.Count;
@@ -1166,31 +1166,31 @@ namespace TuringAndCorbusier
             //}
 
             //라인별로 재정렬
-            List<List<List<HouseholdProperties>>> hhpsl = new List<List<List<HouseholdProperties>>>();
+            List<List<List<Household>>> hhpsl = new List<List<List<Household>>>();
             double land = plot.GetArea();
-            for (int i = 0; i < householdProperties_Original.Count; i++)
+            for (int i = 0; i < household_Original.Count; i++)
             {
                 //건물별
                 //층 수 * 열 수 리스트
                 //층 수
-                int floors = householdProperties_Original[i].Count;
+                int floors = household_Original[i].Count;
                 //열 수
-                int rows = householdProperties_Original[i][floors - 1].Count;
+                int rows = household_Original[i][floors - 1].Count;
                 //열 수 * 층 수 크기의 배열 선언
-                HouseholdProperties[,] hhps = new HouseholdProperties[rows, floors];
+                Household[,] hhps = new Household[rows, floors];
                 for (int j = 0; j < floors; j++)
                 {
                     for (int k = 0; k < rows; k++)
                     {
                         //열,층 칸에 층,열 넣음
-                        householdProperties_Original[i][j][k].indexer = new int[] { k, j };
-                        hhps[k, j] = householdProperties_Original[i][j][k];
+                        household_Original[i][j][k].indexer = new int[] { k, j };
+                        hhps[k, j] = household_Original[i][j][k];
                     }
                 }
-                List<List<HouseholdProperties>> tempfloor = new List<List<HouseholdProperties>>();
+                List<List<Household>> tempfloor = new List<List<Household>>();
                 for (int j = 0; j < rows; j++)
                 {
-                    List<HouseholdProperties> temprow = new List<HouseholdProperties>();
+                    List<Household> temprow = new List<Household>();
                     for (int k = 0; k < floors; k++)
                     {
                         temprow.Add(hhps[j, k]);
@@ -1213,7 +1213,7 @@ namespace TuringAndCorbusier
             while (tempratio > legalFloorAreaRatio * 1.01)
             {
                 // 복도형이 아니고, 첫번째가 아니면
-                if (hhpsl[buildingnum].Count / 2 != coreProperties_Original[buildingnum].Count && !ranonece)
+                if (hhpsl[buildingnum].Count / 2 != core_Original[buildingnum].Count && !ranonece)
                 {
                     //다음건물
                     buildingnum++;
@@ -1231,7 +1231,7 @@ namespace TuringAndCorbusier
                 if (hhpsl[buildingnum][rownum].Count == 0)
                 {
 
-                    //coreProperties_Original[buildingnum][rownum / 2].Stories = 0;
+                    //core_Original[buildingnum][rownum / 2].Stories = 0;
 
 
                     //[첫열이 아니고 마지막 건물] 일때
@@ -1279,7 +1279,7 @@ namespace TuringAndCorbusier
                     }
 
                     var hhp1 = hhpsl[buildingnum][rownum][hhpsl[buildingnum][rownum].Count - 1];
-                    foreach (var z in householdProperties_Original[buildingnum])
+                    foreach (var z in household_Original[buildingnum])
                     {
                         if (z.Contains(hhp1))
                         {
@@ -1288,8 +1288,8 @@ namespace TuringAndCorbusier
                         }
                     }
                     hhpsl[buildingnum][rownum].RemoveAt(hhpsl[buildingnum][rownum].Count - 1);
-                    //var mindistance = coreProperties_Original[buildingnum].Select(n => n.Origin.DistanceTo(hhp1.Origin)).Min();
-                    //var closesetcore = coreProperties_Original[buildingnum].Where(n => n.Origin.DistanceTo(hhp1.Origin) == mindistance).ToList();
+                    //var mindistance = core_Original[buildingnum].Select(n => n.Origin.DistanceTo(hhp1.Origin)).Min();
+                    //var closesetcore = core_Original[buildingnum].Where(n => n.Origin.DistanceTo(hhp1.Origin) == mindistance).ToList();
                     //closesetcore[0].Stories--;
 
                     //tempratio -= closesetcore[0].GetArea() / land * 100;
@@ -1297,7 +1297,7 @@ namespace TuringAndCorbusier
                     if (hhpsl[buildingnum][rownum2].Count > 0)
                     {
                         var hhp2 = hhpsl[buildingnum][rownum2][hhpsl[buildingnum][rownum2].Count - 1];
-                        foreach (var z in householdProperties_Original[buildingnum])
+                        foreach (var z in household_Original[buildingnum])
                         {
                             if (z.Contains(hhp2))
                             {
@@ -1309,13 +1309,13 @@ namespace TuringAndCorbusier
                     }
 
 
-                    for (int i = 0; i < householdProperties_Original.Count; i++)
+                    for (int i = 0; i < household_Original.Count; i++)
                     {
                         //동에 소속된 hhps
-                        var tempBuildinghhps = householdProperties_Original[i];
+                        var tempBuildinghhps = household_Original[i];
 
                         //동에 소속된 core
-                        var tempBuildingcps = coreProperties_Original[i];
+                        var tempBuildingcps = core_Original[i];
 
                         //각 동 별로 가까운 hhps (1~n) 가 없다면 core 삭제 ( 0 ~ n+1)
                         int cpscount = tempBuildingcps.Count;
@@ -1371,7 +1371,7 @@ namespace TuringAndCorbusier
                                 }
                             }
                         }
-                        tempratio = grossArea(householdProperties_Original, coreProperties_Original) * 100 / plot.GetArea();
+                        tempratio = grossArea(household_Original, core_Original) * 100 / plot.GetArea();
                     }
 
 
@@ -1389,25 +1389,25 @@ namespace TuringAndCorbusier
 
         }
 
-        public static double grossArea(List<List<List<HouseholdProperties>>> HouseholdProperties,List<List<CoreProperties>> CoreProperties)
+        public static double grossArea(List<List<List<Household>>> Household,List<List<Core>> Core)
         {
             double output = 0;
 
-            for (int i = 0; i < HouseholdProperties.Count; i++)
+            for (int i = 0; i < Household.Count; i++)
             {
-                for (int j = 0; j < HouseholdProperties[i].Count; j++)
+                for (int j = 0; j < Household[i].Count; j++)
                 {
-                    for (int k = 0; k < HouseholdProperties[i][j].Count; k++)
+                    for (int k = 0; k < Household[i][j].Count; k++)
                     {
 
-                        output += HouseholdProperties[i][j][k].GetExclusiveArea();
+                        output += Household[i][j][k].GetExclusiveArea();
 
-                        output += HouseholdProperties[i][j][k].GetWallArea();
+                        output += Household[i][j][k].GetWallArea();
 
                     }
                 }
 
-                foreach (CoreProperties j in CoreProperties[i])
+                foreach (Core j in Core[i])
                 {
                     output = output + j.GetArea() * (j.Stories + 1);
                 }
@@ -1417,27 +1417,27 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        public static void reduceFloorAreaRatio_Vertical(ref List<List<List<HouseholdProperties>>> householdProperties_Original, ref List<List<CoreProperties>> coreProperties_Original, ref double currentFloorAreaRatio, Plot plot, double legalFloorAreaRatio)
+        public static void reduceFloorAreaRatio_Vertical(ref List<List<List<Household>>> household_Original, ref List<List<Core>> core_Original, ref double currentFloorAreaRatio, Plot plot, double legalFloorAreaRatio)
         {
             double thisFloorAreaRatio = currentFloorAreaRatio;
-            List<List<List<HouseholdProperties>>> householdProperties = new List<List<List<HouseholdProperties>>>(householdProperties_Original);
-            List<List<CoreProperties>> coreProperties = new List<List<CoreProperties>>(coreProperties_Original);
+            List<List<List<Household>>> household = new List<List<List<Household>>>(household_Original);
+            List<List<Core>> core = new List<List<Core>>(core_Original);
 
             //////// 용적률이 너무 크면 제거
 
             List<List<int>> coreRanks = new List<List<int>>();
 
-            //for (int i = 0; i < coreProperties_Original.Count(); i++)
+            //for (int i = 0; i < core_Original.Count(); i++)
             //{
-            //    List<CoreProperties> otherCoreProperties = new List<CoreProperties>();
+            //    List<Core> otherCore = new List<Core>();
 
-            //    for (int j = 0; j < coreProperties_Original.Count(); j++)
+            //    for (int j = 0; j < core_Original.Count(); j++)
             //    {
             //        if (i != j)
-            //            otherCoreProperties.AddRange(coreProperties_Original[j]);
+            //            otherCore.AddRange(core_Original[j]);
             //    }
 
-            //    coreRanks.Add(RankCoreDIstance(coreProperties_Original[i], otherCoreProperties));
+            //    coreRanks.Add(RankCoreDIstance(core_Original[i], otherCore));
             //}
 
             if (thisFloorAreaRatio > legalFloorAreaRatio)
@@ -1445,17 +1445,17 @@ namespace TuringAndCorbusier
                 coreRanks.Clear();
 
 
-                for (int i = 0; i < coreProperties.Count(); i++)
+                for (int i = 0; i < core.Count(); i++)
                 {
-                    List<CoreProperties> otherCoreProperties = new List<CoreProperties>();
+                    List<Core> otherCore = new List<Core>();
 
-                    for (int j = 0; j < coreProperties.Count(); j++)
+                    for (int j = 0; j < core.Count(); j++)
                     {
                         if (i != j)
-                            otherCoreProperties.AddRange(coreProperties[j]);
+                            otherCore.AddRange(core[j]);
                     }
 
-                    coreRanks.Add(RankCoreDIstance(coreProperties[i], otherCoreProperties));
+                    coreRanks.Add(RankCoreDIstance(core[i], otherCore));
                 }
 
 
@@ -1476,32 +1476,32 @@ namespace TuringAndCorbusier
 
                     if (tempCoreIndex != -1)
                     {
-                        List<List<HouseholdProperties>> tempHouseholdProperties = new List<List<HouseholdProperties>>(householdProperties[tempApartmentIndex]);
+                        List<List<Household>> tempHousehold = new List<List<Household>>(household[tempApartmentIndex]);
 
                         double tempExpectedAreaRemove = 0;
                         List<int> tempRemoveHouseholdPropertyStoriesIndex = new List<int>();
                         List<int> tempRemoveHouseholdPropertyIndex = new List<int>();
 
-                        List<Point3d> tempCorePropertiesOrigin = (from coreProperty in coreProperties[tempApartmentIndex]
+                        List<Point3d> tempCoreOrigin = (from coreProperty in core[tempApartmentIndex]
                                                                   select coreProperty.Origin).ToList();
 
                         List<List<int>> tempClosestCorePropertyIndex = new List<List<int>>();
 
-                        for (int i = 0; i < tempHouseholdProperties.Count(); i++)
+                        for (int i = 0; i < tempHousehold.Count(); i++)
                         {
                             tempClosestCorePropertyIndex.Add(new List<int>());
 
-                            for (int j = 0; j < tempHouseholdProperties[i].Count(); j++)
+                            for (int j = 0; j < tempHousehold[i].Count(); j++)
                             {
-                                Point3d tempHouseholdOrigin = tempHouseholdProperties[i][j].Origin;
+                                Point3d tempHouseholdOrigin = tempHousehold[i][j].Origin;
 
                                 RhinoList<double> tempDistance = new RhinoList<double>();
                                 RhinoList<int> tempCorePropertyIndex = new RhinoList<int>();
 
-                                for (int k = 0; k < tempCorePropertiesOrigin.Count(); k++)
+                                for (int k = 0; k < tempCoreOrigin.Count(); k++)
                                 {
                                     tempCorePropertyIndex.Add(k);
-                                    tempDistance.Add(Math.Pow(Math.Pow(tempCorePropertiesOrigin[k].X - tempHouseholdOrigin.X, 2) + Math.Pow(tempCorePropertiesOrigin[k].Y - tempHouseholdOrigin.Y, 2), 0.5) + tempHouseholdOrigin.Z);
+                                    tempDistance.Add(Math.Pow(Math.Pow(tempCoreOrigin[k].X - tempHouseholdOrigin.X, 2) + Math.Pow(tempCoreOrigin[k].Y - tempHouseholdOrigin.Y, 2), 0.5) + tempHouseholdOrigin.Z);
                                 }
 
                                 tempCorePropertyIndex.Sort(tempDistance.ToArray());
@@ -1512,9 +1512,9 @@ namespace TuringAndCorbusier
                         RhinoList<int> tempSelectedHouseholdIndex = new RhinoList<int>();
                         RhinoList<int> tempSelectedHouseholdFloor = new RhinoList<int>();
 
-                        for (int i = 0; i < tempHouseholdProperties.Count(); i++)
+                        for (int i = 0; i < tempHousehold.Count(); i++)
                         {
-                            for (int j = 0; j < tempHouseholdProperties[i].Count(); j++)
+                            for (int j = 0; j < tempHousehold[i].Count(); j++)
                             {
                                 if (tempClosestCorePropertyIndex[i][j] == tempCoreIndex)
                                 {
@@ -1538,7 +1538,7 @@ namespace TuringAndCorbusier
 
                         //if (tempSelectedHouseholdFloor.Count == 0)
                         //{
-                        //    if (tempCoreIndex == coreProperties[tempApartmentIndex].Count)
+                        //    if (tempCoreIndex == core[tempApartmentIndex].Count)
                         //        tempApartmentIndex++;
                             
                         //    continue;
@@ -1572,8 +1572,8 @@ namespace TuringAndCorbusier
                             {
                                 if (thisFloorAreaRatio - tempExpectedAreaRemove / plot.GetArea() * 100 > legalFloorAreaRatio)
                                 {
-                                    tempExpectedAreaRemove += householdProperties[tempApartmentIndex][i][selectedHouseholdIndexByFloor[i][j]].GetExclusiveArea();
-                                    tempExpectedAreaRemove += householdProperties[tempApartmentIndex][i][selectedHouseholdIndexByFloor[i][j]].GetWallArea();
+                                    tempExpectedAreaRemove += household[tempApartmentIndex][i][selectedHouseholdIndexByFloor[i][j]].GetExclusiveArea();
+                                    tempExpectedAreaRemove += household[tempApartmentIndex][i][selectedHouseholdIndexByFloor[i][j]].GetWallArea();
 
                                     tempRemoveHouseholdIndex.Add(selectedHouseholdIndexByFloor[i][j]);
                                     tempRemoveHosueholdFloor.Add(i);
@@ -1582,7 +1582,7 @@ namespace TuringAndCorbusier
                                     {
                                         coreRemoveCount++;
 
-                                        tempExpectedAreaRemove += coreProperties[tempApartmentIndex][tempCoreIndex].GetArea();
+                                        tempExpectedAreaRemove += core[tempApartmentIndex][tempCoreIndex].GetArea();
                                     }
                                 }
                             }
@@ -1600,28 +1600,28 @@ namespace TuringAndCorbusier
 
                             for (int i = 0; i < tempRemoveHosueholdFloor.Count(); i++)
                             {
-                                householdProperties[tempApartmentIndex][tempRemoveHosueholdFloor[i]].RemoveAt(tempRemoveHouseholdIndex[i]);
+                                household[tempApartmentIndex][tempRemoveHosueholdFloor[i]].RemoveAt(tempRemoveHouseholdIndex[i]);
                             }
 
                             thisFloorAreaRatio -= tempExpectedAreaRemove / plot.GetArea() * 100;
 
                             if (coreRemoveCount != 0)
                             {
-                                coreProperties[tempApartmentIndex][tempCoreIndex].Stories -= coreRemoveCount;
-                                //thisFloorAreaRatio -= (coreProperties[tempApartmentIndex][tempCoreIndex].GetArea() * (coreRemoveCount)) / plot.GetArea() * 100;
+                                core[tempApartmentIndex][tempCoreIndex].Stories -= coreRemoveCount;
+                                //thisFloorAreaRatio -= (core[tempApartmentIndex][tempCoreIndex].GetArea() * (coreRemoveCount)) / plot.GetArea() * 100;
                             }
 
                             if (tempRemoveHosueholdFloor.Count() == tempSelectedHouseholdFloor.Count())
                             {
-                                thisFloorAreaRatio -= (coreProperties[tempApartmentIndex][tempCoreIndex].GetArea() * (coreProperties[tempApartmentIndex][tempCoreIndex].Stories + 1)) / plot.GetArea() * 100;
+                                thisFloorAreaRatio -= (core[tempApartmentIndex][tempCoreIndex].GetArea() * (core[tempApartmentIndex][tempCoreIndex].Stories + 1)) / plot.GetArea() * 100;
 
-                                coreProperties[tempApartmentIndex].RemoveAt(tempCoreIndex);
+                                core[tempApartmentIndex].RemoveAt(tempCoreIndex);
                             }
 
                         }
                     }
 
-                    tempApartmentIndex = (tempApartmentIndex + 1) % householdProperties.Count();
+                    tempApartmentIndex = (tempApartmentIndex + 1) % household.Count();
 
                     if (thisFloorAreaRatio < legalFloorAreaRatio)
                     {
@@ -1659,7 +1659,7 @@ namespace TuringAndCorbusier
             return true;
         }
 
-        public static List<int> RankCoreDIstance(List<CoreProperties> currentCores, List<CoreProperties> otherCores)
+        public static List<int> RankCoreDIstance(List<Core> currentCores, List<Core> otherCores)
         {
             try
             {
@@ -1727,11 +1727,11 @@ namespace TuringAndCorbusier
                 return exceptionOutput;
             }
         }
-        public static void reduceFloorAreaRatio(ref List<List<List<HouseholdProperties>>> householdProperties_Original, ref List<List<CoreProperties>> coreProperties_Original, ref double currentFloorAreaRatio, Plot plot, double legalFloorAreaRatio)
+        public static void reduceFloorAreaRatio(ref List<List<List<Household>>> household_Original, ref List<List<Core>> core_Original, ref double currentFloorAreaRatio, Plot plot, double legalFloorAreaRatio)
         {
             double thisFloorAreaRatio = currentFloorAreaRatio;
-            List<List<List<HouseholdProperties>>> householdProperties = new List<List<List<HouseholdProperties>>>(householdProperties_Original);
-            List<List<CoreProperties>> coreProperties = new List<List<CoreProperties>>(coreProperties_Original);
+            List<List<List<Household>>> household = new List<List<List<Household>>>(household_Original);
+            List<List<Core>> core = new List<List<Core>>(core_Original);
 
             //////// 용적률이 너무 크면 제거
 
@@ -1743,7 +1743,7 @@ namespace TuringAndCorbusier
 
                 while (thisFloorAreaRatio > legalFloorAreaRatio)
                 {
-                    int tempStoryIndex = householdProperties[tempApartmentIndex].Count() - tempStoriesFromTopIndex;
+                    int tempStoryIndex = household[tempApartmentIndex].Count() - tempStoriesFromTopIndex;
 
                     double tempExpectedAreaRemove = 0;
                     List<int> tempRemoveHouseholdPropertyIndex = new List<int>();
@@ -1751,23 +1751,23 @@ namespace TuringAndCorbusier
 
                     if (tempStoryIndex < 0)
                     {
-                        tempApartmentIndex = (tempApartmentIndex + 1) % householdProperties.Count();
+                        tempApartmentIndex = (tempApartmentIndex + 1) % household.Count();
                         continue;
                     }
 
                     int nextCorePropertyIndex = 0;
 
-                    for (int i = 0; i < householdProperties[tempApartmentIndex][tempStoryIndex].Count(); i++)
+                    for (int i = 0; i < household[tempApartmentIndex][tempStoryIndex].Count(); i++)
                     {
                         if (thisFloorAreaRatio - tempExpectedAreaRemove / plot.GetArea() * 100 > legalFloorAreaRatio)
                         {
-                            tempExpectedAreaRemove += householdProperties[tempApartmentIndex][tempStoryIndex][i].GetExclusiveArea();
-                            tempExpectedAreaRemove += householdProperties[tempApartmentIndex][tempStoryIndex][i].GetWallArea();
+                            tempExpectedAreaRemove += household[tempApartmentIndex][tempStoryIndex][i].GetExclusiveArea();
+                            tempExpectedAreaRemove += household[tempApartmentIndex][tempStoryIndex][i].GetWallArea();
                             tempRemoveHouseholdPropertyIndex.Add(i);
 
-                            if (Math.Ceiling((double)householdProperties[tempApartmentIndex][tempStoryIndex].Count / (double)coreProperties[tempApartmentIndex].Count * (double)(nextCorePropertyIndex + 1))-1 == i)
+                            if (Math.Ceiling((double)household[tempApartmentIndex][tempStoryIndex].Count / (double)core[tempApartmentIndex].Count * (double)(nextCorePropertyIndex + 1))-1 == i)
                             {
-                                tempExpectedAreaRemove += coreProperties[tempApartmentIndex][nextCorePropertyIndex].GetArea();
+                                tempExpectedAreaRemove += core[tempApartmentIndex][nextCorePropertyIndex].GetArea();
                                 tempRemoveCorePropertyIndex.Add(nextCorePropertyIndex);
                                 nextCorePropertyIndex++;
                             }
@@ -1783,19 +1783,19 @@ namespace TuringAndCorbusier
 
                         for (int i = 0; i < tempRemoveHouseholdPropertyIndex.Count(); i++)
                         {
-                            householdProperties[tempApartmentIndex][tempStoryIndex].RemoveAt(tempRemoveHouseholdPropertyIndex[i]);
+                            household[tempApartmentIndex][tempStoryIndex].RemoveAt(tempRemoveHouseholdPropertyIndex[i]);
                         }
 
                         for (int i = 0; i < tempRemoveCorePropertyIndex.Count(); i++)
                         {
-                            CoreProperties tempCoreProperties = coreProperties[tempApartmentIndex][tempRemoveCorePropertyIndex[i]];
+                            Core tempCore = core[tempApartmentIndex][tempRemoveCorePropertyIndex[i]];
 
-                            coreProperties[tempApartmentIndex][tempRemoveCorePropertyIndex[i]] = new CoreProperties(tempCoreProperties.Origin, tempCoreProperties.XDirection, tempCoreProperties.YDirection, tempCoreProperties.CoreType, tempCoreProperties.Stories - 1, tempCoreProperties.CoreInterpenetration);
+                            core[tempApartmentIndex][tempRemoveCorePropertyIndex[i]] = new Core(tempCore.Origin, tempCore.XDirection, tempCore.YDirection, tempCore.CoreType, tempCore.Stories - 1, tempCore.CoreInterpenetration);
 
-                            if (coreProperties[tempApartmentIndex][tempRemoveCorePropertyIndex[i]].Stories == 0) ////////////////////////////////////////////////////////////
+                            if (core[tempApartmentIndex][tempRemoveCorePropertyIndex[i]].Stories == 0) ////////////////////////////////////////////////////////////
                             {
-                                coreProperties[tempApartmentIndex].RemoveAt(tempRemoveCorePropertyIndex[i]);
-                                tempExpectedAreaRemove += coreProperties[tempApartmentIndex][nextCorePropertyIndex].GetArea();
+                                core[tempApartmentIndex].RemoveAt(tempRemoveCorePropertyIndex[i]);
+                                tempExpectedAreaRemove += core[tempApartmentIndex][nextCorePropertyIndex].GetArea();
                             }
                         }
 
@@ -1803,7 +1803,7 @@ namespace TuringAndCorbusier
                         isSomeThingRemoved = true;
                     }
 
-                    tempApartmentIndex = (tempApartmentIndex + 1) % householdProperties.Count();
+                    tempApartmentIndex = (tempApartmentIndex + 1) % household.Count();
 
                     if (tempApartmentIndex == 0)
                     {
@@ -1818,13 +1818,13 @@ namespace TuringAndCorbusier
 
             }
 
-            householdProperties_Original = householdProperties;
-            coreProperties_Original = coreProperties;
+            household_Original = household;
+            core_Original = core;
             currentFloorAreaRatio = thisFloorAreaRatio;
         }
-        public static void sortHHPOnEarth_OnlyCreateCommercial(ref RhinoList<HouseholdProperties> householdPropertiesOnEarth, List<Curve> PlotArr, List<int> roadWidth)
+        public static void sortHHPOnEarth_OnlyCreateCommercial(ref RhinoList<Household> householdOnEarth, List<Curve> PlotArr, List<int> roadWidth)
         {
-            List<Point3d> hhpOnEarthOrigin = (from hhp in householdPropertiesOnEarth
+            List<Point3d> hhpOnEarthOrigin = (from hhp in householdOnEarth
                                               select hhp.Origin).ToList();
 
             RhinoList<int> tempRoadWidth = new RhinoList<int>();
@@ -1846,27 +1846,27 @@ namespace TuringAndCorbusier
                 distanceFromClosestPlot.Add(distanceFromPlotArr.Min());
             }
 
-            householdPropertiesOnEarth.Sort(distanceFromClosestPlot.ToArray());
+            householdOnEarth.Sort(distanceFromClosestPlot.ToArray());
             tempRoadWidth.Sort(distanceFromClosestPlot.ToArray());
 
-            householdPropertiesOnEarth.Sort(tempRoadWidth.ToArray());
+            householdOnEarth.Sort(tempRoadWidth.ToArray());
 
         }
 
-        public static List<HouseholdProperties> createCommercialFacility(List<List<List<HouseholdProperties>>> householdProperties, List<Curve> apartmentBaseCurves, Plot plot, double buildingCoverageReamin, double grossAreaRatioRemain)
+        public static List<Household> createCommercialFacility(List<List<List<Household>>> household, List<Curve> apartmentBaseCurves, Plot plot, double buildingCoverageReamin, double grossAreaRatioRemain)
         {
             double grossAreaRemain = plot.GetArea() * grossAreaRatioRemain / 100;
             double buildingAreaRemain = plot.GetArea() * buildingCoverageReamin / 100;
 
-            List<HouseholdProperties> output = new List<HouseholdProperties>();
+            List<Household> output = new List<Household>();
 
-            RhinoList<HouseholdProperties> hhpOnEarth = new RhinoList<HouseholdProperties>();
+            RhinoList<Household> hhpOnEarth = new RhinoList<Household>();
 
-            for (int i = 0; i < householdProperties.Count; i++)
+            for (int i = 0; i < household.Count; i++)
             {
-                if (householdProperties[i].Count != 0)
+                if (household[i].Count != 0)
                 {
-                    hhpOnEarth.AddRange(householdProperties[i][0]);
+                    hhpOnEarth.AddRange(household[i][0]);
                 }
             }
 
@@ -1900,20 +1900,20 @@ namespace TuringAndCorbusier
                 {
                     if (grossAreaRemain - hhpOnEarth[i].GetArea() >= 0)
                     {
-                        HouseholdProperties tempHouseholdProperties = new HouseholdProperties(hhpOnEarth[i]);
+                        Household tempHousehold = new Household(hhpOnEarth[i]);
 
-                        tempHouseholdProperties.Origin = new Point3d(tempHouseholdProperties.Origin.X, tempHouseholdProperties.Origin.Y, 0);
+                        tempHousehold.Origin = new Point3d(tempHousehold.Origin.X, tempHousehold.Origin.Y, 0);
 
-                        double LastHouseholdProperteis = tempHouseholdProperties.GetArea();
+                        double LastHouseholdProperteis = tempHousehold.GetArea();
 
-                        if (tempHouseholdProperties.YLengthB != 0)
+                        if (tempHousehold.YLengthB != 0)
                         {
-                            tempHouseholdProperties.XLengthA = tempHouseholdProperties.XLengthA - tempHouseholdProperties.XLengthB;
-                            tempHouseholdProperties.XLengthB = 0;
+                            tempHousehold.XLengthA = tempHousehold.XLengthA - tempHousehold.XLengthB;
+                            tempHousehold.XLengthB = 0;
                         }
 
-                        output.Add(tempHouseholdProperties);
-                        grossAreaRemain -= tempHouseholdProperties.GetArea();
+                        output.Add(tempHousehold);
+                        grossAreaRemain -= tempHousehold.GetArea();
                     }
                     else
                     {
@@ -2862,7 +2862,7 @@ namespace TuringAndCorbusier
                 return "지상 " + maxStories.ToString() + "층";
         }
 
-        public static void AddDesignDetail(List<string> idColumnName, List<string> idColumnCode, string userID, ApartmentGeneratorOutput agOutput, out int REGI_PRE_DESIGN_NO)
+        public static void AddDesignDetail(List<string> idColumnName, List<string> idColumnCode, string userID, Apartment agOutput, out int REGI_PRE_DESIGN_NO)
         {
             //////20160516_수정완료, 지하주차장 데이터 입력할 필요가 있음
 

@@ -21,7 +21,7 @@ namespace TuringAndCorbusier
     /// </summary>
     public partial class ModelingComplexity : Window
     {
-        public ModelingComplexity(ApartmentGeneratorOutput tempOutput)
+        public ModelingComplexity(Apartment tempOutput)
         {
             InitializeComponent();
             this.tempOutput = tempOutput;
@@ -33,7 +33,7 @@ namespace TuringAndCorbusier
 
         }
 
-        private ApartmentGeneratorOutput tempOutput;
+        private Apartment tempOutput;
 
         private void Button_Complex_Click(object sender, RoutedEventArgs e)
         {

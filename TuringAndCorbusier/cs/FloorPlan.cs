@@ -10,7 +10,7 @@ namespace TuringAndCorbusier
     public class FloorPlan
     {
         //Constructor, 생성자
-        public FloorPlan(HouseholdProperties householdProperty, List<FloorPlanLibrary> fpls, string agType)
+        public FloorPlan(Household householdProperty, List<FloorPlanLibrary> fpls, string agType)
         {
             FloorPlanLibrary fpl = typeDetector(fpls, householdProperty, agType);
             double exWallThickness = 300; double inWallThickness = 200; double entDoorWidth = 900; double inDoorWidth = 900;
@@ -69,7 +69,7 @@ namespace TuringAndCorbusier
             }
             catch (Exception)
             {
-                HouseholdProperties hhp = new HouseholdProperties(householdProperty);
+                Household hhp = new Household(householdProperty);
                 wallCurves = new List<List<Curve>>();
                 wallCurves.Add(exWallMaker(hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.WallFactor, exWallThickness, inWallThickness));
                 wallCurves = totalTransformation(wallCurves, householdProperty);
@@ -97,7 +97,7 @@ namespace TuringAndCorbusier
             this.roomTags = roomTags;
         }
         //Field, 필드
-        public HouseholdProperties householdProperty { get; private set; }
+        public Household householdProperty { get; private set; }
         public List<List<Curve>> walls { get; private set; }
         public List<List<Curve>> tilings { get; private set; }
         public List<List<Curve>> doors { get; private set; }
@@ -111,11 +111,11 @@ namespace TuringAndCorbusier
 
         //Method, 메소드
 
-        public List<Text3d> GetRoomTag(HouseholdProperties tempHouseholdProperties, FloorPlanLibrary fpl)
+        public List<Text3d> GetRoomTag(Household tempHousehold, FloorPlanLibrary fpl)
         {
-            List<Point3d> remappedPoints = remapper(tempHouseholdProperties, fpl, fpl.tagPointList);
+            List<Point3d> remappedPoints = remapper(tempHousehold, fpl, fpl.tagPointList);
 
-            remappedPoints = totalTransformation(remappedPoints, tempHouseholdProperties);
+            remappedPoints = totalTransformation(remappedPoints, tempHousehold);
 
             List<Text3d> output = new List<Text3d>();
 
@@ -152,7 +152,7 @@ namespace TuringAndCorbusier
 
             return new BoundingBox(PointCloud);
         }
-        private FloorPlanLibrary typeDetector(List<FloorPlanLibrary> plantypes, HouseholdProperties householdproperty, string agType)
+        private FloorPlanLibrary typeDetector(List<FloorPlanLibrary> plantypes, Household householdproperty, string agType)
         {
             FloorPlanLibrary output = plantypes[0];
             double score = double.MaxValue;
@@ -272,7 +272,7 @@ namespace TuringAndCorbusier
         ///////  remapper  ///////
         //////////////////////////
 
-        private List<Polyline> remapper(HouseholdProperties hhp, FloorPlanLibrary fpl, List<Polyline> beforeRoom)
+        private List<Polyline> remapper(Household hhp, FloorPlanLibrary fpl, List<Polyline> beforeRoom)
         {
             //B stands for before
             double xaB = fpl.xLengthA;
@@ -328,7 +328,7 @@ namespace TuringAndCorbusier
 
             return afterRoom;
         }
-        private List<Line> remapper(HouseholdProperties hhp, FloorPlanLibrary fpl, List<Line> beforeWindow)
+        private List<Line> remapper(Household hhp, FloorPlanLibrary fpl, List<Line> beforeWindow)
         {
             //B stands for before
             double xaB = fpl.xLengthA;
@@ -386,7 +386,7 @@ namespace TuringAndCorbusier
 
             return afterWindow;
         }
-        private List<Point3d> remapper(HouseholdProperties hhp, FloorPlanLibrary fpl, List<Point3d> beforePoint)
+        private List<Point3d> remapper(Household hhp, FloorPlanLibrary fpl, List<Point3d> beforePoint)
         {
             //B stands for before
             double xaB = fpl.xLengthA;
@@ -441,7 +441,7 @@ namespace TuringAndCorbusier
         /////////  main  /////////
         //////////////////////////
 
-        private void planDrawer(FloorPlanLibrary fpl, HouseholdProperties hhp, double exWallThickness, double inWallThickness, double entDoorWidth, double inDoorWidth, out List<List<Curve>> wallCurves, out List<List<Curve>> tilingCurves, out List<List<Curve>> doorCurves, out List<List<Curve>> windowCurves, string agType)
+        private void planDrawer(FloorPlanLibrary fpl, Household hhp, double exWallThickness, double inWallThickness, double entDoorWidth, double inDoorWidth, out List<List<Curve>> wallCurves, out List<List<Curve>> tilingCurves, out List<List<Curve>> doorCurves, out List<List<Curve>> windowCurves, string agType)
         {
             double xa = hhp.XLengthA;
             double xb = hhp.XLengthB;
@@ -1433,7 +1433,7 @@ namespace TuringAndCorbusier
                 set { this.numberText = value; }
             }
         }
-        private List<Line> windowModifier(HouseholdProperties hhp, List<Line> windowLines)
+        private List<Line> windowModifier(Household hhp, List<Line> windowLines)
         {
 
             //cull if window position is not good
@@ -1625,7 +1625,7 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        private List<Point3d> entranceAdjust(FloorPlanLibrary fpl, HouseholdProperties hhp, string agType, List<Point3d> doorPoints)
+        private List<Point3d> entranceAdjust(FloorPlanLibrary fpl, Household hhp, string agType, List<Point3d> doorPoints)
         {
             Polyline outline = outlineMaker(hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, Vector3d.XAxis, Vector3d.YAxis, Point3d.Origin);
 
@@ -1686,7 +1686,7 @@ namespace TuringAndCorbusier
         //////  transform  ///////
         //////////////////////////
 
-        private List<List<Curve>> totalTransformation(List<List<Curve>> curves, HouseholdProperties hhp)
+        private List<List<Curve>> totalTransformation(List<List<Curve>> curves, Household hhp)
         {
             bool doMirror = false;
             if (Math.Sign(getAngle(hhp.XDirection, hhp.YDirection)) < 0)
@@ -1697,7 +1697,7 @@ namespace TuringAndCorbusier
             curves = curves.Select(n => transformations(n, angle, doMirror, new Vector3d(hhp.Origin))).ToList();
             return curves;
         }
-        private List<Point3d> totalTransformation(List<Point3d> points, HouseholdProperties hhp)
+        private List<Point3d> totalTransformation(List<Point3d> points, Household hhp)
         {
             bool doMirror = false;
             if (Math.Sign(getAngle(hhp.XDirection, hhp.YDirection)) < 0)
@@ -1819,7 +1819,7 @@ namespace TuringAndCorbusier
         /////      caps      /////
         //////////////////////////
 
-        private List<Curve> capsMaker(HouseholdProperties hhp, double exWallThickness, double inWallThickness)
+        private List<Curve> capsMaker(Household hhp, double exWallThickness, double inWallThickness)
         {
             List<double> wf = hhp.WallFactor;
             Vector3d x = hhp.XDirection; Vector3d y = hhp.YDirection;
@@ -2213,7 +2213,7 @@ namespace TuringAndCorbusier
         /////  balcony lines  ////
         //////////////////////////
 
-        private List<List<Curve>> balconyLineMaker(HouseholdProperties hhp, double exWallThickness)
+        private List<List<Curve>> balconyLineMaker(Household hhp, double exWallThickness)
         {
             Polyline outline = outlineMaker(hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.XDirection, hhp.YDirection, hhp.Origin);
 

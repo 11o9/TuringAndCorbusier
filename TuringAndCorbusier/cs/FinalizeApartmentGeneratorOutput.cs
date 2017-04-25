@@ -8,11 +8,11 @@ using Rhino;
 
 namespace TuringAndCorbusier
 {
-    public class FinalizeApartmentGeneratorOutput
+    public class FinalizeApartment
     {
-        public static List<ApartmentGeneratorOutput> finalizeAGoutput(ApartmentGeneratorOutput agOutput, double LegalFloorAreaRatio, double LegalBuildingCoverage, bool onlyCreateUnderGround)
+        public static List<Apartment> finalizeAGoutput(Apartment agOutput, double LegalFloorAreaRatio, double LegalBuildingCoverage, bool onlyCreateUnderGround)
         {
-            ApartmentGeneratorOutput tempBasicAgOutput = agOutput;
+            Apartment tempBasicAgOutput = agOutput;
 
             /*
             if(IsRoadCenterMeetStreet(agOutput))
@@ -31,7 +31,7 @@ namespace TuringAndCorbusier
                 if (agOutput.AptLines.Count() != 0)
                     centerCurve = agOutput.AptLines[0];
 
-                ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.CoreProperties, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out parkingLotTypes, out roadCenterCurve, out Angle);
+                ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.Core, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out parkingLotTypes, out roadCenterCurve, out Angle);
 
                 bool IsRoadCenterMeetStreet = CheckRoadCenterMeetStreet(agOutput);
 
@@ -46,8 +46,8 @@ namespace TuringAndCorbusier
                     Boundary = CreateRoadClass.createRoad(tempBoundaryPolyline, Angle).ToNurbsCurve();
                 }
 
-                List<ApartmentGeneratorOutput> tempApartmentSet = duplicateAndReduceAGoutput(agOutput, reducePercentage);
-                List<ApartmentGeneratorOutput> outputApartmentSet = new List<ApartmentGeneratorOutput>();
+                List<Apartment> tempApartmentSet = duplicateAndReduceAGoutput(agOutput, reducePercentage);
+                List<Apartment> outputApartmentSet = new List<Apartment>();
 
                 for (int i = 0; i < tempApartmentSet.Count(); i++)
                 {
@@ -59,7 +59,7 @@ namespace TuringAndCorbusier
                     if (tempApartmentSet[i].AptLines.Count() != 0)
                         tempCenterCurve = tempApartmentSet[i].AptLines[0];
 
-                    List<List<ParkingLine>> tempParkingLines = ParkingLineMaker.parkingLineMaker(tempApartmentSet[i].AGtype, tempApartmentSet[i].CoreProperties, new Plot(Boundary, agOutput.Plot.Surroundings), agOutput.ParameterSet.Parameters[2], tempCenterCurve, out tempParkingLotTypes, out tempRoadCenterCurve, out tempAngle);
+                    List<List<ParkingLine>> tempParkingLines = ParkingLineMaker.parkingLineMaker(tempApartmentSet[i].AGtype, tempApartmentSet[i].Core, new Plot(Boundary, agOutput.Plot.Surroundings), agOutput.ParameterSet.Parameters[2], tempCenterCurve, out tempParkingLotTypes, out tempRoadCenterCurve, out tempAngle);
                     int tempParkingLotCount = 0;
 
                     foreach (List<ParkingLine> j in tempParkingLines)
@@ -79,12 +79,12 @@ namespace TuringAndCorbusier
                     {
                         tempParkingLines = tempParkingLineCopy;
 
-                        List<HouseholdProperties> tempHouseholdOnSecondFloor = new List<HouseholdProperties>();
+                        List<Household> tempHouseholdOnSecondFloor = new List<Household>();
 
-                        for (int j = 0; j < tempApartmentSet[i].HouseholdProperties.Count(); j++)
+                        for (int j = 0; j < tempApartmentSet[i].Household.Count(); j++)
                         {
-                            if (tempApartmentSet[i].HouseholdProperties[j].Count != 0)
-                                tempHouseholdOnSecondFloor.AddRange(tempApartmentSet[i].HouseholdProperties[j][0]);
+                            if (tempApartmentSet[i].Household[j].Count != 0)
+                                tempHouseholdOnSecondFloor.AddRange(tempApartmentSet[i].Household[j][0]);
                         }
 
                         double tempGrossAreaRemain = tempApartmentSet[i].Plot.GetArea() * (LegalFloorAreaRatio / 100) - tempApartmentSet[i].GetGrossArea();
@@ -124,15 +124,15 @@ namespace TuringAndCorbusier
                     }
                     else
                     {
-                        List<List<ParkingLine>> tempParkingline = ParkingLineMaker.parkingLineMaker(tempApartmentSet[i].AGtype, tempApartmentSet[i].CoreProperties, new Plot(Boundary, agOutput.Plot.Surroundings), agOutput.ParameterSet.Parameters[2], tempCenterCurve, out tempParkingLotTypes, out tempRoadCenterCurve, out tempAngle);
+                        List<List<ParkingLine>> tempParkingline = ParkingLineMaker.parkingLineMaker(tempApartmentSet[i].AGtype, tempApartmentSet[i].Core, new Plot(Boundary, agOutput.Plot.Surroundings), agOutput.ParameterSet.Parameters[2], tempCenterCurve, out tempParkingLotTypes, out tempRoadCenterCurve, out tempAngle);
 
 
-                        List<HouseholdProperties> tempHouseholdOnSecondFloor = new List<HouseholdProperties>();
+                        List<Household> tempHouseholdOnSecondFloor = new List<Household>();
 
-                        for (int j = 0; j < tempApartmentSet[i].HouseholdProperties.Count(); j++)
+                        for (int j = 0; j < tempApartmentSet[i].Household.Count(); j++)
                         {
-                            if (tempApartmentSet[i].HouseholdProperties[j].Count != 0)
-                                tempHouseholdOnSecondFloor.AddRange(tempApartmentSet[i].HouseholdProperties[j][0]);
+                            if (tempApartmentSet[i].Household[j].Count != 0)
+                                tempHouseholdOnSecondFloor.AddRange(tempApartmentSet[i].Household[j][0]);
                         }
 
                         double tempGrossAreaRemain = tempApartmentSet[i].Plot.GetArea() * (LegalFloorAreaRatio / 100) - tempApartmentSet[i].GetGrossArea();
@@ -175,7 +175,7 @@ namespace TuringAndCorbusier
                 if (agOutput.AptLines.Count() != 0)
                     centerCurve = agOutput.AptLines[0];
 
-                ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.CoreProperties, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out parkingLotTypes, out roadCenterCurve, out Angle);
+                ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.Core, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out parkingLotTypes, out roadCenterCurve, out Angle);
 
 
                 bool IsRoadCenterMeetStreet = CheckRoadCenterMeetStreet(agOutput);
@@ -191,27 +191,27 @@ namespace TuringAndCorbusier
                     Boundary = CreateRoadClass.createRoad(tempBoundaryPolyline, Angle).ToNurbsCurve();
                 }
 
-                List<ApartmentGeneratorOutput> tempApartmentSet = duplicateAndReduceAGoutput(agOutput, reducePercentage);
-                List<ApartmentGeneratorOutput> outputApartmentSet = new List<ApartmentGeneratorOutput>();
+                List<Apartment> tempApartmentSet = duplicateAndReduceAGoutput(agOutput, reducePercentage);
+                List<Apartment> outputApartmentSet = new List<Apartment>();
 
                 List<ParkingLineMaker.ParkingLotType> tempParkingLotTypes;
                 List<Curve> tempRoadCenterCurve;
                 double tempAngle;
 
-                tempApartmentSet[0].ParkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.CoreProperties, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out tempParkingLotTypes, out tempRoadCenterCurve, out tempAngle));
+                tempApartmentSet[0].ParkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.Core, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out tempParkingLotTypes, out tempRoadCenterCurve, out tempAngle));
 
                 outputApartmentSet.Add(tempApartmentSet[0]);
 
                 for (int i = 1; i < tempApartmentSet.Count(); i++)
                 {
-                    List<List<ParkingLine>> tempParkingline = ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.CoreProperties, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out tempParkingLotTypes, out tempRoadCenterCurve, out tempAngle);
+                    List<List<ParkingLine>> tempParkingline = ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.Core, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out tempParkingLotTypes, out tempRoadCenterCurve, out tempAngle);
 
-                    List<HouseholdProperties> tempHouseholdOnSecondFloor = new List<HouseholdProperties>();
+                    List<Household> tempHouseholdOnSecondFloor = new List<Household>();
 
-                    for (int j = 0; j < tempApartmentSet[i].HouseholdProperties.Count(); j++)
+                    for (int j = 0; j < tempApartmentSet[i].Household.Count(); j++)
                     {
-                        if (tempApartmentSet[i].HouseholdProperties[j].Count != 0)
-                            tempHouseholdOnSecondFloor.AddRange(tempApartmentSet[i].HouseholdProperties[j][0]);
+                        if (tempApartmentSet[i].Household[j].Count != 0)
+                            tempHouseholdOnSecondFloor.AddRange(tempApartmentSet[i].Household[j][0]);
                     }
 
                     double tempGrossAreaRemain = tempApartmentSet[i].Plot.GetArea() * (LegalFloorAreaRatio / 100) - tempApartmentSet[i].GetGrossArea();
@@ -239,28 +239,28 @@ namespace TuringAndCorbusier
             }
         }
 
-        public int GetLegalParkingLotofHousing(List<List<List<HouseholdProperties>>> HouseholdProperties)
+        public int GetLegalParkingLotofHousing(List<List<List<Household>>> Household)
         {
             double legalParkingLotByUnitNum = 0;
             double legalParkingLotByUnitSize = 0;
 
-            for (int i = 0; i < HouseholdProperties.Count; i++)
+            for (int i = 0; i < Household.Count; i++)
             {
-                for (int j = 0; j < HouseholdProperties[i].Count; j++)
+                for (int j = 0; j < Household[i].Count; j++)
                 {
-                    for (int k = 0; k < HouseholdProperties[i][j].Count; k++)
+                    for (int k = 0; k < Household[i][j].Count; k++)
                     {
-                        if (HouseholdProperties[i][j][k].GetExclusiveArea() > 60 * Math.Pow(10, 6))
+                        if (Household[i][j][k].GetExclusiveArea() > 60 * Math.Pow(10, 6))
                             legalParkingLotByUnitNum += 1;
-                        else if (HouseholdProperties[i][j][k].GetExclusiveArea() > 30 * Math.Pow(10, 6))
+                        else if (Household[i][j][k].GetExclusiveArea() > 30 * Math.Pow(10, 6))
                             legalParkingLotByUnitNum += 0.8;
                         else
                             legalParkingLotByUnitNum += 0.5;
 
-                        if (HouseholdProperties[i][j][k].GetExclusiveArea() > 85 * Math.Pow(10, 6))
-                            legalParkingLotByUnitSize = HouseholdProperties[i][j][k].GetExclusiveArea() / 75000000;
+                        if (Household[i][j][k].GetExclusiveArea() > 85 * Math.Pow(10, 6))
+                            legalParkingLotByUnitSize = Household[i][j][k].GetExclusiveArea() / 75000000;
                         else
-                            legalParkingLotByUnitSize = HouseholdProperties[i][j][k].GetExclusiveArea() / 65000000;
+                            legalParkingLotByUnitSize = Household[i][j][k].GetExclusiveArea() / 65000000;
                     }
 
                 }
@@ -272,9 +272,9 @@ namespace TuringAndCorbusier
                 return (int)legalParkingLotByUnitSize;
         }
 
-        private static List<ApartmentGeneratorOutput> duplicateAndReduceAGoutput(ApartmentGeneratorOutput AGoutput, List<double> reducePercentage)
+        private static List<Apartment> duplicateAndReduceAGoutput(Apartment AGoutput, List<double> reducePercentage)
         {
-            List<ApartmentGeneratorOutput> output = new List<ApartmentGeneratorOutput>();
+            List<Apartment> output = new List<Apartment>();
 
             for (int i = 0; i < reducePercentage.Count(); i++)
             {
@@ -282,21 +282,21 @@ namespace TuringAndCorbusier
                 {
                     double currentFloorAreaRatio = AGoutput.GetGrossAreaRatio();
                     Plot tempPlot = AGoutput.Plot;
-                    List<List<List<HouseholdProperties>>> householdProperties = CloneHhp(AGoutput.HouseholdProperties);
-                    List<List<CoreProperties>> coreProperties = CloneCP(AGoutput.CoreProperties);
+                    List<List<List<Household>>> household = CloneHhp(AGoutput.Household);
+                    List<List<Core>> core = CloneCP(AGoutput.Core);
                     List<Curve> aptLines = AGoutput.AptLines;
 
-                    CommonFunc.reduceFloorAreaRatio_Mixref(ref householdProperties, ref coreProperties, ref currentFloorAreaRatio, tempPlot, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio * (100 - reducePercentage[i]) / 100,true);
+                    CommonFunc.reduceFloorAreaRatio_Mixref(ref household, ref core, ref currentFloorAreaRatio, tempPlot, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio * (100 - reducePercentage[i]) / 100,true);
 
                     double[] parameters = (double[])AGoutput.ParameterSet.Parameters.Clone();
-                    parameters[0] = parametersetStoriesChange(parameters[0], CommonFunc.toplevel(coreProperties));
-                    parameters[1] = parametersetStoriesChange(parameters[1], CommonFunc.toplevel(coreProperties));
+                    parameters[0] = parametersetStoriesChange(parameters[0], CommonFunc.toplevel(core));
+                    parameters[1] = parametersetStoriesChange(parameters[1], CommonFunc.toplevel(core));
 
                     ParameterSet newParameterset = new ParameterSet(parameters, AGoutput.ParameterSet.agName, AGoutput.ParameterSet.CoreType);
 
-                    ApartmentGeneratorOutput tempApartmentGeneratorOutput = new ApartmentGeneratorOutput(AGoutput.AGtype, tempPlot, AGoutput.BuildingType, newParameterset, AGoutput.Target, coreProperties, householdProperties, new ParkingLotOnEarth(), new ParkingLotUnderGround(), AGoutput.buildingOutline, AGoutput.AptLines);
+                    Apartment tempApartment = new Apartment(AGoutput.AGtype, tempPlot, AGoutput.BuildingType, newParameterset, AGoutput.Target, core, household, new ParkingLotOnEarth(), new ParkingLotUnderGround(), AGoutput.buildingOutline, AGoutput.AptLines);
 
-                    output.Add(tempApartmentGeneratorOutput);
+                    output.Add(tempApartment);
                 }
             }
 
@@ -315,17 +315,17 @@ namespace TuringAndCorbusier
         }
 
 
-        public static List<List<List<HouseholdProperties>>> CloneHhp(List<List<List<HouseholdProperties>>> cloneBase)
+        public static List<List<List<Household>>> CloneHhp(List<List<List<Household>>> cloneBase)
         {
-            List<List<List<HouseholdProperties>>> output = new List<List<List<HouseholdProperties>>>();
+            List<List<List<Household>>> output = new List<List<List<Household>>>();
 
             for (int i = 0; i < cloneBase.Count(); i++)
             {
-                List<List<HouseholdProperties>> tempOutput = new List<List<HouseholdProperties>>();
+                List<List<Household>> tempOutput = new List<List<Household>>();
 
                 for (int j = 0; j < cloneBase[i].Count(); j++)
                 {
-                    List<HouseholdProperties> tempTempOutput = new List<HouseholdProperties>();
+                    List<Household> tempTempOutput = new List<Household>();
 
                     for (int k = 0; k < cloneBase[i][j].Count(); k++)
                     {
@@ -341,17 +341,17 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        public static List<List<CoreProperties>> CloneCP(List<List<CoreProperties>> cloneBase)
+        public static List<List<Core>> CloneCP(List<List<Core>> cloneBase)
         {
-            List<List<CoreProperties>> output = new List<List<CoreProperties>>();
+            List<List<Core>> output = new List<List<Core>>();
 
             for (int i = 0; i < cloneBase.Count(); i++)
             {
-                List<CoreProperties> tempOutput = new List<CoreProperties>();
+                List<Core> tempOutput = new List<Core>();
 
                 for (int j = 0; j < cloneBase[i].Count(); j++)
                 {
-                    tempOutput.Add(new CoreProperties(cloneBase[i][j]));
+                    tempOutput.Add(new Core(cloneBase[i][j]));
                 }
 
                 output.Add(tempOutput);
@@ -360,16 +360,16 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        private static Curve CreateOutlineOnEarth(HouseholdProperties householdProperties)
+        private static Curve CreateOutlineOnEarth(Household household)
         {
-            HouseholdProperties newHouseholdProperties = new HouseholdProperties(householdProperties);
+            Household newHousehold = new Household(household);
 
-            newHouseholdProperties.Origin = new Point3d(newHouseholdProperties.Origin.X, newHouseholdProperties.Origin.Y, 0);
+            newHousehold.Origin = new Point3d(newHousehold.Origin.X, newHousehold.Origin.Y, 0);
 
-            return newHouseholdProperties.GetOutline();
+            return newHousehold.GetOutline();
         }
 
-        private static List<NonResidential> CreateCommercial(ref List<List<ParkingLine>> parkingLines, List<HouseholdProperties> buildingOutline, ref double grossAreaRemain, ref double buildingAreaRemain)
+        private static List<NonResidential> CreateCommercial(ref List<List<ParkingLine>> parkingLines, List<Household> buildingOutline, ref double grossAreaRemain, ref double buildingAreaRemain)
         {
             List<Curve> buildingOutlines = (from i in buildingOutline
                                             select CreateOutlineOnEarth(i)).ToList();
@@ -463,7 +463,7 @@ namespace TuringAndCorbusier
 
         }
 
-        private static bool CheckRoadCenterMeetStreet(ApartmentGeneratorOutput agOutput)
+        private static bool CheckRoadCenterMeetStreet(Apartment agOutput)
         {
             if (agOutput.AGtype == "PT-4")
                 return true;
@@ -476,7 +476,7 @@ namespace TuringAndCorbusier
             if (agOutput.AptLines.Count() != 0)
                 centerCurve = agOutput.AptLines[0];
 
-            ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.CoreProperties, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out parkingLotTypes, out roadCenterCurve, out Angle);
+            ParkingLineMaker.parkingLineMaker(agOutput.AGtype, agOutput.Core, agOutput.Plot, agOutput.ParameterSet.Parameters[2], centerCurve, out parkingLotTypes, out roadCenterCurve, out Angle);
 
             Polyline plotBoundaryPolyline;
             agOutput.Plot.Boundary.TryGetPolyline(out plotBoundaryPolyline);

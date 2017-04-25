@@ -21,8 +21,8 @@ namespace TuringAndCorbusier
     /// </summary>
     public partial class targetError : Window
     {
-        List<ApartmentGeneratorOutput> returnValue = new List<ApartmentGeneratorOutput>();
-        ApartmentmentGeneratorBase AG = new AG1();
+        List<Apartment> returnValue = new List<Apartment>();
+        ApartmentGeneratorBase AG = new AG1();
         Plot Plot = new Plot();
         ParameterSet ExistingParameter = new ParameterSet();
         Target ExistingTarget = new Target();
@@ -63,7 +63,7 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        public List<ApartmentGeneratorOutput> showDialogAndReturnValue(ApartmentmentGeneratorBase AG, Plot plot, ParameterSet existingParameter, Target existingTarget,  List<ApartmentGeneratorOutput> existingOutput)
+        public List<Apartment> showDialogAndReturnValue(ApartmentGeneratorBase AG, Plot plot, ParameterSet existingParameter, Target existingTarget,  List<Apartment> existingOutput)
         {
             returnValue = existingOutput;
             this.AG = AG;
@@ -78,9 +78,9 @@ namespace TuringAndCorbusier
 
         private void createUnderGroundParking_Click(object sender, RoutedEventArgs e)
         {
-            ApartmentGeneratorOutput newAGoutput = this.AG.generator(this.Plot, this.ExistingParameter, this.ExistingTarget);
+            Apartment newAGoutput = this.AG.generator(this.Plot, this.ExistingParameter, this.ExistingTarget);
 
-            List<ApartmentGeneratorOutput> newAGOutputSet = FinalizeApartmentGeneratorOutput.finalizeAGoutput(newAGoutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, true);
+            List<Apartment> newAGOutputSet = FinalizeApartment.finalizeAGoutput(newAGoutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, true);
 
             if (newAGOutputSet.Count != 0)
                 returnValue = newAGOutputSet;
@@ -94,8 +94,8 @@ namespace TuringAndCorbusier
 
             for(int i = 0; i < sortedTarget.Count(); i++ )
             {
-                ApartmentGeneratorOutput newAGoutput = this.AG.generator(this.Plot, this.ExistingParameter, this.ExistingTarget);
-                List<ApartmentGeneratorOutput> newAGOutputSet = FinalizeApartmentGeneratorOutput.finalizeAGoutput(newAGoutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
+                Apartment newAGoutput = this.AG.generator(this.Plot, this.ExistingParameter, this.ExistingTarget);
+                List<Apartment> newAGOutputSet = FinalizeApartment.finalizeAGoutput(newAGoutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
 
                 if (newAGOutputSet.Count != 0)
                 {

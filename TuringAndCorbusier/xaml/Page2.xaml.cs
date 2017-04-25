@@ -52,16 +52,16 @@ namespace TuringAndCorbusier
 
         public void Disable34()
         {
-            Btn_AG3.Opacity = 0.4;
-            Toggle_AG3.IsChecked = true;
+            //Btn_AG3.Opacity = 0.4;
+            //Toggle_AG3.IsChecked = true;
             
-            ag3errorMsg.Text = "현재 수정 중입니다.";
-            ag3errorMsg.Visibility = Visibility.Visible;
-            ag3errorMsg.IsEnabled = true;
-            Btn_AG3.Click -= Btn_AG3_Click;
+            //ag3errorMsg.Text = "현재 수정 중입니다.";
+            //ag3errorMsg.Visibility = Visibility.Visible;
+            //ag3errorMsg.IsEnabled = true;
+            //Btn_AG3.Click -= Btn_AG3_Click;
            
-            Toggle_AG3.IsEnabled = false;
-            Btn_AG3.IsEnabled = false;
+            //Toggle_AG3.IsEnabled = false;
+            //Btn_AG3.IsEnabled = false;
 
 
             Btn_AG4.Opacity = 0.4;

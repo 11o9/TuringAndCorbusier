@@ -66,7 +66,7 @@ namespace Reports
 
         
 
-        public Dictionary<string,string> showmeinit(List<FixedPage> pages, List<string> pagename , string _projectname, ApartmentGeneratorOutput agoutput, ref List<Dictionary<string,string>>paths , int index)
+        public Dictionary<string,string> showmeinit(List<FixedPage> pages, List<string> pagename , string _projectname, Apartment agoutput, ref List<Dictionary<string,string>>paths , int index)
         {
 
             Dictionary<string, string> result = new Dictionary<string, string>();

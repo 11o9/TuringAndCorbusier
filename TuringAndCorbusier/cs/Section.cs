@@ -24,7 +24,7 @@ namespace TuringAndCorbusier
         public List<Surroundinginfo> Surrounding { get; private set; }
         public List<RoomNamecard> roomNamecard { get; private set; }
 
-        public static Section drawSection(List<Curve> baseCurve, List<List<List<HouseholdProperties>>> households, List<List<CoreProperties>> cores, Plot plot)
+        public static Section drawSection(List<Curve> baseCurve, List<List<List<Household>>> households, List<List<Core>> cores, Plot plot)
         {
             double storyHeight = 2800;
             double floorLow = 200;
@@ -48,7 +48,7 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < index.Count(); i++)
             {
-                CoreProperties tempCoreProperty = cores[index[i]][0];
+                Core tempCoreProperty = cores[index[i]][0];
 
                 Point3d tempCoreStart = tempCoreProperty.Origin;
                 Point3d tempCoreEnd = tempCoreProperty.Origin + tempCoreProperty.YDirection * tempCoreProperty.CoreType.GetDepth();
@@ -71,7 +71,7 @@ namespace TuringAndCorbusier
 
                 for(int j = 0; j < households[i].Count(); j++)
                 {
-                    HouseholdProperties tempHousehold = households[i][j][tempIntersectIndex];
+                    Household tempHousehold = households[i][j][tempIntersectIndex];
                     double widthAsParameter = tempHousehold.YLengthA * (groundCurve.Domain.T1 - groundCurve.Domain.T0) / groundCurve.GetLength();
 
                     Point3d tempStart = groundCurve.PointAt(uniqueParameter[i] - widthAsParameter / 2);
@@ -271,13 +271,13 @@ namespace TuringAndCorbusier
             return new Polyline(ptList).ToNurbsCurve();
         }
 
-        private static List<int> getUniqueIndexByHeight(List<HouseholdProperties> households)
+        private static List<int> getUniqueIndexByHeight(List<Household> households)
         {
             List<int> output = new List<int>();
 
             List<double> height = new List<double>();
 
-            foreach (HouseholdProperties i in households)
+            foreach (Household i in households)
                 height.Add(i.Origin.Z);
 
             List<double> culledHeight = height.Distinct().ToList();

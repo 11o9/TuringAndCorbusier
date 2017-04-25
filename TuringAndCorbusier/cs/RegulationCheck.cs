@@ -11,7 +11,7 @@ namespace TuringAndCorbusier
     {
         //Constructor, 생성자
 
-        public RegulationChecker(ApartmentGeneratorOutput agOut)
+        public RegulationChecker(Apartment agOut)
         {
             //boundary regulation
             int storiesHigh = (int)Math.Max(agOut.ParameterSet.Parameters[0], agOut.ParameterSet.Parameters[1]);
@@ -36,7 +36,7 @@ namespace TuringAndCorbusier
         public List<FloorPlan.Dimension> BuildingDistRegulation { get; private set; }
 
         //method, 메소드
-        private Curve fromSurroundingsRegulation(ApartmentGeneratorOutput agOut)
+        private Curve fromSurroundingsRegulation(Apartment agOut)
         {
             //initial settings
             Polyline outline;
@@ -83,7 +83,7 @@ namespace TuringAndCorbusier
             return new Polyline(ptsNew).ToNurbsCurve();
         }
 
-        private Curve fromNorthRegulation(ApartmentGeneratorOutput agOut, int stories)
+        private Curve fromNorthRegulation(Apartment agOut, int stories)
         {
             Plot plot = agOut.Plot;
             Regulation regulation = new Regulation(stories);
@@ -155,7 +155,7 @@ namespace TuringAndCorbusier
             return fromNorthCurve;
         }
 
-        private Curve byLightingRegulation(ApartmentGeneratorOutput agOut, int stories)
+        private Curve byLightingRegulation(Apartment agOut, int stories)
         {
             double angleRadian = agOut.ParameterSet.Parameters[3];
             Curve lighting1 = byLightingCurve(agOut, stories, angleRadian);
@@ -166,7 +166,7 @@ namespace TuringAndCorbusier
                 return CommonFunc.joinRegulations(lighting1, lighting2);
         }
 
-        private Curve byLightingCurve(ApartmentGeneratorOutput agOut, int stories, double angleRadian)
+        private Curve byLightingCurve(Apartment agOut, int stories, double angleRadian)
         {
             //법규적용 인접대지경계선(채광창)
 
@@ -244,23 +244,23 @@ namespace TuringAndCorbusier
             return byLightingCurve;
         }
 
-        private List<FloorPlan.Dimension> buildingDistanceRegulation(ApartmentGeneratorOutput agOut)
+        private List<FloorPlan.Dimension> buildingDistanceRegulation(Apartment agOut)
         {
             double aptWidth = agOut.ParameterSet.Parameters[2];
             //create core outlines
             List<List<Curve>> coreOutline = new List<List<Curve>>();
-            for (int i = 0; i < agOut.CoreProperties.Count; i++)
+            for (int i = 0; i < agOut.Core.Count; i++)
             {
                 List<Curve> coreOutlineTemp = new List<Curve>();
-                for (int j = 0; j < agOut.CoreProperties[i].Count; j++)
+                for (int j = 0; j < agOut.Core[i].Count; j++)
                 {
                     List<Point3d> outlinePoints = new List<Point3d>();
 
-                    Point3d pt = new Point3d(agOut.CoreProperties[i][j].Origin);
-                    Vector3d x = new Vector3d(agOut.CoreProperties[i][j].XDirection);
-                    Vector3d y = new Vector3d(agOut.CoreProperties[i][j].YDirection);
-                    double width = agOut.CoreProperties[i][j].CoreType.GetWidth();
-                    double depth = agOut.CoreProperties[i][j].CoreType.GetDepth();
+                    Point3d pt = new Point3d(agOut.Core[i][j].Origin);
+                    Vector3d x = new Vector3d(agOut.Core[i][j].XDirection);
+                    Vector3d y = new Vector3d(agOut.Core[i][j].YDirection);
+                    double width = agOut.Core[i][j].CoreType.GetWidth();
+                    double depth = agOut.Core[i][j].CoreType.GetDepth();
 
                     outlinePoints.Add(pt);
                     pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
@@ -323,17 +323,17 @@ namespace TuringAndCorbusier
 
                 //Wall to Lighting
                 List<Curve> lw = new List<Curve>();
-                for (int i = 0; i < agOut.CoreProperties.Count; i++)
+                for (int i = 0; i < agOut.Core.Count; i++)
                 {
-                    for (int j = 0; j < agOut.CoreProperties[i].Count; j++)
+                    for (int j = 0; j < agOut.Core[i].Count; j++)
                     {
                         List<Point3d> outlinePoints = new List<Point3d>();
 
-                        Point3d pt = new Point3d(agOut.CoreProperties[i][j].Origin);
-                        Vector3d x = new Vector3d(agOut.CoreProperties[i][j].XDirection);
-                        Vector3d y = new Vector3d(agOut.CoreProperties[i][j].YDirection);
-                        double width = agOut.CoreProperties[i][j].CoreType.GetWidth();
-                        double depth = agOut.CoreProperties[i][j].CoreType.GetDepth();
+                        Point3d pt = new Point3d(agOut.Core[i][j].Origin);
+                        Vector3d x = new Vector3d(agOut.Core[i][j].XDirection);
+                        Vector3d y = new Vector3d(agOut.Core[i][j].YDirection);
+                        double width = agOut.Core[i][j].CoreType.GetWidth();
+                        double depth = agOut.Core[i][j].CoreType.GetDepth();
 
                         pt.Transform(Transform.Translation(Vector3d.Multiply(x, width / 2)));
                         pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
@@ -362,17 +362,17 @@ namespace TuringAndCorbusier
 
                 //Wall to Wall
                 List<Curve> ww = new List<Curve>();
-                for (int i = 0; i < agOut.CoreProperties.Count; i++)
+                for (int i = 0; i < agOut.Core.Count; i++)
                 {
-                    if (agOut.CoreProperties[i].Count > 1)
+                    if (agOut.Core[i].Count > 1)
                     {
                         List<Point3d> outlinePoints = new List<Point3d>();
 
-                        Point3d pt = new Point3d(agOut.CoreProperties[i][0].Origin);
-                        Vector3d x = new Vector3d(agOut.CoreProperties[i][0].XDirection);
-                        Vector3d y = new Vector3d(agOut.CoreProperties[i][0].YDirection);
-                        double width = agOut.CoreProperties[i][0].CoreType.GetWidth();
-                        double depth = agOut.CoreProperties[i][0].CoreType.GetDepth();
+                        Point3d pt = new Point3d(agOut.Core[i][0].Origin);
+                        Vector3d x = new Vector3d(agOut.Core[i][0].XDirection);
+                        Vector3d y = new Vector3d(agOut.Core[i][0].YDirection);
+                        double width = agOut.Core[i][0].CoreType.GetWidth();
+                        double depth = agOut.Core[i][0].CoreType.GetDepth();
 
                         pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
                         pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth / 2)));
@@ -427,8 +427,8 @@ namespace TuringAndCorbusier
 
                 output.Add(dimMaker(side, "ll"));
 
-                double width = agOut.CoreProperties[0][0].CoreType.GetWidth();
-                double depth = agOut.CoreProperties[0][0].CoreType.GetDepth();
+                double width = agOut.Core[0][0].CoreType.GetWidth();
+                double depth = agOut.Core[0][0].CoreType.GetDepth();
 
                 Curve guide = segs[0].DuplicateCurve();
                 string newGuideStr = "lw";
@@ -437,7 +437,7 @@ namespace TuringAndCorbusier
                 Vector3d vec = new Vector3d(eP - sP);
                 vec.Unitize();
                 sP.Transform(Transform.Translation(vec * width));
-                if (agOut.CoreProperties[0].Count == 4)
+                if (agOut.Core[0].Count == 4)
                 {
                     eP.Transform(Transform.Translation(-vec * width));
                     newGuideStr = "ww";

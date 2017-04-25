@@ -8,9 +8,9 @@ using Rhino.Collections;
 
 namespace TuringAndCorbusier
 {
-    class AG4 : ApartmentmentGeneratorBase
+    class AG4 : ApartmentGeneratorBase
     {
-        public override ApartmentGeneratorOutput generator(Plot plot, ParameterSet parameterSet, Target target)
+        public override Apartment generator(Plot plot, ParameterSet parameterSet, Target target)
         {
             ///////////////////////////////////////////////
             //////////  common initial settings  //////////
@@ -56,7 +56,7 @@ namespace TuringAndCorbusier
             Curve centerline = centerpolyline.ToNurbsCurve();
 
             if (centerline.GetLength() > plot.Boundary.GetLength())
-                return new ApartmentGeneratorOutput(plot);
+                return new Apartment(plot);
 
             double wholeL = centerpolyline.Length;
             double coreWidth = parameterSet.CoreType.GetWidth();
@@ -89,22 +89,22 @@ namespace TuringAndCorbusier
             //household properties
             //household statistics
             //core properties
-            List<List<List<HouseholdProperties>>> householdProperties = new List<List<List<HouseholdProperties>>>();
+            List<List<List<Household>>> household = new List<List<List<Household>>>();
             List<List<HouseholdStatistics>> householdStatistics = new List<List<HouseholdStatistics>>();
-            List<List<CoreProperties>> coreProperties = new List<List<CoreProperties>>();
-            coreAndHouses(unallocated, stretchedLength, target, parameterSet, lines, centerline, out householdProperties, out householdStatistics, out coreProperties);
+            List<List<Core>> core = new List<List<Core>>();
+            coreAndHouses(unallocated, stretchedLength, target, parameterSet, lines, centerline, out household, out householdStatistics, out core);
 
             //building outlines
             List<List<Curve>> buildingOutlines = buildingOutlineMakerAG4(centerline, width);
 
             //parking lot
-            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, coreProperties, plot, parameters[2], centerline));
+            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, core, plot, parameters[2], centerline));
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
 
             List<Curve> aptLines = new List<Curve>();
             aptLines.Add(centerline);
 
-            ApartmentGeneratorOutput result = new ApartmentGeneratorOutput(this.GetAGType, plot, buildingType, parameterSet, target, coreProperties, householdProperties, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
+            Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, core, household, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
             return result;
 
 
@@ -754,7 +754,7 @@ namespace TuringAndCorbusier
             unallocated.Reverse();
             return unallocated;
         }
-        private void coreAndHouses(List<int> unallocated, List<double> stretchedLength, Target target, ParameterSet parameterSet, List<Line> lines, Curve centerline, out List<List<List<HouseholdProperties>>> householdProperties, out List<List<HouseholdStatistics>> householdStatistics, out List<List<CoreProperties>> coreProperties)
+        private void coreAndHouses(List<int> unallocated, List<double> stretchedLength, Target target, ParameterSet parameterSet, List<Line> lines, Curve centerline, out List<List<List<Household>>> household, out List<List<HouseholdStatistics>> householdStatistics, out List<List<Core>> core)
         {
             double storiesHigh = Math.Max((int)parameterSet.Parameters[0], (int)parameterSet.Parameters[1]);
             double coreWidth = parameterSet.CoreType.GetWidth();
@@ -1054,21 +1054,21 @@ namespace TuringAndCorbusier
             }
 
             //household properties
-            householdProperties = new List<List<List<HouseholdProperties>>>();
-            List<List<HouseholdProperties>> hhpB = new List<List<HouseholdProperties>>();
-            List<HouseholdProperties> hhpS = new List<HouseholdProperties>();
+            household = new List<List<List<Household>>>();
+            List<List<Household>> hhpB = new List<List<Household>>();
+            List<Household> hhpS = new List<Household>();
 
             for (int i = 0; i < homeOri.Count; i++)
             {
-                hhpS.Add(new HouseholdProperties(homeOri[i], homeVecX[i], homeVecY[i], xa[i], xb[i], ya[i], yb[i], unallocated[i], exclusiveArea[i], winBuilding[i], entBuilding[i], wallFactors[i]));
+                hhpS.Add(new Household(homeOri[i], homeVecX[i], homeVecY[i], xa[i], xb[i], ya[i], yb[i], unallocated[i], exclusiveArea[i], winBuilding[i], entBuilding[i], wallFactors[i]));
             }
 
             for (int j = 0; j < storiesHigh; j++)
             {
-                List<HouseholdProperties> hhpSTemp = new List<HouseholdProperties>();
+                List<Household> hhpSTemp = new List<Household>();
                 for (int i = 0; i < hhpS.Count; i++)
                 {
-                    HouseholdProperties hhp = hhpS[i];
+                    Household hhp = hhpS[i];
                     Point3d ori = hhp.Origin;
                     Point3d ent = hhp.EntrancePoint;
                     ori.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
@@ -1082,23 +1082,23 @@ namespace TuringAndCorbusier
                         winNew.Add(winTemp);
                     }
 
-                    hhpSTemp.Add(new HouseholdProperties(ori, hhp.XDirection, hhp.YDirection, hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.HouseholdSizeType, hhp.GetExclusiveArea(), winNew, ent, hhp.WallFactor));
+                    hhpSTemp.Add(new Household(ori, hhp.XDirection, hhp.YDirection, hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.HouseholdSizeType, hhp.GetExclusiveArea(), winNew, ent, hhp.WallFactor));
                 }
                 hhpB.Add(hhpSTemp);
             }
 
             //hhpB.Add(hhpS);
-            householdProperties.Add(hhpB);
+            household.Add(hhpB);
 
 
             //household statistics
             householdStatistics = new List<List<HouseholdStatistics>>();
-            List<List<HouseholdProperties>> cornerProperties = new List<List<HouseholdProperties>>();
-            List<List<HouseholdProperties>> edgeProperties = new List<List<HouseholdProperties>>();
+            List<List<Household>> cornerProperties = new List<List<Household>>();
+            List<List<Household>> edgeProperties = new List<List<Household>>();
             for (int i = 0; i < target.TargetArea.Count; i++)
             {
-                cornerProperties.Add(new List<HouseholdProperties>());
-                edgeProperties.Add(new List<HouseholdProperties>());
+                cornerProperties.Add(new List<Household>());
+                edgeProperties.Add(new List<Household>());
                 householdStatistics.Add(new List<HouseholdStatistics>());
             }
 
@@ -1106,11 +1106,11 @@ namespace TuringAndCorbusier
             {
                 if (homeShapeType[i] == 0)
                 {
-                    edgeProperties[unallocated[i]].Add(householdProperties[0][0][i]);
+                    edgeProperties[unallocated[i]].Add(household[0][0][i]);
                 }
                 else
                 {
-                    cornerProperties[unallocated[i]].Add(householdProperties[0][0][i]);
+                    cornerProperties[unallocated[i]].Add(household[0][0][i]);
                 }
             }
 
@@ -1127,13 +1127,13 @@ namespace TuringAndCorbusier
             }
 
             //core properties
-            coreProperties = new List<List<CoreProperties>>();
-            List<CoreProperties> cpB = new List<CoreProperties>();
+            core = new List<List<Core>>();
+            List<Core> cpB = new List<Core>();
             for (int i = 0; i < corePoint.Count; i++)
             {
-                cpB.Add(new CoreProperties(corePoint[i], coreVecX[i], coreVecY[i], parameterSet.CoreType, parameterSet.Parameters[0], parameterSet.CoreType.GetDepth() - 0));
+                cpB.Add(new Core(corePoint[i], coreVecX[i], coreVecY[i], parameterSet.CoreType, parameterSet.Parameters[0], parameterSet.CoreType.GetDepth() - 0));
             }
-            coreProperties.Add(cpB);
+            core.Add(cpB);
         }
 
         ///////////////////////////////
@@ -1196,7 +1196,7 @@ namespace TuringAndCorbusier
             return outline;
         }
 
-        private List<List<ParkingLine>> parkingLotMaker(Curve centerline, double width, double coreWidth, List<List<CoreProperties>> coreProperties)
+        private List<List<ParkingLine>> parkingLotMaker(Curve centerline, double width, double coreWidth, List<List<Core>> core)
         {
             List<List<Curve>> outline = new List<List<Curve>>();
             List<Curve> outlineTemp = new List<Curve>();
@@ -1299,12 +1299,12 @@ namespace TuringAndCorbusier
             //find core end points
 
             List<Point3d> coreEnds = new List<Point3d>();
-            for (int i = 0; i < coreProperties[0].Count; i++)
+            for (int i = 0; i < core[0].Count; i++)
             {
-                Point3d core1 = coreProperties[0][i].Origin;
-                Point3d core2 = coreProperties[0][i].Origin;
-                core1.Transform(Transform.Translation(Vector3d.Multiply(coreProperties[0][i].XDirection, 0)));
-                core2.Transform(Transform.Translation(Vector3d.Multiply(coreProperties[0][i].XDirection, coreWidth)));
+                Point3d core1 = core[0][i].Origin;
+                Point3d core2 = core[0][i].Origin;
+                core1.Transform(Transform.Translation(Vector3d.Multiply(core[0][i].XDirection, 0)));
+                core2.Transform(Transform.Translation(Vector3d.Multiply(core[0][i].XDirection, coreWidth)));
                 coreEnds.Add(core1);
                 coreEnds.Add(core2);
             }

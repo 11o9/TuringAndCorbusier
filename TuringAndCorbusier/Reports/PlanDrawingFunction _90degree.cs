@@ -9,14 +9,14 @@ namespace TuringAndCorbusier
 {
     public class PlanDrawingFunction_90degree
     {
-        public static HouseholdProperties alignHousholdProperties(HouseholdProperties householdProperties)
+        public static Household alignHousholdProperties(Household household)
         {
-            HouseholdProperties tempHouseholdProperties = new HouseholdProperties(householdProperties);
+            Household tempHousehold = new Household(household);
 
-            tempHouseholdProperties.XDirection = Vector3d.XAxis;
-            tempHouseholdProperties.YDirection = Vector3d.YAxis;
+            tempHousehold.XDirection = Vector3d.XAxis;
+            tempHousehold.YDirection = Vector3d.YAxis;
 
-            return tempHouseholdProperties;
+            return tempHousehold;
         }
 
         public static void drawDimension(Rectangle3d tempBoundingBox, List<TuringAndCorbusier.FloorPlan.Dimension> dimensions, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas)

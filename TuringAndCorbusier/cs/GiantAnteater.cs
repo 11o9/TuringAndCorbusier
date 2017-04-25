@@ -8,7 +8,7 @@ namespace TuringAndCorbusier
 {
     class GiantAnteater
     {
-        public static List<ApartmentGeneratorOutput> giantAnteater(Plot plot, ApartmentmentGeneratorBase ag, Target target, bool previewOn)
+        public static List<Apartment> giantAnteater(Plot plot, ApartmentGeneratorBase ag, Target target, bool previewOn)
         {
             double mutationProbability = ag.GAParameterSet[0];
             double elitismPercentage = ag.GAParameterSet[1];
@@ -159,22 +159,22 @@ namespace TuringAndCorbusier
 
                 Rhino.RhinoApp.Wait();
             }
-            ApartmentGeneratorOutput bestOutput = ag.generator(plot, bestGene, target);
+            Apartment bestOutput = ag.generator(plot, bestGene, target);
 
-            return new ApartmentGeneratorOutput[] { bestOutput }.ToList();
+            return new Apartment[] { bestOutput }.ToList();
 
             if (bestOutput.ParameterSet == null)
-                return FinalizeApartmentGeneratorOutput.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
+                return FinalizeApartment.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
 
             if (bestOutput.ParameterSet.Parameters != null)
             {
-                List<ApartmentGeneratorOutput> output = FinalizeApartmentGeneratorOutput.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
+                List<Apartment> output = FinalizeApartment.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
 
                 bool IsSatisfyingLegalParking = false;
 
-                List<ApartmentGeneratorOutput> satisFyingLegalParkingOutput = new List<ApartmentGeneratorOutput>();
+                List<Apartment> satisFyingLegalParkingOutput = new List<Apartment>();
 
-                foreach (ApartmentGeneratorOutput i in output)
+                foreach (Apartment i in output)
                 {
                     if (i.GetLegalParkingLotOfCommercial() + i.GetLegalParkingLotofHousing() < i.ParkingLotOnEarth.GetCount() + i.ParkingLotUnderGround.Count)
                     {
@@ -186,13 +186,13 @@ namespace TuringAndCorbusier
                 if (IsSatisfyingLegalParking == false)
                 {
                     targetError tempErrorMessage = new targetError();
-                    List<ApartmentGeneratorOutput> tempNewOutput = tempErrorMessage.showDialogAndReturnValue(ag, plot, bestGene, target, output);
+                    List<Apartment> tempNewOutput = tempErrorMessage.showDialogAndReturnValue(ag, plot, bestGene, target, output);
 
                     bool tempSatisfyingLegalParking = false;
 
-                    List<ApartmentGeneratorOutput> tempSatisFyingLegalParkingOutput = new List<ApartmentGeneratorOutput>();
+                    List<Apartment> tempSatisFyingLegalParkingOutput = new List<Apartment>();
 
-                    foreach (ApartmentGeneratorOutput i in tempNewOutput)
+                    foreach (Apartment i in tempNewOutput)
                     {
                         if (i.GetLegalParkingLotOfCommercial() + i.GetLegalParkingLotofHousing() < i.ParkingLotOnEarth.GetCount() + i.ParkingLotUnderGround.Count)
                         {
@@ -222,20 +222,20 @@ namespace TuringAndCorbusier
                 System.Windows.MessageBox.Show(CommonFunc.GetApartmentType(ag.GetAGType) + " 타입 설계에 적합하지 않은 대지입니다.");
             }
 
-            return FinalizeApartmentGeneratorOutput.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
+            return FinalizeApartment.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
         }
 
-        public static List<List<List<HouseholdProperties>>> CloneHhp(List<List<List<HouseholdProperties>>> cloneBase)
+        public static List<List<List<Household>>> CloneHhp(List<List<List<Household>>> cloneBase)
         {
-            List<List<List<HouseholdProperties>>> output = new List<List<List<HouseholdProperties>>>();
+            List<List<List<Household>>> output = new List<List<List<Household>>>();
 
             for (int i = 0; i < cloneBase.Count(); i++)
             {
-                List<List<HouseholdProperties>> tempOutput = new List<List<HouseholdProperties>>();
+                List<List<Household>> tempOutput = new List<List<Household>>();
 
                 for (int j = 0; j < cloneBase[i].Count(); j++)
                 {
-                    List<HouseholdProperties> tempTempOutput = new List<HouseholdProperties>();
+                    List<Household> tempTempOutput = new List<Household>();
 
                     for (int k = 0; k < cloneBase[i][j].Count(); k++)
                     {
@@ -250,17 +250,17 @@ namespace TuringAndCorbusier
 
             return output;
         }
-        public static List<List<CoreProperties>> CloneCP(List<List<CoreProperties>> cloneBase)
+        public static List<List<Core>> CloneCP(List<List<Core>> cloneBase)
         {
-            List<List<CoreProperties>> output = new List<List<CoreProperties>>();
+            List<List<Core>> output = new List<List<Core>>();
 
             for (int i = 0; i < cloneBase.Count(); i++)
             {
-                List<CoreProperties> tempOutput = new List<CoreProperties>();
+                List<Core> tempOutput = new List<Core>();
 
                 for (int j = 0; j < cloneBase[i].Count(); j++)
                 {
-                    tempOutput.Add(new CoreProperties(cloneBase[i][j]));
+                    tempOutput.Add(new Core(cloneBase[i][j]));
                 }
 
                 output.Add(tempOutput);
@@ -278,7 +278,7 @@ namespace TuringAndCorbusier
                 return newStory;
         }
 
-        private static List<List<double>> evaluateFitness(Plot plot, ApartmentmentGeneratorBase ag, Target target, List<ParameterSet> gene, double fitnessFactor, bool previewOn)
+        private static List<List<double>> evaluateFitness(Plot plot, ApartmentGeneratorBase ag, Target target, List<ParameterSet> gene, double fitnessFactor, bool previewOn)
         {
             List<List<double>> result = new List<List<double>>();
             List<double> grossAreaRatio = new List<double>();
@@ -293,12 +293,12 @@ namespace TuringAndCorbusier
             }
             , drawSomeThing, TimeSpan.Zero, TimeSpan.FromMilliseconds(500));
 
-            List<ApartmentGeneratorOutput> agOutToDrawList = new List<ApartmentGeneratorOutput>();
+            List<Apartment> agOutToDrawList = new List<Apartment>();
             List<double> agOutToDrawGrossAreaList = new List<double>();
 
             for (i = 0; i < gene.Count(); i++)
             {
-                ApartmentGeneratorOutput tempOutput = ag.generator(plot, gene[i], target);
+                Apartment tempOutput = ag.generator(plot, gene[i], target);
                 grossAreaRatio.Add(tempOutput.GetGrossAreaRatio());
                 targetAccuracy.Add(tempOutput.GetTargetAccuracy());
                 double tempRatio = (tempOutput.ParkingLotOnEarth.GetCount() + tempOutput.ParkingLotUnderGround.Count) / (tempOutput.GetLegalParkingLotOfCommercial() + tempOutput.GetLegalParkingLotofHousing());
@@ -465,7 +465,7 @@ namespace TuringAndCorbusier
             return resultGene;
         }
 
-        private static ParameterSet mutation(ParameterSet gene, ApartmentmentGeneratorBase ag, double mutationFactor, int randomSeed)
+        private static ParameterSet mutation(ParameterSet gene, ApartmentGeneratorBase ag, double mutationFactor, int randomSeed)
         {
             //random gaussian
             Random rand = new Random(randomSeed); //reuse this if you are generating many

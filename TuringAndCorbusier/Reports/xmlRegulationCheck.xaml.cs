@@ -19,7 +19,7 @@ namespace Reports
     /// </summary>
     public partial class xmlRegulationCheck : UserControl
     {
-        public xmlRegulationCheck(TuringAndCorbusier.ApartmentGeneratorOutput AGoutput)
+        public xmlRegulationCheck(TuringAndCorbusier.Apartment AGoutput)
         {
             InitializeComponent();
         }

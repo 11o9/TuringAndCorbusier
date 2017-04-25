@@ -11,17 +11,17 @@ namespace TuringAndCorbusier
 
     public class MakeBuildings
     {
-        public static List<Brep> makeBuildings(ApartmentGeneratorOutput agOut)
+        public static List<Brep> makeBuildings(Apartment agOut)
         {
             List<Brep> output = new List<Brep>();
 
-            List<HouseholdProperties> hhps = new List<HouseholdProperties>();
-            foreach (var hh in agOut.HouseholdProperties)
+            List<Household> hhps = new List<Household>();
+            foreach (var hh in agOut.Household)
                 foreach (var h in hh)
                     hhps.AddRange(h);
 
-            List<CoreProperties> cps = new List<CoreProperties>();
-            foreach (var h in agOut.CoreProperties)
+            List<Core> cps = new List<Core>();
+            foreach (var h in agOut.Core)
                 cps.AddRange(h);
 
             foreach (var hhp in hhps)
@@ -36,7 +36,7 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        public static List<Brep> DrawHouse(HouseholdProperties hhp)
+        public static List<Brep> DrawHouse(Household hhp)
         {
             double height = Consts.FloorHeight;
             Curve outline = hhp.GetOutline();
@@ -138,7 +138,7 @@ namespace TuringAndCorbusier
 
         }
 
-            public static Brep DrawCore(CoreProperties hhp)
+            public static Brep DrawCore(Core hhp)
         {
             double height = hhp.Stories == 0 ? Consts.PilotiHeight : Consts.FloorHeight;
             Vector3d x = hhp.XDirection;
@@ -154,7 +154,7 @@ namespace TuringAndCorbusier
             
         }
 
-        public static List<List<Brep>> makeBuildings(ApartmentGeneratorOutput agOut, bool drawComplexModeling)
+        public static List<List<Brep>> makeBuildings(Apartment agOut, bool drawComplexModeling)
         {
             //description//
             //first List<Brep> : each house outline wall
@@ -165,18 +165,18 @@ namespace TuringAndCorbusier
 
             //create core outlines
             List<List<Curve>> coreOutline = new List<List<Curve>>();
-            for (int i = 0; i < agOut.CoreProperties.Count; i++)
+            for (int i = 0; i < agOut.Core.Count; i++)
             {
                 List<Curve> coreOutlineTemp = new List<Curve>();
-                for (int j = 0; j < agOut.CoreProperties[i].Count; j++)
+                for (int j = 0; j < agOut.Core[i].Count; j++)
                 {
                     List<Point3d> outlinePoints = new List<Point3d>();
 
-                    Point3d pt = new Point3d(agOut.CoreProperties[i][j].Origin);
-                    Vector3d x = new Vector3d(agOut.CoreProperties[i][j].XDirection);
-                    Vector3d y = new Vector3d(agOut.CoreProperties[i][j].YDirection);
-                    double width = agOut.CoreProperties[i][j].CoreType.GetWidth();
-                    double depth = agOut.CoreProperties[i][j].CoreType.GetDepth();
+                    Point3d pt = new Point3d(agOut.Core[i][j].Origin);
+                    Vector3d x = new Vector3d(agOut.Core[i][j].XDirection);
+                    Vector3d y = new Vector3d(agOut.Core[i][j].YDirection);
+                    double width = agOut.Core[i][j].CoreType.GetWidth();
+                    double depth = agOut.Core[i][j].CoreType.GetDepth();
 
                     outlinePoints.Add(pt);
                     pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
@@ -201,23 +201,23 @@ namespace TuringAndCorbusier
             //create house outlines
             List<List<List<Curve>>> houseOutline = new List<List<List<Curve>>>();
 
-            for (int i = 0; i < agOut.HouseholdProperties.Count; i++)
+            for (int i = 0; i < agOut.Household.Count; i++)
             {
                 List<List<Curve>> houseOutline_i = new List<List<Curve>>();
-                for (int j = 0; j < agOut.HouseholdProperties[i].Count; j++)
+                for (int j = 0; j < agOut.Household[i].Count; j++)
                 {
                     List<Curve> houseOutline_j = new List<Curve>();
 
-                    for (int k = 0; k < agOut.HouseholdProperties[i][j].Count(); k++)
+                    for (int k = 0; k < agOut.Household[i][j].Count(); k++)
                     {
                         List<Point3d> outlinePoints = new List<Point3d>();
-                        Point3d pt = new Point3d(agOut.HouseholdProperties[i][j][k].Origin);
-                        Vector3d x = new Vector3d(agOut.HouseholdProperties[i][j][k].XDirection);
-                        Vector3d y = new Vector3d(agOut.HouseholdProperties[i][j][k].YDirection);
-                        double xa = agOut.HouseholdProperties[i][j][k].XLengthA;
-                        double xb = agOut.HouseholdProperties[i][j][k].XLengthB;
-                        double ya = agOut.HouseholdProperties[i][j][k].YLengthA;
-                        double yb = agOut.HouseholdProperties[i][j][k].YLengthB;
+                        Point3d pt = new Point3d(agOut.Household[i][j][k].Origin);
+                        Vector3d x = new Vector3d(agOut.Household[i][j][k].XDirection);
+                        Vector3d y = new Vector3d(agOut.Household[i][j][k].YDirection);
+                        double xa = agOut.Household[i][j][k].XLengthA;
+                        double xb = agOut.Household[i][j][k].XLengthB;
+                        double ya = agOut.Household[i][j][k].YLengthA;
+                        double yb = agOut.Household[i][j][k].YLengthB;
 
                         outlinePoints.Add(pt);
                         pt.Transform(Transform.Translation(Vector3d.Multiply(y, yb)));
@@ -366,7 +366,7 @@ namespace TuringAndCorbusier
                 List<Brep> coreBrepTemp = new List<Brep>();
                 for (int j = 0; j < coreOutline[i].Count; j++)
                 {
-                    Surface tempSurface = Surface.CreateExtrusion(coreOutline[i][j], Vector3d.Multiply(Vector3d.ZAxis, storiesHeight * (agOut.CoreProperties[i][j].Stories + 1) + pilotiHeight));
+                    Surface tempSurface = Surface.CreateExtrusion(coreOutline[i][j], Vector3d.Multiply(Vector3d.ZAxis, storiesHeight * (agOut.Core[i][j].Stories + 1) + pilotiHeight));
 
                     Brep tempBrep = tempSurface.ToBrep().CapPlanarHoles(1);
                     coreBrepTemp.Add(tempBrep);
@@ -399,16 +399,16 @@ namespace TuringAndCorbusier
 
                     try
                     {
-                        if (agOut.Target.TargetArea[agOut.HouseholdProperties[i][0][0].HouseholdSizeType] * 1000 * 1000 < Consts.AreaLimit)
+                        if (agOut.Target.TargetArea[agOut.Household[i][0][0].HouseholdSizeType] * 1000 * 1000 < Consts.AreaLimit)
                         {
 
-                            for (int j = 0; j < agOut.HouseholdProperties[i].Count; j++)
+                            for (int j = 0; j < agOut.Household[i].Count; j++)
                             {
                                 double corridorLength = 0;
-                                Point3d startPoint = agOut.HouseholdProperties[i][j][0].Origin + agOut.HouseholdProperties[i][j][0].XDirection * agOut.HouseholdProperties[i][j][0].XLengthA;
-                                for (int k = 0; k < agOut.HouseholdProperties[i][j].Count; k++)
+                                Point3d startPoint = agOut.Household[i][j][0].Origin + agOut.Household[i][j][0].XDirection * agOut.Household[i][j][0].XLengthA;
+                                for (int k = 0; k < agOut.Household[i][j].Count; k++)
                                 {
-                                    corridorLength += agOut.HouseholdProperties[i][j][k].XLengthA;
+                                    corridorLength += agOut.Household[i][j][k].XLengthA;
                                 }
 
                                 Vector3d tangentVec = aptLines[i].TangentAtStart;
@@ -439,8 +439,8 @@ namespace TuringAndCorbusier
 
                                 Brep corridorFloorBrep = Surface.CreateExtrusion(corridorFloorline.ToNurbsCurve(), -verticalVec * Consts.corridorWidth).ToBrep();
 
-                                corridorWallBrep.Translate(Vector3d.Multiply(Vector3d.ZAxis, agOut.HouseholdProperties[i][j][0].Origin.Z));
-                                corridorFloorBrep.Translate(Vector3d.Multiply(Vector3d.ZAxis, agOut.HouseholdProperties[i][j][0].Origin.Z));
+                                corridorWallBrep.Translate(Vector3d.Multiply(Vector3d.ZAxis, agOut.Household[i][j][0].Origin.Z));
+                                corridorFloorBrep.Translate(Vector3d.Multiply(Vector3d.ZAxis, agOut.Household[i][j][0].Origin.Z));
                                 corridorBrep.Add(corridorWallBrep);
                                 corridorBrep.Add(corridorFloorBrep);
 

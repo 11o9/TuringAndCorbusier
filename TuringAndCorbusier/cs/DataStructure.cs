@@ -654,9 +654,9 @@ namespace TuringAndCorbusier
 
     // ApartmentGenerator의 부모 클래스와 출력값 클래스
 
-    public abstract class ApartmentmentGeneratorBase
+    public abstract class ApartmentGeneratorBase
     {
-        public abstract ApartmentGeneratorOutput generator(Plot plot, ParameterSet parameterSet, Target target);
+        public abstract Apartment generator(Plot plot, ParameterSet parameterSet, Target target);
         public abstract double[] MinInput { get; set; }
         public abstract double[] MaxInput { get; set; }
         public abstract CoreType GetRandomCoreType();
@@ -665,19 +665,19 @@ namespace TuringAndCorbusier
         public abstract string GetAGType { get; }
     }
 
-    public class ApartmentGeneratorOutput : IDisposable
+    public class Apartment : IDisposable
     {
         //Constructor, 생성자
-        public ApartmentGeneratorOutput(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<CoreProperties>> coreProperties, List<List<List<HouseholdProperties>>> householdProperties, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<List<Curve>> buildingOutline, List<Curve> aptLines)
+        public Apartment(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<Core>> core, List<List<List<Household>>> household, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<List<Curve>> buildingOutline, List<Curve> aptLines)
         {
             this.AGtype = AGType;
             this.Plot = plot;
             this.BuildingType = buildingType;
             this.ParameterSet = parameterSet;
             this.Target = target;
-            this.CoreProperties = coreProperties;
-            this.HouseholdProperties = householdProperties;
-            this.HouseholdStatistics = getHouseholdStatistics(householdProperties);
+            this.Core = core;
+            this.Household = household;
+            this.HouseholdStatistics = getHouseholdStatistics(household);
             this.ParkingLotOnEarth = parkingOnEarth;
             this.ParkingLotUnderGround = parkingUnderGround;
             this.Green = Green;
@@ -689,7 +689,7 @@ namespace TuringAndCorbusier
 
         }
 
-        public ApartmentGeneratorOutput(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<CoreProperties>> coreProperties, List<List<List<HouseholdProperties>>> householdProperties, List<NonResidential> commercial, List<NonResidential> publicFacility, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<Curve> Green, List<List<Curve>> buildingOutline, List<Curve> aptLines)
+        public Apartment(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<Core>> core, List<List<List<Household>>> household, List<NonResidential> commercial, List<NonResidential> publicFacility, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<Curve> Green, List<List<Curve>> buildingOutline, List<Curve> aptLines)
         {
             ///////20160516_추가된 생성자, 조경면적, 법정조경면적, 공용공간, 근생 추가
 
@@ -698,9 +698,9 @@ namespace TuringAndCorbusier
             this.BuildingType = buildingType;
             this.ParameterSet = parameterSet;
             this.Target = target;
-            this.CoreProperties = coreProperties;
-            this.HouseholdProperties = householdProperties;
-            this.HouseholdStatistics = getHouseholdStatistics(householdProperties);
+            this.Core = core;
+            this.Household = household;
+            this.HouseholdStatistics = getHouseholdStatistics(household);
             this.Commercial = commercial;
             this.PublicFacility = publicFacility;
             this.ParkingLotOnEarth = parkingOnEarth;
@@ -773,7 +773,7 @@ namespace TuringAndCorbusier
 
         }
 
-        public ApartmentGeneratorOutput(Plot plot)
+        public Apartment(Plot plot)
         {
             this.IsNull = true;
 
@@ -784,8 +784,8 @@ namespace TuringAndCorbusier
             this.ParkingLotOnEarth = new ParkingLotOnEarth();
             this.ParkingLotUnderGround = new ParkingLotUnderGround();
             this.Target = new Target();
-            this.CoreProperties = new List<List<CoreProperties>>();
-            this.HouseholdProperties = new List<List<List<HouseholdProperties>>>();
+            this.Core = new List<List<Core>>();
+            this.Household = new List<List<List<Household>>>();
             this.Commercial = new List<NonResidential>();
             this.PublicFacility = new List<NonResidential>();
             this.Green = new List<Curve>();
@@ -806,8 +806,8 @@ namespace TuringAndCorbusier
         public ParkingLotOnEarth ParkingLotOnEarth { get; set; }
         public ParkingLotUnderGround ParkingLotUnderGround { get; set; }
         public Target Target { get; private set; }
-        public List<List<CoreProperties>> CoreProperties { get; private set; }
-        public List<List<List<HouseholdProperties>>> HouseholdProperties { get; private set; }
+        public List<List<Core>> Core { get; private set; }
+        public List<List<List<Household>>> Household { get; private set; }
         public List<HouseholdStatistics> HouseholdStatistics { get; private set; }
         public List<NonResidential> Commercial { get; set; }
         public List<NonResidential> PublicFacility { get; set; }
@@ -821,9 +821,9 @@ namespace TuringAndCorbusier
         //////////  household statistics  //////////
         ////////////////////////////////////////////
 
-        private List<HouseholdStatistics> getHouseholdStatistics(List<List<List<HouseholdProperties>>> hhp)
+        private List<HouseholdStatistics> getHouseholdStatistics(List<List<List<Household>>> hhp)
         {
-            List<HouseholdProperties> all = new List<HouseholdProperties>();
+            List<Household> all = new List<Household>();
             for (int i = 0; i < hhp.Count; i++)
             {
                 for (int j = 0; j < hhp[i].Count; j++)
@@ -835,7 +835,7 @@ namespace TuringAndCorbusier
                 }
             }
 
-            List<HouseholdProperties> hhpDistinct = new List<HouseholdProperties>();
+            List<Household> hhpDistinct = new List<Household>();
             List<int> hhpCount = new List<int>();
 
             for (int i = 0; i < all.Count; i++)
@@ -865,7 +865,7 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        private bool isHHPequal(HouseholdProperties a, HouseholdProperties b)
+        private bool isHHPequal(Household a, Household b)
         {
             double dXa = a.XLengthA - b.XLengthA;
             double dXb = a.XLengthB - b.XLengthB;
@@ -878,7 +878,7 @@ namespace TuringAndCorbusier
                 return false;
         }
 
-        private bool isHHPsimilar(HouseholdProperties a, HouseholdProperties b)
+        private bool isHHPsimilar(Household a, Household b)
         {
             double aa = a.GetExclusiveArea();
             double bb = b.GetExclusiveArea();
@@ -1033,18 +1033,18 @@ namespace TuringAndCorbusier
 
             try
             {
-                for (int i = 0; i < this.CoreProperties.Count; i++)
+                for (int i = 0; i < this.Core.Count; i++)
                 {
-                    for (int j = 0; j < this.CoreProperties[i].Count; j++)
+                    for (int j = 0; j < this.Core[i].Count; j++)
                     {
                         List<Point3d> outlinePoints = new List<Point3d>();
 
 
-                        Point3d pt = new Point3d(this.CoreProperties[i][j].Origin);
-                        Vector3d x = new Vector3d(this.CoreProperties[i][j].XDirection);
-                        Vector3d y = new Vector3d(this.CoreProperties[i][j].YDirection);
-                        double width = this.CoreProperties[i][j].CoreType.GetWidth();
-                        double depth = this.CoreProperties[i][j].CoreType.GetDepth();
+                        Point3d pt = new Point3d(this.Core[i][j].Origin);
+                        Vector3d x = new Vector3d(this.Core[i][j].XDirection);
+                        Vector3d y = new Vector3d(this.Core[i][j].YDirection);
+                        double width = this.Core[i][j].CoreType.GetWidth();
+                        double depth = this.Core[i][j].CoreType.GetDepth();
 
                         outlinePoints.Add(pt);
                         pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
@@ -1076,13 +1076,13 @@ namespace TuringAndCorbusier
 
             try
             {
-                for (int i = 0; i < this.HouseholdProperties.Count; i++)
+                for (int i = 0; i < this.Household.Count; i++)
                 {
-                    for (int j = 0; j < this.HouseholdProperties[i].Count; j++)
+                    for (int j = 0; j < this.Household[i].Count; j++)
                     {
-                        for (int k = 0; k < this.HouseholdProperties[i][j].Count; k++)
+                        for (int k = 0; k < this.Household[i][j].Count; k++)
                         {
-                            houseOutlines.Add(this.HouseholdProperties[i][j][k].GetOutline());
+                            houseOutlines.Add(this.Household[i][j][k].GetOutline());
                         }
 
                     }
@@ -1102,21 +1102,21 @@ namespace TuringAndCorbusier
         {
             List<List<List<List<Line>>>> output = new List<List<List<List<Line>>>>();
 
-            for (int i = 0; i < this.HouseholdProperties.Count; i++)
+            for (int i = 0; i < this.Household.Count; i++)
             {
                 List<List<List<Line>>> tempLine_i = new List<List<List<Line>>>();
 
-                for (int j = 0; j < this.HouseholdProperties[i].Count; j++)
+                for (int j = 0; j < this.Household[i].Count; j++)
                 {
                     List<List<Line>> tempLine_j = new List<List<Line>>();
 
-                    for (int k = 0; k < this.HouseholdProperties[i][j].Count; k++)
+                    for (int k = 0; k < this.Household[i][j].Count; k++)
                     {
                         List<Line> tempLine_k = new List<Line>();
 
-                        for (int l = 0; l < this.HouseholdProperties[i][j][k].LightingEdge.Count; l++)
+                        for (int l = 0; l < this.Household[i][j][k].LightingEdge.Count; l++)
                         {
-                            tempLine_k.Add(this.HouseholdProperties[i][j][k].LightingEdge[l]);
+                            tempLine_k.Add(this.Household[i][j][k].LightingEdge[l]);
                         }
 
                         tempLine_j.Add(tempLine_k);
@@ -1135,11 +1135,11 @@ namespace TuringAndCorbusier
         {
             double output = 0;
 
-            foreach (List<List<HouseholdProperties>> i in this.HouseholdProperties)
+            foreach (List<List<Household>> i in this.Household)
             {
-                foreach (List<HouseholdProperties> j in i)
+                foreach (List<Household> j in i)
                 {
-                    foreach (HouseholdProperties k in j)
+                    foreach (Household k in j)
                     {
                         output += k.GetBalconyArea();
                     }
@@ -1157,13 +1157,13 @@ namespace TuringAndCorbusier
             {
                 double tempSum = 0;
 
-                foreach (var j in this.CoreProperties)
+                foreach (var j in this.Core)
                 {
                     foreach(var jj in j)
                         if(jj.BuildingGroupNum == i )tempSum += jj.GetArea();
                 }
 
-                foreach (var j in this.HouseholdProperties)
+                foreach (var j in this.Household)
                 {
                     foreach (var jj in j)
                         foreach (var jjj in jj)
@@ -1183,8 +1183,8 @@ namespace TuringAndCorbusier
             double output = 0;
 
 
-            output = HouseholdProperties[0].Sum(n => n.Sum(m => m.GetArea() + m.CorridorArea));
-            output += CoreProperties[0].Sum(n => n.GetArea());
+            output = Household[0].Sum(n => n.Sum(m => m.GetArea() + m.CorridorArea));
+            output += Core[0].Sum(n => n.GetArea());
 
             foreach (NonResidential i in Commercial)
             {
@@ -1211,13 +1211,13 @@ namespace TuringAndCorbusier
         {
             double tempSum = 0;
 
-            for (int i = 0; i < this.HouseholdProperties.Count; i++)
+            for (int i = 0; i < this.Household.Count; i++)
             {
-                for (int j = 0; j < this.HouseholdProperties[i].Count; j++)
+                for (int j = 0; j < this.Household[i].Count; j++)
                 {
-                    for (int k = 0; k < this.HouseholdProperties[i][j].Count; k++)
+                    for (int k = 0; k < this.Household[i][j].Count; k++)
                     {
-                        tempSum += this.HouseholdProperties[i][j][k].GetExclusiveArea();
+                        tempSum += this.Household[i][j][k].GetExclusiveArea();
                     }
                 }
             }
@@ -1227,7 +1227,7 @@ namespace TuringAndCorbusier
 
         public double GetCoreAreaOnEarthSum() ///////////////////////////////////// commercial, public 포함
         {
-            double coreAreaSum = CoreProperties[0].Sum(n=>n.GetArea());
+            double coreAreaSum = Core[0].Sum(n=>n.GetArea());
 
             return coreAreaSum;
         }
@@ -1236,7 +1236,7 @@ namespace TuringAndCorbusier
         {
             double coreAreaSum = 0;
 
-            foreach (List<CoreProperties> i in this.CoreProperties)
+            foreach (List<Core> i in this.Core)
             {
                 coreAreaSum += i.Sum(n => n.GetArea());
             }
@@ -1260,18 +1260,18 @@ namespace TuringAndCorbusier
 
             double tempExclusiveAreaSum = GetExclusiveAreaSum();
 
-            for (int i = 0; i < HouseholdProperties.Count; i++)
+            for (int i = 0; i < Household.Count; i++)
             {
-                for (int j = 0; j < HouseholdProperties[i].Count; j++)
+                for (int j = 0; j < Household[i].Count; j++)
                 {
-                    for (int k = 0; k < HouseholdProperties[i][j].Count; k++)
+                    for (int k = 0; k < Household[i][j].Count; k++)
                     {
-                        double tempExclusiveArea = HouseholdProperties[i][j][k].GetExclusiveArea();
+                        double tempExclusiveArea = Household[i][j][k].GetExclusiveArea();
                         double rate = tempExclusiveArea / tempExclusiveAreaSum;
 
-                        double GroundCoreAreaPerHouse = CoreProperties[0].Sum(n => n.GetArea()) * 2 * rate;
-                        double coreAreaPerHouse = GroundCoreAreaPerHouse + (GetCoreAreaSum() - CoreProperties[0].Sum(n => n.GetArea()) * 2) * rate;
-                        double sup = HouseholdProperties[i][j][k].GetWallArea() + HouseholdProperties[i][j][k].GetExclusiveArea() + coreAreaPerHouse;
+                        double GroundCoreAreaPerHouse = Core[0].Sum(n => n.GetArea()) * 2 * rate;
+                        double coreAreaPerHouse = GroundCoreAreaPerHouse + (GetCoreAreaSum() - Core[0].Sum(n => n.GetArea()) * 2) * rate;
+                        double sup = Household[i][j][k].GetWallArea() + Household[i][j][k].GetExclusiveArea() + coreAreaPerHouse;
 
                         output += sup;
                     }
@@ -1281,9 +1281,9 @@ namespace TuringAndCorbusier
             //double sup = Math.Round((CORE_AREA + houseHoldStatistic.GetWallArea() + houseHoldStatistic.GetExclusiveArea()) / 1000000, 2);
 
             //전체면적 - 발코니면적 + 복도면적 합
-            //output += HouseholdProperties.Sum(n => n.Sum(m => m.Sum(o => o.GetWallArea() + o.GetExclusiveArea())));
+            //output += Household.Sum(n => n.Sum(m => m.Sum(o => o.GetWallArea() + o.GetExclusiveArea())));
             ////전체코어 - 옥탑코어
-            //output += CoreProperties.Sum(n => n.Sum(m => m.GetArea())) - CoreProperties[0].Sum(n => n.GetArea());
+            //output += Core.Sum(n => n.Sum(m => m.GetArea())) - Core[0].Sum(n => n.GetArea());
 
             output += GetCommercialArea();
             output += GetPublicFacilityArea();
@@ -1312,23 +1312,23 @@ namespace TuringAndCorbusier
             double legalParkingLotByUnitNum = 0;
             double legalParkingLotByUnitSize = 0;
 
-            for (int i = 0; i < this.HouseholdProperties.Count; i++)
+            for (int i = 0; i < this.Household.Count; i++)
             {
-                for (int j = 0; j < this.HouseholdProperties[i].Count; j++)
+                for (int j = 0; j < this.Household[i].Count; j++)
                 {
-                    for (int k = 0; k < this.HouseholdProperties[i][j].Count; k++)
+                    for (int k = 0; k < this.Household[i][j].Count; k++)
                     {
-                        if (this.HouseholdProperties[i][j][k].GetExclusiveArea() > 60 * Math.Pow(10, 6))
+                        if (this.Household[i][j][k].GetExclusiveArea() > 60 * Math.Pow(10, 6))
                             legalParkingLotByUnitNum += 1;
-                        else if (this.HouseholdProperties[i][j][k].GetExclusiveArea() > 30 * Math.Pow(10, 6))
+                        else if (this.Household[i][j][k].GetExclusiveArea() > 30 * Math.Pow(10, 6))
                             legalParkingLotByUnitNum += 0.8;
                         else
                             legalParkingLotByUnitNum += 0.5;
 
-                        if (this.HouseholdProperties[i][j][k].GetExclusiveArea() > 85 * Math.Pow(10, 6))
-                            legalParkingLotByUnitSize = this.HouseholdProperties[i][j][k].GetExclusiveArea() / 75000000;
+                        if (this.Household[i][j][k].GetExclusiveArea() > 85 * Math.Pow(10, 6))
+                            legalParkingLotByUnitSize = this.Household[i][j][k].GetExclusiveArea() / 75000000;
                         else
-                            legalParkingLotByUnitSize = this.HouseholdProperties[i][j][k].GetExclusiveArea() / 65000000;
+                            legalParkingLotByUnitSize = this.Household[i][j][k].GetExclusiveArea() / 65000000;
                     }
 
                 }
@@ -1355,11 +1355,11 @@ namespace TuringAndCorbusier
         {
             int output = 0;
 
-            for (int i = 0; i < HouseholdProperties.Count(); i++)
+            for (int i = 0; i < Household.Count(); i++)
             {
-                for (int j = 0; j < HouseholdProperties[i].Count(); j++)
+                for (int j = 0; j < Household[i].Count(); j++)
                 {
-                    output += HouseholdProperties[i][j].Count();
+                    output += Household[i][j].Count();
                 }
             }
 
@@ -1393,7 +1393,7 @@ namespace TuringAndCorbusier
             disposed = true;
         }
 
-        ~ApartmentGeneratorOutput()
+        ~Apartment()
         {
             Dispose(false);
         }
@@ -1496,15 +1496,15 @@ namespace TuringAndCorbusier
         public static CoreType Vertical_AG1 { get { return new CoreType("Vertical_AG1"); } }
     }
 
-    public class CoreProperties
+    public class Core
     {
         //Constructor, 생성자
-        public CoreProperties()
+        public Core()
         {
 
         }
 
-        public CoreProperties(CoreProperties anotherCoreProperty)
+        public Core(Core anotherCoreProperty)
         {
             this.origin = anotherCoreProperty.origin;
             this.xDirection = anotherCoreProperty.xDirection;
@@ -1513,7 +1513,7 @@ namespace TuringAndCorbusier
             this.Stories = anotherCoreProperty.Stories;
         }
 
-        public CoreProperties(Point3d origin, Vector3d xDirection, Vector3d yDirection, CoreType coreType, double stories, double coreInterpenetration)
+        public Core(Point3d origin, Vector3d xDirection, Vector3d yDirection, CoreType coreType, double stories, double coreInterpenetration)
         {
             this.origin = origin;
             this.xDirection = xDirection;
@@ -1566,23 +1566,23 @@ namespace TuringAndCorbusier
 
         }
 
-        public HouseholdStatistics(HouseholdProperties householdProperties, int count)
+        public HouseholdStatistics(Household household, int count)
         {
-            this.isCorridorType = householdProperties.isCorridorType;
-            this.origin = householdProperties.Origin;
-            this.xDirection = householdProperties.XDirection;
-            this.yDirection = householdProperties.YDirection;
-            this.xLengthA = householdProperties.XLengthA;
-            this.xLengthB = householdProperties.XLengthB;
-            this.yLengthA = householdProperties.YLengthA;
-            this.yLengthB = householdProperties.YLengthB;
-            this.householdSizeType = householdProperties.HouseholdSizeType;
-            this.exclusiveArea = householdProperties.GetExclusiveArea() + householdProperties.GetWallArea();
-            this.lightingEdge = householdProperties.LightingEdge;
-            this.entrancePoint = householdProperties.EntrancePoint;
-            this.wallFactor = householdProperties.WallFactor;
+            this.isCorridorType = household.isCorridorType;
+            this.origin = household.Origin;
+            this.xDirection = household.XDirection;
+            this.yDirection = household.YDirection;
+            this.xLengthA = household.XLengthA;
+            this.xLengthB = household.XLengthB;
+            this.yLengthA = household.YLengthA;
+            this.yLengthB = household.YLengthB;
+            this.householdSizeType = household.HouseholdSizeType;
+            this.exclusiveArea = household.GetExclusiveArea() + household.GetWallArea();
+            this.lightingEdge = household.LightingEdge;
+            this.entrancePoint = household.EntrancePoint;
+            this.wallFactor = household.WallFactor;
             this.Count = count;
-            this.CorridorArea = householdProperties.CorridorArea;
+            this.CorridorArea = household.CorridorArea;
         }
 
         public HouseholdStatistics(List<HouseholdStatistics> householdStatistics)
@@ -1633,9 +1633,9 @@ namespace TuringAndCorbusier
 
         //Method, 메소드
 
-        public HouseholdProperties ToHouseholdProperties()
+        public Household ToHousehold()
         {
-            HouseholdProperties output = new HouseholdProperties(this.origin, this.xDirection, this.yDirection, this.XLengthA, this.XLengthB, this.YLengthA, this.YLengthB, this.HouseholdSizeType, this.ExclusiveArea, this.LightingEdge, this.EntrancePoint, this.WallFactor);
+            Household output = new Household(this.origin, this.xDirection, this.yDirection, this.XLengthA, this.XLengthB, this.YLengthA, this.YLengthB, this.HouseholdSizeType, this.ExclusiveArea, this.LightingEdge, this.EntrancePoint, this.WallFactor);
             output.isCorridorType = isCorridorType;
             return output;
         }
@@ -1684,13 +1684,13 @@ namespace TuringAndCorbusier
         public double CorridorArea { get; set; }
     }
 
-    public class HouseholdProperties
+    public class Household
     {
         //Constructor, 생성자
 
         public int[] indexer = new int[] { 0, 0 };
         public bool isCorridorType { get; set; }
-        public HouseholdProperties(Point3d origin, Vector3d xDirection, Vector3d yDirection, double xLengthA, double xLengthB, double yLengthA, double yLengthB, int householdSizeType, double exclusiveArea, List<Line> lightingEdge, Point3d entrancePoint, List<double> wallFactor)
+        public Household(Point3d origin, Vector3d xDirection, Vector3d yDirection, double xLengthA, double xLengthB, double yLengthA, double yLengthB, int householdSizeType, double exclusiveArea, List<Line> lightingEdge, Point3d entrancePoint, List<double> wallFactor)
         {
             this.Origin = origin;
             this.XDirection = xDirection;
@@ -1708,45 +1708,45 @@ namespace TuringAndCorbusier
             //this.connectedCoreIndex = connectedCoreIndex;
         }
 
-        public HouseholdProperties()
+        public Household()
         {
             this.CorridorArea = 0;
         }
 
-        public HouseholdProperties(HouseholdProperties householdProperties)
+        public Household(Household household)
         {
-            this.Origin = householdProperties.Origin;
-            this.XDirection = householdProperties.XDirection;
-            this.YDirection = householdProperties.YDirection;
-            this.XLengthA = householdProperties.XLengthA;
-            this.XLengthB = householdProperties.XLengthB;
-            this.YLengthA = householdProperties.YLengthA;
-            this.YLengthB = householdProperties.YLengthB;
-            this.HouseholdSizeType = householdProperties.HouseholdSizeType;
-            //this.ExclusiveArea = householdProperties.GetExclusiveArea() + householdProperties.GetWallArea();
-            //this.LightingEdge = householdProperties.LightingEdge;
-            this.WallFactor = householdProperties.WallFactor;
-            this.EntrancePoint = householdProperties.EntrancePoint;
-            this.CorridorArea = householdProperties.CorridorArea;
-            this.isCorridorType = householdProperties.isCorridorType;
+            this.Origin = household.Origin;
+            this.XDirection = household.XDirection;
+            this.YDirection = household.YDirection;
+            this.XLengthA = household.XLengthA;
+            this.XLengthB = household.XLengthB;
+            this.YLengthA = household.YLengthA;
+            this.YLengthB = household.YLengthB;
+            this.HouseholdSizeType = household.HouseholdSizeType;
+            //this.ExclusiveArea = household.GetExclusiveArea() + household.GetWallArea();
+            //this.LightingEdge = household.LightingEdge;
+            this.WallFactor = household.WallFactor;
+            this.EntrancePoint = household.EntrancePoint;
+            this.CorridorArea = household.CorridorArea;
+            this.isCorridorType = household.isCorridorType;
         }
-        public HouseholdProperties(HouseholdProperties householdProperties,double downheight)
+        public Household(Household household,double downheight)
         {
-            this.isCorridorType = householdProperties.isCorridorType;
-            this.Origin = householdProperties.Origin - Vector3d.ZAxis * downheight;
-            this.XDirection = householdProperties.XDirection;
-            this.YDirection = householdProperties.YDirection;
-            this.XLengthA = householdProperties.XLengthA;
-            this.XLengthB = householdProperties.XLengthB;
-            this.YLengthA = householdProperties.YLengthA;
-            this.YLengthB = householdProperties.YLengthB;
-            this.HouseholdSizeType = householdProperties.HouseholdSizeType;
-            //this.ExclusiveArea = householdProperties.GetExclusiveArea() + householdProperties.GetWallArea();
-            householdProperties.LightingEdge.ForEach(n => n.Transform(Transform.Translation(-Vector3d.ZAxis * downheight)));
-            //this.LightingEdge = householdProperties.LightingEdge;
-            this.WallFactor = householdProperties.WallFactor;
-            this.EntrancePoint = householdProperties.EntrancePoint - Vector3d.ZAxis * downheight;
-            this.CorridorArea = householdProperties.CorridorArea; 
+            this.isCorridorType = household.isCorridorType;
+            this.Origin = household.Origin - Vector3d.ZAxis * downheight;
+            this.XDirection = household.XDirection;
+            this.YDirection = household.YDirection;
+            this.XLengthA = household.XLengthA;
+            this.XLengthB = household.XLengthB;
+            this.YLengthA = household.YLengthA;
+            this.YLengthB = household.YLengthB;
+            this.HouseholdSizeType = household.HouseholdSizeType;
+            //this.ExclusiveArea = household.GetExclusiveArea() + household.GetWallArea();
+            household.LightingEdge.ForEach(n => n.Transform(Transform.Translation(-Vector3d.ZAxis * downheight)));
+            //this.LightingEdge = household.LightingEdge;
+            this.WallFactor = household.WallFactor;
+            this.EntrancePoint = household.EntrancePoint - Vector3d.ZAxis * downheight;
+            this.CorridorArea = household.CorridorArea; 
         }
         public override int GetHashCode()
         {
@@ -1754,9 +1754,9 @@ namespace TuringAndCorbusier
         }
         public override bool Equals(object obj)
         {
-            if (obj is HouseholdProperties)
+            if (obj is Household)
             {
-                HouseholdProperties hhp = obj as HouseholdProperties;
+                Household hhp = obj as Household;
                 if (hhp.EntrancePoint.X == this.EntrancePoint.X && hhp.EntrancePoint.Y == this.EntrancePoint.Y && hhp.EntrancePoint.Z == this.EntrancePoint.Z)
                     return true;
             }

@@ -9,19 +9,19 @@ namespace TuringAndCorbusier
 {
     class CalculateScore
     {
-        public static int SatisfyTargetArea(ApartmentGeneratorOutput agOut)
+        public static int SatisfyTargetArea(Apartment agOut)
         {
             List<double> targetData = new List<double>();
             List<double> realData = new List<double>();
 
-            for (int i = 0; i < agOut.HouseholdProperties.Count(); i++)
+            for (int i = 0; i < agOut.Household.Count(); i++)
             {
-                for (int j = 0; j < agOut.HouseholdProperties[i].Count(); j++)
+                for (int j = 0; j < agOut.Household[i].Count(); j++)
                 {
-                    for (int k = 0; k < agOut.HouseholdProperties[i][j].Count(); k++)
+                    for (int k = 0; k < agOut.Household[i][j].Count(); k++)
                     {
-                        targetData.Add(agOut.HouseholdProperties[i][j][k].GetArea());
-                        realData.Add(agOut.Target.TargetArea[ agOut.HouseholdProperties[i][j][k].HouseholdSizeType]);
+                        targetData.Add(agOut.Household[i][j][k].GetArea());
+                        realData.Add(agOut.Target.TargetArea[ agOut.Household[i][j][k].HouseholdSizeType]);
                     }
                 }
             }
@@ -49,34 +49,34 @@ namespace TuringAndCorbusier
             return result;
         }
 
-        public static int FacingSouth(ApartmentGeneratorOutput agOut)
+        public static int FacingSouth(Apartment agOut)
         {
             //create house outlines and windows with normal facing outwards
             List<List<List<Curve>>> houseOutline = new List<List<List<Curve>>>();
             List<List<List<List<Line>>>> windowLinesOld = agOut.getLightingWindow();
             List<List<List<List<Line>>>> windowLines = new List<List<List<List<Line>>>>();
 
-            for (int i = 0; i < agOut.HouseholdProperties.Count; i++)
+            for (int i = 0; i < agOut.Household.Count; i++)
             {
                 List<List<Curve>> houseOutline_i = new List<List<Curve>>();
                 List<List<List<Line>>> windowLines_i = new List<List<List<Line>>>();
 
-                for (int j = 0; j < agOut.HouseholdProperties[i].Count; j++)
+                for (int j = 0; j < agOut.Household[i].Count; j++)
                 {
                     List<Curve> houseOutline_j = new List<Curve>();
                     List<List<Line>> windowLines_j = new List<List<Line>>();
 
-                    for (int k = 0; k < agOut.HouseholdProperties[i][j].Count(); k++)
+                    for (int k = 0; k < agOut.Household[i][j].Count(); k++)
                     {
                         //create house outline curve
                         List<Point3d> outlinePoints = new List<Point3d>();
-                        Point3d pt = new Point3d(agOut.HouseholdProperties[i][j][k].Origin);
-                        Vector3d x = new Vector3d(agOut.HouseholdProperties[i][j][k].XDirection);
-                        Vector3d y = new Vector3d(agOut.HouseholdProperties[i][j][k].YDirection);
-                        double xa = agOut.HouseholdProperties[i][j][k].XLengthA;
-                        double xb = agOut.HouseholdProperties[i][j][k].XLengthB;
-                        double ya = agOut.HouseholdProperties[i][j][k].YLengthA;
-                        double yb = agOut.HouseholdProperties[i][j][k].YLengthB;
+                        Point3d pt = new Point3d(agOut.Household[i][j][k].Origin);
+                        Vector3d x = new Vector3d(agOut.Household[i][j][k].XDirection);
+                        Vector3d y = new Vector3d(agOut.Household[i][j][k].YDirection);
+                        double xa = agOut.Household[i][j][k].XLengthA;
+                        double xb = agOut.Household[i][j][k].XLengthB;
+                        double ya = agOut.Household[i][j][k].YLengthA;
+                        double yb = agOut.Household[i][j][k].YLengthB;
 
                         outlinePoints.Add(pt);
                         pt.Transform(Transform.Translation(Vector3d.Multiply(y, yb)));

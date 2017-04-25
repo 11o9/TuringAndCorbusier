@@ -34,7 +34,7 @@ namespace TuringAndCorbusier
 
         List<Point3d> SlopePoints = new List<Point3d>();
 
-        public List<ApartmentGeneratorOutput> MainPanel_AGOutputList = new List<ApartmentGeneratorOutput>();
+        public List<Apartment> MainPanel_AGOutputList = new List<Apartment>();
 
         public string[] CurrentDataIdName = { "REGI_MST_NO", "REGI_SUB_MST_NO" };
         public string[] CurrentDataId = { CommonFunc.getStringFromRegistry("REGI_MST_NO"), CommonFunc.getStringFromRegistry("REGI_SUB_MST_NO") };
@@ -174,15 +174,15 @@ namespace TuringAndCorbusier
             RhinoApp.WriteLine("tempoutputplottype = " + tempoutput.Plot.PlotType.ToString());
 
             MainPanel_building2DPreview.CurveToDisplay = tempCurves;
-            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.HouseholdProperties.Count,true);
-            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.HouseholdProperties.Count, false);
-            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.HouseholdProperties.Count, tempoutput);
-            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.HouseholdProperties.Count);
+            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count,true);
+            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count, false);
+            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count, tempoutput);
+            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count);
             string widthlog;
             MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.ApartDistance(MainPanel_AGOutputList[tempIndex],out widthlog);
             MainPanel_LawPreview_ApartDistance.dimension = widthlog;
             //MainPanel_LawPreview_ApartDistance.dimPoint = MainPanel_LawPreview_ApartDistance.CurveToDisplay[0].
-            // CommonFunc.JoinRegulation(tempoutput.Plot, tempoutput.HouseholdProperties.Count, tempoutput);
+            // CommonFunc.JoinRegulation(tempoutput.Plot, tempoutput.Household.Count, tempoutput);
             MainPanel_building2DPreview.Enabled = true;
             parkingLotPreview.CurveToDisplay = tempParkingLotArr.ToList();
             parkingLotPreview.Enabled = true;
@@ -312,7 +312,7 @@ namespace TuringAndCorbusier
             //Target testTarget = new Target();
             //var test = testAg3.generator(TuringAndCorbusierPlugIn.InstanceClass.plot, parameterset4minimumPattern3, testTarget);
 
-            ////if (test.HouseholdProperties.Count == 0)
+            ////if (test.Household.Count == 0)
             ////    RhinoApp.WriteLine("안.되.잖.아.요.");
             ////RhinoApp.WriteLine(test.GetBuildingCoverage().ToString());
 
@@ -370,7 +370,7 @@ namespace TuringAndCorbusier
             return tempTextBlock;
         }
 
-        public void AddButton(string AGName, ApartmentGeneratorOutput AGOutput)
+        public void AddButton(string AGName, Apartment AGOutput)
         {
             string[] stackPannelButtonStyle = { "stackPannelButtonStyle1", "stackPannelButtonStyle2" };
 
@@ -533,7 +533,7 @@ namespace TuringAndCorbusier
                 double serviceArea = -1000;
 
                 List<FloorPlan> floorPlans = (from i in uniqueHouseHoldProperties
-                                              select new FloorPlan(PlanDrawingFunction.alignHousholdProperties(i.ToHouseholdProperties()), MainPanel_planLibraries, MainPanel_AGOutputList[tempIndex].AGtype)).ToList();
+                                              select new FloorPlan(PlanDrawingFunction.alignHousholdProperties(i.ToHousehold()), MainPanel_planLibraries, MainPanel_AGOutputList[tempIndex].AGtype)).ToList();
 
                 List<Rectangle3d> boundingBoxes = (from i in floorPlans
                                                    select new Rectangle3d(Plane.WorldXY, i.GetBoundingBox().Min, i.GetBoundingBox().Max)).ToList();
@@ -544,7 +544,7 @@ namespace TuringAndCorbusier
 
                 for (int i = 0; i < uniqueHouseHoldProperties.Count(); i++)
                 {
-                    HouseholdProperties i_Copy = new HouseholdProperties(uniqueHouseHoldProperties[i].ToHouseholdProperties());
+                    Household i_Copy = new Household(uniqueHouseHoldProperties[i].ToHousehold());
 
                     i_Copy.Origin = new Point3d(i_Copy.Origin.X, i_Copy.Origin.Y, 0);
 
@@ -675,8 +675,8 @@ namespace TuringAndCorbusier
                 return;
             }
 
-            //Elevation tempElevation = Elevation.drawElevation(MainPanel_AGOutputList[tempIndex].AptLines[0], MainPanel_AGOutputList[tempIndex].HouseholdProperties[0], MainPanel_AGOutputList[tempIndex].CoreProperties[0]);
-            Section tempSection = Section.drawSection(MainPanel_AGOutputList[tempIndex].AptLines, MainPanel_AGOutputList[tempIndex].HouseholdProperties, MainPanel_AGOutputList[tempIndex].CoreProperties, MainPanel_AGOutputList[tempIndex].Plot);
+            //Elevation tempElevation = Elevation.drawElevation(MainPanel_AGOutputList[tempIndex].AptLines[0], MainPanel_AGOutputList[tempIndex].Household[0], MainPanel_AGOutputList[tempIndex].Core[0]);
+            Section tempSection = Section.drawSection(MainPanel_AGOutputList[tempIndex].AptLines, MainPanel_AGOutputList[tempIndex].Household, MainPanel_AGOutputList[tempIndex].Core, MainPanel_AGOutputList[tempIndex].Plot);
 
             List<Curve> output = new List<Curve>(tempSection.Boundary);
             output.AddRange(tempSection.Room);
@@ -713,9 +713,9 @@ namespace TuringAndCorbusier
 
             try
             {
-                ///출력 할 ApartmentGeneratorOutput
+                ///출력 할 Apartment
 
-                ApartmentGeneratorOutput tempAGOutput = MainPanel_AGOutputList[tempIndex];
+                Apartment tempAGOutput = MainPanel_AGOutputList[tempIndex];
 
                 ///현재 대지에 대한 DesignMaster입력 << 중복될 시 입력 안함
 
@@ -829,12 +829,12 @@ namespace TuringAndCorbusier
                     //double GroundCoreAreaPerHouse = tempAGOutput.GetCoreAreaOnEarthSum() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
 
                     //ground , rooftop cores
-                    double GroundCoreAreaPerHouse = tempAGOutput.CoreProperties[0].Sum(n => n.GetArea()) * 2 * rate;
+                    double GroundCoreAreaPerHouse = tempAGOutput.Core[0].Sum(n => n.GetArea()) * 2 * rate;
 
                     //double coreareaSum = tempAGOutput.GetCoreAreaSum();
                     //double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.GetCoreAreaOnEarthSum()) / tempExclusiveAreaSum * tempExclusiveArea;
-                    //double floorCores = tempAGOutput.GetCoreAreaSum() - tempAGOutput.CoreProperties[0].Sum(n => n.GetArea()) * 2;
-                    double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.CoreProperties[0].Sum(n=>n.GetArea())*2)*rate;
+                    //double floorCores = tempAGOutput.GetCoreAreaSum() - tempAGOutput.Core[0].Sum(n => n.GetArea()) * 2;
+                    double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.Core[0].Sum(n=>n.GetArea())*2)*rate;
 
                     double parkingLotAreaPerHouse = tempAGOutput.ParkingLotUnderGround.ParkingArea / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
 
@@ -1465,7 +1465,7 @@ namespace TuringAndCorbusier
             //MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.ApartDistance(MainPanel_AGOutputList[tempIndex], out widthlog);
             //MainPanel_LawPreview_ApartDistance.dimension = widthlog;
             //MainPanel_LawPreview_ApartDistance.dimPoint = MainPanel_LawPreview_ApartDistance.CurveToDisplay[0].
-            // CommonFunc.JoinRegulation(tempoutput.Plot, tempoutput.HouseholdProperties.Count, tempoutput);
+            // CommonFunc.JoinRegulation(tempoutput.Plot, tempoutput.Household.Count, tempoutput);
             //MainPanel_building2DPreview.Enabled = true;
             //parkingLotPreview.CurveToDisplay = tempParkingLotArr.ToList();
             //parkingLotPreview.Enabled = true;

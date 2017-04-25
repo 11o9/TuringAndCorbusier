@@ -41,10 +41,10 @@ namespace TuringAndCorbusier
             InitializeComponent();
         }
 
-        public List<ApartmentGeneratorOutput> tempOutput = new List<ApartmentGeneratorOutput>();
+        public List<Apartment> tempOutput = new List<Apartment>();
         public List<string> tempAGName = new List<string>();
 
-        private bool checkHasSimilarPattern(ApartmentGeneratorOutput agOutput, out int index)
+        private bool checkHasSimilarPattern(Apartment agOutput, out int index)
         {
             int tempIndex = tempOutput.Count;
             index = tempIndex;
@@ -91,11 +91,11 @@ namespace TuringAndCorbusier
             return result;
         }
 
-        private void AddButtonMethod(ApartmentGeneratorOutput agOutput)
+        private void AddButtonMethod(Apartment agOutput)
         {
             double grossAreaRatio = agOutput.GetGrossAreaRatio();
             double buildingCoverage = agOutput.GetBuildingCoverage();
-            int buildingNums = agOutput.HouseholdProperties.Count;
+            int buildingNums = agOutput.Household.Count;
             int householdNums = agOutput.GetHouseholdCount();
             int parkingLot = (int)(agOutput.ParkingLotOnEarth.GetCount() + agOutput.ParkingLotUnderGround.Count);
             int neededParkingLot = (int)System.Math.Round((double)agOutput.GetLegalParkingLotofHousing() + agOutput.GetLegalParkingLotOfCommercial());
@@ -171,7 +171,7 @@ namespace TuringAndCorbusier
             stackPanel.Children.Add(btn);
         }
 
-        public void AddButtonToStackPanel(ApartmentGeneratorOutput agOutput)
+        public void AddButtonToStackPanel(Apartment agOutput)
         {
             int similarIndex;
             if (checkHasSimilarPattern(agOutput, out similarIndex))
@@ -227,7 +227,7 @@ namespace TuringAndCorbusier
             DisableConduit();
         }
 
-        private string GetConvertedAGName(ApartmentmentGeneratorBase AG)
+        private string GetConvertedAGName(ApartmentGeneratorBase AG)
         {
             return "AG1";
         }
@@ -245,7 +245,7 @@ namespace TuringAndCorbusier
             return tempTextBlock;
         }
 
-        public void UpdateSummary(ApartmentGeneratorOutput agOutput)
+        public void UpdateSummary(Apartment agOutput)
         {
             BuildingType.Text = "공동주택(" + agOutput.BuildingType.ToString() + ")";
 
@@ -262,9 +262,9 @@ namespace TuringAndCorbusier
         
             int numberOfHousing = 0;
 
-            foreach (List<List<HouseholdProperties>> i in agOutput.HouseholdProperties)
+            foreach (List<List<Household>> i in agOutput.Household)
             {
-                foreach (List<HouseholdProperties> j in i)
+                foreach (List<Household> j in i)
                 {
                     numberOfHousing += j.Count();
                 }
@@ -277,7 +277,7 @@ namespace TuringAndCorbusier
             var ta = agOutput.Target.TargetArea;
             int[] type = new int[ta.Count];
             type = type.Select(n => 0).ToArray();
-            foreach (var hh in agOutput.HouseholdProperties)
+            foreach (var hh in agOutput.Household)
             {
                 foreach (var h in hh)
                 {
@@ -330,7 +330,7 @@ namespace TuringAndCorbusier
 
             GC.Collect();
 
-            List<ApartmentmentGeneratorBase> agSet = new List<ApartmentmentGeneratorBase>();
+            List<ApartmentGeneratorBase> agSet = new List<ApartmentGeneratorBase>();
 
             agSet.Add(new AG1());
             agSet.Add(new AG3());
@@ -344,7 +344,7 @@ namespace TuringAndCorbusier
             Plot tempPlot = TuringAndCorbusierPlugIn.InstanceClass.plot;
             Target tempTarget = TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Target;
 
-            List<ApartmentmentGeneratorBase> usingAGSet = new List<ApartmentmentGeneratorBase>();
+            List<ApartmentGeneratorBase> usingAGSet = new List<ApartmentGeneratorBase>();
 
             for (int i = 0; i < agSet.Count(); i++)
             {
@@ -368,7 +368,7 @@ namespace TuringAndCorbusier
                 {
                     AG1 tempAG = new AG1();
 
-                    List<ApartmentGeneratorOutput> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, tempAG, tempTarget, !this.Preview_Toggle.IsChecked.Value);
+                    List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, tempAG, tempTarget, !this.Preview_Toggle.IsChecked.Value);
 
                     string tempAGname = GetConvertedAGName(tempAG);
 
@@ -393,7 +393,7 @@ namespace TuringAndCorbusier
 
                     try
                     {
-                        List<ApartmentGeneratorOutput> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
+                        List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
 
 
 
@@ -452,16 +452,16 @@ namespace TuringAndCorbusier
             NavigationService.Navigate(TuringAndCorbusierPlugIn.InstanceClass.page2);
         }
 
-        public void preview(ApartmentGeneratorOutput outputToPreview)
+        public void preview(Apartment outputToPreview)
         {
             /*
             List<Rhino.Display.Text3d> textToShow = new List<Rhino.Display.Text3d>();
 
-            foreach(List<List<HouseholdProperties>> i in outputToPreview.HouseholdProperties)
+            foreach(List<List<Household>> i in outputToPreview.Household)
             {
-                foreach(List<HouseholdProperties> j in i)
+                foreach(List<Household> j in i)
                 {
-                    foreach(HouseholdProperties k in j)
+                    foreach(Household k in j)
                     {
                         Rhino.Display.Text3d tempText = new Rhino.Display.Text3d(Math.Round(k.ExclusiveArea / 1000000, 0).ToString(), new Plane(k.Origin, Vector3d.ZAxis), 2000);
 
@@ -535,11 +535,11 @@ namespace TuringAndCorbusier
             CurrentCondition.Text = currentConditionString;
         }
 
-        public void calcWorkQuantity(List<ApartmentmentGeneratorBase> agList)
+        public void calcWorkQuantity(List<ApartmentGeneratorBase> agList)
         {
             double output = 0;
 
-            foreach (ApartmentmentGeneratorBase i in agList)
+            foreach (ApartmentGeneratorBase i in agList)
             {
                 output += (i.GAParameterSet[2] + i.GAParameterSet[4]) * i.GAParameterSet[3];
             }

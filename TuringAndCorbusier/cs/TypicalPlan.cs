@@ -58,7 +58,7 @@ namespace TuringAndCorbusier
             return this.OutLine.BoundingBox;
         }
 
-        public static typicalPlan DrawTypicalPlan(Plot plot, Rectangle3d outLine, List<Curve> surroundingSite, ApartmentGeneratorOutput agOutput, List<FloorPlanLibrary> fpls, int targetFloor)
+        public static typicalPlan DrawTypicalPlan(Plot plot, Rectangle3d outLine, List<Curve> surroundingSite, Apartment agOutput, List<FloorPlanLibrary> fpls, int targetFloor)
         {
             List<CorePlan> tempCorePlans = new List<CorePlan>();
             List<FloorPlan> tempUnitPlans = new List<FloorPlan>();
@@ -66,23 +66,23 @@ namespace TuringAndCorbusier
 
 
 
-            foreach (List<CoreProperties> i in agOutput.CoreProperties)
+            foreach (List<Core> i in agOutput.Core)
             {
-                foreach (CoreProperties j in i)
+                foreach (Core j in i)
                 {
                     if (j.Stories + 2 > targetFloor)
                         tempCorePlans.Add(new CorePlan(j));
                 }
             }
 
-            for (int i = 0; i < agOutput.HouseholdProperties[targetFloor-1].Count(); i++)
+            for (int i = 0; i < agOutput.Household[targetFloor-1].Count(); i++)
             {
                 try
                 {
-                    if (agOutput.HouseholdProperties[targetFloor-1][i] != null)
+                    if (agOutput.Household[targetFloor-1][i] != null)
                     {
-                        for(int j = 0; j < agOutput.HouseholdProperties[targetFloor-1][i].Count;j++)
-                        tempUnitPlans.Add(new FloorPlan(agOutput.HouseholdProperties[targetFloor- 1][i][j], fpls, agOutput.AGtype));
+                        for(int j = 0; j < agOutput.Household[targetFloor-1][i].Count;j++)
+                        tempUnitPlans.Add(new FloorPlan(agOutput.Household[targetFloor- 1][i][j], fpls, agOutput.AGtype));
                     }
 
                 }

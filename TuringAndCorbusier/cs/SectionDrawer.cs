@@ -10,9 +10,9 @@ namespace TuringAndCorbusier
 {
     class DrawSection
     {
-        ApartmentGeneratorOutput _agout = null;
+        Apartment _agout = null;
         bool drawnorthline = true;
-        public DrawSection(ApartmentGeneratorOutput agout)
+        public DrawSection(Apartment agout)
         {
             _agout = agout;
             if (agout.Plot.PlotType == PlotType.상업지역)
@@ -50,19 +50,19 @@ namespace TuringAndCorbusier
 
         }
 
-        public Section_Pattern1 Section1(ApartmentGeneratorOutput agout)
+        public Section_Pattern1 Section1(Apartment agout)
         {
             Section_Pattern1 section = new Section_Pattern1(agout);
             section.DrawSection(drawnorthline);
             return section;
         }
-        public Section_Pattern3 Section3(ApartmentGeneratorOutput agout)
+        public Section_Pattern3 Section3(Apartment agout)
         {
             Section_Pattern3 section = new Section_Pattern3(agout);
             section.DrawSection(drawnorthline);
             return section;
         }
-        public Section_Pattern4 Section4(ApartmentGeneratorOutput agout)
+        public Section_Pattern4 Section4(Apartment agout)
         {
             Section_Pattern4 section = new Section_Pattern4(agout);
             section.DrawSection(drawnorthline);
@@ -206,7 +206,7 @@ namespace TuringAndCorbusier
 
         bool is4core = false;
 
-        public Section_Pattern3(ApartmentGeneratorOutput agOut)
+        public Section_Pattern3(Apartment agOut)
         {
             this.Dimensions = new List<FloorPlan.Dimension2>();
             this.SectionLines = new List<Curve>();
@@ -225,14 +225,14 @@ namespace TuringAndCorbusier
             List<double> temp = new List<double>();
             List<double> temp2 = new List<double>();
             List<double> widthtemp = new List<double>();
-            for (int i = 0; i < agOut.CoreProperties.Count; i++)
+            for (int i = 0; i < agOut.Core.Count; i++)
             {
-                Point3d coreOri = agOut.CoreProperties[i][0].Origin;
+                Point3d coreOri = agOut.Core[i][0].Origin;
                 double param;
                 AptLines[i].ClosestPoint(coreOri, out param);
                 Point3d aptClosest = AptLines[i].PointAt(param);
-                temp.Add(Vector3d.Multiply(agOut.CoreProperties[i][0].YDirection, new Vector3d(coreOri - aptClosest)));
-                if (agOut.CoreProperties[i].Count > 2)
+                temp.Add(Vector3d.Multiply(agOut.Core[i][0].YDirection, new Vector3d(coreOri - aptClosest)));
+                if (agOut.Core[i].Count > 2)
                 {
                     is4core = true;
                 }
@@ -244,10 +244,10 @@ namespace TuringAndCorbusier
             this.u = temp;
             //corefront = coreleft
 
-            for (int i = 0; i < agOut.CoreProperties.Count; i++)
+            for (int i = 0; i < agOut.Core.Count; i++)
             {
-                temp2.AddRange(u.Select(n => n + agOut.CoreProperties[i][0].CoreType.GetDepth()).ToList());
-                strs.Add(Convert.ToInt32(Math.Round(agOut.CoreProperties[i][0].Stories + 1)));
+                temp2.AddRange(u.Select(n => n + agOut.Core[i][0].CoreType.GetDepth()).ToList());
+                strs.Add(Convert.ToInt32(Math.Round(agOut.Core[i][0].Stories + 1)));
             }
             this.y = temp2;
 
@@ -1300,7 +1300,7 @@ namespace TuringAndCorbusier
         //
         List<Point3d> CenterlineCore = new List<Point3d>();
 
-        public Section_Pattern4(ApartmentGeneratorOutput agOut)
+        public Section_Pattern4(Apartment agOut)
         {
             this.Dimensions = new List<FloorPlan.Dimension2>();
             this.SectionLines = new List<Curve>();
@@ -1319,21 +1319,21 @@ namespace TuringAndCorbusier
             List<double> temp = new List<double>();
             List<double> temp2 = new List<double>();
             List<double> widthtemp = new List<double>();
-            for (int i = 0; i < agOut.CoreProperties.Count; i++)
+            for (int i = 0; i < agOut.Core.Count; i++)
             {
-                Point3d coreOri = agOut.CoreProperties[i][0].Origin;
+                Point3d coreOri = agOut.Core[i][0].Origin;
                 double param;
                 AptLines[i].ClosestPoint(coreOri, out param);
                 Point3d aptClosest = AptLines[i].PointAt(param);
-                temp.Add(Vector3d.Multiply(agOut.CoreProperties[i][0].YDirection, new Vector3d(coreOri - aptClosest)));
+                temp.Add(Vector3d.Multiply(agOut.Core[i][0].YDirection, new Vector3d(coreOri - aptClosest)));
   
                 widthtemp.Add(agOut.ParameterSet.Parameters[2] / 2);
             }
 
             List<Point3d> centercores = new List<Point3d>();
-            for (int i = 0; i < agOut.CoreProperties[0].Count; i++)
+            for (int i = 0; i < agOut.Core[0].Count; i++)
             {
-                Point3d coreOri = agOut.CoreProperties[0][i].Origin;
+                Point3d coreOri = agOut.Core[0][i].Origin;
                 double param;
                 AptLines[1].ClosestPoint(coreOri, out param);
                 Point3d aptClosest = AptLines[1].PointAt(param);
@@ -1355,10 +1355,10 @@ namespace TuringAndCorbusier
             //this.u = temp;
             //corefront = coreleft
 
-            for (int i = 0; i < agOut.CoreProperties[0].Count; i++)
+            for (int i = 0; i < agOut.Core[0].Count; i++)
             {
-               // temp2.AddRange(u.Select(n => n + agOut.CoreProperties[i][0].CoreType.GetDepth()).ToList());
-                strs.Add(Convert.ToInt32(Math.Round(agOut.CoreProperties[0][i].Stories + 1)));
+               // temp2.AddRange(u.Select(n => n + agOut.Core[i][0].CoreType.GetDepth()).ToList());
+                strs.Add(Convert.ToInt32(Math.Round(agOut.Core[0][i].Stories + 1)));
             }
            //this.y = temp2;
 
@@ -2494,7 +2494,7 @@ namespace TuringAndCorbusier
 
         List<Guid> drawnGuids = new List<Guid>();
 
-        public Section_Pattern1(ApartmentGeneratorOutput agOut)
+        public Section_Pattern1(Apartment agOut)
         {
             this.Dimensions = new List<FloorPlan.Dimension2>();
             this.SectionLines = new List<Curve>();
@@ -2524,19 +2524,19 @@ namespace TuringAndCorbusier
             {
                 if (passindex.Contains(i))
                     continue;
-                for (int j = 0; j < agOut.CoreProperties[0].Count; j++)
+                for (int j = 0; j < agOut.Core[0].Count; j++)
                 {
-                    Point3d coreOri = agOut.CoreProperties[0][j].Origin;
+                    Point3d coreOri = agOut.Core[0][j].Origin;
                     double param;
                     agOut.AptLines[i].ClosestPoint(coreOri, out param);
                     Point3d aptClosest = agOut.AptLines[i].PointAt(param);
 
                     if (coreOri.DistanceTo(aptClosest) < agOut.ParameterSet.Parameters[2])
                     {
-                        temp.Add(Vector3d.Multiply(agOut.CoreProperties[0][j].YDirection, new Vector3d(coreOri - aptClosest)));
+                        temp.Add(Vector3d.Multiply(agOut.Core[0][j].YDirection, new Vector3d(coreOri - aptClosest)));
                         widthtemp.Add(agOut.ParameterSet.Parameters[2] / 2);
-                        temp2.Add(temp.Last() + agOut.CoreProperties[0][j].CoreType.GetDepth());
-                        strs.Add(agOut.HouseholdProperties.Count);
+                        temp2.Add(temp.Last() + agOut.Core[0][j].CoreType.GetDepth());
+                        strs.Add(agOut.Household.Count);
                     }
                 }
             }
@@ -2551,8 +2551,8 @@ namespace TuringAndCorbusier
             //    if (passindex.Contains(i))
             //        continue;
 
-            //    temp2.AddRange(u.Select(n => n + agOut.CoreProperties[i][0].CoreType.GetDepth()).ToList());
-            //    strs.Add(Convert.ToInt32(Math.Round(agOut.CoreProperties[i][0].Stories+1)));
+            //    temp2.AddRange(u.Select(n => n + agOut.Core[i][0].CoreType.GetDepth()).ToList());
+            //    strs.Add(Convert.ToInt32(Math.Round(agOut.Core[i][0].Stories+1)));
             //}
             this.y = temp2;
 

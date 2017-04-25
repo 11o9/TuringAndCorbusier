@@ -8,9 +8,9 @@ using Rhino.Collections;
 
 namespace TuringAndCorbusier
 {
-    class AG3 : ApartmentmentGeneratorBase
+    class AG3 : ApartmentGeneratorBase
     {
-        public override ApartmentGeneratorOutput generator(Plot plot, ParameterSet parameterSet, Target target)
+        public override Apartment generator(Plot plot, ParameterSet parameterSet, Target target)
         {
             string tempString = parameterSet.CoreType.ToString();
 
@@ -61,7 +61,7 @@ namespace TuringAndCorbusier
             if (!valid)
             {
                 isvalid = false;
-                return new ApartmentGeneratorOutput(plot);
+                return new Apartment(plot);
             }
             //create outline curve
             Curve outlineCurve = outlineRect.ToNurbsCurve();
@@ -121,11 +121,11 @@ namespace TuringAndCorbusier
             ///////////////////////////////
 
             //core properties
-            List<List<CoreProperties>> coreProperties = corePropertiesMaker(parameterSet, inlineCurve, WWregBool);
+            List<List<Core>> core = coreMaker(parameterSet, inlineCurve, WWregBool);
 
             //household properties
             //household statistics
-            List<List<List<HouseholdProperties>>> householdProperties = householdPropertiesMaker(parameterSet, lines, midlinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
+            List<List<List<Household>>> household = householdMaker(parameterSet, lines, midlinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
 
             //building outlines
             Polyline outlinePolyline;
@@ -136,18 +136,20 @@ namespace TuringAndCorbusier
 
             //parking lot
 
-            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, coreProperties, plot, parameters[2], midlineCurve)); //parkingLotOnEarthMaker(boundary, householdProperties, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
+            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, core, plot, parameters[2], midlineCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
 
             List<Curve> aptLines = new List<Curve>();
             aptLines.Add(midlineCurve);
 
-            ApartmentGeneratorOutput result = new ApartmentGeneratorOutput(this.GetAGType, plot, buildingType, parameterSet, target, coreProperties, householdProperties, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
+            Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, core, household, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
             return result;
 
 
         }
 
+
+        #region GA Settings
         ///////////////////////////////////////////
         //////////  GA initial settings  //////////
         ///////////////////////////////////////////
@@ -214,6 +216,7 @@ namespace TuringAndCorbusier
                 return GAparameterset;
             }
         }
+        #endregion GA Settings
 
         ///////////////////////////////////////////////
         //////////  common initial settings  //////////
@@ -234,6 +237,8 @@ namespace TuringAndCorbusier
             return plotArr;
         }
 
+
+        #region LightingRegulation
         ///////////////////////////////////////////
         //////////  additional settings  //////////
         ///////////////////////////////////////////
@@ -322,7 +327,10 @@ namespace TuringAndCorbusier
 
             return byLightingCurve;
         }
+        #endregion LightingRegulation
 
+
+        #region MaxRectangle
         /////////////////////////////////////////
         //////////  maximum rectangle  //////////
         /////////////////////////////////////////
@@ -711,6 +719,8 @@ namespace TuringAndCorbusier
             rect.Transform(Transform.Rotation(-angle, Point3d.Origin));
             return rect;
         }
+        #endregion MaxRectangle
+
 
         ////////////////////////////////////////////////
         //////////  apt distribution & cores  //////////
@@ -981,6 +991,7 @@ namespace TuringAndCorbusier
             }
             return target;
         }
+
         private List<double> pushpush(double width, List<double> leftL, List<double> cornerL, List<List<int>> edgeIndices, double minL, int resolution, int iteration)
         {
             //
@@ -1108,7 +1119,7 @@ namespace TuringAndCorbusier
         //////////  outputs  //////////
         ///////////////////////////////
 
-        private List<List<CoreProperties>> corePropertiesMaker(ParameterSet parameterSet, Curve inlineCurve, bool WWregBool)
+        private List<List<Core>> coreMaker(ParameterSet parameterSet, Curve inlineCurve, bool WWregBool)
         {
             //initial settings
             Polyline inlinePolyline;
@@ -1171,20 +1182,20 @@ namespace TuringAndCorbusier
             coreVecX.Add(coreVecXTemp);
             coreVecY.Add(coreVecYTemp);
 
-            //combine information into coreProperties
-            List<List<CoreProperties>> coreProperties = new List<List<CoreProperties>>();
+            //combine information into core
+            List<List<Core>> core = new List<List<Core>>();
             for (int i = 0; i < coreOri.Count; i++)
             {
-                List<CoreProperties> corePropertiesTemp = new List<CoreProperties>();
+                List<Core> coreTemp = new List<Core>();
                 for (int j = 0; j < coreOri[i].Count; j++)
                 {
-                    corePropertiesTemp.Add(new CoreProperties(coreOri[i][j], coreVecX[i][j], coreVecY[i][j], parameterSet.CoreType, storiesHigh, parameterSet.CoreType.GetDepth() - 0));
+                    coreTemp.Add(new Core(coreOri[i][j], coreVecX[i][j], coreVecY[i][j], parameterSet.CoreType, storiesHigh, parameterSet.CoreType.GetDepth() - 0));
                 }
-                coreProperties.Add(corePropertiesTemp);
+                core.Add(coreTemp);
             }
-            return coreProperties;
+            return core;
         }
-        private List<List<List<HouseholdProperties>>> householdPropertiesMaker(ParameterSet parameterSet, Curve[] lines, Polyline midline, List<double> mappedVals, List<int> targetAreaType, int typeN)
+        private List<List<List<Household>>> householdMaker(ParameterSet parameterSet, Curve[] lines, Polyline midline, List<double> mappedVals, List<int> targetAreaType, int typeN)
         {
             //initial settings
             double[] parameters = parameterSet.Parameters;
@@ -1205,9 +1216,9 @@ namespace TuringAndCorbusier
             int entranceLength = 2000;
             int entranceCheck = 0;
 
-            List<List<List<HouseholdProperties>>> output = new List<List<List<HouseholdProperties>>>();
-            List<List<HouseholdProperties>> outputB = new List<List<HouseholdProperties>>();
-            List<HouseholdProperties> outputS = new List<HouseholdProperties>();
+            List<List<List<Household>>> output = new List<List<List<Household>>>();
+            List<List<Household>> outputB = new List<List<Household>>();
+            List<Household> outputS = new List<Household>();
 
             for (int i = 0; i < mappedVals.Count; i++)
             {
@@ -1223,12 +1234,12 @@ namespace TuringAndCorbusier
                 List<double> wallFactor;
                 //int targetAreaTypeH = new List<int>();
                 //double exclusiveAreaH = new List<double>();
-                if ((int)(mappedVals[i] - 0.01) == (int)(mappedVals[(i + 1) % mappedVals.Count] - 0.01))
+                if ((int)(mappedVals[i] - 0.01) == (int)(mappedVals[(i + 1) % mappedVals.Count] - 0.01)) // if not corner
                 {
-                    double avrg = (mappedVals[i] + mappedVals[(i + 1) % mappedVals.Count]) / 2;
+                    double avrg = (mappedVals[i] + mappedVals[(i + 1) % mappedVals.Count]) / 2.0;
                     Point3d midOri = midline.PointAt(avrg);
                     Vector3d midVec = midline.TangentAt(avrg);
-                    minCornerCheck.Add(Consts.corridorWidth + 0.1);//***1500이 어떤 숫자? 아래에 이어지는 else문이랑 같이 고칠 것.
+                    minCornerCheck.Add(Consts.corridorWidth + 0.1);
                     Vector3d verticalVec = midVec;
                     verticalVec.Rotate(-Math.PI / 2, new Vector3d(0, 0, 1));
                     midOri.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
@@ -1278,7 +1289,7 @@ namespace TuringAndCorbusier
 
                     wallFactor = new List<double>(new double[] { 1, 0.5, 1, 0.5 });
                 }
-                else
+                else //if is corner
                 {
                     Point3d checkP = lines[(int)(mappedVals[i] - 0.01)].PointAtEnd;
                     Vector3d v1 = new Vector3d(houseEndPoints[i] - checkP);
@@ -1309,7 +1320,7 @@ namespace TuringAndCorbusier
 
                     if (Math.Max(l1, l2) < width / 2 + entranceLength)
                     {
-                        entranceCheck = 1;
+                        //entranceCheck = 1;
                     }
 
                     if (Math.Abs(ybH) < 10)
@@ -1346,13 +1357,13 @@ namespace TuringAndCorbusier
                 {
                     if (cornerOrEdge == 0)
                     {
-                        HouseholdProperties tempHP = new HouseholdProperties(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Corner(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
+                        Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Corner(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
                         outputS.Add(tempHP);
                         //cornerProperties[targetAreaType[i]].Add(tempHP);
                     }
                     else
                     {
-                        HouseholdProperties tempHP = new HouseholdProperties(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Edge(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
+                        Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Edge(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
                         outputS.Add(tempHP);
                         //edgeProperties[targetAreaType[i]].Add(tempHP);
                     }
@@ -1361,10 +1372,10 @@ namespace TuringAndCorbusier
 
             for (int j = 0; j < storiesHigh; j++)
             {
-                List<HouseholdProperties> outputSTemp = new List<HouseholdProperties>();
+                List<Household> outputSTemp = new List<Household>();
                 for (int i = 0; i < outputS.Count; i++)
                 {
-                    HouseholdProperties hp = outputS[i];
+                    Household hp = outputS[i];
                     Point3d ori = hp.Origin;
                     Point3d ent = hp.EntrancePoint;
                     ori.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
@@ -1378,12 +1389,11 @@ namespace TuringAndCorbusier
                         winNew.Add(winTemp);
                     }
 
-                    outputSTemp.Add(new HouseholdProperties(ori, hp.XDirection, hp.YDirection, hp.XLengthA, hp.XLengthB, hp.YLengthA, hp.YLengthB, hp.HouseholdSizeType, hp.GetExclusiveArea() + hp.GetWallArea(), winNew, ent, hp.WallFactor));
+                    outputSTemp.Add(new Household(ori, hp.XDirection, hp.YDirection, hp.XLengthA, hp.XLengthB, hp.YLengthA, hp.YLengthB, hp.HouseholdSizeType, hp.GetExclusiveArea() + hp.GetWallArea(), winNew, ent, hp.WallFactor));
                 }
                 outputB.Add(outputSTemp);
             }
             output.Add(outputB);
-
             return output;
         }
 
@@ -1442,19 +1452,19 @@ namespace TuringAndCorbusier
             return buildingOutlines;
         }
 
-        private List<ParkingLine> parkingLotMaker(List<List<CoreProperties>> coreProperties, ParameterSet parameterSet, Curve plotCurve)
+        private List<ParkingLine> parkingLotMaker(List<List<Core>> core, ParameterSet parameterSet, Curve plotCurve)
         {
             //////////////////
             List<Point3d> coreOri = new List<Point3d>();
             List<Vector3d> coreVecX = new List<Vector3d>();
             List<Vector3d> coreVecY = new List<Vector3d>();
-            for (int i = 0; i < coreProperties.Count; i++)
+            for (int i = 0; i < core.Count; i++)
             {
-                for (int j = 0; j < coreProperties[i].Count; j++)
+                for (int j = 0; j < core[i].Count; j++)
                 {
-                    coreOri.Add(coreProperties[i][j].Origin);
-                    coreVecX.Add(coreProperties[i][j].XDirection);
-                    coreVecY.Add(coreProperties[i][j].YDirection);
+                    coreOri.Add(core[i][j].Origin);
+                    coreVecX.Add(core[i][j].XDirection);
+                    coreVecY.Add(core[i][j].YDirection);
                 }
             }
 

@@ -15,13 +15,13 @@ namespace TuringAndCorbusier
 
         }
 
-        public CorePlan(CoreProperties coreProperties)
+        public CorePlan(Core core)
         {
-            CoreType coreType = coreProperties.CoreType;
-            Vector3d xVector = coreProperties.XDirection;
-            Vector3d yVector = coreProperties.YDirection;
-            Point3d origin = coreProperties.Origin;
-            double coreInterpenetration = coreProperties.CoreInterpenetration;
+            CoreType coreType = core.CoreType;
+            Vector3d xVector = core.XDirection;
+            Vector3d yVector = core.YDirection;
+            Point3d origin = core.Origin;
+            double coreInterpenetration = core.CoreInterpenetration;
 
             string[] fixedAndFlex = GetCoreString(coreType).Split('&');
 

@@ -40,7 +40,7 @@ namespace TuringAndCorbusier
             return tempBoundingBox;
         }
 
-        public static Elevation drawElevation(Curve baseCurve, List<List<HouseholdProperties>> houseHolds, List<CoreProperties> cores)
+        public static Elevation drawElevation(Curve baseCurve, List<List<Household>> houseHolds, List<Core> cores)
         {
             double storiesHeight = Consts.FloorHeight;
             double pilotiHeight = Consts.PilotiHeight;
@@ -58,9 +58,9 @@ namespace TuringAndCorbusier
 
             List<double> widthList = new List<double>();
 
-            foreach (List<HouseholdProperties> i in houseHolds)
+            foreach (List<Household> i in houseHolds)
             {
-                foreach(HouseholdProperties j in i)
+                foreach(Household j in i)
                     widthList.Add(j.YLengthA);
             }
 
