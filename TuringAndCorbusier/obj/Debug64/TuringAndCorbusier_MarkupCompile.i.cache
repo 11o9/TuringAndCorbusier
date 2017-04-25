@@ -16,5 +16,5 @@ DEBUG;TRACE
 24-1171831492
 Reports\section.xaml;Reports\showme.xaml;Reports\typicalPlan.xaml;Reports\xmlBuildingReport.xaml;Reports\xmlcover.xaml;Reports\birdeye.xaml;Reports\xmlRegulationCheck.xaml;Reports\xmlUnitReport.xaml;xaml\Corbusier.xaml;xaml\errorMessage.xaml;xaml\FindForm.xaml;xaml\MenuWindow.xaml;xaml\ModelingComplexity.xaml;xaml\NewProjectWindow.xaml;xaml\Page2.xaml;xaml\Page3.xaml;xaml\plotAreaError.xaml;Reports\realReportBase.xaml;Reports\ReportNavigation.xaml;xaml\SlopeSetting.xaml;xaml\targetError.xaml;xaml\Turing.xaml;xaml\UnitTypeButton.xaml;xaml\UnitTypeInputBox.xaml;xaml\UnitTypeSetting.xaml;
 
-True
+False
 
