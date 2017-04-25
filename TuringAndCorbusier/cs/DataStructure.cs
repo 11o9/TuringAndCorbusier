@@ -29,7 +29,7 @@ namespace TuringAndCorbusier
         public static double exWallThickness { get { return 300; } }
         public static double inWallThickness { get { return 200; } }
 
-        public static double balconyRate_Stair { get { return 1.16; } }
+        public static double balconyRate_Tower { get { return 1.16; } }
         public static double balconyRate_Corridor { get { return 1.1; } }
     }
 
@@ -1244,6 +1244,8 @@ namespace TuringAndCorbusier
                 coreAreaSum += i.Sum(n => n.GetArea());
             }
 
+            coreAreaSum -= CoreProperties.Last().Sum(n => n.GetArea());
+
             return coreAreaSum;
         }
 
@@ -1501,6 +1503,8 @@ namespace TuringAndCorbusier
 
     public class Core
     {
+        public double Area { get; set; }
+
         //Constructor, 생성자
         public Core()
         {
@@ -1514,6 +1518,7 @@ namespace TuringAndCorbusier
             this.yDirection = anotherCoreProperty.yDirection;
             this.coreType = anotherCoreProperty.coreType;
             this.Stories = anotherCoreProperty.Stories;
+            this.Area = anotherCoreProperty.Area;
         }
 
         public Core(Point3d origin, Vector3d xDirection, Vector3d yDirection, CoreType coreType, double stories, double coreInterpenetration)
@@ -1537,18 +1542,20 @@ namespace TuringAndCorbusier
 
         public double GetArea()
         {
-            if (coreType == CoreType.Horizontal)
-                return 7660 * 4400 - 3100 * 150 + (4250 + 4400 - this.CoreInterpenetration * 2) * 300;
-            else if (coreType == CoreType.Parallel)
-                return 5200 * 4860 - 2700 * 300 + (4860 + 4560 - this.CoreInterpenetration * 2) * 300;
-            else if (coreType == CoreType.Folded)
-                return 5800 * 6060;
-            else if (coreType == CoreType.Vertical)
-                return 2500 * 8220;
-            else if (CoreType == CoreType.Vertical_AG1)
-                return 2500 * 7920 + (7920 - this.CoreInterpenetration) * 300 * 2;
-            else
-                return 0;
+            //if (coreType == CoreType.Horizontal)
+            //    return 7660 * 4400 - 3100 * 150 + (4250 + 4400 - this.CoreInterpenetration * 2) * 300;
+            //else if (coreType == CoreType.Parallel)
+            //    return 5200 * 4860 - 2700 * 300 + (4860 + 4560 - this.CoreInterpenetration * 2) * 300;
+            //else if (coreType == CoreType.Folded)
+            //    return 5800 * 6060;
+            //else if (coreType == CoreType.Vertical)
+            //    return 2500 * 8220;
+            //else if (CoreType == CoreType.Vertical_AG1)
+            //    return 2500 * 7920 + (7920 - this.CoreInterpenetration) * 300 * 2;
+            //else
+            //    return 0;
+
+            return Area;
         }
 
         //Property, 속성
@@ -1650,7 +1657,7 @@ namespace TuringAndCorbusier
 
         public double GetBalconyArea()
         {
-            return GetArea() - GetExclusiveArea();
+            return GetArea() - GetExclusiveArea()-GetWallArea();
         }
 
         public double GetExclusiveArea()
@@ -1658,7 +1665,7 @@ namespace TuringAndCorbusier
             if (isCorridorType)
                 return (GetArea() - CorridorArea) * 0.91 / Consts.balconyRate_Corridor;
             else
-                return GetArea() * 0.91 / Consts.balconyRate_Stair;
+                return GetArea() * 0.91 / Consts.balconyRate_Tower;
 
         }
 
@@ -1825,15 +1832,15 @@ namespace TuringAndCorbusier
 
         public double GetBalconyArea()
         {
-            return GetArea() - GetExclusiveArea() - CorridorArea;
+            return GetArea() - GetExclusiveArea() - CorridorArea - GetWallArea(); ;
         }
 
         public double GetExclusiveArea()
         {
             if (isCorridorType)
-                return (GetArea() - CorridorArea) * 0.91 / Consts.balconyRate_Corridor;
+                return GetArea() * 0.91 / Consts.balconyRate_Corridor;
             else
-                return GetArea() * 0.91 / Consts.balconyRate_Stair;
+                return GetArea() * 0.91 / Consts.balconyRate_Tower;
 
         }
 
@@ -2140,8 +2147,9 @@ namespace TuringAndCorbusier
                 // A 나 B 둘중 한 선의 위에.
                 if (isparamAonA && !isparamBonB || !isparamAonA && isparamBonB)
                 {
-                    topoly.Add(segments[k].PointAtEnd);
-                    topoly.Add(segments[j].PointAtStart);
+                    topoly.Add(li.PointAt(paramA));
+                    //topoly.Add(segments[k].PointAtEnd);
+                    //topoly.Add(segments[j].PointAtStart);
                     //k의 endpoint 에서 j의 startpoint로 선 긋는다.
                 }
                 // 두 선 위의 교점에.
@@ -2174,9 +2182,74 @@ namespace TuringAndCorbusier
 
             topoly.Add(topoly[0]);
 
-            return new Polyline(topoly).ToNurbsCurve();
+            var tempcurve = new PolylineCurve(topoly);
+            var rotation = tempcurve.ClosedCurveOrientation(Vector3d.ZAxis);
+            var selfintersection = Rhino.Geometry.Intersect.Intersection.CurveSelf(tempcurve, 0);
+
+            var parameters = selfintersection.Select(n => n.ParameterA).ToList();
+
+            parameters.AddRange(selfintersection.Select(n => n.ParameterB));
+
+            var spl = tempcurve.Split(parameters);
+
+            var f = NewJoin(spl);
+
+
+            var merged = f.Where(n => n.ClosedCurveOrientation(Vector3d.ZAxis) == rotation).ToList();
+           
+
+
+            return merged[0];
 
         }
+
+        public List<Curve> NewJoin(IEnumerable<Curve> spl)
+        {
+            Queue<Curve> q = new Queue<Curve>(spl);
+            Stack<Curve> s = new Stack<Curve>();
+            List<Curve> f = new List<Curve>();
+            while (q.Count > 0)
+            {
+                Curve temp = q.Dequeue();
+
+                if (temp.IsClosable(0))
+                {
+                    temp.MakeClosed(0);
+                    f.Add(temp);
+                }
+
+                else
+                {
+                    if (s.Count > 0)
+                    {
+                        Curve pop = s.Pop();
+                        var joined = Curve.JoinCurves(new Curve[] { pop, temp });
+                        if (joined[0].IsClosable(0))
+                        {
+                            joined[0].MakeClosed(0);
+                            f.Add(joined[0]);
+                        }
+                        else
+                        {
+                            s.Push(pop);
+                            s.Push(temp);
+                        }
+                    }
+                    else
+                    {
+                        s.Push(temp);
+                    }
+                }
+            }
+
+            if (s.Count > 0)
+            {
+                var last = Curve.JoinCurves(s);
+                f.AddRange(last);
+            }
+            return f;
+        }
+
 
         public Curve[] fromSurroundingsCurve(Plot plot)
         {

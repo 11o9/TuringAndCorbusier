@@ -45,16 +45,16 @@ namespace TuringAndCorbusier
                     //서비스면적 10%
                     area[i] = area[i] * Consts.balconyRate_Corridor;
                     //코어&복도
-                    area[i] += Consts.corridorWidth * width / 4;
+                    area[i] = area[i] * (1 + Consts.corridorWidth / (width - Consts.corridorWidth));
 
                 }
                 else
                 {
 
                     //서비스면적 18%
-                    area[i] = area[i] * Consts.balconyRate_Stair;
+                    area[i] = area[i] * Consts.balconyRate_Tower;
                     //코어&복도
-                    area[i] += parameters[i] + corearea / 2;
+                    area[i] += corearea / 2;
 
                 }
             }
@@ -286,7 +286,15 @@ namespace TuringAndCorbusier
                         corep.CoreType = parameterSet.CoreType;
 
                         corep.BuildingGroupNum = j;
+                        corep.Area = corearea;
+
+
                         cps.Add(corep);
+
+                        //이거뭐지....왜..
+                        double aaarea = corep.GetArea();
+
+                       
                     }
 
                     var tempBuildingTowerUnits = Low[i].Where(n => n.indexer[0] == j && !n.isCorridorType).ToList();
@@ -307,6 +315,7 @@ namespace TuringAndCorbusier
                             corep.CoreType = parameterSet.CoreType;
 
                             corep.BuildingGroupNum = j;
+                            corep.Area = corearea;
                             cps.Add(corep);
                         }
                     }

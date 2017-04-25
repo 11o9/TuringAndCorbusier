@@ -102,7 +102,8 @@ namespace TuringAndCorbusier
                     }
                     catch (System.Exception ex)
                     {
-                        MessageBox.Show(ex.ToString());
+                        //MessageBox.Show(ex.ToString());
+                        RhinoApp.WriteLine(ex.Message);
                     }
                 }
             }
@@ -548,7 +549,10 @@ namespace TuringAndCorbusier
 
                     i_Copy.Origin = new Point3d(i_Copy.Origin.X, i_Copy.Origin.Y, 0);
 
-                    double tempCoreArea = coreAreaSum / MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum() * i_Copy.GetExclusiveArea();
+                    double exclusiveSum = MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum();
+                    double exclusiveTemp = i_Copy.GetExclusiveArea();
+
+                    double tempCoreArea = coreAreaSum * exclusiveTemp / exclusiveSum;
                     double tempParkingLotArea = UGParkingLotAreaSum / MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum() * i_Copy.GetExclusiveArea();
                     tempCoreArea += uniqueHouseHoldProperties[i].CorridorArea;
                     Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport(i_Copy, typeString[i], tempCoreArea, tempParkingLotArea, publicFacilityArea, serviceArea, uniqueHouseHoldProperties[i].Count);
@@ -1457,10 +1461,11 @@ namespace TuringAndCorbusier
             ProjectArea.Text = Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea).ToString();
 
             //MainPanel_building2DPreview.CurveToDisplay = tempCurves;
-            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLines(plot, 6, true);
-            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLines(plot, 6, false);
-            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawbyLighting(plot,6);
-            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLines(plot, 6);
+            //MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLines(plot, 6, true);
+            //MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLines(plot, 6, false);
+            //MainPanel_LawPreview_Lighting.CurveToDisplay = new List<Curve>() { new Regulation(6).RoadCenterLines(plot) };//CommonFunc.LawbyLighting(plot,6);
+            //MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLines(plot, 6);
+            
            // string widthlog;
             //MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.ApartDistance(MainPanel_AGOutputList[tempIndex], out widthlog);
             //MainPanel_LawPreview_ApartDistance.dimension = widthlog;

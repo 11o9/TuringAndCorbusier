@@ -47,8 +47,8 @@ namespace Reports
             this.ContractArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea + publicFacilityArea + serviceArea + parkingLotArea) / 1000000 / 3.3).ToString() + "평";
             this.balconyArea.Text = Math.Round(houseHoldProperty.GetBalconyArea() / 1000000, 2).ToString() + "m\xB2";
             this.balconyArea_Py.Text = Math.Round(houseHoldProperty.GetBalconyArea() / 1000000 / 3.3, 2).ToString() + "평";
-            this.usableArea.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea()) / 1000000, 2).ToString() + "m\xB2";
-            this.usableArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea()) / 1000000 / 3.3, 2).ToString() + "평";
+            this.usableArea.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea() + houseHoldProperty.GetWallArea()) / 1000000, 2).ToString() + "m\xB2";
+            this.usableArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea() + houseHoldProperty.GetWallArea()) / 1000000 / 3.3, 2).ToString() + "평";
         }
 
         public static System.Windows.Shapes.Rectangle GetCanvasRectangle()
