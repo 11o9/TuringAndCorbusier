@@ -160,8 +160,10 @@ namespace TuringAndCorbusier
                 Rhino.RhinoApp.Wait();
             }
             Apartment bestOutput = ag.generator(plot, bestGene, target);
-
+            //var uniqueGenes = offspringGenes.Distinct();
+            //ApartmentGeneratorOutput[] bestOutputs = offspringGenes.Take(10).Select(n=>ag.generator(plot, n, target)).ToArray();
             return new Apartment[] { bestOutput }.ToList();
+            //return bestOutputs.ToList();
 
             if (bestOutput.ParameterSet == null)
                 return FinalizeApartment.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);

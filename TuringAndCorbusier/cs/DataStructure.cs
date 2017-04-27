@@ -2060,6 +2060,8 @@ namespace TuringAndCorbusier
                 this.BuildingType = BuildingType.RowHouses;
             }
 
+
+
             totalheight = stories;
         }
 
@@ -2341,7 +2343,6 @@ namespace TuringAndCorbusier
 
             return new Curve[] { fromSurroundingCurve };
         }
-
         public Curve[] fromNorthCurve(Plot plot)
         {
             Curve roadCenter = RoadCenterLines(plot);
@@ -2462,8 +2463,8 @@ namespace TuringAndCorbusier
         public Curve[] byLightingCurve(Plot plot, double angle)
         {
         
-            //특례 적용 안하는경우 h * 0.5
-            if (!plot.isSpecialCase)
+            //특례 적용 안하는경우 h * 0.5 , 8 층 이상인 경우
+            if (!plot.isSpecialCase || totalheight > 7)
                 distanceByLighting = 0.5;
             //특례 적용 하는 경우 h * 0.25
             else 
