@@ -19,7 +19,7 @@ namespace TuringAndCorbusier
 
             //입력"값" 부분
             double[] parameters = parameterSet.Parameters;
-            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
+            double storiesHigh =Math.Max((int)parameters[0], (int)parameters[1]);
             double storiesLow = Math.Min((int)parameters[0], (int)parameters[1]);
             double width = parameters[2];
             double angleRadian = parameters[3];
@@ -132,7 +132,8 @@ namespace TuringAndCorbusier
             ////////////////////////////////////
 
             //List<Line> baselines = baselineMaker(wholeRegulationHigh, parameterSet);
-            List<Curve> aptLines = NewLineMaker(wholeRegulationHigh, parameterSet);
+            List<Line> parkingLines = new List<Line>();
+            List<Curve> aptLines = NewLineMaker(wholeRegulationHigh, parameterSet, out parkingLines);
 
 
 
@@ -436,21 +437,30 @@ namespace TuringAndCorbusier
                 }
                 //Rhino.RhinoDoc.ActiveDoc.Objects.Add(forParking.Boundary);
             }
-            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cpss, forParking, parameters[2], centerCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
+
+
+            double apartDistance = width + (storiesHigh * Consts.FloorHeight + Consts.PilotiHeight) * 0.8;
+
+            ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList(), apartDistance);
+            pm.CalculateParkingScore();
+            var pls = pm.parkingCells.Select(n => new ParkingLine(n));
+            ParkingLotOnEarth sigh = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls.ToList() });
+
+            //ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cpss, forParking, parameters[2], centerCurve)); //parkingLotOnEarthMaker(boundary, householdProperties, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
             ParkingLotUnderGround parkingLotUnderGroud = new ParkingLotUnderGround();
 
-            for (int i = parkingLotOnEarth.ParkingLines.Count - 1; i >= 0; i--)
-            {
-                for (int j = parkingLotOnEarth.ParkingLines[i].Count - 1; j >= 0; j--)
-                {
-                    var testpoint = new Point3d(parkingLotOnEarth.ParkingLines[i][j].Boundary.Center.X, parkingLotOnEarth.ParkingLines[i][j].Boundary.Center.Y, 0);
+            //for (int i = parkingLotOnEarth.ParkingLines.Count - 1; i >= 0; i--)
+            //{
+            //    for (int j = parkingLotOnEarth.ParkingLines[i].Count - 1; j >= 0; j--)
+            //    {
+            //        var testpoint = new Point3d(parkingLotOnEarth.ParkingLines[i][j].Boundary.Center.X, parkingLotOnEarth.ParkingLines[i][j].Boundary.Center.Y, 0);
 
-                    if (forParking.Boundary.Contains(testpoint) == PointContainment.Outside)
-                    {
-                        parkingLotOnEarth.ParkingLines[i].RemoveAt(j);
-                    }
-                }
-            }
+            //        if (forParking.Boundary.Contains(testpoint) == PointContainment.Outside)
+            //        {
+            //            parkingLotOnEarth.ParkingLines[i].RemoveAt(j);
+            //        }
+            //    }
+            //}
 
 
             //하아..
@@ -472,7 +482,7 @@ namespace TuringAndCorbusier
         private double[] maxInput = { 7, 7, 10500, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
-        private double[] GAparameterset = { 0.2, 0.03, 4, 50, 7, 3, 1 }; //원본
+        private double[] GAparameterset = { 0.1, 0.05, 3, 120, 5, 3, 1 }; //원본
                                                                          //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
 
 
@@ -537,14 +547,16 @@ namespace TuringAndCorbusier
         //////////  apt baseline  //////////
         ////////////////////////////////////
 
-        //newlinemaker
-        private List<Curve> NewLineMaker(Curve[] regCurve, ParameterSet parameterSet)
+        //new line maker
+        private List<Curve> NewLineMaker(Curve[] regCurve, ParameterSet parameterSet, out List<Line> ParkingLines)
         {
 
             Curve[] RegCurve = regCurve.Select(n => n.DuplicateCurve()).ToArray();
+            List<Line> parkingLines = new List<Line>();
             List<Curve> aptlines = new List<Curve>();
             foreach (var regulationCurve in RegCurve)
             {
+                
                 Curve temp = regulationCurve.DuplicateCurve();
                 double[] parameters = parameterSet.Parameters;
                 double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
@@ -584,7 +596,7 @@ namespace TuringAndCorbusier
                     unitlength -= z + y;
 
                 double lengthremain = ygap - unitlength;
-
+                param[0] += z;
                 #region After
 
                 List<double> wholeLengths = new List<double>();
@@ -612,9 +624,10 @@ namespace TuringAndCorbusier
                     for (int i = 0; i < tempResult.Count; i++)
                     {
                         Line tempr = tempResult[i];
-                        tempr.Transform(Transform.Rotation(angleRadian, Vector3d.ZAxis, rotatecenter));
+                        tempr.Transform(Transform.Rotation(-angleRadian, Vector3d.ZAxis, rotatecenter));
                         tempResult[i] = tempr;
                     }
+
 
                     List<Curve> tempAptlines = new List<Curve>();
 
@@ -634,14 +647,12 @@ namespace TuringAndCorbusier
                         MaxLength = AvailableLength;
                         maximumLines = tempAptlines;
                         MaxPosition = k * step;
+                        parkingLines = tempResult;
                     }
 
                 }
 
                 #endregion
-
-
-
                 #region Before
 
 
@@ -707,10 +718,10 @@ namespace TuringAndCorbusier
                 //    aptlines.AddRange(Curve.JoinCurves(survivor));
                 //}
                 #endregion
-
+               
                 aptlines.AddRange(maximumLines);
             }
-
+            ParkingLines = parkingLines;
             aptlines = aptlines.Select(n => new LineCurve(n.PointAtStart, n.PointAtEnd) as Curve).ToList();
             return aptlines;
         }
@@ -824,6 +835,9 @@ namespace TuringAndCorbusier
 
             return result;
         }
+        //
+
+        #region Regacy
 
         private List<Line> baselineMaker(Curve regCurve, ParameterSet parameterSet)
         {

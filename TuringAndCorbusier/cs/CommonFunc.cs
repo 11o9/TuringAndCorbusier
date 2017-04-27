@@ -16,7 +16,54 @@ namespace TuringAndCorbusier
 
     class CommonFunc
     {
-        public static List<Curve> ApartDistance(Apartment output, out string log)
+        public static List<Curve> NewJoin(IEnumerable<Curve> spl)
+        {
+            Queue<Curve> q = new Queue<Curve>(spl);
+            Stack<Curve> s = new Stack<Curve>();
+            List<Curve> f = new List<Curve>();
+            while (q.Count > 0)
+            {
+                Curve temp = q.Dequeue();
+
+                if (temp.IsClosable(0))
+                {
+                    temp.MakeClosed(0);
+                    f.Add(temp);
+                }
+
+                else
+                {
+                    if (s.Count > 0)
+                    {
+                        Curve pop = s.Pop();
+                        var joined = Curve.JoinCurves(new Curve[] { pop, temp });
+                        if (joined[0].IsClosable(0))
+                        {
+                            joined[0].MakeClosed(0);
+                            f.Add(joined[0]);
+                        }
+                        else
+                        {
+                            s.Push(pop);
+                            s.Push(temp);
+                        }
+                    }
+                    else
+                    {
+                        s.Push(temp);
+                    }
+                }
+            }
+
+            if (s.Count > 0)
+            {
+                var last = Curve.JoinCurves(s);
+                f.AddRange(last);
+            }
+            return f;
+        }
+
+        public static List<Curve> ApartDistance(ApartmentGeneratorOutput output, out string log)
         {
             List<Curve> crvs = new List<Curve>();
             string dim = "";

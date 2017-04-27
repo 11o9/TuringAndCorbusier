@@ -41,7 +41,39 @@ namespace TuringAndCorbusier
 
             List<ParameterSet> offspringGenes = new List<ParameterSet>();
 
-            for (int i = 0; i < (int)population * initialBoost; i++)
+            //for (int i = 0; i < initialBoost; i++)
+            //{
+            //    CoreType tempCoreType = ag.GetRandomCoreType();
+
+            //    double[] oneGene = new double[ag.MinInput.Length];
+
+            //    //if (ag.IsCoreProtrude)
+            //    //    tempMaxInput[2] = tempCoreType.GetDepth();
+
+            //    for (int j = 0; j < ag.MinInput.Length; j++)
+            //    {
+            //        if (i % 2 == 0 && j == 3 && ag.GetType() == typeof(AG1))
+            //        {
+            //            oneGene[j] = goodAngle;
+            //        }
+            //        else
+            //        {
+            //            double parameterForGene = (tempMaxInput[j] - tempMinInput[j]) * myRandom.NextDouble() + tempMinInput[j];
+            //            oneGene[j] = parameterForGene;
+            //        }
+
+            //        oneGene[0] = Math.Floor(oneGene[0]);
+            //        oneGene[1] = Math.Floor(oneGene[1]);
+
+            //    }
+
+            //    ParameterSet a = new ParameterSet(oneGene, ag.GetType().ToString(), tempCoreType);
+            //    offspringGenes.Add(a);
+            //}
+
+            double otherAngles = population * initialBoost;//(population - 1) * initialBoost;
+            
+            for (int i = 0; i < (int)otherAngles; i++)
             {
                 CoreType tempCoreType = ag.GetRandomCoreType();
 
@@ -52,10 +84,12 @@ namespace TuringAndCorbusier
 
                 for (int j = 0; j < ag.MinInput.Length; j++)
                 {
-                    if (i % 2 == 0 && j == 3 && ag.GetType() == typeof(AG1))
+                    if (/*i % 2 == 0 &&*/ j == 3 && ag.GetType() == typeof(AG1))
                     {
-                        double parameterForGene = ((goodAngle + Math.PI / 2 * (i % 4) / 2) % (Math.PI * 2) + Math.PI * ((int)(i / 4) % 2) % (Math.PI * 2));
-                        oneGene[j] = parameterForGene;
+                        //double parameterForGene = ((goodAngle + Math.PI / 2 * (i % 4) / 2) % (Math.PI * 2) + Math.PI * ((int)(i / 4) % 2) % (Math.PI * 2));
+                        //oneGene[j] = parameterForGene;
+                        double mainAngle = Math.PI * i / otherAngles;
+                        oneGene[j] = mainAngle;
                     }
                     else
                     {
@@ -93,6 +127,7 @@ namespace TuringAndCorbusier
                 fitnessValues.Reverse();
                 offspringGenes = myRhinoList.ToList();
 
+                var radcheck = offspringGenes.Select(n => n.Parameters[3]);
                 /*
                 //write
                 Rhino.RhinoApp.WriteLine(genCount.ToString());
@@ -122,7 +157,7 @@ namespace TuringAndCorbusier
                     ParameterSet newOffspring = crossover(offspringGenes, fitnessValues, (int)myRandom.Next(0, int.MaxValue), ag.GetType().ToString());
                     if (myRandom.NextDouble() < mutationProbability)
                     {
-                        mutation(newOffspring, ag, mutationFactor, (int)myRandom.Next(0, int.MaxValue));
+                        newOffspring = mutation(newOffspring, ag, mutationFactor, (int)myRandom.Next(0, int.MaxValue));
                     }
                     tempGenes.Add(newOffspring);
                 }
@@ -494,8 +529,10 @@ namespace TuringAndCorbusier
                 double mutatedParameter = gene.Parameters[i] + parameterDomainLength * fitThreeSigma;
                 mutatedParameter = Math.Max(ag.MinInput[i], mutatedParameter);
                 mutatedParameter = Math.Min(ag.MaxInput[i], mutatedParameter);
+                if(i <= 1)
+                    mutatedParameter = Math.Floor(mutatedParameter);
                 newGene.Add(mutatedParameter);
-                newGene[0] = Math.Floor(newGene[0]);
+                
             }
             ParameterSet resultGene = new ParameterSet(newGene.ToArray(), ag.GetType().ToString(), gene.CoreType);
             return resultGene;

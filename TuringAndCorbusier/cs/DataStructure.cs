@@ -2194,7 +2194,7 @@ namespace TuringAndCorbusier
 
             var spl = tempcurve.Split(parameters);
 
-            var f = NewJoin(spl);
+            var f = CommonFunc.NewJoin(spl);
 
 
             var merged = f.Where(n => n.ClosedCurveOrientation(Vector3d.ZAxis) == rotation).ToList();
@@ -2205,52 +2205,7 @@ namespace TuringAndCorbusier
 
         }
 
-        public List<Curve> NewJoin(IEnumerable<Curve> spl)
-        {
-            Queue<Curve> q = new Queue<Curve>(spl);
-            Stack<Curve> s = new Stack<Curve>();
-            List<Curve> f = new List<Curve>();
-            while (q.Count > 0)
-            {
-                Curve temp = q.Dequeue();
-
-                if (temp.IsClosable(0))
-                {
-                    temp.MakeClosed(0);
-                    f.Add(temp);
-                }
-
-                else
-                {
-                    if (s.Count > 0)
-                    {
-                        Curve pop = s.Pop();
-                        var joined = Curve.JoinCurves(new Curve[] { pop, temp });
-                        if (joined[0].IsClosable(0))
-                        {
-                            joined[0].MakeClosed(0);
-                            f.Add(joined[0]);
-                        }
-                        else
-                        {
-                            s.Push(pop);
-                            s.Push(temp);
-                        }
-                    }
-                    else
-                    {
-                        s.Push(temp);
-                    }
-                }
-            }
-
-            if (s.Count > 0)
-            {
-                var last = Curve.JoinCurves(s);
-                f.AddRange(last);
-            }
-            return f;
-        }
+    
 
 
         public Curve[] fromSurroundingsCurve(Plot plot)
@@ -2611,7 +2566,12 @@ namespace TuringAndCorbusier
         {
             this.Boundary = boundary;
         }
-
+        public ParkingLine(Curve boundary)
+        {
+            Plane boundaryPlane = new Plane(boundary.PointAtStart, boundary.TangentAtStart, -boundary.TangentAtEnd);
+            Point3d[] points = boundary.DuplicateSegments().Select(n => n.PointAtStart).ToArray();
+            this.Boundary = new Rectangle3d(boundaryPlane, points[0], points[2]);
+        }
         //method, 메소드
 
         public double GetArea()

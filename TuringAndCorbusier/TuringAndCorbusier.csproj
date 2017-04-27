@@ -97,11 +97,14 @@
     <Compile Include="cs\KDG.cs" />
     <Compile Include="cs\LoadManager.cs" />
     <Compile Include="cs\ParkingLineMaker.cs" />
+    <Compile Include="cs\PeterParker.cs" />
+    <Compile Include="cs\Predicts.cs" />
     <Compile Include="cs\RegulationCheck.cs" />
     <Compile Include="cs\SectionDrawer.cs" />
     <Compile Include="cs\TypicalPlan.cs" />
     <Compile Include="cs\UIManager.cs" />
     <Compile Include="cs\CalculateScore.cs" />
+    <Compile Include="cs\UnitDistributor.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
