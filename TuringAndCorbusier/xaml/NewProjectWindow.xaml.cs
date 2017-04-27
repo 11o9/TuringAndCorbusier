@@ -83,6 +83,7 @@ namespace TuringAndCorbusier
             this.maxBuildingCoverage.Text = "60";
             this.maxFloors.Text = "4";
             Rhino.RhinoApp.WriteLine(plotType2.ToString());
+            SpecialCase.IsChecked = true;
         }
 
         private void PlotType_2_Click(object sender, RoutedEventArgs e)
@@ -98,6 +99,7 @@ namespace TuringAndCorbusier
             this.maxBuildingCoverage.Text = "60";
             this.maxFloors.Text = "7";
             RhinoApp.WriteLine(plotType2.ToString());
+            SpecialCase.IsChecked = true;
         }
 
         private void PlotType_3_Click(object sender, RoutedEventArgs e)
@@ -113,7 +115,7 @@ namespace TuringAndCorbusier
             this.maxBuildingCoverage.Text = "50";
             this.maxFloors.Text = "10";
             RhinoApp.WriteLine(plotType2.ToString());
-            SpecialCase.IsChecked = false;
+            SpecialCase.IsChecked = true;
         }
         private void Commercial_Click(object sender, RoutedEventArgs e)
         {

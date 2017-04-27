@@ -202,8 +202,10 @@ namespace TuringAndCorbusier
 
             double height = output.Household.Count * Consts.FloorHeight;
             double posz = height + Consts.PilotiHeight;
-            double distance = height * (plot.isSpecialCase ? 0.25 : 0.5);
-
+            double k = plot.isSpecialCase ? 0.25 : 0.5;
+            k = output.HouseholdProperties.Count > 6 ? 0.5 : k;
+            double distance = height * k;
+            
             Vector3d frontv = lightingEdgeFront[0].Direction;
             frontv.Rotate(rotateAngle, Vector3d.ZAxis);
             frontv.Unitize();

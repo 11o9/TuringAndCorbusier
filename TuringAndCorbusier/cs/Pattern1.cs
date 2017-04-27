@@ -537,6 +537,7 @@ namespace TuringAndCorbusier
         //////////  apt baseline  //////////
         ////////////////////////////////////
 
+        //newlinemaker
         private List<Curve> NewLineMaker(Curve[] regCurve, ParameterSet parameterSet)
         {
 
@@ -552,6 +553,8 @@ namespace TuringAndCorbusier
                 double angleRadian = parameters[3];
                 double moveFactor = parameters[4];
                 Regulation reg = new Regulation(storiesHigh);
+                //Curve regZero = reg.
+
 
                 Polyline regpoly;
                 temp.TryGetPolyline(out regpoly);
@@ -582,118 +585,244 @@ namespace TuringAndCorbusier
 
                 double lengthremain = ygap - unitlength;
 
-                //param.Select(n => n + lengthremain / 2 - z / 2).ToList();
-                param[0] += z;
-                for (int i = 0; i < param.Count; i++)
+                #region After
+
+                List<double> wholeLengths = new List<double>();
+                List<Curve> maximumLines = new List<Curve>();
+                double MaxLength = double.MinValue;
+                double MaxPosition = 0;
+                double step = 500;
+
+                for (int k = 0; k < ygap / step; k++)
                 {
-                    param[i] += lengthremain / 2 - z / 2;
-                    Line templine = new Line(new Point3d(boundingbox.Min.X, boundingbox.Min.Y + param[i], 0), new Point3d(boundingbox.Max.X, boundingbox.Min.Y + param[i], 0));
-                    result.Add(templine);
-                }
+                    List<Line> tempResult = new List<Line>();
 
-                for (int i = 0; i < result.Count; i++)
-                {
-                    Line tempr = result[i];
+                    double[] tempParam = param.ToArray();
 
-                    tempr.Transform(Transform.Rotation(-angleRadian, Vector3d.ZAxis, rotatecenter));
-
-                    result[i] = tempr;
-                }
-
-                List<Curve> up = new List<Curve>();
-                List<Curve> down = new List<Curve>();
-
-                up = result.Select(n => n.ToNurbsCurve().DuplicateCurve()).ToList();
-                down = result.Select(n => n.ToNurbsCurve().DuplicateCurve()).ToList();
-
-                Vector3d v = result[0].UnitTangent;
-                v.Rotate(Math.PI / 2, Vector3d.ZAxis);
-                v.Unitize();
-
-
-
-                for (int i = 0; i < up.Count; i++)
-                {
-                    up[i].Transform(Transform.Translation(v * z / 2));
-                    down[i].Transform(Transform.Translation(-v * z / 2));
-
-
-
-                    var i1 = Rhino.Geometry.Intersect.Intersection.CurveCurve(up[i], regulationCurve, 0, 0);
-                    var i2 = Rhino.Geometry.Intersect.Intersection.CurveCurve(down[i], regulationCurve, 0, 0);
-
-                    var splitparams = i1.Select(n => n.ParameterA).ToList();
-                    var splitparams2 = i2.Select(n => n.ParameterA).ToList();
-
-                    splitparams.AddRange(splitparams2);
-
-                    var splted1 = up[i].Split(splitparams);
-                    var splted2 = down[i].Split(splitparams);
-                    var spltedmain = result[i].ToNurbsCurve().Split(splitparams);
-
-                    List<Curve> survivor = new List<Curve>();
-
-                    for (int j = 0; j < splted1.Length; j++)
+                    //parameter[i] + 단위길이 - width/2 위치에 라인 생성
+                    for (int i = 0; i < param.Count; i++)
                     {
-                        if (regulationCurve.Contains(splted1[j].PointAtNormalizedLength(0.5)) == PointContainment.Inside
-                            && regulationCurve.Contains(splted2[j].PointAtNormalizedLength(0.5)) == PointContainment.Inside)
-                        {
-                            survivor.Add(spltedmain[j]);
-                        }
+                        tempParam[i] = param[i] + k * step - z / 2;
+                        Line templine = new Line(new Point3d(boundingbox.Min.X, boundingbox.Min.Y + tempParam[i], 0), new Point3d(boundingbox.Max.X, boundingbox.Min.Y + tempParam[i], 0));
+                        tempResult.Add(templine);
                     }
 
-                    aptlines.AddRange(Curve.JoinCurves(survivor));
 
+                    //생성된 라인을 역회전 하여 기존 상태로 되돌림.
+                    for (int i = 0; i < tempResult.Count; i++)
+                    {
+                        Line tempr = tempResult[i];
+                        tempr.Transform(Transform.Rotation(angleRadian, Vector3d.ZAxis, rotatecenter));
+                        tempResult[i] = tempr;
+                    }
 
+                    List<Curve> tempAptlines = new List<Curve>();
 
+                    //offset한 라인마다 충돌체크,길이조정
+                    for (int i = 0; i < tempResult.Count; i++)
+                    {
+                        Curve[] inner = InnerRegion(regulationCurve, tempResult[i].ToNurbsCurve(), z);
+                        tempAptlines.AddRange(inner);
+                    }
 
-                    //if (i1.Count <= 1 && i2.Count <= 1)
-                    //    continue;
+                    //결과 값의 길이 확인
+                    var AvailableLength = GetAvailableLength(tempAptlines);
+                    //wholeLines.AddRange(aptlines);
+                    wholeLengths.Add(AvailableLength);
+                    if (MaxLength < AvailableLength)
+                    {
+                        MaxLength = AvailableLength;
+                        maximumLines = tempAptlines;
+                        MaxPosition = k * step;
+                    }
 
-                    //else if (i1.Count > 0 && i2.Count == 0)
-                    //{
-
-                    //}
-
-                    //else if (i1.Count == 0 && i2.Count > 0)
-                    //{
-
-                    //}
-
-                    //else
-                    //{
-                    //    var i1a = i1.Max(n => n.ParameterA);
-                    //    var i1b = i1.Min(n => n.ParameterA);
-
-                    //    var i2a = i2.Max(n => n.ParameterA);
-                    //    var i2b = i2.Min(n => n.ParameterA);
-
-                    //    var minA = i1a > i2a ? i2a : i1a;
-                    //    var minB = i1b < i2b ? i2b : i1b;
-
-                    //    var p1 = up[i].PointAt(minA);
-                    //    var p2 = up[i].PointAt(minB);
-                    //    var p3 = down[i].PointAt(minB);
-                    //    var p4 = down[i].PointAt(minA);
-
-
-                    //    var temp = new Polyline(new Point3d[] { p1, p2, p3, p4, p1 }).ToNurbsCurve();
-
-                    //    var tempresult = result[i].ToNurbsCurve();
-
-                    //    var lastintersection = Rhino.Geometry.Intersect.Intersection.CurveCurve(tempresult, temp, 0, 0);
-
-                    //    var interval = lastintersection.Select(n => n.ParameterA).ToList();
-
-                    //    var aptline = tempresult.Trim(interval[0], interval[1]);
-                    //    aptlines.Add(aptline);
-                    //}
                 }
 
+                #endregion
+
+
+
+                #region Before
+
+
+                //param.Select(n => n + lengthremain / 2 - z / 2).ToList();
+                //param[0] += z;
+                //for (int i = 0; i < param.Count; i++)
+                //{
+                //    param[i] += lengthremain / 2 - z / 2;
+                //    Line templine = new Line(new Point3d(boundingbox.Min.X, boundingbox.Min.Y + param[i], 0), new Point3d(boundingbox.Max.X, boundingbox.Min.Y + param[i], 0));
+                //    result.Add(templine);
+                //}
+
+                //for (int i = 0; i < result.Count; i++)
+                //{
+                //    Line tempr = result[i];
+
+                //    tempr.Transform(Transform.Rotation(-angleRadian, Vector3d.ZAxis, rotatecenter));
+
+                //    result[i] = tempr;
+                //}
+                //List<Curve> up = new List<Curve>();
+                //List<Curve> down = new List<Curve>();
+
+                //up = result.Select(n => n.ToNurbsCurve().DuplicateCurve()).ToList();
+                //down = result.Select(n => n.ToNurbsCurve().DuplicateCurve()).ToList();
+
+                //Vector3d v = result[0].UnitTangent;
+                //v.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                //v.Unitize();
+
+
+
+                //for (int i = 0; i < up.Count; i++)
+                //{
+                //    up[i].Transform(Transform.Translation(v * z / 2));
+                //    down[i].Transform(Transform.Translation(-v * z / 2));
+
+
+
+                //    var i1 = Rhino.Geometry.Intersect.Intersection.CurveCurve(up[i], regulationCurve, 0, 0);
+                //    var i2 = Rhino.Geometry.Intersect.Intersection.CurveCurve(down[i], regulationCurve, 0, 0);
+
+                //    var splitparams = i1.Select(n => n.ParameterA).ToList();
+                //    var splitparams2 = i2.Select(n => n.ParameterA).ToList();
+
+                //    splitparams.AddRange(splitparams2);
+
+                //    var splted1 = up[i].Split(splitparams);
+                //    var splted2 = down[i].Split(splitparams);
+                //    var spltedmain = result[i].ToNurbsCurve().Split(splitparams);
+
+                //    List<Curve> survivor = new List<Curve>();
+
+                //    for (int j = 0; j < splted1.Length; j++)
+                //    {
+                //        if (regulationCurve.Contains(splted1[j].PointAtNormalizedLength(0.5)) == PointContainment.Inside
+                //            && regulationCurve.Contains(splted2[j].PointAtNormalizedLength(0.5)) == PointContainment.Inside)
+                //        {
+                //            survivor.Add(spltedmain[j]);
+                //        }
+                //    }
+
+                //    aptlines.AddRange(Curve.JoinCurves(survivor));
+                //}
+                #endregion
+
+                aptlines.AddRange(maximumLines);
             }
 
             aptlines = aptlines.Select(n => new LineCurve(n.PointAtStart, n.PointAtEnd) as Curve).ToList();
             return aptlines;
+        }
+        public Curve[] InnerRegion(Curve outside, Curve baseCurve, double regionWidth)
+        {
+            //check upper, lower bound
+            int underzero = 5;
+
+            Curve up = baseCurve.DuplicateCurve();
+            Curve down = baseCurve.DuplicateCurve();
+
+            Vector3d vu = up.TangentAtStart * regionWidth / 2;
+            vu.Rotate(Math.PI / 2, Vector3d.ZAxis);
+            Vector3d vd = -vu;
+
+            up.Translate(vu);
+            down.Translate(vd);
+
+            var iu = Rhino.Geometry.Intersect.Intersection.CurveCurve(up, outside, 0, 0);
+            var id = Rhino.Geometry.Intersect.Intersection.CurveCurve(down, outside, 0, 0);
+
+            List<double> parameters = new List<double>();
+            parameters.AddRange(iu.Select(n => Math.Round(n.ParameterA, underzero)));
+            parameters.AddRange(id.Select(n => Math.Round(n.ParameterA, underzero)));
+
+            var su = up.Split(parameters);
+            var sd = down.Split(parameters);
+
+            bool[] inu = su.Select(n => outside.Contains(n.PointAtNormalizedLength(0.5)) == PointContainment.Inside).ToArray();
+            bool[] ind = sd.Select(n => outside.Contains(n.PointAtNormalizedLength(0.5)) == PointContainment.Inside).ToArray();
+
+            if (inu.Length != ind.Length)
+            //why?
+            {
+                return new Curve[0];
+            }
+
+            var sb = baseCurve.Split(parameters);
+            List<Curve> result = new List<Curve>();
+            List<Curve> boxes = new List<Curve>();
+            for (int i = 0; i < inu.Length; i++)
+            {
+                if (inu[i] && ind[i])
+                {
+                    //1번,3번 segments 가 사이드선
+                    boxes.Add(new Polyline(
+                      new Point3d[] { su[i].PointAtStart, su[i].PointAtEnd, sd[i].PointAtEnd, sd[i].PointAtStart, su[i].PointAtStart }
+                      ).ToNurbsCurve());
+
+                    result.Add(sb[i]);
+                }
+            }
+
+
+            // check side
+            Vector3d testv = -baseCurve.TangentAtStart;
+            //makebox
+            for (int i = 0; i < boxes.Count; i++)
+            {
+                //외곽 기준선의 vertex들
+                var outps = outside.DuplicateSegments().Select(n => n.PointAtStart).ToList();
+
+                List<double> lefts = new List<double>();
+                List<double> rights = new List<double>();
+
+                for (int j = 0; j < outps.Count; j++)
+                {
+                    //박스 i 가 점 j 를 포함하면?
+                    if (boxes[i].Contains(outps[j]) == PointContainment.Inside)
+                    {
+                        var boxsegments = boxes[i].DuplicateSegments();
+                        Point3d testleft = outps[j] - testv;
+
+                        double param;
+                        result[i].ClosestPoint(outps[j], out param);
+                        //외곽 기준선이 testpoint 를 포함하면?
+                        if (outside.Contains(testleft) == PointContainment.Inside)
+                        {
+                            //왼쪽 선 수정
+                            lefts.Add(param);
+                        }
+                        else
+                        {
+                            //오른쪽 선 수정
+                            rights.Add(param);
+                        }
+
+                    }
+                }
+
+                //lefts 중 max, rights 중 min 으로 선 조정....
+                var newstart = lefts.Count > 0 ? result[i].PointAt(lefts.Max()) : result[i].PointAtStart;
+                var newend = rights.Count > 0 ? result[i].PointAt(rights.Min()) : result[i].PointAtEnd;
+                result[i] = new LineCurve(newstart, newend);
+
+            }
+
+            return result.ToArray();
+
+        }
+        public double GetAvailableLength(IEnumerable<Curve> curves)
+        {
+            double minlength = 8000;
+            var list = curves.ToList();
+            double result = 0;
+            for (int i = 0; i < list.Count; i++)
+            {
+                var d = list[i].GetLength() >= minlength ? list[i].GetLength() : 0;
+                result += d;
+            }
+
+            return result;
         }
 
         private List<Line> baselineMaker(Curve regCurve, ParameterSet parameterSet)
@@ -1498,4 +1627,6 @@ namespace TuringAndCorbusier
 
         #endregion
     }
+
+
 }

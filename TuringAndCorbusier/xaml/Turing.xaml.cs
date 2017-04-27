@@ -41,7 +41,7 @@ namespace TuringAndCorbusier
 
         public string USERID = CommonFunc.getStringFromRegistry("USERID");
         public string DBURL = CommonFunc.getStringFromRegistry("DBURL");
-
+        
         List<FloorPlanLibrary> MainPanel_planLibraries = new List<FloorPlanLibrary>();
 
         /*
@@ -66,9 +66,11 @@ namespace TuringAndCorbusier
             try
             {
                 this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
-
+                
                 this.ProjectAddress.Text = CommonFunc.getAddressFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList());
-            }
+
+                this.ProjectArea.Text = Math.Round(CommonFunc.GetManualAreaFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList()),2).ToString();
+    }
             catch (System.Exception)
             {
                 errorMessage tempError = new errorMessage("서버와 연결할 수 없습니다.");
