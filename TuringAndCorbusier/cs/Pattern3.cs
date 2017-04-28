@@ -120,11 +120,8 @@ namespace TuringAndCorbusier
             //////////  outputs  //////////
             ///////////////////////////////
 
-            //List<List<Core>> core = coreMaker(parameterSet, inlineCurve, WWregBool);
-            //List<List<List<Household>>> household = householdMaker(parameterSet, lines, midlinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
-
-            List<List<Core>> cores = MakeCores();
-            List<List<List<Household>>> households = MakeHouseholds();
+            List<List<Core>> cores = MakeCores(parameterSet, inlineCurve, WWregBool);
+            List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, midlinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
 
 
             //building outlines
@@ -149,17 +146,282 @@ namespace TuringAndCorbusier
         }
 
         #region New Apartment Generating Methods
-        private List<List<Core>> MakeCores()
+        private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve, bool WWregBool)
         {
+            //initial settings
+            Polyline inlinePolyline;
+            inlineCurve.TryGetPolyline(out inlinePolyline);
+            Curve[] lines = inlineCurve.DuplicateSegments();
+            if (lines[0].GetLength() > lines[1].GetLength())
+            {
+                Array.Reverse(lines);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    lines[i].Reverse();
+                }
+            }
+
+            double[] parameters = parameterSet.Parameters;
+            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
+            double width = parameters[2];
+            double coreWidth = parameterSet.CoreType.GetWidth();
+            double coreDepth = parameterSet.CoreType.GetDepth();
+
+            Vector3d courtX = new Vector3d(lines[0].PointAtEnd - lines[0].PointAtStart);
+            Vector3d courtY = new Vector3d(lines[3].PointAtStart - lines[3].PointAtEnd);
+            courtX.Unitize();
+            courtY.Unitize();
+
+            List<Point3d> coreOrigins = new List<Point3d>();
+            List<Vector3d> coreXVectors = new List<Vector3d>();
+            List<Vector3d> coreYVectors = new List<Vector3d>();
+
+            //Draw groundFloor cores
+            //1
+            coreOrigins.Add(lines[0].PointAtStart);
+            coreXVectors.Add(Vector3d.Multiply(courtX, 1));
+            coreYVectors.Add(Vector3d.Multiply(courtY, 1));
+            if (WWregBool)
+            {
+                //2
+                coreOrigins.Add(lines[1].PointAtStart);
+                coreXVectors.Add(Vector3d.Multiply(courtX, -1));
+                coreYVectors.Add(Vector3d.Multiply(courtY, 1));
+            }
+            //3
+            coreOrigins.Add(lines[2].PointAtStart);
+            coreXVectors.Add(Vector3d.Multiply(courtX, -1));
+            coreYVectors.Add(Vector3d.Multiply(courtY, -1));
+            if (WWregBool)
+            {
+                //4
+                coreOrigins.Add(lines[3].PointAtStart);
+                coreXVectors.Add(Vector3d.Multiply(courtX, 1));
+                coreYVectors.Add(Vector3d.Multiply(courtY, -1));
+            }
+
+            //stack
             List<List<Core>> outputCores = new List<List<Core>>();
+
+            for (int i = 0; i < storiesHigh+2; i++)
+            {
+                double tempStoryHeight = (i == 0) ? 0 : Consts.PilotiHeight + Consts.FloorHeight * (i - 1);
+                List<Core> currentFloorCores = new List<Core>();
+
+                for (int j = 0; j < coreOrigins.Count; j++)
+                {
+                    Core oneCore = new Core(coreOrigins[j], coreXVectors[j], coreYVectors[j], parameterSet.CoreType, storiesHigh, parameterSet.CoreType.GetDepth() - 0);
+                    oneCore.Origin = oneCore.Origin + Vector3d.ZAxis * tempStoryHeight;
+                    oneCore.Stories = i;
+
+                    currentFloorCores.Add(oneCore);
+                }
+
+                outputCores.Add(currentFloorCores);
+            }
+
             return outputCores;
         }
 
-        private List<List<List<Household>>> MakeHouseholds()
+        private List<List<List<Household>>> MakeHouseholds(ParameterSet parameterSet, Curve[] lines, Polyline midline, List<double> mappedVals, List<int> targetAreaType, int typeN)
         {
-            List<List<List<Household>>> outputHouseholds = new List<List<List<Household>>>();
+            //initial settings
+            double[] parameters = parameterSet.Parameters;
+            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
+            double width = parameters[2];
+            double coreWidth = parameterSet.CoreType.GetWidth();
+            double coreDepth = parameterSet.CoreType.GetDepth();
+            int cornerOrEdge = 0;
 
-            return outputHouseholds;
+            List<Point3d> houseEndPoints = new List<Point3d>();
+            List<Vector3d> houseEndPerps = new List<Vector3d>();
+            for (int i = 0; i < mappedVals.Count; i++)
+            {
+                houseEndPoints.Add(midline.PointAt(mappedVals[i]));
+                houseEndPerps.Add(midline.TangentAt(mappedVals[i]));
+            }
+            List<double> minCornerCheck = new List<double>();
+            int entranceLength = 2000;
+            int entranceCheck = 0;
+
+            List<List<List<Household>>> output = new List<List<List<Household>>>();
+            List<Household> outputS = new List<Household>();
+
+            for (int i = 0; i < mappedVals.Count; i++)
+            {
+                Point3d homeOriH;
+                Vector3d homeVecXH;
+                Vector3d homeVecYH;
+                double xaH;
+                double xbH;
+                double yaH;
+                double ybH;
+                List<Line> windowsH = new List<Line>();
+                Point3d ent = new Point3d();
+                List<double> wallFactor;
+                //int targetAreaTypeH = new List<int>();
+                //double exclusiveAreaH = new List<double>();
+                if ((int)(mappedVals[i] - 0.01) == (int)(mappedVals[(i + 1) % mappedVals.Count] - 0.01)) // if not corner
+                {
+                    double avrg = (mappedVals[i] + mappedVals[(i + 1) % mappedVals.Count]) / 2.0;
+                    Point3d midOri = midline.PointAt(avrg);
+                    Vector3d midVec = midline.TangentAt(avrg);
+                    minCornerCheck.Add(Consts.corridorWidth + 0.1);
+                    Vector3d verticalVec = midVec;
+                    verticalVec.Rotate(-Math.PI / 2, new Vector3d(0, 0, 1));
+                    midOri.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
+
+                    //
+                    Random r = new Random(i);
+                    //int randInt = r.Next(10) % 2;
+                    int randInt = 1;
+                    List<Point3d> selOri = new List<Point3d>();
+                    selOri.Add(midline.PointAt(mappedVals[i]));
+                    selOri.Add(midline.PointAt(mappedVals[(i + 1) % mappedVals.Count]));
+                    xaH = selOri[0].DistanceTo(selOri[1]);
+                    xbH = 0;
+                    yaH = width;
+                    ybH = 0;
+                    Point3d realOri = selOri[randInt];
+                    realOri.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
+                    homeOriH = realOri;
+                    midVec.Rotate(Math.PI * randInt, new Vector3d(0, 0, 1));
+                    //
+
+                    homeVecXH = Vector3d.Multiply(1, midVec);
+                    homeVecYH = verticalVec;
+
+                    //windows
+                    Point3d winPt1 = homeOriH;
+                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, ybH)));
+                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, xaH - xbH)));
+                    Point3d winPt2 = winPt1;
+                    winPt2.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xaH)));
+                    Point3d winPt3 = winPt1;
+                    winPt3.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, -yaH)));
+                    Point3d winPt4 = winPt3;
+                    winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xaH)));
+                    ////////그런데, 복도 방향도 채광창 방향이라고 할 수 있을까?
+                    windowsH.Add(new Line(winPt1, winPt2));
+                    ////////
+                    windowsH.Add(new Line(winPt3, winPt4));
+
+                    //entrance points
+                    ent = new Point3d(homeOriH);
+                    //***혹시 여기에서도 레퍼런스된 점을 그대로 옮겨서 깽판나는지 확인 필요
+                    ent.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH / 2)));
+
+                    //this is edge type
+                    cornerOrEdge = 1;
+
+                    wallFactor = new List<double>(new double[] { 1, 0.5, 1, 0.5 });
+                }
+                else //if is corner
+                {
+                    Point3d checkP = lines[(int)(mappedVals[i] - 0.01)].PointAtEnd;
+                    Vector3d v1 = new Vector3d(houseEndPoints[i] - checkP);
+                    Vector3d v2 = new Vector3d(houseEndPoints[(i + 1) % mappedVals.Count] - checkP);
+                    double l1 = v1.Length;
+                    double l2 = v2.Length;
+                    minCornerCheck.Add(Math.Max(l1, l2));
+                    v1.Unitize();
+                    v2.Unitize();
+                    checkP.Transform(Transform.Translation(v1 * width / 2 + v2 * width / 2));
+                    homeOriH = checkP;
+                    if (l1 > l2)
+                    {
+                        v1.Reverse();
+                        homeVecXH = v1;
+                        homeVecYH = v2;
+                    }
+                    else
+                    {
+                        v2.Reverse();
+                        homeVecXH = v2;
+                        homeVecYH = v1;
+                    }
+                    xaH = Math.Max(l1, l2) + width / 2;
+                    xbH = Math.Max(l1, l2) - width / 2;
+                    yaH = Math.Min(l1, l2) + width / 2;
+                    ybH = Math.Min(l1, l2) - width / 2;
+
+                    if (Math.Max(l1, l2) < width / 2 + entranceLength)
+                    {
+                        //entranceCheck = 1;
+                    }
+
+                    if (Math.Abs(ybH) < 10)
+                        ybH = 0;
+
+                    //windows
+                    Point3d winPt1 = homeOriH;
+                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH)));
+                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, ybH - yaH)));
+                    Point3d winPt2 = winPt1;
+                    winPt2.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, xaH)));
+                    Point3d winPt3 = winPt2;
+                    Point3d winPt4 = winPt2;
+                    winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, yaH)));
+                    windowsH.Add(new Line(winPt1, winPt2));
+                    windowsH.Add(new Line(winPt3, winPt4));
+
+                    //entrance points
+                    ent = new Point3d(homeOriH);
+                    ent.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH / 2)));
+
+                    //this is corner type
+                    cornerOrEdge = 0;
+
+                    if (ybH > 0)
+                        wallFactor = new List<double>(new double[] { 1, 0.5, 1, 1, 0.5, 1 });
+                    else if (ybH == 0)
+                        wallFactor = new List<double>(new double[] { 1, 1, 1, 0.5, 1 });
+                    else
+                        wallFactor = new List<double>(new double[] { 0, 0.5, 1, 1, 0.5, 1 });
+                }
+                if (entranceCheck == 0 && minCornerCheck.Min() > Consts.corridorWidth)
+                {
+                    if (cornerOrEdge == 0)
+                    {
+                        Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Corner(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
+                        outputS.Add(tempHP);
+                        //cornerProperties[targetAreaType[i]].Add(tempHP);
+                    }
+                    else
+                    {
+                        Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Edge(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
+                        outputS.Add(tempHP);
+                        //edgeProperties[targetAreaType[i]].Add(tempHP);
+                    }
+                }
+            }
+
+            for (int j = 0; j < storiesHigh; j++)
+            {
+                List<List<Household>> outputB = new List<List<Household>>();
+                List<Household> outputSTemp = new List<Household>();
+                for (int i = 0; i < outputS.Count; i++)
+                {
+                    Household hp = outputS[i];
+                    Point3d ori = hp.Origin;
+                    Point3d ent = hp.EntrancePoint;
+                    ori.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
+                    ent.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
+                    List<Line> win = hp.LightingEdge;
+                    List<Line> winNew = new List<Line>();
+                    for (int k = 0; k < win.Count; k++)
+                    {
+                        Line winTemp = win[k];
+                        winTemp.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
+                        winNew.Add(winTemp);
+                    }
+
+                    outputSTemp.Add(new Household(ori, hp.XDirection, hp.YDirection, hp.XLengthA, hp.XLengthB, hp.YLengthA, hp.YLengthB, hp.HouseholdSizeType, hp.GetExclusiveArea() + hp.GetWallArea(), winNew, ent, hp.WallFactor));
+                }
+                outputB.Add(outputSTemp);
+                output.Add(outputB);
+            }
+            return output;
         }
 
         #endregion
@@ -1123,285 +1385,6 @@ namespace TuringAndCorbusier
         ///////////////////////////////
         //////////  outputs  //////////
         ///////////////////////////////
-
-        private List<List<Core>> coreMaker(ParameterSet parameterSet, Curve inlineCurve, bool WWregBool)
-        {
-            //initial settings
-            Polyline inlinePolyline;
-            inlineCurve.TryGetPolyline(out inlinePolyline);
-            Curve[] lines = inlineCurve.DuplicateSegments();
-            if (lines[0].GetLength() > lines[1].GetLength())
-            {
-                Array.Reverse(lines);
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    lines[i].Reverse();
-                }
-            }
-
-            double[] parameters = parameterSet.Parameters;
-            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
-            double width = parameters[2];
-            double coreWidth = parameterSet.CoreType.GetWidth();
-            double coreDepth = parameterSet.CoreType.GetDepth();
-
-            Vector3d courtX = new Vector3d(lines[0].PointAtEnd - lines[0].PointAtStart);
-            Vector3d courtY = new Vector3d(lines[3].PointAtStart - lines[3].PointAtEnd);
-            courtX.Unitize();
-            courtY.Unitize();
-
-            List<List<Point3d>> coreOri = new List<List<Point3d>>();
-            List<List<Vector3d>> coreVecX = new List<List<Vector3d>>();
-            List<List<Vector3d>> coreVecY = new List<List<Vector3d>>();
-
-            List<Point3d> coreOriTemp = new List<Point3d>();
-            List<Vector3d> coreVecXTemp = new List<Vector3d>();
-            List<Vector3d> coreVecYTemp = new List<Vector3d>();
-
-            //placing cores
-
-            //1
-            coreOriTemp.Add(lines[0].PointAtStart);
-            coreVecXTemp.Add(Vector3d.Multiply(courtX, 1));
-            coreVecYTemp.Add(Vector3d.Multiply(courtY, 1));
-            if (WWregBool)
-            {
-                //2
-                coreOriTemp.Add(lines[1].PointAtStart);
-                coreVecXTemp.Add(Vector3d.Multiply(courtX, -1));
-                coreVecYTemp.Add(Vector3d.Multiply(courtY, 1));
-            }
-            //3
-            coreOriTemp.Add(lines[2].PointAtStart);
-            coreVecXTemp.Add(Vector3d.Multiply(courtX, -1));
-            coreVecYTemp.Add(Vector3d.Multiply(courtY, -1));
-            if (WWregBool)
-            {
-                //4
-                coreOriTemp.Add(lines[3].PointAtStart);
-                coreVecXTemp.Add(Vector3d.Multiply(courtX, 1));
-                coreVecYTemp.Add(Vector3d.Multiply(courtY, -1));
-            }
-
-            coreOri.Add(coreOriTemp);
-            coreVecX.Add(coreVecXTemp);
-            coreVecY.Add(coreVecYTemp);
-
-            //combine information into core
-            List<List<Core>> core = new List<List<Core>>();
-            for (int i = 0; i < coreOri.Count; i++)
-            {
-                List<Core> coreTemp = new List<Core>();
-                for (int j = 0; j < coreOri[i].Count; j++)
-                {
-                    coreTemp.Add(new Core(coreOri[i][j], coreVecX[i][j], coreVecY[i][j], parameterSet.CoreType, storiesHigh, parameterSet.CoreType.GetDepth() - 0));
-                }
-                core.Add(coreTemp);
-            }
-            return core;
-        }
-        private List<List<List<Household>>> householdMaker(ParameterSet parameterSet, Curve[] lines, Polyline midline, List<double> mappedVals, List<int> targetAreaType, int typeN)
-        {
-            //initial settings
-            double[] parameters = parameterSet.Parameters;
-            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
-            double width = parameters[2];
-            double coreWidth = parameterSet.CoreType.GetWidth();
-            double coreDepth = parameterSet.CoreType.GetDepth();
-            int cornerOrEdge = 0;
-
-            List<Point3d> houseEndPoints = new List<Point3d>();
-            List<Vector3d> houseEndPerps = new List<Vector3d>();
-            for (int i = 0; i < mappedVals.Count; i++)
-            {
-                houseEndPoints.Add(midline.PointAt(mappedVals[i]));
-                houseEndPerps.Add(midline.TangentAt(mappedVals[i]));
-            }
-            List<double> minCornerCheck = new List<double>();
-            int entranceLength = 2000;
-            int entranceCheck = 0;
-
-            List<List<List<Household>>> output = new List<List<List<Household>>>();
-            List<List<Household>> outputB = new List<List<Household>>();
-            List<Household> outputS = new List<Household>();
-
-            for (int i = 0; i < mappedVals.Count; i++)
-            {
-                Point3d homeOriH;
-                Vector3d homeVecXH;
-                Vector3d homeVecYH;
-                double xaH;
-                double xbH;
-                double yaH;
-                double ybH;
-                List<Line> windowsH = new List<Line>();
-                Point3d ent = new Point3d();
-                List<double> wallFactor;
-                //int targetAreaTypeH = new List<int>();
-                //double exclusiveAreaH = new List<double>();
-                if ((int)(mappedVals[i] - 0.01) == (int)(mappedVals[(i + 1) % mappedVals.Count] - 0.01)) // if not corner
-                {
-                    double avrg = (mappedVals[i] + mappedVals[(i + 1) % mappedVals.Count]) / 2.0;
-                    Point3d midOri = midline.PointAt(avrg);
-                    Vector3d midVec = midline.TangentAt(avrg);
-                    minCornerCheck.Add(Consts.corridorWidth + 0.1);
-                    Vector3d verticalVec = midVec;
-                    verticalVec.Rotate(-Math.PI / 2, new Vector3d(0, 0, 1));
-                    midOri.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
-
-                    //
-                    Random r = new Random(i);
-                    //int randInt = r.Next(10) % 2;
-                    int randInt = 1;
-                    List<Point3d> selOri = new List<Point3d>();
-                    selOri.Add(midline.PointAt(mappedVals[i]));
-                    selOri.Add(midline.PointAt(mappedVals[(i + 1) % mappedVals.Count]));
-                    xaH = selOri[0].DistanceTo(selOri[1]);
-                    xbH = 0;
-                    yaH = width;
-                    ybH = 0;
-                    Point3d realOri = selOri[randInt];
-                    realOri.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
-                    homeOriH = realOri;
-                    midVec.Rotate(Math.PI * randInt, new Vector3d(0, 0, 1));
-                    //
-
-                    homeVecXH = Vector3d.Multiply(1, midVec);
-                    homeVecYH = verticalVec;
-
-                    //windows
-                    Point3d winPt1 = homeOriH;
-                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, ybH)));
-                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, xaH - xbH)));
-                    Point3d winPt2 = winPt1;
-                    winPt2.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xaH)));
-                    Point3d winPt3 = winPt1;
-                    winPt3.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, -yaH)));
-                    Point3d winPt4 = winPt3;
-                    winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xaH)));
-                    ////////그런데, 복도 방향도 채광창 방향이라고 할 수 있을까?
-                    windowsH.Add(new Line(winPt1, winPt2));
-                    ////////
-                    windowsH.Add(new Line(winPt3, winPt4));
-
-                    //entrance points
-                    ent = new Point3d(homeOriH);
-                    //***혹시 여기에서도 레퍼런스된 점을 그대로 옮겨서 깽판나는지 확인 필요
-                    ent.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH / 2)));
-
-                    //this is edge type
-                    cornerOrEdge = 1;
-
-                    wallFactor = new List<double>(new double[] { 1, 0.5, 1, 0.5 });
-                }
-                else //if is corner
-                {
-                    Point3d checkP = lines[(int)(mappedVals[i] - 0.01)].PointAtEnd;
-                    Vector3d v1 = new Vector3d(houseEndPoints[i] - checkP);
-                    Vector3d v2 = new Vector3d(houseEndPoints[(i + 1) % mappedVals.Count] - checkP);
-                    double l1 = v1.Length;
-                    double l2 = v2.Length;
-                    minCornerCheck.Add(Math.Max(l1, l2));
-                    v1.Unitize();
-                    v2.Unitize();
-                    checkP.Transform(Transform.Translation(Vector3d.Add(Vector3d.Multiply(v1, width / 2), Vector3d.Multiply(v2, width / 2))));
-                    homeOriH = checkP;
-                    if (l1 > l2)
-                    {
-                        v1.Reverse();
-                        homeVecXH = v1;
-                        homeVecYH = v2;
-                    }
-                    else
-                    {
-                        v2.Reverse();
-                        homeVecXH = v2;
-                        homeVecYH = v1;
-                    }
-                    xaH = Math.Max(l1, l2) + width / 2;
-                    xbH = Math.Max(l1, l2) - width / 2;
-                    yaH = Math.Min(l1, l2) + width / 2;
-                    ybH = Math.Min(l1, l2) - width / 2;
-
-                    if (Math.Max(l1, l2) < width / 2 + entranceLength)
-                    {
-                        //entranceCheck = 1;
-                    }
-
-                    if (Math.Abs(ybH) < 10)
-                        ybH = 0;
-
-                    //windows
-                    Point3d winPt1 = homeOriH;
-                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH)));
-                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, ybH - yaH)));
-                    Point3d winPt2 = winPt1;
-                    winPt2.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, xaH)));
-                    Point3d winPt3 = winPt2;
-                    Point3d winPt4 = winPt2;
-                    winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, yaH)));
-                    windowsH.Add(new Line(winPt1, winPt2));
-                    windowsH.Add(new Line(winPt3, winPt4));
-
-                    //entrance points
-                    ent = new Point3d(homeOriH);
-                    //***혹시 여기에서도 레퍼런스된 점을 그대로 옮겨서 깽판나는지 확인 필요
-                    ent.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH / 2)));
-
-                    //this is corner type
-                    cornerOrEdge = 0;
-
-                    if (ybH > 0)
-                        wallFactor = new List<double>(new double[] { 1, 0.5, 1, 1, 0.5, 1 });
-                    else if (ybH == 0)
-                        wallFactor = new List<double>(new double[] { 1, 1, 1, 0.5, 1 });
-                    else
-                        wallFactor = new List<double>(new double[] { 0, 0.5, 1, 1, 0.5, 1 });
-                }
-                if (entranceCheck == 0 && minCornerCheck.Min() > Consts.corridorWidth)
-                {
-                    if (cornerOrEdge == 0)
-                    {
-                        Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Corner(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
-                        outputS.Add(tempHP);
-                        //cornerProperties[targetAreaType[i]].Add(tempHP);
-                    }
-                    else
-                    {
-                        Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Edge(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
-                        outputS.Add(tempHP);
-                        //edgeProperties[targetAreaType[i]].Add(tempHP);
-                    }
-                }
-            }
-
-            for (int j = 0; j < storiesHigh; j++)
-            {
-                List<Household> outputSTemp = new List<Household>();
-                for (int i = 0; i < outputS.Count; i++)
-                {
-                    Household hp = outputS[i];
-                    Point3d ori = hp.Origin;
-                    Point3d ent = hp.EntrancePoint;
-                    ori.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                    ent.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                    List<Line> win = hp.LightingEdge;
-                    List<Line> winNew = new List<Line>();
-                    for (int k = 0; k < win.Count; k++)
-                    {
-                        Line winTemp = win[k];
-                        winTemp.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                        winNew.Add(winTemp);
-                    }
-
-                    outputSTemp.Add(new Household(ori, hp.XDirection, hp.YDirection, hp.XLengthA, hp.XLengthB, hp.YLengthA, hp.YLengthB, hp.HouseholdSizeType, hp.GetExclusiveArea() + hp.GetWallArea(), winNew, ent, hp.WallFactor));
-                }
-                outputB.Add(outputSTemp);
-            }
-            output.Add(outputB);
-            return output;
-        }
-
         private double exclusiveAreaCalculatorAG3Corner(double xa, double xb, double ya, double yb, double targetArea, double balconyDepth)
         {
             double exclusiveArea = xa * ya - xb * yb;

@@ -1768,11 +1768,11 @@ namespace TuringAndCorbusier
 
         public List<Line> GetLightingEdges()
         {
-            if (YLengthB == 0)
-            {
-                return new List<Line>() { new Line(Origin + YDirection * YLengthB, XDirection * (XLengthA - XLengthB)), new Line(Origin - YDirection * (YLengthA - YLengthB), XDirection * XLengthA) };
+            //if (YLengthB == 0)
+            //{
+            //    return new List<Line>() { new Line(Origin + YDirection * YLengthB, XDirection * (XLengthA - XLengthB)), new Line(Origin - YDirection * (YLengthA - YLengthB), XDirection * XLengthA) };
 
-            }
+            //}
             return new List<Line>() { new Line(Origin + YDirection * YLengthB, XDirection * (XLengthA - XLengthB)), new Line(Origin + XDirection * (XLengthA - XLengthB) - YDirection * (YLengthA-YLengthB), -XDirection * XLengthA) };
         }
 
