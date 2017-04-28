@@ -120,12 +120,12 @@ namespace TuringAndCorbusier
             //////////  outputs  //////////
             ///////////////////////////////
 
-            //core properties
-            List<List<Core>> core = coreMaker(parameterSet, inlineCurve, WWregBool);
+            //List<List<Core>> core = coreMaker(parameterSet, inlineCurve, WWregBool);
+            //List<List<List<Household>>> household = householdMaker(parameterSet, lines, midlinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
 
-            //household properties
-            //household statistics
-            List<List<List<Household>>> household = householdMaker(parameterSet, lines, midlinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
+            List<List<Core>> cores = MakeCores();
+            List<List<List<Household>>> households = MakeHouseholds();
+
 
             //building outlines
             Polyline outlinePolyline;
@@ -136,18 +136,33 @@ namespace TuringAndCorbusier
 
             //parking lot
 
-            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, core, plot, parameters[2], midlineCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
+            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cores, plot, parameters[2], midlineCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
 
             List<Curve> aptLines = new List<Curve>();
             aptLines.Add(midlineCurve);
 
-            Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, core, household, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
+            Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
             return result;
 
-
+            
         }
 
+        #region New Apartment Generating Methods
+        private List<List<Core>> MakeCores()
+        {
+            List<List<Core>> outputCores = new List<List<Core>>();
+            return outputCores;
+        }
+
+        private List<List<List<Household>>> MakeHouseholds()
+        {
+            List<List<List<Household>>> outputHouseholds = new List<List<List<Household>>>();
+
+            return outputHouseholds;
+        }
+
+        #endregion
 
         #region GA Settings
         ///////////////////////////////////////////
@@ -751,10 +766,10 @@ namespace TuringAndCorbusier
             }
             return n;
         }
-        private List<double> houseEndParameters(List<int> unallocated, List<double> areaLength, Curve midlineCurve, double width, out List<int> targetAreaIndices)
+        private List<double> houseEndParameters(List<int> unallocatedLengthIndices, List<double> areaLength, Curve midlineCurve, double width, out List<int> targetAreaIndices)
         {
             //
-            List<Curve> lines = midlineCurve.DuplicateSegments().ToList();
+            List<Curve> midLineSegments = midlineCurve.DuplicateSegments().ToList();
             Polyline midlinePolyline;
             midlineCurve.TryGetPolyline(out midlinePolyline);
 
@@ -770,9 +785,9 @@ namespace TuringAndCorbusier
 
             //stretch
             double sourceL = 0;
-            for (int i = 0; i < unallocated.Count; i++)
+            for (int i = 0; i < unallocatedLengthIndices.Count; i++)
             {
-                sourceL += areaLength[unallocated[i]];
+                sourceL += areaLength[unallocatedLengthIndices[i]];
             }
             double targetL = midlineCurve.GetLength();
             double stretchRatio = targetL / sourceL;
@@ -783,37 +798,39 @@ namespace TuringAndCorbusier
             }
 
             //junction 1 : less than 10 houses, or not
-            if (5 < unallocated.Count && unallocated.Count < 10)
+            if (5 < unallocatedLengthIndices.Count && unallocatedLengthIndices.Count < 10)
             {
                 List<int> indices = new List<int>();
                 //junction 2 : specific solutions for 6~9 houses
-                if (unallocated.Count == 6)
+                if (unallocatedLengthIndices.Count == 6)
                 {
                     indices = new int[] { 4, 0, 3, 5, 1, 2 }.ToList();
-                    val = lines[0].GetLength() / 2;
+                    val = midLineSegments[0].GetLength() / 2;
                 }
-                else if (unallocated.Count == 7)
+                else if (unallocatedLengthIndices.Count == 7)
                 {
                     indices = new int[] { 0, 2, 5, 6, 4, 3, 1 }.ToList();
-                    val = lines[0].GetLength() / 2;
+                    val = midLineSegments[0].GetLength() / 2;
                 }
-                else if (unallocated.Count == 8)
+                else if (unallocatedLengthIndices.Count == 8)
                 {
                     indices = new int[] { 5, 0, 7, 2, 6, 1, 4, 3 }.ToList();
-                    val = (lines[0].GetLength() + lines[1].GetLength() / 2) - stretchedLength[unallocated[indices[0]]] - stretchedLength[unallocated[indices[1]]];
+                    val = (midLineSegments[0].GetLength() + midLineSegments[1].GetLength() / 2) 
+                        - stretchedLength[unallocatedLengthIndices[indices[0]]] - stretchedLength[unallocatedLengthIndices[indices[1]]];
                 }
-                else if (unallocated.Count == 9)
+                else if (unallocatedLengthIndices.Count == 9)
                 {
                     //junction 3 : rectangle ratio
-                    if (lines[1].GetLength() / lines[0].GetLength() > nineHouseR)
+                    if (midLineSegments[1].GetLength() / midLineSegments[0].GetLength() > nineHouseR)
                     {
                         indices = new int[] { 0, 7, 4, 3, 8, 2, 5, 6, 1 }.ToList();
-                        val = lines[0].GetLength() / 2;
+                        val = midLineSegments[0].GetLength() / 2;
                     }
                     else
                     {
                         indices = new int[] { 6, 7, 8, 5, 4, 1, 0, 2, 3 }.ToList();
-                        val = (lines[0].GetLength() + lines[1].GetLength() / 2) - stretchedLength[unallocated[indices[0]]] - stretchedLength[unallocated[indices[1]]];
+                        val = (midLineSegments[0].GetLength() + midLineSegments[1].GetLength() / 2)
+                            - stretchedLength[unallocatedLengthIndices[indices[0]]] - stretchedLength[unallocatedLengthIndices[indices[1]]];
                     }
                 }
 
@@ -821,74 +838,67 @@ namespace TuringAndCorbusier
 
                 for (int i = 0; i < indices.Count; i++)
                 {
-                    targetAreaIndices.Add(unallocated[i]);
+                    targetAreaIndices.Add(unallocatedLengthIndices[i]);
                 }
 
                 //value mapping
                 houseEndVals.Add(val);
-                for (int i = 0; i < unallocated.Count - 1; i++)
+                for (int i = 0; i < unallocatedLengthIndices.Count - 1; i++)
                 {
-                    val += stretchedLength[unallocated[indices[i]]];
-                    houseEndVals.Add(val % ((lines[0].GetLength() + lines[1].GetLength()) * 2));
+                    val += stretchedLength[unallocatedLengthIndices[indices[i]]];
+                    houseEndVals.Add(val % ((midLineSegments[0].GetLength() + midLineSegments[1].GetLength()) * 2));
                 }
-                mappedVals = new List<double>(valMapper(lines[0].GetLength(), lines[1].GetLength(), houseEndVals));
+                mappedVals = new List<double>(valMapper(midLineSegments[0].GetLength(), midLineSegments[1].GetLength(), houseEndVals));
             }
-            else if (10 <= unallocated.Count)
+            else if (10 <= unallocatedLengthIndices.Count)
             {
                 double cornerMinLength = 1500;
 
                 //preserve top 4 areas for corners
-                List<int> cornerIndices = unallocated.Take(4).ToList();
-                unallocated.RemoveRange(0, 4);
+                List<int> cornerIndices = unallocatedLengthIndices.Take(4).ToList();
+                unallocatedLengthIndices.RemoveRange(0, 4);
 
                 //put others on edges
-                List<double> edgeLength = lines.Select(n => n.GetLength()).ToList();
+                List<double> edgeLength = midLineSegments.Select(n => n.GetLength()).ToList();
                 List<List<int>> edgeIndices = new List<List<int>>();
                 for (int i = 0; i < 4; i++)
                 {
                     List<int> blank = new List<int>();
                     edgeIndices.Add(blank);
                 }
-                int token = 0;
-                List<double> edgeLengthTemp = new List<double>(edgeLength);
-                while (token != unallocated.Count)
+                
+                
+                foreach (int i in unallocatedLengthIndices)
                 {
-                    int ind = unallocated[token];
-                    int maxB = edgeLengthTemp.IndexOf(edgeLengthTemp.Max());
-                    edgeLengthTemp[maxB] -= areaLength[ind];
-                    edgeIndices[maxB].Add(ind);
-                    token += 1;
+                    int longestRemainEdgeIndex = edgeLength.IndexOf(edgeLength.Max());
+                    edgeLength[longestRemainEdgeIndex] -= areaLength[i];
+                    edgeIndices[longestRemainEdgeIndex].Add(i);
                 }
 
                 //sort corners
-                List<double> leftSum = new List<double>();
+                List<double> leftLengthAtCorner = new List<double>();
+
                 for (int i = 0; i < 4; i++)
-                {
-                    leftSum.Add(edgeLengthTemp[i] / 2 + edgeLengthTemp[(i + 3) % 4] / 2);
-                }
-                RhinoList<int> indices = new RhinoList<int>(new int[] { 0, 1, 2, 3 });
-                indices.Sort(leftSum.ToArray());
-                List<int> cornerIndicesTemp = new List<int>();
-                for (int i = 0; i < 4; i++)
-                {
-                    cornerIndicesTemp.Add(cornerIndices[indices[i]]);
-                }
-                cornerIndices = cornerIndicesTemp;
+                    leftLengthAtCorner.Add(edgeLength[i] / 2 + edgeLength[(i + 3) % 4] / 2);
+                
+                cornerIndices.Sort((a, b) => leftLengthAtCorner[a].CompareTo(leftLengthAtCorner[b]));
+
 
                 //make unallocated list
                 cornerIndices.Reverse();
-                unallocated.Reverse();
-                unallocated.AddRange(cornerIndices);
+                unallocatedLengthIndices.Reverse();
+                unallocatedLengthIndices.AddRange(cornerIndices);
                 cornerIndices.Reverse();
-                unallocated.Reverse();
+                unallocatedLengthIndices.Reverse();
 
                 //adjust corners
-                List<double> cornerL = new List<double>();
+                List<double> cornerLength = new List<double>();
                 for (int i = 0; i < 4; i++)
                 {
-                    cornerL.Add(areaLength[cornerIndices[i]]);
+                    cornerLength.Add(areaLength[cornerIndices[i]]);
                 }
-                List<double> edgeStart = new List<double>(pushpush(width, edgeLengthTemp, cornerL, edgeIndices, cornerMinLength, 5, 5));
+
+                List<double> edgeStart = new List<double>(pushpush(width, edgeLength, cornerLength, edgeIndices, cornerMinLength, 5, 5));
                 List<double> edgeEnd = new List<double>();
                 for (int i = 0; i < 4; i++)
                 {
@@ -910,11 +920,11 @@ namespace TuringAndCorbusier
                 List<double> targetEdgeL = new List<double>();
                 for (int i = 0; i < 4; i++)
                 {
-                    targetEdgeL.Add(lines[i].GetLength() - edgeStart[i] - edgeEnd[i]);
+                    targetEdgeL.Add(midLineSegments[i].GetLength() - edgeStart[i] - edgeEnd[i]);
                 }
 
                 List<double> stretchEdgeRatio = new List<double>();
-                for (int i = 0; i < lines.Count; i++)
+                for (int i = 0; i < midLineSegments.Count; i++)
                 {
                     stretchEdgeRatio.Add(targetEdgeL[i] / sourceEdgeL[i]);
                 }
@@ -936,7 +946,7 @@ namespace TuringAndCorbusier
                     val = edgeStart[i];
                     for (int j = 0; j < i; j++)
                     {
-                        val += lines[j].GetLength();
+                        val += midLineSegments[j].GetLength();
                     }
                     houseEndVals.Add(val);
                     for (int j = 0; j < edgeIndices[i].Count; j++)
@@ -958,7 +968,7 @@ namespace TuringAndCorbusier
                     //***혹시 여기서 i가 아니라 i+1이 들어가야 할 수도 있으니 나중에 확인할 것.
                 }
 
-                mappedVals = new List<double>(valMapper(lines[0].GetLength(), lines[1].GetLength(), houseEndVals));
+                mappedVals = new List<double>(valMapper(midLineSegments[0].GetLength(), midLineSegments[1].GetLength(), houseEndVals));
             }
             else//which means, less than 6 houses
             {
@@ -992,79 +1002,74 @@ namespace TuringAndCorbusier
             return target;
         }
 
-        private List<double> pushpush(double width, List<double> leftL, List<double> cornerL, List<List<int>> edgeIndices, double minL, int resolution, int iteration)
+        private List<double> pushpush(double width, List<double> edgeLength, List<double> cornerLength, List<List<int>> edgeIndices, double minL, int resolutionCount, int iterationCount)
         {
-            //
+            //initial setting
             List<int> edgeNum = edgeIndices.Select(n => n.Count).ToList();
+            double deviation = double.PositiveInfinity;
 
-            //start. sd stands for standard deviation
-            double sd = double.PositiveInfinity;
-
-            //domain for moving length
-            List<double> c = new List<double>();
+          
+            List<double> adjustableLength = new List<double>();   //Secure min Length.
             for (int i = 0; i < 4; i++)
             {
-                c.Add(cornerL[i] - 2 * minL - width);
+                adjustableLength.Add(cornerLength[i] - 2 * minL - width);
             }
 
-            //starting point of solving
-            List<double> sol = new List<double>();
+           
+            List<double> solution = new List<double>();  //Set intitial solution.
             for (int i = 0; i < 4; i++)
             {
-                sol.Add(cornerL[i] / 2);
+                solution.Add(cornerLength[i] / 2);
             }
 
             //loop start
             int token = 1;
-            while (token != iteration)
+            while (token != iterationCount)
             {
-                List<double> res = new List<double>();
                 for (int i = 0; i < 4; i++)
                 {
-                    res.Add(c[i] / Math.Pow(2, token + 1) / resolution);
-                }
+                    double resoultionCurrent = adjustableLength[i] / Math.Pow(2, token + 1) / resolutionCount;
 
-                for (int a = 0; a < 4; a++)
-                {
-                    int t = resolution + 1;
-                    double sdHere = sd;
-                    List<double> solHere = new List<double>(sol);
-                    for (int b = 0; b < 2 * resolution + 1; b++)
+                    double deviationCurrent = deviation;
+                    List<double> solutionHere = new List<double>(solution);
+
+                    for (int j = 0; j < 2 * resolutionCount + 1; j++)
                     {
                         //new solution to test
-                        List<double> solClone = new List<double>(sol);
-                        solClone[a] = sol[a] + ((b - resolution) * res[a]);
+                        List<double> solClone = new List<double>(solution);
+                        solClone[i] = solution[i] + ((j - resolutionCount) * resoultionCurrent);
 
                         //new solution standard deviation
                         List<double> fitnessVal = new List<double>();
-                        for (int i = 0; i < 4; i++)
+                        for (int k = 0; k < 4; k++)
                         {
-                            fitnessVal.Add((leftL[i] - solClone[i] - (cornerL[(i + 1) % 4] - solClone[(i + 1) % 4]) + width) / edgeNum[i]);
+                            fitnessVal.Add((edgeLength[k] - solClone[k] - (cornerLength[(k + 1) % 4] - solClone[(k + 1) % 4]) + width) / edgeNum[k]);
                         }
                         double average = fitnessVal.Average();
                         double sumOfSquaresOfDifferences = fitnessVal.Select(val => (val - average) * (val - average)).Sum();
-                        double sdNew = Math.Sqrt(sumOfSquaresOfDifferences / fitnessVal.Count);
+                        double deviationNew = Math.Sqrt(sumOfSquaresOfDifferences / fitnessVal.Count);
 
                         //find the best solution in this 'for loop'
-                        if (sdNew < sdHere)
+                        if (deviationNew < deviationCurrent)
                         {
-                            sdHere = sdNew;
-                            solHere = solClone;
+                            deviationCurrent = deviationNew;
+                            solutionHere = solClone;
                         }
                     }
+
                     //compare with old solution
-                    if (sdHere < sd)
+                    if (deviationCurrent < deviation)
                     {
-                        sd = sdHere;
-                        sol = solHere;
+                        deviation = deviationCurrent;
+                        solution = solutionHere;
                     }
                 }
                 token += 1;
             }
 
             //no corner sd check
-            double sdcorner = double.PositiveInfinity;
-            List<double> solCorner = new List<double>(sol);
+            double deviationCorner = double.PositiveInfinity;
+            List<double> solCorner = new List<double>(solution);
             int cornerInd = 0;
             for (int i = 0; i < 16; i++)
             {
@@ -1075,23 +1080,23 @@ namespace TuringAndCorbusier
                 k.Add(((int)i / 8) % 2);
                 for (int j = 0; j < 4; j++)
                 {
-                    solCorner[j] = width + (cornerL[j] - width) * k[j] - width / 2;
+                    solCorner[j] = width + (cornerLength[j] - width) * k[j] - width / 2;
                 }
 
                 //new solution standard deviation
                 List<double> fitnessVal = new List<double>();
                 for (int j = 0; j < 4; j++)
                 {
-                    fitnessVal.Add((leftL[j] - solCorner[j] - (cornerL[(j + 1) % 4] - solCorner[(j + 1) % 4]) + width) / edgeNum[j]);
+                    fitnessVal.Add((edgeLength[j] - solCorner[j] - (cornerLength[(j + 1) % 4] - solCorner[(j + 1) % 4]) + width) / edgeNum[j]);
                 }
                 double average = fitnessVal.Average();
                 double sumOfSquaresOfDifferences = fitnessVal.Select(val => (val - average) * (val - average)).Sum();
-                double sdNew = Math.Sqrt(sumOfSquaresOfDifferences / fitnessVal.Count);
+                double deviationNew= Math.Sqrt(sumOfSquaresOfDifferences / fitnessVal.Count); 
 
                 //find the best solution in this 'for loop'
-                if (sdNew < sdcorner)
+                if (deviationNew < deviationCorner)
                 {
-                    sdcorner = sdNew;
+                    deviationCorner = deviationNew;
                     cornerInd = i;
                 }
 
@@ -1104,15 +1109,15 @@ namespace TuringAndCorbusier
             d.Add(((int)cornerInd / 8) % 2);
             for (int j = 0; j < 4; j++)
             {
-                solThis.Add(width + (cornerL[j] - width) * d[j] - width / 2);
+                solThis.Add(width + (cornerLength[j] - width) * d[j] - width / 2);
             }
 
-            if (sdcorner < sd)
+            if (deviationCorner < deviation)
             {
-                sol = solThis;
+                solution = solThis;
             }
 
-            return sol;
+            return solution;
         }
 
         ///////////////////////////////
