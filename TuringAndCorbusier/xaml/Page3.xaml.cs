@@ -136,7 +136,10 @@ namespace TuringAndCorbusier
             tempGrid.Children.Add(buildingCoverageTextBlock);
             Grid.SetColumn(buildingCoverageTextBlock, 3);
 
-            TextBlock storiesTextBlock = createTextBlock(((int)agOutput.ParameterSet.Stories + 1).ToString() + "층");
+
+            //parameter 를 그대로 층수로 사용 했었으나, 지역 최적화에서 층수를 낮추는 과정에서 실제 층수와 맞지 않을수 있어 수정
+            //TextBlock storiesTextBlock = createTextBlock(((int)agOutput.ParameterSet.Stories + 1).ToString() + "층");
+            TextBlock storiesTextBlock = createTextBlock(((int)agOutput.HouseholdProperties.Count+1).ToString() + "층");
             tempGrid.Children.Add(storiesTextBlock);
             Grid.SetColumn(storiesTextBlock, 4);
 
@@ -391,9 +394,15 @@ namespace TuringAndCorbusier
                 if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse[i])
                 {
 
+<<<<<<< HEAD
                     try
                     {
                         List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
+=======
+                    //try
+                    //{
+                        List<ApartmentGeneratorOutput> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
+>>>>>>> 4-4 finished
 
 
 
@@ -414,11 +423,11 @@ namespace TuringAndCorbusier
 
                         Rhino.RhinoApp.Wait();
                         GC.Collect();
-                    }
-                    catch (Exception ex)
-                    {
-                        RhinoApp.WriteLine(ex.Message);
-                    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    RhinoApp.WriteLine(ex.Message);
+                    //}
                 }
             }
         }
@@ -502,11 +511,12 @@ namespace TuringAndCorbusier
             List<Curve> aptCurves = outputToPreview.drawEachHouse();
             aptCurves.AddRange(outputToPreview.drawEachCore());
             aptCurves.AddRange(outputToPreview.AptLines);
+            aptCurves.AddRange(outputToPreview.topReg);
             List<Curve> lotCurves = new List<Curve>();
 
             //foreach (List<ParkingLine> i in outputToPreview.ParkingLotOnEarth.ParkingLines)
             //{
-            //    foreach(ParkingLine j in i)
+            //    foreach (ParkingLine j in i)
             //    {
             //        lotCurves.Add(j.Boundary.ToNurbsCurve());
             //    }

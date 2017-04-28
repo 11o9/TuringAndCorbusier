@@ -280,6 +280,9 @@ namespace TuringAndCorbusier
                         var op = new Point3d(tempBuildingCorridorUnits.Last().Origin);
                         op += tempBuildingCorridorUnits[0].XDirection * (wholeLength / 2 + coreWidth / 2);
 
+                        //코어 안튀어나가게 하기위한 임시방편
+                        op += tempBuildingCorridorUnits[0].YDirection * (-coreDepth + Consts.corridorWidth);
+
                         corep.Origin = op;
                         corep.Stories = 0;
                         corep.XDirection = -tempBuildingCorridorUnits[0].XDirection;
@@ -443,8 +446,10 @@ namespace TuringAndCorbusier
 
             ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList(), apartDistance);
             pm.CalculateParkingScore();
-            var pls = pm.parkingCells.Select(n => new ParkingLine(n));
-            ParkingLotOnEarth sigh = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls.ToList() });
+            List<ParkingLine> pls = new List<ParkingLine>();
+            if(pm.parkingCells!=null)  
+                pls = pm.parkingCells.Select(n => new ParkingLine(n)).ToList();
+            ParkingLotOnEarth sigh = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
 
             //ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cpss, forParking, parameters[2], centerCurve)); //parkingLotOnEarthMaker(boundary, householdProperties, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
             ParkingLotUnderGround parkingLotUnderGroud = new ParkingLotUnderGround();
@@ -466,6 +471,7 @@ namespace TuringAndCorbusier
             //하아..
             var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLotOnEarth, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
             result.BuildingGroupCount = buildingnum;
+            result.topReg = wholeRegulationHigh;
             return result;
             #endregion
 
@@ -479,7 +485,7 @@ namespace TuringAndCorbusier
         //Parameter 최소값 ~ 최대값 {storiesHigh, storiesLow, width, angle, moveFactor}
         private double[] minInput = { 3, 3, 5000, 0, 0 };
         //private double[] minInput = { 6, 6, 10500, 0, 0 };
-        private double[] maxInput = { 7, 7, 10500, 2 * Math.PI, 1 };
+        private double[] maxInput = { 6, 6, 10500, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         private double[] GAparameterset = { 0.1, 0.05, 3, 120, 5, 3, 1 }; //원본

@@ -670,6 +670,8 @@ namespace TuringAndCorbusier
 
     public class Apartment : IDisposable
     {
+        //visible regulation
+        public Curve[] topReg { get; set; }
         //Constructor, 생성자
         public Apartment(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<Core>> core, List<List<List<Household>>> household, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<List<Curve>> buildingOutline, List<Curve> aptLines)
         {

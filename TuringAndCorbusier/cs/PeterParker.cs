@@ -25,7 +25,7 @@ namespace TuringAndCorbusier
         private Curve InnerLoop(Curve boundary)
         {
             CurveOrientation ot = boundary.ClosedCurveOrientation(Plane.WorldXY);
-            double offsetDistance = 6;
+            double offsetDistance = 3500;
             var segments = boundary.DuplicateSegments();
             
 
@@ -252,6 +252,8 @@ namespace TuringAndCorbusier
             PeterParkerCollection fit = new PeterParkerCollection();
             wait.Enqueue(origin);
 
+            double leftLengthLimit = 5000;
+
             while (wait.Count > 0)
             {
                 PeterParker current = wait.Dequeue();
@@ -264,7 +266,7 @@ namespace TuringAndCorbusier
                     }
                     else if (temp.LeftLength() > 0)
                     {
-                        if (temp.LeftLength() < 5)
+                        if (temp.LeftLength() < leftLengthLimit)
                         {
                             //fit
                             fit.Add(temp);
@@ -361,80 +363,80 @@ namespace TuringAndCorbusier
             {
                 case ParkingType.P0Single:
                     {
-                        height = 2;
-                        width = 6;
-                        widthOffset = 6;
-                        necessaryRoad = 3.5;
+                        height = 2000;
+                        width = 6000;
+                        widthOffset = 6000;
+                        necessaryRoad = 3500;
                         isDouble = false;
                         break;
                     }
 
                 case ParkingType.P0Double:
                     {
-                        height = 4;
-                        width = 6;
-                        widthOffset = 6;
-                        necessaryRoad = 3.5;
+                        height = 4000;
+                        width = 6000;
+                        widthOffset = 6000;
+                        necessaryRoad = 3500;
                         isDouble = true;
                         break;
                     }
 
                 case ParkingType.P45Single:
                     {
-                        height = 5.162;
-                        width = 5.162;
-                        widthOffset = 3.253;
-                        necessaryRoad = 3.5;
+                        height = 5162;
+                        width = 5162;
+                        widthOffset = 3253;
+                        necessaryRoad = 3500;
                         isDouble = false;
                         break;
                     }
 
                 case ParkingType.P45Double:
                     {
-                        height = 8.697;
-                        width = 5.162;
-                        widthOffset = 3.253;
-                        necessaryRoad = 3.5;
+                        height = 8697;
+                        width = 5162;
+                        widthOffset = 3253;
+                        necessaryRoad = 3500;
                         isDouble = true;
                         break;
                     }
 
                 case ParkingType.P60Single:
                     {
-                        height = 5.48;
-                        width = 4.492;
-                        widthOffset = 2.656;
-                        necessaryRoad = 4.5;
+                        height = 5480;
+                        width = 4492;
+                        widthOffset = 2656;
+                        necessaryRoad = 4500;
                         isDouble = false;
                         break;
                     }
 
                 case ParkingType.P60Double:
                     {
-                        height = 9.810;
-                        width = 4.492;
-                        widthOffset = 2.656;
-                        necessaryRoad = 4.5;
+                        height = 9810;
+                        width = 4492;
+                        widthOffset = 2656;
+                        necessaryRoad = 4500;
                         isDouble = true;
                         break;
                     }
 
                 case ParkingType.P90Single:
                     {
-                        height = 5;
-                        width = 2.3;
-                        widthOffset = 2.3;
-                        necessaryRoad = 6;
+                        height = 5000;
+                        width = 2300;
+                        widthOffset = 2300;
+                        necessaryRoad = 6000;
                         isDouble = false;
                         break;
                     }
 
                 case ParkingType.P90Double:
                     {
-                        height = 10;
-                        width = 2.3;
-                        widthOffset = 2.3;
-                        necessaryRoad = 6;
+                        height = 10000;
+                        width = 2300;
+                        widthOffset = 2300;
+                        necessaryRoad = 6000;
                         isDouble = true;
                         break;
                     }
@@ -477,7 +479,6 @@ namespace TuringAndCorbusier
             }
             return null;
         }
-
         public List<Curve> DrawRect(Point3d origin, double rad, bool isdouble)
         {
             List<Curve> result = new List<Curve>();
@@ -486,9 +487,9 @@ namespace TuringAndCorbusier
             {
                 Polyline p = new Polyline(new Point3d[]{
           origin,
-          origin - Vector3d.YAxis * 2,
-          origin - Vector3d.YAxis * 2 + Vector3d.XAxis * 6,
-          origin + Vector3d.XAxis * 6,
+          origin - Vector3d.YAxis * 2000,
+          origin - Vector3d.YAxis * 2000 + Vector3d.XAxis * 6000,
+          origin + Vector3d.XAxis * 6000,
           origin});
 
                 result.Add(p.ToNurbsCurve());
@@ -497,9 +498,9 @@ namespace TuringAndCorbusier
                 {
                     Polyline p2 = new Polyline(new Point3d[]{
             p[1],
-            p[1] - Vector3d.YAxis * 2,
-            p[1] - Vector3d.YAxis * 2 + Vector3d.XAxis * 6,
-            p[1] + Vector3d.XAxis * 6,
+            p[1] - Vector3d.YAxis * 2000,
+            p[1] - Vector3d.YAxis * 2000 + Vector3d.XAxis * 6000,
+            p[1] + Vector3d.XAxis * 6000,
             p[1]});
 
                     result.Add(p2.ToNurbsCurve());
@@ -510,18 +511,18 @@ namespace TuringAndCorbusier
             {
                 Polyline p = new Polyline(new Point3d[]{
           origin,
-          origin - Vector3d.YAxis * 5,
-          origin - Vector3d.YAxis * 5 + Vector3d.XAxis * 2.3,
-          origin + Vector3d.XAxis * 2.3,
+          origin - Vector3d.YAxis * 5000,
+          origin - Vector3d.YAxis * 5000 + Vector3d.XAxis * 2300,
+          origin + Vector3d.XAxis * 2300,
           origin});
 
                 if (isdouble)
                 {
                     Polyline p2 = new Polyline(new Point3d[]{
             p[1],
-            p[1] - Vector3d.YAxis * 5,
-            p[1] - Vector3d.YAxis * 5 + Vector3d.XAxis * 2.3,
-            p[1] + Vector3d.XAxis * 2.3,
+            p[1] - Vector3d.YAxis * 5000,
+            p[1] - Vector3d.YAxis * 5000 + Vector3d.XAxis * 2300,
+            p[1] + Vector3d.XAxis * 2300,
             p[1]});
 
                     p2.Transform(Transform.Rotation(-rad, origin));
@@ -653,7 +654,7 @@ namespace TuringAndCorbusier
             List<int> Counts = new List<int>();
             for (int i = 0; i < parkings.Count; i++)
             {
-                double totalWidth = 100;
+                double totalWidth = 100000;
                 int count = 0;
                 while (true)
                 {
