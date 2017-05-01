@@ -639,6 +639,13 @@ namespace TuringAndCorbusier
             this.ratio = targetRatio;
         }
 
+        public Target(List<double> targetArea, List<double> targetRatio, List<Interval> domains , List<int> mandatories)
+        {
+            this.area = targetArea;
+            this.ratio = targetRatio;
+            this.domain = domains;
+            this.mandatoryCount = mandatories;
+        }
         //Field, 필드
 
         private List<double> area = new List<double>();
@@ -724,6 +731,9 @@ namespace TuringAndCorbusier
         public double GetTargetAccuracy()
         {
             var target = Target.Area.OrderByDescending(n => n);
+
+            if (HouseholdStatistics.Count == 0)
+                return 0;
             var result = HouseholdStatistics.Select(n => n.ExclusiveArea / 1000000).OrderByDescending(n => n);
 
             double targetaccuracy = 0;

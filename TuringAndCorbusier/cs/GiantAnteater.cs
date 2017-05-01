@@ -496,6 +496,10 @@ namespace TuringAndCorbusier
                 select.Add(j);
             }
 
+            if (select[0] == -1)
+                select[0] = r.Next(gene.Count - 1);
+            if (select[1] == -1)
+                select[1] = r.Next(gene.Count - 1);
             //crossover
             List<double> newGene = new List<double>();
             int geneLen = gene[select[0]].Parameters.Length;

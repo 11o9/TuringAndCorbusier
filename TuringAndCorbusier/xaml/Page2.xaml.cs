@@ -84,9 +84,10 @@ namespace TuringAndCorbusier
         {
             bool[] whichAgToUse = { !Toggle_AG1.IsChecked.Value, !Toggle_AG3.IsChecked.Value, !Toggle_AG4.IsChecked.Value };
 
-            List<double> targetArea = new List<double>();
-            List<double> targetRatio = new List<double>();
-
+            List<double> areas = new List<double>();
+            List<double> ratios = new List<double>();
+            List<Interval> intervals = new List<Interval>();
+            List<int> mandatories = new List<int>();
             //targetsetting.UnitTypeVM.SetPercentages();
 
             foreach (var x in targetsetting.UnitTypeVM.UnitTypes)
@@ -96,21 +97,26 @@ namespace TuringAndCorbusier
 
                 if (x.RelativeValue.Contains(" %"))
                 {
-                    targetArea.Add(x.MaxArea);
-                    targetRatio.Add(double.Parse(x.RelativeValue.Replace(" %", "")) / 100);
+                    areas.Add(x.Area);
+                    ratios.Add(double.Parse(x.RelativeValue.Replace(" %", "")) / 100);
+                    intervals.Add(new Interval(x.MinArea, x.MaxArea));
+                    mandatories.Add(x.Mandatory);
                 }
                 else
                 {
-                    targetArea.Add(x.MaxArea);
-                    targetRatio.Add(0);
+                    areas.Add(x.Area);
+                    ratios.Add(0);
+                    intervals.Add(new Interval(x.MinArea, x.MaxArea));
+                    mandatories.Add(x.Mandatory);
                 }
             }
 
             Target target;
 
-            if (targetArea.Count != 0)
+            if (areas.Count != 0)
             {
-                target = new Target(targetArea, targetRatio);
+                target = new Target(areas, ratios, intervals,mandatories);
+                
             }
             else
             {

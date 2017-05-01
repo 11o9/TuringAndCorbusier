@@ -24,21 +24,41 @@ namespace TuringAndCorbusier.xaml
          
         public ValueChangedCallBack valueChangedCallBack = null;
         public RemoveThisCallBack removethisCallBack = null;
-        Binding binding = new Binding("RelativeValue");
+
+        Binding rateBinding = new Binding("RelativeValue");
+        Binding minBinding = new Binding("MinArea");
+        Binding maxBinding = new Binding("MaxArea");
+        Binding mandatoryBinding = new Binding("Mandatory");
+
         UnitType unittype;
-        public UnitType Unittype { get { return unittype; } set { unittype = value; name.Text = unittype.Name; } }
+
+        public UnitType Unittype { get { return unittype; } set { unittype = value; SetBinding(); name.Text = unittype.Name; } }
 
         public UnitTypeButton()
         {
             InitializeComponent();
+
             Input.Text = "1";
+
         }
 
-        public void SetUnitType(string value)
+        public void SetBinding()
         {
-            unittype = new WeakReference(new UnitType((double)int.Parse(value))).Target as UnitType;
-            binding.Source = Unittype;
-            percentage.SetBinding(TextBlock.TextProperty, binding);
+            rateBinding.Source = Unittype;
+            rateBinding.Mode = BindingMode.TwoWay;
+            percentage.SetBinding(TextBlock.TextProperty, rateBinding);
+
+            minBinding.Source = Unittype;
+            minBinding.Mode = BindingMode.TwoWay;
+            minimum_Input.SetBinding(TextBox.TextProperty, minBinding);
+
+            maxBinding.Source = Unittype;
+            maxBinding.Mode = BindingMode.TwoWay;
+            maximum_Input.SetBinding(TextBox.TextProperty, maxBinding);
+
+            mandatoryBinding.Source = Unittype;
+            mandatoryBinding.Mode = BindingMode.TwoWay;
+            mandatory_Input.SetBinding(TextBox.TextProperty, mandatoryBinding);
         }
 
         private void mainButton_Click(object sender, RoutedEventArgs e)
@@ -61,6 +81,21 @@ namespace TuringAndCorbusier.xaml
             valueChangedCallBack?.Invoke();
         }
 
+        private void minimum_Input_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void maximum_Input_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void mandatory_Input_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
         //private void valueslider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         //{
         //    if (unittype == null)
@@ -73,18 +108,30 @@ namespace TuringAndCorbusier.xaml
     public class UnitType : INotifyPropertyChanged
     {
         string name;
-        double maxarea;
+        
         double scrollvalue;
+
+        double area;
+        double maxarea;
+        double minarea;
+        int mandatory;
+
+
         string rvalue;
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string info)
         {
             //scrollvalue = 1;
+            Rhino.RhinoApp.WriteLine(info + "has been changed");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
-  
-        public double MaxArea { get { return maxarea; } }
+
+        public double Area { get { return area; } set { area = value; OnPropertyChanged("Area"); } }
+        public double MinArea { get { return minarea; } set { minarea = value; OnPropertyChanged("MinArea"); } }
+        public double MaxArea { get { return maxarea; } set { maxarea = value; OnPropertyChanged("MaxArea"); } }
+        public int Mandatory { get { return mandatory; } set { mandatory = value; OnPropertyChanged("Mandatory"); } }
         public string Name { get{ return name; } }
         public double ScrollValue { get { return scrollvalue; } set { scrollvalue = value; } }
         public string RelativeValue { get { return rvalue; } set { rvalue = value; OnPropertyChanged("RelativeValue"); } }
@@ -92,7 +139,11 @@ namespace TuringAndCorbusier.xaml
         {
             name = area.ToString() + " m2 형";
             //평 -> m2
+            this.area = area;
+
             maxarea = area;
+            minarea = area;
+            mandatory = 1;
         }
 
       

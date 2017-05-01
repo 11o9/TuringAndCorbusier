@@ -47,7 +47,7 @@ namespace TuringAndCorbusier.xaml
             typeinput.CallBack += (string n) => { if (n == "") n = "59"; tempbutton.Unittype = new UnitType(double.Parse(n)); tempbutton.Unittype.ScrollValue = 1; win.Close(); return n; };
             win.ShowDialog();
 
-            int insertindex = GetInsertIndex(tempbutton.Unittype.MaxArea);
+            int insertindex = GetInsertIndex(tempbutton.Unittype.Area);
 
             stackpanel.Children.Insert(insertindex, tempbutton);
 
@@ -59,10 +59,10 @@ namespace TuringAndCorbusier.xaml
         private int GetInsertIndex(double area)
         {
 
-            VM.UnitTypes = VM.UnitTypes.OrderBy(n => n.MaxArea).ToList();
+            VM.UnitTypes = VM.UnitTypes.OrderBy(n => n.Area).ToList();
             for (int i = 0; i < VM.UnitTypes.Count; i++)
             {
-                if (area < VM.UnitTypes[i].MaxArea)
+                if (area < VM.UnitTypes[i].Area)
                     return i;
             }
 
