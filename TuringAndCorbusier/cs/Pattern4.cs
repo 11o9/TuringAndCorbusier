@@ -110,6 +110,8 @@ namespace TuringAndCorbusier
 
         }
 
+       
+        #region GA Sttings
         ///////////////////////////////////////////
         //////////  GA initial settings  //////////
         ///////////////////////////////////////////
@@ -170,6 +172,7 @@ namespace TuringAndCorbusier
                 return GAparameterset;
             }
         }
+        #endregion GA Sttings
 
         ///////////////////////////////////////////////
         //////////  common initial settings  //////////
@@ -277,6 +280,8 @@ namespace TuringAndCorbusier
             return byLightingCurve;
         }
 
+
+        #region MaxPoly
         ////////////////////////////////////////
         //////////  maximum polyline  //////////
         ////////////////////////////////////////
@@ -522,6 +527,7 @@ namespace TuringAndCorbusier
 
             return folds;
         }
+        #endregion MaxPoly
 
         private Polyline maxPolyline(double aptWidth, Curve outline, Line line, List<double> folds, Regulation regulation, out List<double> tempFolds)
         {
@@ -1055,7 +1061,6 @@ namespace TuringAndCorbusier
 
             //household properties
             household = new List<List<List<Household>>>();
-            List<List<Household>> hhpB = new List<List<Household>>();
             List<Household> hhpS = new List<Household>();
 
             for (int i = 0; i < homeOri.Count; i++)
@@ -1065,6 +1070,7 @@ namespace TuringAndCorbusier
 
             for (int j = 0; j < storiesHigh; j++)
             {
+                List<List<Household>> hhpB = new List<List<Household>>();
                 List<Household> hhpSTemp = new List<Household>();
                 for (int i = 0; i < hhpS.Count; i++)
                 {
@@ -1085,10 +1091,11 @@ namespace TuringAndCorbusier
                     hhpSTemp.Add(new Household(ori, hhp.XDirection, hhp.YDirection, hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.HouseholdSizeType, hhp.GetExclusiveArea(), winNew, ent, hhp.WallFactor));
                 }
                 hhpB.Add(hhpSTemp);
+                household.Add(hhpB);
             }
 
             //hhpB.Add(hhpS);
-            household.Add(hhpB);
+          
 
 
             //household statistics
@@ -1128,12 +1135,21 @@ namespace TuringAndCorbusier
 
             //core properties
             core = new List<List<Core>>();
-            List<Core> cpB = new List<Core>();
-            for (int i = 0; i < corePoint.Count; i++)
+            for(int i =0; i<storiesHigh+2; i++)
             {
-                cpB.Add(new Core(corePoint[i], coreVecX[i], coreVecY[i], parameterSet.CoreType, parameterSet.Parameters[0], parameterSet.CoreType.GetDepth() - 0));
-            }
-            core.Add(cpB);
+                double tempStoryHeight = (i == 0) ? 0 : Consts.PilotiHeight + Consts.FloorHeight * (i - 1);
+                List<Core> cpB = new List<Core>();
+
+                for (int j = 0; j < corePoint.Count; j++)
+                {
+                    Core oneCore = new Core(corePoint[j], coreVecX[j], coreVecY[j], parameterSet.CoreType, parameterSet.Parameters[0], parameterSet.CoreType.GetDepth() - 0);
+                    oneCore.Origin = oneCore.Origin + Vector3d.ZAxis * tempStoryHeight;
+                    oneCore.Stories = i;
+
+                    cpB.Add(oneCore);
+                }
+                core.Add(cpB);
+            }          
         }
 
         ///////////////////////////////

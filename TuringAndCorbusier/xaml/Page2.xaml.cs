@@ -54,26 +54,26 @@ namespace TuringAndCorbusier
         {
             //Btn_AG3.Opacity = 0.4;
             //Toggle_AG3.IsChecked = true;
-            
+
             //ag3errorMsg.Text = "현재 수정 중입니다.";
             //ag3errorMsg.Visibility = Visibility.Visible;
             //ag3errorMsg.IsEnabled = true;
             //Btn_AG3.Click -= Btn_AG3_Click;
-           
+
             //Toggle_AG3.IsEnabled = false;
             //Btn_AG3.IsEnabled = false;
 
 
-            Btn_AG4.Opacity = 0.4;
-            Toggle_AG4.IsChecked = true;
+            //Btn_AG4.Opacity = 0.4;
+            //Toggle_AG4.IsChecked = true;
 
 
-            ag4errorMsg.Text = "현재 수정 중입니다.";
-            ag4errorMsg.Visibility = Visibility.Visible;
-            ag4errorMsg.IsEnabled = true;
+            //ag4errorMsg.Text = "현재 수정 중입니다.";
+            //ag4errorMsg.Visibility = Visibility.Visible;
+            //ag4errorMsg.IsEnabled = true;
 
-            Toggle_AG4.IsEnabled = false;
-            Btn_AG4.IsEnabled = false;
+            //Toggle_AG4.IsEnabled = false;
+            //Btn_AG4.IsEnabled = false;
         }
 
         private void SliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

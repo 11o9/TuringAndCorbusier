@@ -616,13 +616,13 @@ namespace TuringAndCorbusier
             double[] tempTargetArea = { 55, 85 };
             double[] tempTargetRatio = { 1, 1 };
 
-            this.targetArea = tempTargetArea.ToList();
-            this.targetRatio = tempTargetRatio.ToList();
+            this.area = tempTargetArea.ToList();
+            this.ratio = tempTargetRatio.ToList();
         }
 
         public Target(List<double> targetArea)
         {
-            this.targetArea = targetArea;
+            this.area = targetArea;
             List<double> tempTargetRatio = new List<double>();
 
             for (int i = 0; i < targetArea.Count; i++)
@@ -630,26 +630,29 @@ namespace TuringAndCorbusier
                 tempTargetRatio.Add(1);
             }
 
-            this.targetRatio = tempTargetRatio;
+            this.ratio = tempTargetRatio;
         }
 
         public Target(List<double> targetArea, List<double> targetRatio)
         {
-            this.targetArea = targetArea;
-            this.targetRatio = targetRatio;
+            this.area = targetArea;
+            this.ratio = targetRatio;
         }
 
         //Field, 필드
 
-        private List<double> targetArea = new List<double>();
-        private List<double> targetRatio = new List<double>();
-
+        private List<double> area = new List<double>();
+        private List<double> ratio = new List<double>();
+        private List<Interval> domain = new List<Interval>();
+        private List<int> mandatoryCount = new List<int>();
         //Method, 메소드
 
         //Property, 속성
 
-        public List<double> TargetArea { get { return targetArea; } }
-        public List<double> TargetRatio { get { return targetRatio; } }
+        public List<double> Area { get { return area; } }
+        public List<double> Ratio { get { return ratio; } }
+        public List<Interval> Domain { get { return domain; } }
+        public List<int> MandatoryCount { get { return mandatoryCount; } }
     }
 
     // ApartmentGenerator의 부모 클래스와 출력값 클래스
