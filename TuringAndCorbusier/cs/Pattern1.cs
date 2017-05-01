@@ -143,6 +143,7 @@ namespace TuringAndCorbusier
             ////////////////////////////////////
 
 
+            #region UnitPacking
             List<List<UnitType>> isclearance;
             List<List<double>> lengths = AptPacking(area, aptLines.Select(n => n.GetLength()).ToList(), ratio, width, corearea, out isclearance);
             //shorten
@@ -161,11 +162,11 @@ namespace TuringAndCorbusier
                 }
             }
 
-            List<List<List<Household>>> hhps = new List<List<List<Household>>>();
+            #endregion
+            
 
-            List<List<Household>> Low = new List<List<Household>>();
             #region GetLow
-
+            List<List<HouseholdProperties>> Low = new List<List<HouseholdProperties>>();
 
             //buildingnumber..
             int buildingnum = -1;
@@ -295,7 +296,7 @@ namespace TuringAndCorbusier
 
                         cps.Add(corep);
 
-                        //이거뭐지....왜..
+                        //이거뭐지....왜.. // getArea가 이상했음
                         double aaarea = corep.GetArea();
 
                        
@@ -347,8 +348,9 @@ namespace TuringAndCorbusier
 
             #endregion 
 
-
             #region stack
+
+            List<List<List<HouseholdProperties>>> hhps = new List<List<List<HouseholdProperties>>>();
             for (int i = 0; i < storiesHigh; i++)
             {
 
@@ -404,55 +406,45 @@ namespace TuringAndCorbusier
             }
             #endregion
 
-            Curve centerCurve = new LineCurve(Point3d.Origin, Point3d.Origin);
-            if (aptLines.Count() != 0)
-                centerCurve = aptLines[0];
+            #region parkingregacy
 
-            Plot forParking = new Plot(plot);
-            var segs = forParking.Boundary.DuplicateSegments();
+            //Curve centerCurve = new LineCurve(Point3d.Origin, Point3d.Origin);
+            //if (aptLines.Count() != 0)
+            //    centerCurve = aptLines[0];
 
-            List<Curve> regions = new List<Curve>();
-            for (int i = 0; i < segs.Length; i++)
-            {
-                if (forParking.Surroundings[i] == 0)
-                {
-                    var p1 = segs[i].PointAtStart;
-                    var p2 = segs[i].PointAtEnd;
-                    var v = segs[i].TangentAtStart;
-                    v.Rotate(-Math.PI / 2, Vector3d.ZAxis);
-                    segs[i].Translate(v * 5000);
-                    var region = new Polyline(new Point3d[] { segs[i].PointAtStart, segs[i].PointAtEnd, p2, p1, segs[i].PointAtStart });
-                    regions.Add(region.ToNurbsCurve());
-                }
-            }
+            //Plot forParking = new Plot(plot);
+            //var segs = forParking.Boundary.DuplicateSegments();
 
-            if (regions.Count != 0)
-            {
-                Curve original = forParking.Boundary.DuplicateCurve();
-                var diff = Curve.CreateBooleanDifference(original, regions);
+            //List<Curve> regions = new List<Curve>();
+            //for (int i = 0; i < segs.Length; i++)
+            //{
+            //    if (forParking.Surroundings[i] == 0)
+            //    {
+            //        var p1 = segs[i].PointAtStart;
+            //        var p2 = segs[i].PointAtEnd;
+            //        var v = segs[i].TangentAtStart;
+            //        v.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+            //        segs[i].Translate(v * 5000);
+            //        var region = new Polyline(new Point3d[] { segs[i].PointAtStart, segs[i].PointAtEnd, p2, p1, segs[i].PointAtStart });
+            //        regions.Add(region.ToNurbsCurve());
+            //    }
+            //}
 
-                if (diff.Length == 0)
-                { }
-                else
-                {
-                    forParking.Boundary = diff[0];
-                    forParking.SimplifiedBoundary = diff[0];
-                }
-                //Rhino.RhinoDoc.ActiveDoc.Objects.Add(forParking.Boundary);
-            }
+            //if (regions.Count != 0)
+            //{
+            //    Curve original = forParking.Boundary.DuplicateCurve();
+            //    var diff = Curve.CreateBooleanDifference(original, regions);
 
+            //    if (diff.Length == 0)
+            //    { }
+            //    else
+            //    {
+            //        forParking.Boundary = diff[0];
+            //        forParking.SimplifiedBoundary = diff[0];
+            //    }
+            //    //Rhino.RhinoDoc.ActiveDoc.Objects.Add(forParking.Boundary);
+            //}
 
-            double apartDistance = width + (storiesHigh * Consts.FloorHeight + Consts.PilotiHeight) * 0.8;
-
-            ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList(), apartDistance);
-            pm.CalculateParkingScore();
-            List<ParkingLine> pls = new List<ParkingLine>();
-            if(pm.parkingCells!=null)  
-                pls = pm.parkingCells.Select(n => new ParkingLine(n)).ToList();
-            ParkingLotOnEarth sigh = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
-
-            //ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cpss, forParking, parameters[2], centerCurve)); //parkingLotOnEarthMaker(boundary, householdProperties, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
-            ParkingLotUnderGround parkingLotUnderGroud = new ParkingLotUnderGround();
 
             //for (int i = parkingLotOnEarth.ParkingLines.Count - 1; i >= 0; i--)
             //{
@@ -467,7 +459,70 @@ namespace TuringAndCorbusier
             //    }
             //}
 
+            //ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cpss, forParking, parameters[2], centerCurve)); //parkingLotOnEarthMaker(boundary, householdProperties, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
 
+            #endregion
+
+            #region NewParking
+
+
+            ParkingLotOnEarth parkingLot;
+            //parking start line == core start line
+            List<Curve> parkingStartLine = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
+            if (parkingStartLine.Count != 0)
+            {
+                Vector3d setBack = parkingStartLine[0].TangentAtStart;
+                setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+                parkingStartLine.ForEach(n => n.Translate(setBack * width / 2));
+
+                //line distance
+                double apartDistance = width + (storiesHigh * Consts.FloorHeight + Consts.PilotiHeight) * 0.8;
+
+                //parking
+                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance);
+                pm.CalculateParkingScore();
+
+
+                //check core collision
+                List<Curve> firstFloorCores = cpss[0].Select(n => n.DrawOutline()).ToList();
+                List<Curve> parkable = new List<Curve>();
+                foreach (Curve park in pm.parkingCells)
+                {
+                    bool collision = false;
+                    foreach (Curve core in firstFloorCores)
+                    {
+                        //collision 생기거나
+                        if (Curve.PlanarCurveCollision(park, core, Plane.WorldXY, 0))
+                        {
+                            collision = true;
+                            break;
+                        }
+                        //내포,외포 하거나
+                        else if (Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.AInsideB || Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.BInsideA)
+                        {
+                            collision = true;
+                            break;
+                        }
+                    }
+
+                    if (!collision)
+                        parkable.Add(park);
+                }
+
+                List<ParkingLine> pls = new List<ParkingLine>();
+                if (pm.parkingCells != null)
+                    pls = parkable.Select(n => new ParkingLine(n)).ToList();
+
+                parkingLot = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
+            }
+            else
+            {
+                parkingLot = new ParkingLotOnEarth();
+            }
+
+            ParkingLotUnderGround parkingLotUnderGroud = new ParkingLotUnderGround();
+            #endregion
+           
             //하아..
             var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLotOnEarth, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
             result.BuildingGroupCount = buildingnum;

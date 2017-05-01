@@ -1042,28 +1042,7 @@ namespace TuringAndCorbusier
                 {
                     for (int j = 0; j < this.Core[i].Count; j++)
                     {
-                        List<Point3d> outlinePoints = new List<Point3d>();
-
-
-                        Point3d pt = new Point3d(this.Core[i][j].Origin);
-                        Vector3d x = new Vector3d(this.Core[i][j].XDirection);
-                        Vector3d y = new Vector3d(this.Core[i][j].YDirection);
-                        double width = this.Core[i][j].CoreType.GetWidth();
-                        double depth = this.Core[i][j].CoreType.GetDepth();
-
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(x, -width)));
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(y, -depth)));
-                        outlinePoints.Add(pt);
-
-                        Polyline outlinePolyline = new Polyline(outlinePoints);
-                        Curve outlineCurve = outlinePolyline.ToNurbsCurve();
-                        coreOutlines.Add(outlineCurve);
+                        coreOutlines.Add(CoreProperties[i][j].DrawOutline());
                     }
                 }
             }
@@ -1558,6 +1537,32 @@ namespace TuringAndCorbusier
             //    return 0;
 
             return Area;
+        }
+
+        public Curve DrawOutline()
+        {
+            List<Point3d> outlinePoints = new List<Point3d>();
+
+
+            Point3d pt = new Point3d(Origin);
+            Vector3d x = new Vector3d(XDirection);
+            Vector3d y = new Vector3d(YDirection);
+            double width = CoreType.GetWidth();
+            double depth = CoreType.GetDepth();
+
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, -width)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, -depth)));
+            outlinePoints.Add(pt);
+
+            Polyline outlinePolyline = new Polyline(outlinePoints);
+            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
+            return outlineCurve;
         }
 
         //Property, 속성
