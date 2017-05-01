@@ -420,9 +420,9 @@ namespace TuringAndCorbusier
             this.coreDepth = coreDepth;
         }
 
-        public HouseholdProperties Generate(UnitType type, int buildingnum, int houseindex)
+        public Household Generate(UnitType type, int buildingnum, int houseindex)
         {
-            HouseholdProperties temp = new HouseholdProperties();
+            Household temp = new Household();
             temp.XDirection = XDirection;
             temp.YDirection = YDirection;
             temp.XLengthA = Length;

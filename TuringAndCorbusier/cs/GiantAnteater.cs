@@ -196,23 +196,23 @@ namespace TuringAndCorbusier
             }
 
             //best 1
-            ApartmentGeneratorOutput bestOutput = ag.generator(plot, bestGene, target);
-            //return new ApartmentGeneratorOutput[] { bestOutput }.ToList();
+            Apartment bestOutput = ag.generator(plot, bestGene, target);
+            //return new Apartment[] { bestOutput }.ToList();
 
             //best 5
             //var uniqueGenes = offspringGenes.Distinct();
-            ApartmentGeneratorOutput[] bestOutputs = offspringGenes.Take(5).Select(n => ag.generator(plot, n, target)).ToArray();
+            Apartment[] bestOutputs = offspringGenes.Take(5).Select(n => ag.generator(plot, n, target)).ToArray();
             return bestOutputs.ToList();
 
 
             //best 10
             //var uniqueGenes = offspringGenes.Distinct();
-            //ApartmentGeneratorOutput[] bestOutputs = offspringGenes.Take(10).Select(n=>ag.generator(plot, n, target)).ToArray();
+            //Apartment[] bestOutputs = offspringGenes.Take(10).Select(n=>ag.generator(plot, n, target)).ToArray();
             return new Apartment[] { bestOutput }.ToList();
             //return bestOutputs.ToList();
 
             //all
-            //ApartmentGeneratorOutput[] bestOutputs = offspringGenes.Select(n=>ag.generator(plot, n, target)).ToArray();
+            //Apartment[] bestOutputs = offspringGenes.Select(n=>ag.generator(plot, n, target)).ToArray();
             //return bestOutputs.ToList();
 
             if (bestOutput.ParameterSet == null)

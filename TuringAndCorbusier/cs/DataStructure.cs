@@ -1042,7 +1042,7 @@ namespace TuringAndCorbusier
                 {
                     for (int j = 0; j < this.Core[i].Count; j++)
                     {
-                        coreOutlines.Add(CoreProperties[i][j].DrawOutline());
+                        coreOutlines.Add(Core[i][j].DrawOutline());
                     }
                 }
             }
@@ -1225,7 +1225,7 @@ namespace TuringAndCorbusier
                 coreAreaSum += i.Sum(n => n.GetArea());
             }
 
-            coreAreaSum -= CoreProperties.Last().Sum(n => n.GetArea());
+            coreAreaSum -= Core.Last().Sum(n => n.GetArea());
 
             return coreAreaSum;
         }

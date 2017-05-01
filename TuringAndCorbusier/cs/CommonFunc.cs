@@ -63,7 +63,7 @@ namespace TuringAndCorbusier
             return f;
         }
 
-        public static List<Curve> ApartDistance(ApartmentGeneratorOutput output, out string log)
+        public static List<Curve> ApartDistance(Apartment output, out string log)
         {
             List<Curve> crvs = new List<Curve>();
             string dim = "";
@@ -250,7 +250,7 @@ namespace TuringAndCorbusier
             double height = output.Household.Count * Consts.FloorHeight;
             double posz = height + Consts.PilotiHeight;
             double k = plot.isSpecialCase ? 0.25 : 0.5;
-            k = output.HouseholdProperties.Count > 6 ? 0.5 : k;
+            k = output.Household.Count > 6 ? 0.5 : k;
             double distance = height * k;
             
             Vector3d frontv = lightingEdgeFront[0].Direction;

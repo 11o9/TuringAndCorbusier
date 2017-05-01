@@ -166,7 +166,7 @@ namespace TuringAndCorbusier
             
 
             #region GetLow
-            List<List<HouseholdProperties>> Low = new List<List<HouseholdProperties>>();
+            List<List<Household>> Low = new List<List<Household>>();
 
             //buildingnumber..
             int buildingnum = -1;
@@ -350,7 +350,7 @@ namespace TuringAndCorbusier
 
             #region stack
 
-            List<List<List<HouseholdProperties>>> hhps = new List<List<List<HouseholdProperties>>>();
+            List<List<List<Household>>> hhps = new List<List<List<Household>>>();
             for (int i = 0; i < storiesHigh; i++)
             {
 
@@ -459,7 +459,7 @@ namespace TuringAndCorbusier
             //    }
             //}
 
-            //ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cpss, forParking, parameters[2], centerCurve)); //parkingLotOnEarthMaker(boundary, householdProperties, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
+            //ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cpss, forParking, parameters[2], centerCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
 
             #endregion
 
@@ -524,7 +524,7 @@ namespace TuringAndCorbusier
             #endregion
            
             //하아..
-            var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLotOnEarth, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
+            var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
             result.BuildingGroupCount = buildingnum;
             result.topReg = wholeRegulationHigh;
             return result;
