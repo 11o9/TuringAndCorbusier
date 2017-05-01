@@ -134,13 +134,13 @@ namespace TuringAndCorbusier
                 try
                 {
                     double score = 0;
-                    for (int i = 0; i < a.TargetArea.Count; i++)
+                    for (int i = 0; i < a.Area.Count; i++)
                     {
                         double iScore = 0;
-                        for (int j = 0; j < b.TargetArea.Count; j++)
+                        for (int j = 0; j < b.Area.Count; j++)
                         {
-                            double dist = Math.Pow(Math.Abs(a.TargetArea[i] - b.TargetArea[j]) + adjust, 1);
-                            iScore += ratioScaling(a.TargetRatio)[i] * ratioScaling(b.TargetRatio)[j] / dist;
+                            double dist = Math.Pow(Math.Abs(a.Area[i] - b.Area[j]) + adjust, 1);
+                            iScore += ratioScaling(a.Ratio)[i] * ratioScaling(b.Ratio)[j] / dist;
                         }
                         score += 1 / iScore;
                     }

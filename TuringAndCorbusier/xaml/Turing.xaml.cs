@@ -852,7 +852,7 @@ namespace TuringAndCorbusier
 
                 }
 
-                CommonFunc.AddDesignModel(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, temp_REGI_PRE_DESIGN_NO, tempAGOutput.AGtype, CommonFunc.ListToCSV(tempAGOutput.ParameterSet.Parameters.ToList()), tempAGOutput.ParameterSet.CoreType.ToString(), tempAGOutput.Target.TargetArea, tempAGOutput.Target.TargetRatio);
+                CommonFunc.AddDesignModel(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, temp_REGI_PRE_DESIGN_NO, tempAGOutput.AGtype, CommonFunc.ListToCSV(tempAGOutput.ParameterSet.Parameters.ToList()), tempAGOutput.ParameterSet.CoreType.ToString(), tempAGOutput.Target.Area, tempAGOutput.Target.Ratio);
 
                 if (tempAGOutput.Commercial.Count != 0)
                 {

@@ -399,7 +399,7 @@ namespace TuringAndCorbusier
 
                     try
                     {
-                        if (agOut.Target.TargetArea[agOut.Household[i][0][0].HouseholdSizeType] * 1000 * 1000 < Consts.AreaLimit)
+                        if (agOut.Target.Area[agOut.Household[i][0][0].HouseholdSizeType] * 1000 * 1000 < Consts.AreaLimit)
                         {
 
                             for (int j = 0; j < agOut.Household[i].Count; j++)

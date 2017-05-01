@@ -613,24 +613,24 @@ namespace TuringAndCorbusier
 
         public Target()
         {
-            double[] tempTargetArea = { 55, 85 };
-            double[] tempTargetRatio = { 1, 1 };
+            double[] tempArea = { 55, 85 };
+            double[] tempRatio = { 1, 1 };
 
-            this.area = tempTargetArea.ToList();
-            this.ratio = tempTargetRatio.ToList();
+            this.area = tempArea.ToList();
+            this.ratio = tempRatio.ToList();
         }
 
         public Target(List<double> targetArea)
         {
             this.area = targetArea;
-            List<double> tempTargetRatio = new List<double>();
+            List<double> tempRatio = new List<double>();
 
             for (int i = 0; i < targetArea.Count; i++)
             {
-                tempTargetRatio.Add(1);
+                tempRatio.Add(1);
             }
 
-            this.ratio = tempTargetRatio;
+            this.ratio = tempRatio;
         }
 
         public Target(List<double> targetArea, List<double> targetRatio)
@@ -723,7 +723,7 @@ namespace TuringAndCorbusier
 
         public double GetTargetAccuracy()
         {
-            var target = Target.TargetArea.OrderByDescending(n => n);
+            var target = Target.Area.OrderByDescending(n => n);
             var result = HouseholdStatistics.Select(n => n.ExclusiveArea / 1000000).OrderByDescending(n => n);
 
             double targetaccuracy = 0;

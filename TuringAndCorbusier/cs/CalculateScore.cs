@@ -9,7 +9,7 @@ namespace TuringAndCorbusier
 {
     class CalculateScore
     {
-        public static int SatisfyTargetArea(Apartment agOut)
+        public static int SatisfyArea(Apartment agOut)
         {
             List<double> targetData = new List<double>();
             List<double> realData = new List<double>();
@@ -21,7 +21,7 @@ namespace TuringAndCorbusier
                     for (int k = 0; k < agOut.Household[i][j].Count(); k++)
                     {
                         targetData.Add(agOut.Household[i][j][k].GetArea());
-                        realData.Add(agOut.Target.TargetArea[ agOut.Household[i][j][k].HouseholdSizeType]);
+                        realData.Add(agOut.Target.Area[ agOut.Household[i][j][k].HouseholdSizeType]);
                     }
                 }
             }

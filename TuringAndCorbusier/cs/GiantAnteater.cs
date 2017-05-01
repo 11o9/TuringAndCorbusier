@@ -208,7 +208,7 @@ namespace TuringAndCorbusier
             //best 10
             //var uniqueGenes = offspringGenes.Distinct();
             //Apartment[] bestOutputs = offspringGenes.Take(10).Select(n=>ag.generator(plot, n, target)).ToArray();
-            return new Apartment[] { bestOutput }.ToList();
+            //return new Apartment[] { bestOutput }.ToList();
             //return bestOutputs.ToList();
 
             //all

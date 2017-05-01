@@ -277,7 +277,7 @@ namespace TuringAndCorbusier
             NumOfParking.Text = (agOutput.ParkingLotOnEarth.GetCount() + agOutput.ParkingLotUnderGround.Count).ToString() + "대";
 
             
-            var ta = agOutput.Target.TargetArea;
+            var ta = agOutput.Target.Area;
             int[] type = new int[ta.Count];
             type = type.Select(n => 0).ToArray();
             foreach (var hh in agOutput.Household)
@@ -394,15 +394,10 @@ namespace TuringAndCorbusier
                 if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse[i])
                 {
 
-<<<<<<< HEAD
-                    try
-                    {
-                        List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
-=======
+
                     //try
                     //{
                         List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
->>>>>>> 4-4 finished
 
 
 
@@ -511,7 +506,7 @@ namespace TuringAndCorbusier
             List<Curve> aptCurves = outputToPreview.drawEachHouse();
             aptCurves.AddRange(outputToPreview.drawEachCore());
             aptCurves.AddRange(outputToPreview.AptLines);
-            aptCurves.AddRange(outputToPreview.topReg);
+            //aptCurves.AddRange(outputToPreview.topReg);
             List<Curve> lotCurves = new List<Curve>();
 
             //foreach (List<ParkingLine> i in outputToPreview.ParkingLotOnEarth.ParkingLines)

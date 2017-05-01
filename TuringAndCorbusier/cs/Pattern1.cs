@@ -19,15 +19,15 @@ namespace TuringAndCorbusier
 
             //입력"값" 부분
             double[] parameters = parameterSet.Parameters;
-            double storiesHigh =Math.Max((int)parameters[0], (int)parameters[1]);
+            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
             double storiesLow = Math.Min((int)parameters[0], (int)parameters[1]);
             double width = parameters[2];
             double angleRadian = parameters[3];
             double moveFactor = parameters[4];
             Regulation regulationHigh = new Regulation(storiesHigh);
             Regulation regulationLow = new Regulation(storiesHigh, storiesLow);
-            List<double> ratio = target.TargetRatio;
-            List<double> area = target.TargetArea.Select(n => n / 0.91 * 1000 * 1000).ToList();
+            List<double> ratio = target.Ratio;
+            List<double> area = target.Area.Select(n => n / 0.91 * 1000 * 1000).ToList();
             double areaLimit = Consts.AreaLimit;
             BuildingType buildingType = regulationHigh.BuildingType;
             List<double> areaLength = new List<double>();
@@ -163,7 +163,7 @@ namespace TuringAndCorbusier
             }
 
             #endregion
-            
+
 
             #region GetLow
             List<List<Household>> Low = new List<List<Household>>();
@@ -203,7 +203,7 @@ namespace TuringAndCorbusier
 
                 for (int j = 0; j < isclearance[i].Count; j++)
                 {
-                   
+
                     //조각j로 초기화
                     hhg.Initialize(shattered[j]);
                     #region create new hhp
@@ -220,7 +220,7 @@ namespace TuringAndCorbusier
                         //복도형
                         if (isclearance[i][j] == UnitType.Corridor)
                         {
-                            Household corridor = hhg.Generate(UnitType.Corridor,buildingnum,houseindex);
+                            Household corridor = hhg.Generate(UnitType.Corridor, buildingnum, houseindex);
                             z.Add(corridor);
                             houseindex++;
                             if (isclearance[i].Count > 1)
@@ -271,7 +271,7 @@ namespace TuringAndCorbusier
                 for (int j = minindex; j <= maxindex; j++)
                 {
                     var tempBuildingCorridorUnits = Low[i].Where(n => n.indexer[0] == j && n.isCorridorType).ToList();
-                    
+
                     if (tempBuildingCorridorUnits.Count != 0)
                     {
                         double wholeLength = tempBuildingCorridorUnits[0].XLengthA * tempBuildingCorridorUnits.Count;
@@ -299,7 +299,7 @@ namespace TuringAndCorbusier
                         //이거뭐지....왜.. // getArea가 이상했음
                         double aaarea = corep.GetArea();
 
-                       
+
                     }
 
                     var tempBuildingTowerUnits = Low[i].Where(n => n.indexer[0] == j && !n.isCorridorType).ToList();
@@ -522,7 +522,7 @@ namespace TuringAndCorbusier
 
             ParkingLotUnderGround parkingLotUnderGroud = new ParkingLotUnderGround();
             #endregion
-           
+
             //하아..
             var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
             result.BuildingGroupCount = buildingnum;
@@ -544,7 +544,7 @@ namespace TuringAndCorbusier
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         private double[] GAparameterset = { 0.1, 0.05, 3, 120, 5, 3, 1 }; //원본
-                                                                         //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
+                                                                          //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
 
 
         //private double[] GAparameterset = { 0.2, 0.03, 1, 100, 5, 3, 1 };
@@ -602,7 +602,7 @@ namespace TuringAndCorbusier
                 return GAparameterset;
             }
         }
-#endregion GASetting
+        #endregion GASetting
 
         //////////////////////////////////
         //////////  apt baseline  //////////
@@ -617,7 +617,7 @@ namespace TuringAndCorbusier
             List<Curve> aptlines = new List<Curve>();
             foreach (var regulationCurve in RegCurve)
             {
-                
+
                 Curve temp = regulationCurve.DuplicateCurve();
                 double[] parameters = parameterSet.Parameters;
                 double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
@@ -779,7 +779,7 @@ namespace TuringAndCorbusier
                 //    aptlines.AddRange(Curve.JoinCurves(survivor));
                 //}
                 #endregion
-               
+
                 aptlines.AddRange(maximumLines);
             }
             ParkingLines = parkingLines;
@@ -898,7 +898,6 @@ namespace TuringAndCorbusier
         }
         //
 
-        #region Regacy
 
         private List<Line> baselineMaker(Curve regCurve, ParameterSet parameterSet)
         {
@@ -1015,7 +1014,7 @@ namespace TuringAndCorbusier
             //Unit unit1 = new Unit(20, 5234, UnitType.Corridor);
             //Unit unit2 = new Unit(55, 12324, UnitType.Tower);
             //Unit unit3 = new Unit(70, 17065, UnitType.Tower);
-            List<double> rates = balancedRate.Select(n=>(double)n/100).ToList();
+            List<double> rates = balancedRate.Select(n => (double)n / 100).ToList();
 
 
             UnitDistributor distributor = new UnitDistributor(aptLineLengths, units, rates);
@@ -1033,7 +1032,7 @@ namespace TuringAndCorbusier
                 types.Add(thisLineClearances.ToList());
             }
 
-           
+
 
             #region MyRegion
 
@@ -1303,7 +1302,7 @@ namespace TuringAndCorbusier
                         {
 
                             bool nothingAdded = true;
-                            for (int i = units.Count-1; i >=0 ; i--)
+                            for (int i = units.Count - 1; i >= 0; i--)
                             {
                                 var addResult = aptLines[k].Add(units[i]);
                                 if (addResult)
@@ -1314,7 +1313,7 @@ namespace TuringAndCorbusier
                                 }
                             }
 
-                            if(nothingAdded)
+                            if (nothingAdded)
                             {
                                 //홀수 tower 체크
                                 int towerCount = aptLines[k].Units.GetTypes().Where(n => n == UnitType.Tower).Count();
@@ -1346,8 +1345,8 @@ namespace TuringAndCorbusier
 
                                 }
                                 //RhinoApp.WriteLine("Nothing Added, Finish at {0}", k);
-                                if(nothingAdded)
-                                break;
+                                if (nothingAdded)
+                                    break;
                             }
                         }
                     }
@@ -1494,7 +1493,7 @@ namespace TuringAndCorbusier
 
                 //번이 들어갈 간격
                 double offset = (double)corridorCount / (double)(corridorBurgerPattyCount + 1);
-                
+
                 //패티 개수만큼 돌며 패티 삽입
                 for (int i = 0; i < corridorBurgerPattyCount; i++)
                 {
@@ -1509,7 +1508,7 @@ namespace TuringAndCorbusier
                 }
 
                 int[] towerIndex = GetStartEnd(UnitType.Tower);
-                offset =  (double)towerCount / (double)(towerBurgerPattyCount + 1);
+                offset = (double)towerCount / (double)(towerBurgerPattyCount + 1);
                 offset = Math.Ceiling(offset);
 
                 if (offset % 2 != 0)
@@ -1571,7 +1570,7 @@ namespace TuringAndCorbusier
 
             public bool Add(Unit unit)
             {
-                
+
                 if (LeftLength >= unit.Length)
                 {
                     Units.Add(unit);
@@ -1590,7 +1589,7 @@ namespace TuringAndCorbusier
                         }
                     }
 
-               
+
                     return true;
                 }
                 else
@@ -1626,7 +1625,7 @@ namespace TuringAndCorbusier
 
         class HouseholdGenerator
         {
-           
+
             Vector3d XDirection;
             Vector3d YDirection;
             double Width;
@@ -1654,7 +1653,7 @@ namespace TuringAndCorbusier
                 this.coreDepth = coreDepth;
             }
 
-            public Household Generate(UnitType type,int buildingnum, int houseindex)
+            public Household Generate(UnitType type, int buildingnum, int houseindex)
             {
                 Household temp = new Household();
                 temp.XDirection = XDirection;
@@ -1702,6 +1701,4 @@ namespace TuringAndCorbusier
 
         #endregion
     }
-
-
 }

@@ -25,8 +25,8 @@ namespace TuringAndCorbusier
             //double moveFactor = parameters[4];
             Regulation regulationHigh = new Regulation(storiesHigh);
             //Regulation regulationLow = new Regulation(storiesLow);
-            List<double> ratio = target.TargetRatio;
-            List<double> area = target.TargetArea.Select(n => n * 1000 * 1000).ToList();
+            List<double> ratio = target.Ratio;
+            List<double> area = target.Area.Select(n => n * 1000 * 1000).ToList();
             //double areaLimit = Consts.AreaLimit;
             BuildingType buildingType = regulationHigh.BuildingType;
             List<double> areaLength = new List<double>();
@@ -98,7 +98,7 @@ namespace TuringAndCorbusier
             List<List<Curve>> buildingOutlines = buildingOutlineMakerAG4(centerline, width);
 
             //parking lot
-            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, core, plot, parameters[2], centerline));
+            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth();//new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, core, plot, parameters[2], centerline));
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
 
             List<Curve> aptLines = new List<Curve>();
@@ -1102,7 +1102,7 @@ namespace TuringAndCorbusier
             householdStatistics = new List<List<HouseholdStatistics>>();
             List<List<Household>> cornerProperties = new List<List<Household>>();
             List<List<Household>> edgeProperties = new List<List<Household>>();
-            for (int i = 0; i < target.TargetArea.Count; i++)
+            for (int i = 0; i < target.Area.Count; i++)
             {
                 cornerProperties.Add(new List<Household>());
                 edgeProperties.Add(new List<Household>());
@@ -1121,7 +1121,7 @@ namespace TuringAndCorbusier
                 }
             }
 
-            for (int i = 0; i < target.TargetArea.Count; i++)
+            for (int i = 0; i < target.Area.Count; i++)
             {
                 for (int j = 0; j < cornerProperties[i].Count; j++)
                 {
