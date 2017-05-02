@@ -1191,8 +1191,6 @@ namespace TuringAndCorbusier
 
         private ParkingLotOnEarth GetParking(List<Line> parkingLines, ParameterSet paramSet, Plot plot, List<List<Core>> cpss)
         {
-           
-        
             double width = paramSet.Parameters[2];
             double coreDepth = paramSet.CoreType.GetDepth();
             double apartDistance = width + (paramSet.Parameters[0] * Consts.FloorHeight + Consts.PilotiHeight) * 0.8;
@@ -1205,12 +1203,9 @@ namespace TuringAndCorbusier
                 setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
                 parkingStartLine.ForEach(n => n.Translate(setBack * width / 2));
 
-                
-
                 //parking
                 ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance,coreDepth);
                 pm.CalculateParkingScore();
-
 
                 //check core collision
                 List<Curve> firstFloorCores = cpss[0].Select(n => n.DrawOutline(width)).ToList();

@@ -27,7 +27,7 @@ namespace TuringAndCorbusier
         private Curve InnerLoop(Curve boundary)
         {
             CurveOrientation ot = boundary.ClosedCurveOrientation(Plane.WorldXY);
-            double offsetDistance = 3500;
+            double offsetDistance = 6000;
             var segments = boundary.DuplicateSegments();
             
 
@@ -87,6 +87,8 @@ namespace TuringAndCorbusier
             }
 
             var parkingResult = ParkingPrediction.Calculate(TotalLength,CoreDepth);
+            if (parkingResult.resultCollection.Count == 0)
+                return 0;
             List<Curve> result = new List<Curve>();
             List<Curve> partitions = new List<Curve>();
             for (int i = 0; i < origins.Count; i++)
@@ -130,7 +132,7 @@ namespace TuringAndCorbusier
     //단위 거리 분할 결과.
     public class ParkingResult
     {
-        PeterParkerCollection resultCollection;
+        public PeterParkerCollection resultCollection;
         public ParkingResult(PeterParkerCollection result)
         {
             resultCollection = result;

@@ -132,8 +132,20 @@ namespace TuringAndCorbusier
             ////////////////////////////////////////////////////////////////////////////////////////
 
             //parking lot
+            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY,cores[0][0].CoreType.GetDepth()/2, 1, CurveOffsetCornerStyle.Sharp)[0];
+            Curve[] parkingLineSegments = parkingLine.DuplicateSegments();
+            Curve[] shortSegments = parkingLineSegments.OrderBy(n => n.GetLength()).Take(2).ToArray();
+            //세배 길이의 라인으로
+            List<Line> toLine = shortSegments.Select(n => new Line(n.PointAtStart - n.TangentAtStart * n.GetLength(), n.PointAtEnd + n.TangentAtStart * n.GetLength())).ToList();
+            //둘중 하나 역으로
+            toLine[1] = new Line(toLine[1].To, toLine[1].From);
+            //뒷줄 복사
+            Line additionalLine = new Line(toLine[1].From + (toLine[1].From - toLine[0].From), toLine[1].To + (toLine[1].To - toLine[0].To));
+            toLine.Add(additionalLine);
 
-            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth();// new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cores, plot, parameters[2], midlineCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
+            double lineDistance = toLine[0].From.DistanceTo(toLine[1].From);
+
+            ParkingLotOnEarth parkingLotOnEarth = GetParking(toLine, plot, cores, lineDistance, parameterSet.CoreType.GetDepth());//new ParkingLotOnEarth();// new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cores, plot, parameters[2], midlineCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
 
             List<Curve> aptLines = new List<Curve>();
@@ -1440,6 +1452,70 @@ namespace TuringAndCorbusier
             return buildingOutlines;
         }
 
+        //new parking
+        private ParkingLotOnEarth GetParking(List<Line> parkingLines,Plot plot, List<List<Core>> cpss,double distance,double coreDepth)
+        {
+         
+            //pattern3 한정.. ㅅㅂ
+            double apartDistance = distance;
+            
+            ParkingLotOnEarth parkingLot;
+            //parking start line == core start line
+            List<Curve> parkingStartLine = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
+            if (parkingStartLine.Count != 0)
+            {
+                Vector3d setBack = parkingStartLine[0].TangentAtStart;
+                setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+                parkingStartLine.ForEach(n => n.Translate(setBack * coreDepth / 2));
+
+                //parking
+                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance, coreDepth);
+                pm.CalculateParkingScore();
+
+                //check core collision
+                List<Curve> firstFloorCores = cpss[0].Select(n => n.DrawOutline(5000)).ToList();
+                for (int i = 0; i < firstFloorCores.Count; i++)
+                {
+                    firstFloorCores[i].Translate(cpss[0][i].YDirection * (cpss[0][i].CoreType.GetDepth() - 5000) / 2);
+                }
+                List<Curve> parkable = new List<Curve>();
+                foreach (Curve park in pm.parkingCells)
+                {
+                    bool collision = false;
+                    foreach (Curve core in firstFloorCores)
+                    {
+                        //collision 생기거나
+                        if (Curve.PlanarCurveCollision(park, core, Plane.WorldXY, 0))
+                        {
+                            collision = true;
+                            break;
+                        }
+                        //내포,외포 하거나
+                        else if (Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.AInsideB || Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.BInsideA)
+                        {
+                            collision = true;
+                            break;
+                        }
+                    }
+
+                    if (!collision)
+                        parkable.Add(park);
+                }
+
+                List<ParkingLine> pls = new List<ParkingLine>();
+                if (pm.parkingCells != null)
+                    pls = parkable.Select(n => new ParkingLine(n)).ToList();
+
+                parkingLot = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
+            }
+            else
+            {
+                parkingLot = new ParkingLotOnEarth();
+            }
+
+            return parkingLot;
+
+        }
         private List<ParkingLine> parkingLotMaker(List<List<Core>> core, ParameterSet parameterSet, Curve plotCurve)
         {
             //////////////////
