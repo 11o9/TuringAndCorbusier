@@ -506,16 +506,17 @@ namespace TuringAndCorbusier
             List<Curve> aptCurves = outputToPreview.drawEachHouse();
             aptCurves.AddRange(outputToPreview.drawEachCore());
             aptCurves.AddRange(outputToPreview.AptLines);
+            
             //aptCurves.AddRange(outputToPreview.topReg);
             List<Curve> lotCurves = new List<Curve>();
 
-            //foreach (List<ParkingLine> i in outputToPreview.ParkingLotOnEarth.ParkingLines)
-            //{
-            //    foreach (ParkingLine j in i)
-            //    {
-            //        lotCurves.Add(j.Boundary.ToNurbsCurve());
-            //    }
-            //}
+            foreach (List<ParkingLine> i in outputToPreview.ParkingLotOnEarth.ParkingLines)
+            {
+                foreach (ParkingLine j in i)
+                {
+                    lotCurves.Add(j.Boundary.ToNurbsCurve());
+                }
+            }
 
             this.building2DPreview.CurveToDisplay = aptCurves;
             this.parkingLotPreview.CurveToDisplay = lotCurves;

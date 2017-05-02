@@ -14,11 +14,13 @@ namespace TuringAndCorbusier
         List<Curve> aptLines;
         double TotalLength;
         public List<Curve> parkingCells;
-        public ParkingMaster(Curve boundary, List<Curve> aptLines, double Length)
+        double CoreDepth;
+        public ParkingMaster(Curve boundary, List<Curve> aptLines, double length, double coreDepth)
         {
             Boundary = InnerLoop(boundary);
             this.aptLines = aptLines;
-            TotalLength = Length;
+            TotalLength = length;
+            CoreDepth = coreDepth;
             //ParkingResult result = ParkingPrediction.Calculate()
         }
 
@@ -84,7 +86,7 @@ namespace TuringAndCorbusier
 
             }
 
-            var parkingResult = ParkingPrediction.Calculate(TotalLength);
+            var parkingResult = ParkingPrediction.Calculate(TotalLength,CoreDepth);
             List<Curve> result = new List<Curve>();
             List<Curve> partitions = new List<Curve>();
             for (int i = 0; i < origins.Count; i++)
@@ -245,7 +247,7 @@ namespace TuringAndCorbusier
 
     public class ParkingPrediction
     {
-        public static ParkingResult Calculate(double initialLength/*, Curve initialCurve*/)
+        public static ParkingResult Calculate(double initialLength,double coreDepth)
         {
             PeterParker origin = new PeterParker(initialLength/*, initialCurve*/);
             Queue<PeterParker> wait = new Queue<PeterParker>();
@@ -253,12 +255,14 @@ namespace TuringAndCorbusier
             wait.Enqueue(origin);
 
             double leftLengthLimit = 5000;
-
+            //bool isFirst = true;
             while (wait.Count > 0)
             {
                 PeterParker current = wait.Dequeue();
                 for (int i = 0; i < (int)ParkingType.Max; i++)
                 {
+                    if ((current.LeftLength() == current.totalLength) && coreDepth > new Parking((ParkingType)i).height)
+                        continue;
                     PeterParker temp = new PeterParker(current, (ParkingType)i);
                     if (temp.LeftLength() < 0)
                     {
@@ -279,6 +283,8 @@ namespace TuringAndCorbusier
                     }
 
                 }
+
+                //isFirst = false;
             }
 
             //

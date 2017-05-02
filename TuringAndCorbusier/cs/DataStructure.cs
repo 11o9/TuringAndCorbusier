@@ -1575,6 +1575,36 @@ namespace TuringAndCorbusier
             return outlineCurve;
         }
 
+        //주차배치용 확장
+        public Curve DrawOutline(double aptWidth)
+        {
+            List<Point3d> outlinePoints = new List<Point3d>();
+
+
+            Point3d pt = new Point3d(Origin);
+            Vector3d x = new Vector3d(XDirection);
+            Vector3d y = new Vector3d(YDirection);
+            double width = CoreType.GetWidth();
+            double depth = CoreType.GetDepth();
+
+            if (depth < aptWidth)
+                depth = aptWidth;
+
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, -width)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, -depth)));
+            outlinePoints.Add(pt);
+
+            Polyline outlinePolyline = new Polyline(outlinePoints);
+            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
+            return outlineCurve;
+        }
+
         //Property, 속성
         public int BuildingGroupNum { get; set; }
         public Point3d Origin { get { return origin; } set { origin = value; } }
