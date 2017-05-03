@@ -8,26 +8,58 @@ using Rhino.Geometry;
 
 namespace TuringAndCorbusier
 {
+
+    public enum ParkingLineType
+    {
+        Default = 0,
+        SingleLine,
+        DoubleLine,
+        PerpOnly
+    }
+
     public class ParkingMaster
     {
+
+
+        ParkingLineType lineType;
         Curve Boundary;
         List<Curve> aptLines;
         double TotalLength;
         public List<Curve> parkingCells;
         double CoreDepth;
-        public ParkingMaster(Curve boundary, List<Curve> aptLines, double length, double coreDepth)
+
+        public ParkingMaster(Curve boundary, List<Curve> aptLines, double length, double coreDepth, bool useInnerLoop)
         {
-            Boundary = InnerLoop(boundary);
+            if (useInnerLoop)
+                Boundary = InnerLoop(boundary,6000);
+            else
+                Boundary = boundary;
+            this.lineType = ParkingLineType.Default;
             this.aptLines = aptLines;
             TotalLength = length;
             CoreDepth = coreDepth;
+            parkingCells = new List<Curve>();
             //ParkingResult result = ParkingPrediction.Calculate()
         }
 
-        private Curve InnerLoop(Curve boundary)
+        public ParkingMaster(Curve boundary, List<Curve> aptLines, double length, double coreDepth, bool useInnerLoop, ParkingLineType lineType)
+        {
+            if (useInnerLoop)
+                Boundary = InnerLoop(boundary, 6000);
+            else
+                Boundary = boundary;
+            this.lineType = lineType;
+            this.aptLines = aptLines;
+            TotalLength = length;
+            CoreDepth = coreDepth;
+            parkingCells = new List<Curve>();
+            //ParkingResult result = ParkingPrediction.Calculate()
+        }
+
+        private Curve InnerLoop(Curve boundary,double offset)
         {
             CurveOrientation ot = boundary.ClosedCurveOrientation(Plane.WorldXY);
-            double offsetDistance = 6000;
+            double offsetDistance = offset;
             var segments = boundary.DuplicateSegments();
             
 
@@ -70,10 +102,8 @@ namespace TuringAndCorbusier
 
         }
 
-        public int CalculateParkingScore()
+        public void AddFront()
         {
-            if (aptLines.Count == 0)
-                return 0;
             Vector3d dir0 = aptLines[0].TangentAtStart;
             List<Curve> origins = new List<Curve>(aptLines);
             dir0.Rotate(-Math.PI / 2, Vector3d.ZAxis);
@@ -83,10 +113,35 @@ namespace TuringAndCorbusier
                 Curve temp = origins[0].DuplicateCurve();
                 temp.Translate(dir0 * TotalLength);
                 origins.Insert(0, temp);
-
             }
 
-            var parkingResult = ParkingPrediction.Calculate(TotalLength,CoreDepth);
+            aptLines = origins;
+        }
+
+        public void AddBack()
+        {
+            Vector3d dir0 = aptLines[0].TangentAtStart;
+            List<Curve> origins = new List<Curve>(aptLines);
+            dir0.Rotate(Math.PI / 2, Vector3d.ZAxis);
+            //List<Point3d> starts = x.Select(n => n.PointAtStart).ToList();
+            if (origins.Count > 0)
+            {
+                Curve temp = origins.Last().DuplicateCurve();
+                temp.Translate(dir0 * TotalLength);
+                origins.Add(temp);
+            }
+            aptLines = origins;
+        }
+
+        public int CalculateParkingScore()
+        {
+            if (aptLines.Count == 0)
+                return 0;
+
+            List<Curve> origins = new List<Curve>(aptLines);
+
+
+            var parkingResult = ParkingPrediction.Calculate(TotalLength,CoreDepth,lineType);
             if (parkingResult.resultCollection.Count == 0)
                 return 0;
             List<Curve> result = new List<Curve>();
@@ -101,11 +156,12 @@ namespace TuringAndCorbusier
             var heights = parkingResult.heights();
 
             var innerParkings = partitions.Where(n => IsInside(Boundary, n)).ToList();
-
+            
+            //to debug
             string log = innerParkings.Count.ToString() + " / " + partitions.Count.ToString()
               + " ( " + (double)innerParkings.Count / partitions.Count * 100 + " %)";
 
-            //to debug
+            
             parkingCells = innerParkings;
 
             return innerParkings.Count;
@@ -249,12 +305,32 @@ namespace TuringAndCorbusier
 
     public class ParkingPrediction
     {
-        public static ParkingResult Calculate(double initialLength,double coreDepth)
+        public static ParkingResult Calculate(double initialLength,double coreDepth,ParkingLineType lineType)
         {
             PeterParker origin = new PeterParker(initialLength/*, initialCurve*/);
             Queue<PeterParker> wait = new Queue<PeterParker>();
             PeterParkerCollection fit = new PeterParkerCollection();
             wait.Enqueue(origin);
+
+            List<ParkingType> parkingTypeSelected = new List<ParkingType>();
+
+            switch (lineType)
+            {
+                case ParkingLineType.Default:
+                    parkingTypeSelected = new double[] { 0, 1, 2, 3, 4, 5, 6, 7 }.Select(n => (ParkingType)n).ToList();
+                    break;
+                case ParkingLineType.DoubleLine:
+                    parkingTypeSelected = new double[] { 1, 3, 5, 7}.Select(n => (ParkingType)n).ToList();
+                    break;
+                case ParkingLineType.PerpOnly:
+                    parkingTypeSelected = new double[] {6,7}.Select(n => (ParkingType)n).ToList();
+                    break;
+                case ParkingLineType.SingleLine:
+                    parkingTypeSelected = new double[] { 0, 2, 4, 6 }.Select(n => (ParkingType)n).ToList();
+                    break;
+                default:
+                    break;
+            }
 
             double leftLengthLimit = 5000;
             //bool isFirst = true;
@@ -263,8 +339,14 @@ namespace TuringAndCorbusier
                 PeterParker current = wait.Dequeue();
                 for (int i = 0; i < (int)ParkingType.Max; i++)
                 {
-                    if ((current.LeftLength() == current.totalLength) && coreDepth > new Parking((ParkingType)i).height)
+                    if(lineType == ParkingLineType.Default)
+                        if ((current.LeftLength() == current.totalLength) && coreDepth > new Parking((ParkingType)i).height)
+                            continue;
+
+                    //주차 타입 필터
+                    if (!parkingTypeSelected.Contains((ParkingType)i))
                         continue;
+
                     PeterParker temp = new PeterParker(current, (ParkingType)i);
                     if (temp.LeftLength() < 0)
                     {

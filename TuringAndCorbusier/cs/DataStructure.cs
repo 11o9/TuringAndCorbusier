@@ -731,7 +731,8 @@ namespace TuringAndCorbusier
         public double GetTargetAccuracy()
         {
             var target = Target.Area.OrderByDescending(n => n);
-
+            if (HouseholdStatistics == null)
+                return 0;
             if (HouseholdStatistics.Count == 0)
                 return 0;
             var result = HouseholdStatistics.Select(n => n.ExclusiveArea / 1000000).OrderByDescending(n => n);

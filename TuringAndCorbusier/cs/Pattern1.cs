@@ -1199,12 +1199,17 @@ namespace TuringAndCorbusier
             List<Curve> parkingStartLine = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
             if (parkingStartLine.Count != 0)
             {
+
                 Vector3d setBack = parkingStartLine[0].TangentAtStart;
                 setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
                 parkingStartLine.ForEach(n => n.Translate(setBack * width / 2));
 
                 //parking
-                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance,coreDepth);
+                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance,coreDepth,true);
+                
+                //pattern1 한정
+                pm.AddFront();
+
                 pm.CalculateParkingScore();
 
                 //check core collision

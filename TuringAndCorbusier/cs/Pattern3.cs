@@ -139,11 +139,27 @@ namespace TuringAndCorbusier
             List<Line> toLine = shortSegments.Select(n => new Line(n.PointAtStart - n.TangentAtStart * n.GetLength(), n.PointAtEnd + n.TangentAtStart * n.GetLength())).ToList();
             //둘중 하나 역으로
             toLine[1] = new Line(toLine[1].To, toLine[1].From);
-            //뒷줄 복사
-            Line additionalLine = new Line(toLine[1].From + (toLine[1].From - toLine[0].From), toLine[1].To + (toLine[1].To - toLine[0].To));
-            toLine.Add(additionalLine);
+            ////뒷줄 복사
+            //Line additionalLine = new Line(toLine[1].From + (toLine[1].From - toLine[0].From), toLine[1].To + (toLine[1].To - toLine[0].To));
+            //toLine.Add(additionalLine);
 
             double lineDistance = toLine[0].From.DistanceTo(toLine[1].From);
+
+
+            // 일정 길이 이상 멀어지면 급격히 느려지는 현상 있어서 길이 제한
+
+            while (lineDistance >= 64000)
+            {
+                lineDistance = lineDistance / 2;
+                List<Line> midline = new List<Line>(toLine);
+                Vector3d dir = toLine[1].To - toLine[0].To;
+                dir.Unitize();
+                midline = midline.Select(n => new Line(n.From + dir * lineDistance, n.To + dir * lineDistance)).ToList();
+
+                toLine.AddRange(midline);
+                int count = toLine.Count;
+            }
+
 
             ParkingLotOnEarth parkingLotOnEarth = GetParking(toLine, plot, cores, lineDistance, parameterSet.CoreType.GetDepth());//new ParkingLotOnEarth();// new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cores, plot, parameters[2], midlineCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
@@ -446,7 +462,7 @@ namespace TuringAndCorbusier
         //Parameter 최소값 ~ 최대값 {storiesHigh, storiesLow, width, angle, moveFactor}
         private double[] minInput = { 3, 3, 7000, 0, 0 };
         //private double[] minInput = { 6, 6, 10500, 0, 0 };
-        private double[] maxInput = { 7, 7, 8000, 2 * Math.PI, 1 };
+        private double[] maxInput = { 6, 6, 10500, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation , fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         //private double[] GAparameterset = { 0.8, 0.05, 1, 20, 4, 10, 1 };
@@ -1458,7 +1474,6 @@ namespace TuringAndCorbusier
          
             //pattern3 한정.. ㅅㅂ
             double apartDistance = distance;
-            
             ParkingLotOnEarth parkingLot;
             //parking start line == core start line
             List<Curve> parkingStartLine = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
@@ -1469,7 +1484,11 @@ namespace TuringAndCorbusier
                 parkingStartLine.ForEach(n => n.Translate(setBack * coreDepth / 2));
 
                 //parking
-                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance, coreDepth);
+                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance, coreDepth,true);
+
+                //pattern3한정
+                pm.AddBack();
+
                 pm.CalculateParkingScore();
 
                 //check core collision

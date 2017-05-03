@@ -97,8 +97,153 @@ namespace TuringAndCorbusier
             //building outlines
             List<List<Curve>> buildingOutlines = buildingOutlineMakerAG4(centerline, width);
 
+
             //parking lot
-            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth();//new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, core, plot, parameters[2], centerline));
+            //parkingline 
+
+            List<Curve> centerSegments = centerline.DuplicateSegments().ToList();
+            ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth();
+
+            //rotation check
+            Vector3d dirCheck = centerSegments[1].TangentAtStart;
+            dirCheck.Rotate(Math.PI / 2, Vector3d.ZAxis);
+            Point3d testPoint = centerSegments[1].PointAtNormalizedLength(0.5) + dirCheck;
+
+            int dirK = -1;
+            Polyline testLine = new Polyline(centerpolyline);
+            testLine.Add(testLine[0]);
+            Curve testCurve = testLine.ToNurbsCurve();
+            if (testCurve.Contains(testPoint) == PointContainment.Inside)
+                dirK = 1;
+
+            var debug = segments.Select(n => n.TangentAtStart);
+
+            for (int i = 0; i < 3; i ++)
+            {
+                //[0] - 장변 [1] - 단변 [2] - 장변
+                //패턴4 - 두번 나눠서 생각 ( 사이드, 중심 )
+                if (i == 1)
+                {
+                    //1. 중심
+                    // 중심 부터 대지 끝까지 밈 = 가장 긴 변 + 30%
+                    double lineDistance = centerSegments.Max(n => n.GetLength()) * 1.3;
+                    //단변 양 옆 6m + width/2 씩 제거.. 주차가 들어가긴 하나
+                    //만약 단변 길이가 기준치 이하면 아무것도 안넣음. 
+                    Line centerSegment;
+
+                    if(dirK == 1)
+                        centerSegment = new Line(centerSegments[1].PointAtLength(width / 2), centerSegments[1].PointAtLength(centerSegments[i].GetLength() - width / 2));
+
+                    else
+                        centerSegment = new Line(centerSegments[1].PointAtLength(centerSegments[i].GetLength() - width / 2), centerSegments[1].PointAtLength(width / 2));
+
+
+                    List<Line> parkingLines = new List<Line>() { centerSegment };
+
+                    //도로확보
+                    Vector3d roadDir = centerSegment.Direction;
+                    roadDir.Unitize();
+                    roadDir.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                    Curve leftRoad = new PolylineCurve(new Point3d[] {
+                    centerSegments[1].PointAtStart + roadDir * (width/2 + 1),
+                    centerSegments[1].PointAtLength(6000+width/2) + roadDir * (width/2 + 1),
+                    centerSegments[1].PointAtLength(6000+width/2) + roadDir * lineDistance,
+                    centerSegments[1].PointAtStart + roadDir * lineDistance,
+                    centerSegments[1].PointAtStart + roadDir * (width/2 + 1) });
+
+                    Curve rightRoad = new PolylineCurve(new Point3d[] {
+                    centerSegments[1].PointAtEnd + roadDir * (width/2 + 1),
+                    centerSegments[1].PointAtLength(centerSegments[1].GetLength() - 6000 - width / 2) + roadDir * (width/2 + 1),
+                    centerSegments[1].PointAtLength(centerSegments[1].GetLength() - 6000 - width / 2) + roadDir * lineDistance,
+                    centerSegments[1].PointAtEnd + roadDir * lineDistance,
+                    centerSegments[1].PointAtEnd + roadDir * (width/2 + 1)});
+
+                    List<Curve> roads = new List<Curve>() { leftRoad, rightRoad };
+
+                    // 일정 길이 이상 멀어지면 급격히 느려지는 현상 있어서 길이 제한
+
+                    while (lineDistance >= 64000)
+                    {
+                        lineDistance = lineDistance / 2;
+                        List<Line> midline = new List<Line>(parkingLines);
+                        midline = midline.Select(n => new Line(n.From + roadDir * lineDistance, n.To + roadDir * lineDistance)).ToList();
+                        parkingLines.AddRange(midline);
+                        if (roadDir.X > 0)
+                            parkingLines = parkingLines.OrderBy(n => n.From.X).ToList();
+                        else
+                            parkingLines = parkingLines.OrderByDescending(n => n.From.X).ToList();
+
+                        int count = parkingLines.Count;
+                    }
+                    ParkingLotOnEarth firstLine = GetParking(parkingLines.Take(1).ToList(), plot, core, 12000, parameterSet.CoreType.GetDepth(), roads, ParkingLineType.SingleLine);//
+                    //parkingLines.RemoveAt(0);
+                    //내부주차선은 코어로부터 6000 떨어트려서
+                    //parkingLines.ForEach(n => n.Transform(Transform.Translation(roadDir * (6000 + width / 2))));
+                    for (int j = 0; j < parkingLines.Count; j++)
+                    {
+                        Line newline = new Line(parkingLines[j].From + roadDir * (6000 + width),parkingLines[j].To + roadDir * (6000 + width));
+                        parkingLines[j] = newline;
+                    }
+                    ParkingLotOnEarth parkingLotCenter = GetParking(parkingLines, plot, core, lineDistance, parameterSet.CoreType.GetDepth(), roads,ParkingLineType.Default);//
+                    parkingLotOnEarth.ParkingLines.AddRange(firstLine.ParkingLines);
+                    parkingLotOnEarth.ParkingLines.AddRange(parkingLotCenter.ParkingLines);
+                }
+                else
+                {
+                    //2. 사이드
+                    // 일단 밀만큼 밀어보고,
+                    double lineDistance = centerSegments.Max(n => n.GetLength()) * 1.3;
+                    //각 변 에서 단변에 닿는 쪽 width/2 씩 제거
+                    Line sideSegment;
+                    if (i == 0)
+                        if(dirK==-1)
+                            sideSegment = new Line(centerSegments[i].PointAtStart, centerSegments[i].PointAtLength(centerSegments[i].GetLength() - width));
+                        else
+                            sideSegment = new Line(centerSegments[i].PointAtLength(centerSegments[i].GetLength() - width), centerSegments[i].PointAtStart);
+
+                    else
+                        if (dirK ==- 1)
+                        sideSegment = new Line(centerSegments[i].PointAtLength(width), centerSegments[i].PointAtEnd);
+                        else
+                        sideSegment = new Line(centerSegments[i].PointAtEnd, centerSegments[i].PointAtLength(width));
+
+                    List<Line> parkingLines = new List<Line>() { sideSegment };
+                    // 일정 길이 이상 멀어지면 급격히 느려지는 현상 있어서 길이 제한
+                    Vector3d dir = parkingLines[0].UnitTangent;
+                    dir.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                    dir.Unitize();
+                    while (lineDistance >= 64000)
+                    {
+                        lineDistance = lineDistance / 2;
+                        List<Line> midline = new List<Line>(parkingLines);
+                        midline = midline.Select(n => new Line(n.From + dir * lineDistance, n.To + dir * lineDistance)).ToList();
+                        parkingLines.AddRange(midline);
+                        int count = parkingLines.Count;
+                    }
+
+                    ParkingLotOnEarth firstLine = GetParking(parkingLines.Take(1).ToList(), plot, core, 12000, parameterSet.CoreType.GetDepth(), new List<Curve>(), ParkingLineType.SingleLine);//
+
+                    for (int j = 0; j < parkingLines.Count; j++)
+                    {
+                        Line newline = new Line(parkingLines[j].From + dir * (6000 + width), parkingLines[j].To + dir * (6000 + width));
+                        parkingLines[j] = newline;
+                    }
+                    //외부주차선은 코어로부터 6000 떨어트려서
+                    
+                    ParkingLotOnEarth parkingLotSide = GetParking(parkingLines, plot, core, lineDistance, parameterSet.CoreType.GetDepth(),new List<Curve>(),ParkingLineType.Default);//
+
+                    parkingLotOnEarth.ParkingLines.AddRange(firstLine.ParkingLines);
+                    parkingLotOnEarth.ParkingLines.AddRange(parkingLotSide.ParkingLines);
+                }
+            }
+           
+
+
+
+
+
+
+            //ParkingLotOnEarth parkingLotOnEarth = GetParking(parkingLines, plot, core, lineDistance,parameterSet.CoreType.GetDepth());//
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
 
             List<Curve> aptLines = new List<Curve>();
@@ -1210,6 +1355,76 @@ namespace TuringAndCorbusier
             outlineTemp.Add(outlineCurve);
             outline.Add(outlineTemp);
             return outline;
+        }
+
+        //new parking
+        private ParkingLotOnEarth GetParking(List<Line> parkingLines, Plot plot, List<List<Core>> cpss, double distance, double coreDepth, List<Curve> obstacles , ParkingLineType lineType)
+        {
+            //pattern4 한정.. 
+            double apartDistance = distance;
+
+            ParkingLotOnEarth parkingLot;
+            //parking start line == core start line
+            List<Curve> parkingStartLine = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
+            if (parkingStartLine.Count != 0)
+            {
+                if(parkingStartLine[0] == null)
+                { return new ParkingLotOnEarth(); }
+                Vector3d setBack = parkingStartLine[0].TangentAtStart;
+                setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+                parkingStartLine.ForEach(n => n.Translate(setBack * coreDepth / 2));
+
+                //parking
+                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance, coreDepth,false, lineType);
+                pm.CalculateParkingScore();
+
+                //check core collision
+                List<Curve> firstFloorCores = cpss[0].Select(n => n.DrawOutline(5000)).ToList();
+                for (int i = 0; i < firstFloorCores.Count; i++)
+                {
+                    firstFloorCores[i].Translate(cpss[0][i].YDirection * (cpss[0][i].CoreType.GetDepth() - 5000) / 2);
+                }
+
+                //코어에 그 외 장애물 추가.
+                firstFloorCores.AddRange(obstacles);
+
+                List<Curve> parkable = new List<Curve>();
+                foreach (Curve park in pm.parkingCells)
+                {
+                    bool collision = false;
+                    foreach (Curve core in firstFloorCores)
+                    {
+                        //collision 생기거나
+                        if (Curve.PlanarCurveCollision(park, core, Plane.WorldXY, 0))
+                        {
+                            collision = true;
+                            break;
+                        }
+                        //내포,외포 하거나
+                        else if (Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.AInsideB || Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.BInsideA)
+                        {
+                            collision = true;
+                            break;
+                        }
+                    }
+
+                    if (!collision)
+                        parkable.Add(park);
+                }
+
+                List<ParkingLine> pls = new List<ParkingLine>();
+                if (pm.parkingCells != null)
+                    pls = parkable.Select(n => new ParkingLine(n)).ToList();
+
+                parkingLot = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
+            }
+            else
+            {
+                parkingLot = new ParkingLotOnEarth();
+            }
+
+            return parkingLot;
+
         }
 
         private List<List<ParkingLine>> parkingLotMaker(Curve centerline, double width, double coreWidth, List<List<Core>> core)
