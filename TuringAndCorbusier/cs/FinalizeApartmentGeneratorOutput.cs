@@ -292,7 +292,8 @@ namespace TuringAndCorbusier
                     parameters[0] = parametersetStoriesChange(parameters[0], CommonFunc.toplevel(core));
                     parameters[1] = parametersetStoriesChange(parameters[1], CommonFunc.toplevel(core));
 
-                    ParameterSet newParameterset = new ParameterSet(parameters, AGoutput.ParameterSet.agName, AGoutput.ParameterSet.CoreType);
+    
+                    ParameterSet newParameterset = new ParameterSet(parameters);
 
                     Apartment tempApartment = new Apartment(AGoutput.AGtype, tempPlot, AGoutput.BuildingType, newParameterset, AGoutput.Target, core, household, new ParkingLotOnEarth(), new ParkingLotUnderGround(), AGoutput.buildingOutline, AGoutput.AptLines);
 

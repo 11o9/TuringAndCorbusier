@@ -16,6 +16,8 @@ namespace TuringAndCorbusier
             //////////  common initial settings  //////////
             ///////////////////////////////////////////////
 
+            randomCoreType = GetRandomCoreType();
+
             //입력"값" 부분
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
@@ -59,7 +61,7 @@ namespace TuringAndCorbusier
                 return new Apartment(plot);
 
             double wholeL = centerpolyline.Length;
-            double coreWidth = parameterSet.CoreType.GetWidth();
+            double coreWidth = randomCoreType.GetWidth();
             Curve[] segments = centerline.DuplicateSegments();
             List<Line> lines = new List<Line>();
             List<Point3d> toMidline = new List<Point3d>();
@@ -131,7 +133,7 @@ namespace TuringAndCorbusier
             {
                 //each settings
                 //coredepth
-                double coreDepth = parameterSet.CoreType.GetDepth();
+                double coreDepth = randomCoreType.GetDepth();
                 //parkinglines
                 //1. 건물 밑 라인
                 List<Curve> parkingCurve = new List<Curve>() { alignCurve[i] };
@@ -858,7 +860,7 @@ namespace TuringAndCorbusier
         private void coreAndHouses(List<int> unallocated, List<double> stretchedLength, Target target, ParameterSet parameterSet, List<Line> lines, Curve centerline, out List<List<List<Household>>> household, out List<List<HouseholdStatistics>> householdStatistics, out List<List<Core>> core)
         {
             double storiesHigh = Math.Max((int)parameterSet.Parameters[0], (int)parameterSet.Parameters[1]);
-            double coreWidth = parameterSet.CoreType.GetWidth();
+            double coreWidth = randomCoreType.GetWidth();
             double width = parameterSet.Parameters[2];
 
             List<double> houseEndVals = new List<double>();
@@ -1237,7 +1239,7 @@ namespace TuringAndCorbusier
 
                 for (int j = 0; j < corePoint.Count; j++)
                 {
-                    Core oneCore = new Core(corePoint[j], coreVecX[j], coreVecY[j], parameterSet.CoreType, parameterSet.Parameters[0], parameterSet.CoreType.GetDepth() - 0);
+                    Core oneCore = new Core(corePoint[j], coreVecX[j], coreVecY[j], randomCoreType, parameterSet.Parameters[0], randomCoreType.GetDepth() - 0);
                     oneCore.Origin = oneCore.Origin + Vector3d.ZAxis * tempStoryHeight;
                     oneCore.Stories = i;
 

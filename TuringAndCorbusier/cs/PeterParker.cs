@@ -56,6 +56,11 @@ namespace TuringAndCorbusier
             if (!FieldCheck())
                 return new ParkingLotOnEarth();
 
+            if (addFront)
+                AddFrontLine();
+            if (addBack)
+                AddBackLine();
+
             while (distance >= 64000)
             {
                 MultiplyLines();
@@ -65,12 +70,6 @@ namespace TuringAndCorbusier
 
             //parking
             ParkingResultContainer pm = new ParkingResultContainer(boundary, parkingLines, distance, coreDepth, useInnerLoop,LineType);
-
-            if(addFront)
-                pm.AddFront();
-            if (addBack)
-                pm.AddBack();
-
             pm.CalculateParkingScore();
 
             //check obstacle collision 
@@ -142,6 +141,38 @@ namespace TuringAndCorbusier
 
             return true;
         }
+
+        private void AddFrontLine()
+        {
+            Vector3d dir0 = parkingLines[0].TangentAtStart;
+            List<Curve> origins = new List<Curve>(parkingLines);
+            dir0.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+            //List<Point3d> starts = x.Select(n => n.PointAtStart).ToList();
+            if (origins.Count > 0)
+            {
+                Curve temp = origins[0].DuplicateCurve();
+                temp.Translate(dir0 * distance);
+                origins.Insert(0, temp);
+            }
+
+            parkingLines = origins;
+        }
+
+        private void AddBackLine()
+        {
+            Vector3d dir0 = parkingLines[0].TangentAtStart;
+            List<Curve> origins = new List<Curve>(parkingLines);
+            dir0.Rotate(Math.PI / 2, Vector3d.ZAxis);
+            //List<Point3d> starts = x.Select(n => n.PointAtStart).ToList();
+            if (origins.Count > 0)
+            {
+                Curve temp = origins.Last().DuplicateCurve();
+                temp.Translate(dir0 * distance);
+                origins.Add(temp);
+            }
+            parkingLines = origins;
+        }
+
     }
 
     public class ParkingResultContainer
@@ -227,37 +258,7 @@ namespace TuringAndCorbusier
 
         }
 
-        public void AddFront()
-        {
-            Vector3d dir0 = aptLines[0].TangentAtStart;
-            List<Curve> origins = new List<Curve>(aptLines);
-            dir0.Rotate(-Math.PI / 2, Vector3d.ZAxis);
-            //List<Point3d> starts = x.Select(n => n.PointAtStart).ToList();
-            if (origins.Count > 0)
-            {
-                Curve temp = origins[0].DuplicateCurve();
-                temp.Translate(dir0 * TotalLength);
-                origins.Insert(0, temp);
-            }
-
-            aptLines = origins;
-        }
-
-        public void AddBack()
-        {
-            Vector3d dir0 = aptLines[0].TangentAtStart;
-            List<Curve> origins = new List<Curve>(aptLines);
-            dir0.Rotate(Math.PI / 2, Vector3d.ZAxis);
-            //List<Point3d> starts = x.Select(n => n.PointAtStart).ToList();
-            if (origins.Count > 0)
-            {
-                Curve temp = origins.Last().DuplicateCurve();
-                temp.Translate(dir0 * TotalLength);
-                origins.Add(temp);
-            }
-            aptLines = origins;
-        }
-
+      
         public int CalculateParkingScore()
         {
             if (aptLines.Count == 0)

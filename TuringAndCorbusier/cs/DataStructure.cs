@@ -568,42 +568,27 @@ namespace TuringAndCorbusier
     public class ParameterSet
     {
         //Constructor, 생성자
-
         public ParameterSet()
         {
-
         }
-
-        public ParameterSet(double[] parameters, string agName, CoreType coreType)
+        public ParameterSet(double[] parameters)
         {
-            this.agName = agName;
             this.thisParameters = parameters;
             this.height = Math.Max(parameters[0], parameters[1]);
-            this.coreType = coreType;
-        }
-
-        public ParameterSet(double[] parameters, string agName, int heightIndex, CoreType coreType)
-        {
-            this.agName = agName;
-            this.thisParameters = parameters;
-            this.height = parameters[heightIndex];
-            this.coreType = coreType;
         }
 
         //Field, 필드
 
         double[] thisParameters;
         double height;
-        CoreType coreType;
+
 
         //Method, 메소드
 
         //Property, 속성
 
-        public string agName { get; private set; }
         public double[] Parameters { get { return thisParameters; } }
         public double Stories { get { return height; } set { height = value; }} 
-        public CoreType CoreType { get { return coreType; } }
 
     }
 
@@ -666,6 +651,7 @@ namespace TuringAndCorbusier
 
     public abstract class ApartmentGeneratorBase
     {
+        protected CoreType randomCoreType;
         public abstract Apartment generator(Plot plot, ParameterSet parameterSet, Target target);
         public abstract double[] MinInput { get; set; }
         public abstract double[] MaxInput { get; set; }

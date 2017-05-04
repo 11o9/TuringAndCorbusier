@@ -106,7 +106,7 @@ namespace TuringAndCorbusier
 
                 }
 
-                ParameterSet a = new ParameterSet(oneGene, ag.GetType().ToString(), tempCoreType);
+                ParameterSet a = new ParameterSet(oneGene);
                 offspringGenes.Add(a);
             }
 
@@ -521,7 +521,7 @@ namespace TuringAndCorbusier
                 geneMarker += 1;
             }
 
-            ParameterSet resultGene = new ParameterSet(newGene.ToArray(), agType, gene[select[0]].CoreType);
+            ParameterSet resultGene = new ParameterSet(newGene.ToArray());
             return resultGene;
         }
 
@@ -560,7 +560,7 @@ namespace TuringAndCorbusier
                 newGene.Add(mutatedParameter);
                 
             }
-            ParameterSet resultGene = new ParameterSet(newGene.ToArray(), ag.GetType().ToString(), gene.CoreType);
+            ParameterSet resultGene = new ParameterSet(newGene.ToArray());
             return resultGene;
         }
 

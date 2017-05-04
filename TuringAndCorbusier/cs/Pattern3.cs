@@ -12,7 +12,7 @@ namespace TuringAndCorbusier
     {
         public override Apartment generator(Plot plot, ParameterSet parameterSet, Target target)
         {
-            string tempString = parameterSet.CoreType.ToString();
+            randomCoreType = GetRandomCoreType();
 
             ///////////////////////////////////////////////
             //////////  common initial settings  //////////
@@ -57,7 +57,7 @@ namespace TuringAndCorbusier
             /////////////////////////////////////////
 
             bool valid;
-            Rectangle3d outlineRect = maxInnerRect(boundary, regulationHigh, plot, width, parameterSet.CoreType, out valid);
+            Rectangle3d outlineRect = maxInnerRect(boundary, regulationHigh, plot, width, randomCoreType, out valid);
             if (!valid)
             {
                 isvalid = false;
@@ -106,7 +106,7 @@ namespace TuringAndCorbusier
             }
 
             //법규 : 최소 인동거리
-            bool WWregBool = regulationHigh.DistanceLL + 2 * parameterSet.CoreType.GetWidth() + width < Math.Min(lines[0].GetLength(), lines[1].GetLength());
+            bool WWregBool = regulationHigh.DistanceLL + 2 * randomCoreType.GetWidth() + width < Math.Min(lines[0].GetLength(), lines[1].GetLength());
 
             ////////////////////////////////////////
             //////////  apt distribution  //////////
@@ -164,7 +164,7 @@ namespace TuringAndCorbusier
             double lineDistance = toLine[0].From.DistanceTo(toLine[1].From);
 
             //coredepth
-            double coreDepth = parameterSet.CoreType.GetDepth();
+            double coreDepth = randomCoreType.GetDepth();
 
             #endregion  
 
@@ -209,8 +209,8 @@ namespace TuringAndCorbusier
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
             double width = parameters[2];
-            double coreWidth = parameterSet.CoreType.GetWidth();
-            double coreDepth = parameterSet.CoreType.GetDepth();
+            double coreWidth = randomCoreType.GetWidth();
+            double coreDepth = randomCoreType.GetDepth();
 
             Vector3d courtX = new Vector3d(lines[0].PointAtEnd - lines[0].PointAtStart);
             Vector3d courtY = new Vector3d(lines[3].PointAtStart - lines[3].PointAtEnd);
@@ -255,7 +255,7 @@ namespace TuringAndCorbusier
 
                 for (int j = 0; j < coreOrigins.Count; j++)
                 {
-                    Core oneCore = new Core(coreOrigins[j], coreXVectors[j], coreYVectors[j], parameterSet.CoreType, storiesHigh, parameterSet.CoreType.GetDepth() - 0);
+                    Core oneCore = new Core(coreOrigins[j], coreXVectors[j], coreYVectors[j], randomCoreType, storiesHigh, randomCoreType.GetDepth() - 0);
                     oneCore.Origin = oneCore.Origin + Vector3d.ZAxis * tempStoryHeight;
                     oneCore.Stories = i;
 
@@ -274,8 +274,8 @@ namespace TuringAndCorbusier
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
             double width = parameters[2];
-            double coreWidth = parameterSet.CoreType.GetWidth();
-            double coreDepth = parameterSet.CoreType.GetDepth();
+            double coreWidth = randomCoreType.GetWidth();
+            double coreDepth = randomCoreType.GetDepth();
             int cornerOrEdge = 0;
 
             List<Point3d> houseEndPoints = new List<Point3d>();

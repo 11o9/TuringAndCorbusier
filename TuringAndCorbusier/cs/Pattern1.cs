@@ -20,6 +20,7 @@ namespace TuringAndCorbusier
             ///////////////////////////////////////////////
 
             //입력"값" 부분
+            randomCoreType = GetRandomCoreType();
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
             double storiesLow = Math.Min((int)parameters[0], (int)parameters[1]);
@@ -34,8 +35,8 @@ namespace TuringAndCorbusier
             BuildingType buildingType = regulationHigh.BuildingType;
             List<double> areaLength = new List<double>();
 
-            double coreWidth = parameterSet.CoreType.GetWidth();
-            double coreDepth = parameterSet.CoreType.GetDepth();
+            double coreWidth = randomCoreType.GetWidth();
+            double coreDepth = randomCoreType.GetDepth();
 
             double corearea = coreWidth * coreDepth;
 
@@ -288,7 +289,7 @@ namespace TuringAndCorbusier
                         corep.Stories = 0;
                         corep.XDirection = -tempBuildingCorridorUnits[0].XDirection;
                         corep.YDirection = tempBuildingCorridorUnits[0].YDirection;
-                        corep.CoreType = parameterSet.CoreType;
+                        corep.CoreType = randomCoreType;
 
                         corep.BuildingGroupNum = j;
                         corep.Area = corearea;
@@ -317,7 +318,7 @@ namespace TuringAndCorbusier
                             corep.Stories = 0;
                             corep.XDirection = -tempBuildingTowerUnits[k].XDirection;
                             corep.YDirection = tempBuildingTowerUnits[k].YDirection;
-                            corep.CoreType = parameterSet.CoreType;
+                            corep.CoreType = randomCoreType;
 
                             corep.BuildingGroupNum = j;
                             corep.Area = corearea;
