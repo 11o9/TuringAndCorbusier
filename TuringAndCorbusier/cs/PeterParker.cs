@@ -17,7 +17,134 @@ namespace TuringAndCorbusier
         PerpOnly
     }
 
-    public class ParkingMaster
+    /// <summary>
+    /// default 
+    /// </summary>
+    public class ParkingModule
+    {
+        //parking lines , parameter set , plot , cores...
+
+        //check 1 cores => obstacles
+        //check 2 plot => plot.boundary
+
+        //necces - lines, obstacles, plotboundary, distance, coredepth, ,,, , line type?
+        // make field
+
+        private List<Curve> parkingLines;
+        private List<Curve> obstacles;
+        private Curve boundary;
+        private double distance;
+        private double coreDepth;
+        private ParkingLineType lineType = ParkingLineType.Default;
+        private bool useInnerLoop = true;
+        private bool addBack = false;
+        private bool addFront = false;
+
+        public List<Curve> ParkingLines { private get { return parkingLines; } set { parkingLines = value; } }
+        public List<Curve> Obstacles { private get { return obstacles; }set { obstacles = value; } }
+        public Curve Boundary { private get { return boundary; } set { boundary = value; } }
+        public double Distance { private get { return distance; } set { distance = value; } }
+        public double CoreDepth { private get { return coreDepth; } set { coreDepth = value; } }
+        public ParkingLineType LineType { private get { return lineType; } set { lineType = value; } }
+        public bool UseInnerLoop { private get { return useInnerLoop; } set { useInnerLoop = value; } }
+        public bool AddBack { private get { return addBack; } set { addBack = value; } }
+        public bool AddFront { private get { return addFront; } set { addFront = value; } }
+
+        //common
+        public ParkingLotOnEarth GetParking()
+        {
+            if (!FieldCheck())
+                return new ParkingLotOnEarth();
+
+            while (distance >= 64000)
+            {
+                MultiplyLines();
+            }
+
+            ParkingLotOnEarth parkingLot;
+
+            //parking
+            ParkingResultContainer pm = new ParkingResultContainer(boundary, parkingLines, distance, coreDepth, useInnerLoop,LineType);
+
+            if(addFront)
+                pm.AddFront();
+            if (addBack)
+                pm.AddBack();
+
+            pm.CalculateParkingScore();
+
+            //check obstacle collision 
+
+            List<Curve> parkable = new List<Curve>();
+            foreach (Curve park in pm.parkingCells)
+            {
+                bool collision = false;
+                foreach (Curve obs in obstacles)
+                {
+                    //collision 생기거나
+                    if (Curve.PlanarCurveCollision(park, obs, Plane.WorldXY, 0))
+                    {
+                        collision = true;
+                        break;
+                    }
+                    //내포,외포 하거나
+                    else if (Curve.PlanarClosedCurveRelationship(park, obs, Plane.WorldXY, 0) == RegionContainment.AInsideB || Curve.PlanarClosedCurveRelationship(park, obs, Plane.WorldXY, 0) == RegionContainment.BInsideA)
+                    {
+                        collision = true;
+                        break;
+                    }
+                }
+
+                if (!collision)
+                    parkable.Add(park);
+            }
+
+            List<ParkingLine> pls = new List<ParkingLine>();
+            if (pm.parkingCells != null)
+                pls = parkable.Select(n => new ParkingLine(n)).ToList();
+
+            parkingLot = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
+            return parkingLot;
+
+        }
+
+        private void MultiplyLines()
+        {
+            distance = distance / 2;
+            List<Curve> copy = new List<Curve>(parkingLines);
+            Vector3d dir = copy[0].TangentAtStart;
+            dir.Rotate(Math.PI / 2, Vector3d.ZAxis);
+            dir.Unitize();
+            copy = copy.Select(n => new LineCurve(n.PointAtStart + dir * distance, n.PointAtEnd + dir * distance) as Curve).ToList();
+            parkingLines.AddRange(copy);
+
+            if (dir.X > 0)
+                parkingLines = parkingLines.OrderBy(n => n.PointAtStart.X).ToList();
+            else
+                parkingLines = parkingLines.OrderByDescending(n => n.PointAtStart.X).ToList();
+
+        }
+
+        private bool FieldCheck()
+        {
+            if (parkingLines == null)
+                return false;
+            if (ParkingLines.Count == 0)
+                return false;
+            if (obstacles == null)
+                return false;
+            if (boundary == null)
+                return false;
+            if (distance == double.NaN)
+                return false;
+            if (coreDepth == double.NaN)
+                return false;
+
+            return true;
+        }
+    }
+
+    public class ParkingResultContainer
     {
 
 
@@ -28,7 +155,7 @@ namespace TuringAndCorbusier
         public List<Curve> parkingCells;
         double CoreDepth;
 
-        public ParkingMaster(Curve boundary, List<Curve> aptLines, double length, double coreDepth, bool useInnerLoop)
+        public ParkingResultContainer(Curve boundary, List<Curve> aptLines, double length, double coreDepth, bool useInnerLoop)
         {
             if (useInnerLoop)
                 Boundary = InnerLoop(boundary,6000);
@@ -42,7 +169,7 @@ namespace TuringAndCorbusier
             //ParkingResult result = ParkingPrediction.Calculate()
         }
 
-        public ParkingMaster(Curve boundary, List<Curve> aptLines, double length, double coreDepth, bool useInnerLoop, ParkingLineType lineType)
+        public ParkingResultContainer(Curve boundary, List<Curve> aptLines, double length, double coreDepth, bool useInnerLoop, ParkingLineType lineType)
         {
             if (useInnerLoop)
                 Boundary = InnerLoop(boundary, 6000);

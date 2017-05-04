@@ -144,7 +144,6 @@ namespace TuringAndCorbusier
             //////////  zzzzzzzzzzz   //////////
             ////////////////////////////////////
 
-
             #region UnitPacking
             List<List<UnitType>> isclearance;
             List<List<double>> lengths = AptPacking(area, aptLines.Select(n => n.GetLength()).ToList(), ratio, width, corearea, out isclearance);
@@ -165,7 +164,6 @@ namespace TuringAndCorbusier
             }
 
             #endregion
-
 
             #region GetLow
             List<List<Household>> Low = new List<List<Household>>();
@@ -467,13 +465,39 @@ namespace TuringAndCorbusier
 
             #region NewParking
 
+            ParkingModule pm = new ParkingModule();
+
+            #region ParkingSetup
+            ///setups for parking
+            //1. curves
+            var parkingCurves = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
+
+            Vector3d setBack = parkingLines.Count > 0 ? parkingLines[0].Direction : Vector3d.Zero;
+            setBack.Unitize();
+            setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+            parkingCurves.ForEach(n => n.Translate(setBack * width / 2));
+
+            //2. obstacles
+            List<Curve> obstacles = cpss[0].Select(n => n.DrawOutline(width)).ToList();
+            for (int i = 0; i < obstacles.Count; i++)
+            {
+                obstacles[i].Translate(cpss[0][i].YDirection * (cpss[0][i].CoreType.GetDepth() - width) / 2);
+            }
+            #endregion
+
+            //pattern 1 parking settings
+            pm.ParkingLines = parkingCurves; // 만약 라인마다 다른 depth로 뽑고싶다면 따로따로
+            pm.Obstacles = obstacles;
+            pm.Boundary = plot.Boundary;
+            pm.Distance = width + (storiesHigh * Consts.FloorHeight/* + Consts.PilotiHeight*/) * 0.8;
+            pm.CoreDepth = coreDepth;
+            pm.AddFront = true;
+
+            //get parking
+            ParkingLotOnEarth parkingLot = pm.GetParking();
+
 
             //line distance
-            double[] newParameter = parameters;
-            newParameter[0] = storiesHigh;
-            newParameter[1] = storiesHigh;
-            ParameterSet newParameterSet = new ParameterSet(newParameter, GetAGType, parameterSet.CoreType);
-            ParkingLotOnEarth parkingLot = GetParking(parkingLines, newParameterSet, plot, cpss);
             ParkingLotUnderGround parkingLotUnderGroud = new ParkingLotUnderGround();
             #endregion
 
@@ -1186,74 +1210,6 @@ namespace TuringAndCorbusier
 
             isclearance = types;
             return positions;
-
-        }
-
-        private ParkingLotOnEarth GetParking(List<Line> parkingLines, ParameterSet paramSet, Plot plot, List<List<Core>> cpss)
-        {
-            double width = paramSet.Parameters[2];
-            double coreDepth = paramSet.CoreType.GetDepth();
-            double apartDistance = width + (paramSet.Parameters[0] * Consts.FloorHeight + Consts.PilotiHeight) * 0.8;
-            ParkingLotOnEarth parkingLot;
-            //parking start line == core start line
-            List<Curve> parkingStartLine = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
-            if (parkingStartLine.Count != 0)
-            {
-
-                Vector3d setBack = parkingStartLine[0].TangentAtStart;
-                setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
-                parkingStartLine.ForEach(n => n.Translate(setBack * width / 2));
-
-                //parking
-                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance,coreDepth,true);
-                
-                //pattern1 한정
-                pm.AddFront();
-
-                pm.CalculateParkingScore();
-
-                //check core collision
-                List<Curve> firstFloorCores = cpss[0].Select(n => n.DrawOutline(width)).ToList();
-                for (int i = 0; i < firstFloorCores.Count; i++)
-                {
-                    firstFloorCores[i].Translate(cpss[0][i].YDirection * (cpss[0][i].CoreType.GetDepth() - width)/2);
-                }
-                List<Curve> parkable = new List<Curve>();
-                foreach (Curve park in pm.parkingCells)
-                {
-                    bool collision = false;
-                    foreach (Curve core in firstFloorCores)
-                    {
-                        //collision 생기거나
-                        if (Curve.PlanarCurveCollision(park, core, Plane.WorldXY, 0))
-                        {
-                            collision = true;
-                            break;
-                        }
-                        //내포,외포 하거나
-                        else if (Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.AInsideB || Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.BInsideA)
-                        {
-                            collision = true;
-                            break;
-                        }
-                    }
-
-                    if (!collision)
-                        parkable.Add(park);
-                }
-
-                List<ParkingLine> pls = new List<ParkingLine>();
-                if (pm.parkingCells != null)
-                    pls = parkable.Select(n => new ParkingLine(n)).ToList();
-
-                parkingLot = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
-            }
-            else
-            {
-                parkingLot = new ParkingLotOnEarth();
-            }
-
-            return parkingLot;
 
         }
     }

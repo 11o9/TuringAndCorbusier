@@ -103,46 +103,56 @@ namespace TuringAndCorbusier
 
             List<Curve> centerSegments = centerline.DuplicateSegments().ToList();
             ParkingLotOnEarth parkingLotOnEarth = new ParkingLotOnEarth();
-
+            #region GetParking
             //rotation check
-            Vector3d dirCheck = centerSegments[1].TangentAtStart;
-            dirCheck.Rotate(Math.PI / 2, Vector3d.ZAxis);
-            Point3d testPoint = centerSegments[1].PointAtNormalizedLength(0.5) + dirCheck;
 
-            int dirK = -1;
             Polyline testLine = new Polyline(centerpolyline);
             testLine.Add(testLine[0]);
             Curve testCurve = testLine.ToNurbsCurve();
-            if (testCurve.Contains(testPoint) == PointContainment.Inside)
-                dirK = 1;
 
-            var debug = segments.Select(n => n.TangentAtStart);
-
-            for (int i = 0; i < 3; i ++)
+            if (testCurve.ClosedCurveOrientation(Plane.WorldXY) != CurveOrientation.CounterClockwise)
             {
-                //[0] - 장변 [1] - 단변 [2] - 장변
-                //패턴4 - 두번 나눠서 생각 ( 사이드, 중심 )
+                testLine.Reverse();
+                testLine.RemoveAt(0);
+            }
+            else
+            {
+                testLine.RemoveAt(testLine.Count - 1);
+            }
+            //정렬 된 커브
+            List<Curve> alignCurve = testLine.ToNurbsCurve().DuplicateSegments().ToList();
+            //길이 수정
+            alignCurve[0] = new LineCurve(alignCurve[0].PointAtStart, alignCurve[0].PointAtLength(alignCurve[0].GetLength() - width / 2));
+            //중간커브 돌림
+            alignCurve[1] = new LineCurve(alignCurve[1].PointAtLength(alignCurve[1].GetLength()-width/2), alignCurve[1].PointAtLength(width/2));
+            alignCurve[2] = new LineCurve(alignCurve[2].PointAtLength(width / 2), alignCurve[2].PointAtEnd);
+
+            for (int i = 0; i < alignCurve.Count; i++)
+            {
+                //each settings
+                //coredepth
+                double coreDepth = parameterSet.CoreType.GetDepth();
+                //parkinglines
+                //1. 건물 밑 라인
+                List<Curve> parkingCurve = new List<Curve>() { alignCurve[i] };
+                //2. 외부 라인
+                List<Curve> parkingCurve2 = new List<Curve>() { alignCurve[i].DuplicateCurve() };
+                Vector3d setBack = alignCurve[i].TangentAtStart;
+                setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+                parkingCurve.ForEach(n => n.Translate(setBack * coreDepth / 2));
+                parkingCurve2.ForEach(n => n.Translate(-setBack * (coreDepth / 2 + 6000)));
+                //distance
+                double lineDistance = centerSegments.Max(n => n.GetLength()) * 1.3;
+                //obstacles
+                List<Curve> obstacles = core[0].Select(n => n.DrawOutline(width)).ToList();
+                for (int j = 0; j < obstacles.Count; j++)
+                {
+                    obstacles[j].Translate(core[0][j].YDirection * (core[0][j].CoreType.GetDepth() - width) / 2);
+                }
                 if (i == 1)
                 {
-                    //1. 중심
-                    // 중심 부터 대지 끝까지 밈 = 가장 긴 변 + 30%
-                    double lineDistance = centerSegments.Max(n => n.GetLength()) * 1.3;
-                    //단변 양 옆 6m + width/2 씩 제거.. 주차가 들어가긴 하나
-                    //만약 단변 길이가 기준치 이하면 아무것도 안넣음. 
-                    Line centerSegment;
-
-                    if(dirK == 1)
-                        centerSegment = new Line(centerSegments[1].PointAtLength(width / 2), centerSegments[1].PointAtLength(centerSegments[i].GetLength() - width / 2));
-
-                    else
-                        centerSegment = new Line(centerSegments[1].PointAtLength(centerSegments[i].GetLength() - width / 2), centerSegments[1].PointAtLength(width / 2));
-
-
-                    List<Line> parkingLines = new List<Line>() { centerSegment };
-
                     //도로확보
-                    Vector3d roadDir = centerSegment.Direction;
-                    roadDir.Unitize();
+                    Vector3d roadDir = alignCurve[i].TangentAtStart;
                     roadDir.Rotate(Math.PI / 2, Vector3d.ZAxis);
                     Curve leftRoad = new PolylineCurve(new Point3d[] {
                     centerSegments[1].PointAtStart + roadDir * (width/2 + 1),
@@ -159,91 +169,31 @@ namespace TuringAndCorbusier
                     centerSegments[1].PointAtEnd + roadDir * (width/2 + 1)});
 
                     List<Curve> roads = new List<Curve>() { leftRoad, rightRoad };
-
-                    // 일정 길이 이상 멀어지면 급격히 느려지는 현상 있어서 길이 제한
-
-                    while (lineDistance >= 64000)
-                    {
-                        lineDistance = lineDistance / 2;
-                        List<Line> midline = new List<Line>(parkingLines);
-                        midline = midline.Select(n => new Line(n.From + roadDir * lineDistance, n.To + roadDir * lineDistance)).ToList();
-                        parkingLines.AddRange(midline);
-                        if (roadDir.X > 0)
-                            parkingLines = parkingLines.OrderBy(n => n.From.X).ToList();
-                        else
-                            parkingLines = parkingLines.OrderByDescending(n => n.From.X).ToList();
-
-                        int count = parkingLines.Count;
-                    }
-                    ParkingLotOnEarth firstLine = GetParking(parkingLines.Take(1).ToList(), plot, core, 12000, parameterSet.CoreType.GetDepth(), roads, ParkingLineType.SingleLine);//
-                    //parkingLines.RemoveAt(0);
-                    //내부주차선은 코어로부터 6000 떨어트려서
-                    //parkingLines.ForEach(n => n.Transform(Transform.Translation(roadDir * (6000 + width / 2))));
-                    for (int j = 0; j < parkingLines.Count; j++)
-                    {
-                        Line newline = new Line(parkingLines[j].From + roadDir * (6000 + width),parkingLines[j].To + roadDir * (6000 + width));
-                        parkingLines[j] = newline;
-                    }
-                    ParkingLotOnEarth parkingLotCenter = GetParking(parkingLines, plot, core, lineDistance, parameterSet.CoreType.GetDepth(), roads,ParkingLineType.Default);//
-                    parkingLotOnEarth.ParkingLines.AddRange(firstLine.ParkingLines);
-                    parkingLotOnEarth.ParkingLines.AddRange(parkingLotCenter.ParkingLines);
+                    obstacles.AddRange(roads);
                 }
-                else
-                {
-                    //2. 사이드
-                    // 일단 밀만큼 밀어보고,
-                    double lineDistance = centerSegments.Max(n => n.GetLength()) * 1.3;
-                    //각 변 에서 단변에 닿는 쪽 width/2 씩 제거
-                    Line sideSegment;
-                    if (i == 0)
-                        if(dirK==-1)
-                            sideSegment = new Line(centerSegments[i].PointAtStart, centerSegments[i].PointAtLength(centerSegments[i].GetLength() - width));
-                        else
-                            sideSegment = new Line(centerSegments[i].PointAtLength(centerSegments[i].GetLength() - width), centerSegments[i].PointAtStart);
 
-                    else
-                        if (dirK ==- 1)
-                        sideSegment = new Line(centerSegments[i].PointAtLength(width), centerSegments[i].PointAtEnd);
-                        else
-                        sideSegment = new Line(centerSegments[i].PointAtEnd, centerSegments[i].PointAtLength(width));
+                ParkingModule pm1 = new ParkingModule();
+                pm1.ParkingLines = parkingCurve;
+                pm1.Boundary = plot.Boundary;
+                pm1.UseInnerLoop = false;
+                pm1.Obstacles = obstacles;
+                pm1.LineType = ParkingLineType.SingleLine;
+                pm1.Distance = 12000; // 직각 한줄 들어갈 폭
+                pm1.CoreDepth = coreDepth;
+                ParkingLotOnEarth underAptLine = pm1.GetParking();
 
-                    List<Line> parkingLines = new List<Line>() { sideSegment };
-                    // 일정 길이 이상 멀어지면 급격히 느려지는 현상 있어서 길이 제한
-                    Vector3d dir = parkingLines[0].UnitTangent;
-                    dir.Rotate(Math.PI / 2, Vector3d.ZAxis);
-                    dir.Unitize();
-                    while (lineDistance >= 64000)
-                    {
-                        lineDistance = lineDistance / 2;
-                        List<Line> midline = new List<Line>(parkingLines);
-                        midline = midline.Select(n => new Line(n.From + dir * lineDistance, n.To + dir * lineDistance)).ToList();
-                        parkingLines.AddRange(midline);
-                        int count = parkingLines.Count;
-                    }
+                ParkingModule pm2 = new ParkingModule();
+                pm2.ParkingLines = parkingCurve2;
+                pm2.Boundary = plot.Boundary;
+                pm2.Obstacles = obstacles;
+                pm2.Distance = lineDistance;
+                pm2.CoreDepth = coreDepth;
+                ParkingLotOnEarth overGround = pm2.GetParking();
 
-                    ParkingLotOnEarth firstLine = GetParking(parkingLines.Take(1).ToList(), plot, core, 12000, parameterSet.CoreType.GetDepth(), new List<Curve>(), ParkingLineType.SingleLine);//
-
-                    for (int j = 0; j < parkingLines.Count; j++)
-                    {
-                        Line newline = new Line(parkingLines[j].From + dir * (6000 + width), parkingLines[j].To + dir * (6000 + width));
-                        parkingLines[j] = newline;
-                    }
-                    //외부주차선은 코어로부터 6000 떨어트려서
-                    
-                    ParkingLotOnEarth parkingLotSide = GetParking(parkingLines, plot, core, lineDistance, parameterSet.CoreType.GetDepth(),new List<Curve>(),ParkingLineType.Default);//
-
-                    parkingLotOnEarth.ParkingLines.AddRange(firstLine.ParkingLines);
-                    parkingLotOnEarth.ParkingLines.AddRange(parkingLotSide.ParkingLines);
-                }
+                parkingLotOnEarth.ParkingLines.AddRange(underAptLine.ParkingLines);
+                parkingLotOnEarth.ParkingLines.AddRange(overGround.ParkingLines);
             }
-           
-
-
-
-
-
-
-            //ParkingLotOnEarth parkingLotOnEarth = GetParking(parkingLines, plot, core, lineDistance,parameterSet.CoreType.GetDepth());//
+            #endregion
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
 
             List<Curve> aptLines = new List<Curve>();
@@ -1355,320 +1305,6 @@ namespace TuringAndCorbusier
             outlineTemp.Add(outlineCurve);
             outline.Add(outlineTemp);
             return outline;
-        }
-
-        //new parking
-        private ParkingLotOnEarth GetParking(List<Line> parkingLines, Plot plot, List<List<Core>> cpss, double distance, double coreDepth, List<Curve> obstacles , ParkingLineType lineType)
-        {
-            //pattern4 한정.. 
-            double apartDistance = distance;
-
-            ParkingLotOnEarth parkingLot;
-            //parking start line == core start line
-            List<Curve> parkingStartLine = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
-            if (parkingStartLine.Count != 0)
-            {
-                if(parkingStartLine[0] == null)
-                { return new ParkingLotOnEarth(); }
-                Vector3d setBack = parkingStartLine[0].TangentAtStart;
-                setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
-                parkingStartLine.ForEach(n => n.Translate(setBack * coreDepth / 2));
-
-                //parking
-                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance, coreDepth,false, lineType);
-                pm.CalculateParkingScore();
-
-                //check core collision
-                List<Curve> firstFloorCores = cpss[0].Select(n => n.DrawOutline(5000)).ToList();
-                for (int i = 0; i < firstFloorCores.Count; i++)
-                {
-                    firstFloorCores[i].Translate(cpss[0][i].YDirection * (cpss[0][i].CoreType.GetDepth() - 5000) / 2);
-                }
-
-                //코어에 그 외 장애물 추가.
-                firstFloorCores.AddRange(obstacles);
-
-                List<Curve> parkable = new List<Curve>();
-                foreach (Curve park in pm.parkingCells)
-                {
-                    bool collision = false;
-                    foreach (Curve core in firstFloorCores)
-                    {
-                        //collision 생기거나
-                        if (Curve.PlanarCurveCollision(park, core, Plane.WorldXY, 0))
-                        {
-                            collision = true;
-                            break;
-                        }
-                        //내포,외포 하거나
-                        else if (Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.AInsideB || Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.BInsideA)
-                        {
-                            collision = true;
-                            break;
-                        }
-                    }
-
-                    if (!collision)
-                        parkable.Add(park);
-                }
-
-                List<ParkingLine> pls = new List<ParkingLine>();
-                if (pm.parkingCells != null)
-                    pls = parkable.Select(n => new ParkingLine(n)).ToList();
-
-                parkingLot = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
-            }
-            else
-            {
-                parkingLot = new ParkingLotOnEarth();
-            }
-
-            return parkingLot;
-
-        }
-
-        private List<List<ParkingLine>> parkingLotMaker(Curve centerline, double width, double coreWidth, List<List<Core>> core)
-        {
-            List<List<Curve>> outline = new List<List<Curve>>();
-            List<Curve> outlineTemp = new List<Curve>();
-
-            List<Curve> offset = new List<Curve>();
-            offset.Add(centerline.Offset(Plane.WorldXY, width / 2, 1, CurveOffsetCornerStyle.Sharp)[0]);
-            offset.Add(centerline.Offset(Plane.WorldXY, -width / 2, 1, CurveOffsetCornerStyle.Sharp)[0]);
-            List<Curve> segmentsStart = new List<Curve>();
-
-            List<double> offsetDirs = new List<double>(new double[] { -1, 1 });
-
-            List<double> offsetLength = new List<double>();
-            foreach (Curve i in offset)
-            {
-                offsetLength.Add(i.GetLength());
-            }
-
-            Curve innerLine = offset[offsetLength.IndexOf(offsetLength.Min())];
-            double offsetDirection = offsetDirs[offsetLength.IndexOf(offsetLength.Min())];
-
-            //merge extended for z shape
-
-            List<Rectangle3d> parkingLots = new List<Rectangle3d>();
-
-            Curve[] segmentsStartTemp = innerLine.DuplicateSegments();
-            List<Curve> worm = new List<Curve>(segmentsStartTemp);
-            List<Curve> result = new List<Curve>();
-            if (worm.Count == 5)
-            {
-                Vector3d tangent1 = worm[0].TangentAtStart;
-                Vector3d tangent2 = worm[1].TangentAtStart;
-                if (Vector3d.CrossProduct(tangent1, tangent2).Length < 0.1)
-                {
-                    Point3d tempEnd = worm[1].PointAtEnd;
-                    Vector3d tempTangent = worm[1].TangentAtStart;
-                    Vector3d tempTangentRev = Vector3d.Multiply(tempTangent, -1);
-                    tempEnd.Transform(Transform.Translation(Vector3d.Multiply(tempTangentRev, width)));
-                    Line tempLine = new Line(worm[0].PointAtStart, tempEnd);
-                    Curve l = tempLine.ToNurbsCurve();
-                    result.Add(l);
-                    Point3d tempStart = worm[2].PointAtStart;
-                    tempTangent = worm[2].TangentAtStart;
-                    tempTangentRev = Vector3d.Multiply(tempTangent, -1);
-                    tempStart.Transform(Transform.Translation(Vector3d.Multiply(tempTangent, width)));
-                    tempLine = new Line(tempStart, worm[3].PointAtEnd);
-                    l = tempLine.ToNurbsCurve();
-                    result.Add(l);
-                    result.Add(worm[4]);
-                }
-                else
-                {
-                    result.Add(worm[0]);
-                    Point3d tempEnd = worm[2].PointAtEnd;
-                    Vector3d tempTangent = worm[2].TangentAtStart;
-                    Vector3d tempTangentRev = Vector3d.Multiply(tempTangent, -1);
-                    tempEnd.Transform(Transform.Translation(Vector3d.Multiply(tempTangentRev, width)));
-                    Line tempLine = new Line(worm[1].PointAtStart, tempEnd);
-                    Curve l = tempLine.ToNurbsCurve();
-                    result.Add(l);
-                    Point3d tempStart = worm[3].PointAtStart;
-                    tempTangent = worm[3].TangentAtStart;
-                    tempTangentRev = Vector3d.Multiply(tempTangent, -1);
-                    tempStart.Transform(Transform.Translation(Vector3d.Multiply(tempTangent, width)));
-                    tempLine = new Line(tempStart, worm[4].PointAtEnd);
-                    l = tempLine.ToNurbsCurve();
-                    result.Add(l);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < worm.Count; i++)
-                {
-                    result.Add(worm[i]);
-                }
-            }
-
-            segmentsStart = new List<Curve>(result);
-
-            //break polyline and offset outwards by 5000
-
-            List<Curve> segmentsEnd = new List<Curve>();
-            for (int i = 0; i < 3; i++)
-            {
-                segmentsEnd.Add(segmentsStart[i].Offset(Plane.WorldXY, 5000 * offsetDirection, 1, CurveOffsetCornerStyle.Sharp)[0]);
-            }
-
-            List<Line> parkingStart = new List<Line>();
-            List<Line> parkingEnd = new List<Line>();
-            for (int i = 0; i < 3; i++)
-            {
-                Line l = new Line(segmentsStart[i].PointAtStart, segmentsStart[i].PointAtEnd);
-                parkingStart.Add(l);
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                Line l = new Line(segmentsEnd[i].PointAtStart, segmentsEnd[i].PointAtEnd);
-                parkingEnd.Add(l);
-            }
-
-            //find core end points
-
-            List<Point3d> coreEnds = new List<Point3d>();
-            for (int i = 0; i < core[0].Count; i++)
-            {
-                Point3d core1 = core[0][i].Origin;
-                Point3d core2 = core[0][i].Origin;
-                core1.Transform(Transform.Translation(Vector3d.Multiply(core[0][i].XDirection, 0)));
-                core2.Transform(Transform.Translation(Vector3d.Multiply(core[0][i].XDirection, coreWidth)));
-                coreEnds.Add(core1);
-                coreEnds.Add(core2);
-            }
-
-
-
-
-            List<List<Point3d>> coreDeletePoints = new List<List<Point3d>>();
-            for (int i = 0; i < 3; i++)
-            {
-                coreDeletePoints.Add(new List<Point3d>());
-            }
-
-            for (int i = 0; i < 3; i++)
-            {
-                coreDeletePoints[i].Add(segmentsStart[i].PointAtStart);
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < coreEnds.Count; j++)
-                {
-                    double dist = parkingStart[i].DistanceTo(coreEnds[j], true);
-                    if (dist < 0.01)
-                    {
-                        coreDeletePoints[i].Add(coreEnds[j]);
-                    }
-                }
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                coreDeletePoints[i].Add(segmentsStart[i].PointAtEnd);
-            }
-
-            //make parking lines
-
-            List<Line> parkingLines = new List<Line>();
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < coreDeletePoints[i].Count - 1; j++)
-                {
-                    Line seg = new Line(coreDeletePoints[i][j], coreDeletePoints[i][j + 1]);
-                    if (seg.Length < coreWidth - 0.1 || seg.Length > coreWidth + 0.1)
-                    {
-                        parkingLines.Add(seg);
-                    }
-                }
-            }
-
-            for (int i = 0; i < parkingLines.Count; i++)
-            {
-                int lotNum = (int)parkingLines[i].Length / 2300;
-                Vector3d lotX = parkingLines[i].UnitTangent;
-                Vector3d lotY = lotX;
-                lotY.Rotate(Math.PI / 2 * (-offsetDirection), new Vector3d(0, 0, 1));
-                Plane lotOri = new Plane(parkingLines[i].From, lotX, lotY);
-                for (int j = 0; j < lotNum; j++)
-                {
-                    Plane lotOriTemp = lotOri;
-                    lotOriTemp.Transform(Transform.Translation(Vector3d.Multiply(lotX, 2300 * j)));
-                    parkingLots.Add(new Rectangle3d(lotOriTemp, 2300, 5000));
-                }
-            }
-
-            //parallel parking
-
-            if (width > 5000 + 2300 && width < 5000 + 5000)
-            {
-                for (int i = 0; i < parkingLines.Count; i++)
-                {
-                    int lotNum = (int)parkingLines[i].Length / 5000;
-                    Vector3d lotX = parkingLines[i].UnitTangent;
-                    Vector3d lotY = lotX;
-                    lotY.Rotate(Math.PI / 2 * (-offsetDirection), new Vector3d(0, 0, 1));
-                    Point3d Ori = parkingLines[i].From;
-                    Ori.Transform(Transform.Translation(Vector3d.Multiply(lotY, 5000)));
-                    Plane lotOri = new Plane(Ori, lotX, lotY);
-                    for (int j = 0; j < lotNum; j++)
-                    {
-                        Plane lotOriTemp = lotOri;
-                        lotOriTemp.Transform(Transform.Translation(Vector3d.Multiply(lotX, 5000 * j)));
-                        parkingLots.Add(new Rectangle3d(lotOriTemp, 5000, 2300));
-                    }
-                }
-            }
-
-            //double parking
-
-            if (width >= 5000 + 5000)
-            {
-                for (int i = 0; i < parkingLines.Count; i++)
-                {
-                    int lotNum = (int)parkingLines[i].Length / 2300;
-                    Vector3d lotX = parkingLines[i].UnitTangent;
-                    Vector3d lotY = lotX;
-                    lotY.Rotate(Math.PI / 2 * (-offsetDirection), new Vector3d(0, 0, 1));
-                    Point3d Ori = parkingLines[i].From;
-                    Ori.Transform(Transform.Translation(Vector3d.Multiply(lotY, 5000)));
-                    Plane lotOri = new Plane(Ori, lotX, lotY);
-                    for (int j = 0; j < lotNum; j++)
-                    {
-                        Plane lotOriTemp = lotOri;
-                        lotOriTemp.Transform(Transform.Translation(Vector3d.Multiply(lotX, 2300 * j)));
-                        parkingLots.Add(new Rectangle3d(lotOriTemp, 2300, 5000));
-                    }
-                }
-            }
-
-
-            List<ParkingLine> parkingLotsOut = new List<ParkingLine>();
-            for (int i = 0; i < parkingLots.Count; i++)
-            {
-                parkingLotsOut.Add(new ParkingLine(parkingLots[i]));
-            }
-
-            List<List<ParkingLine>> parkingLotsOutOut = new List<List<ParkingLine>>();
-            parkingLotsOutOut.Add(parkingLotsOut);
-
-            return parkingLotsOutOut;
-        }
-        public List<double> SplitWithRegions(Curve target, List<Curve> cutter)
-        {
-            List<double> intersectParam = new List<double>();
-            foreach (Curve i in cutter)
-            {
-                var tempIntersection = Rhino.Geometry.Intersect.Intersection.CurveCurve(target, i, 0.1, 0.1);
-
-                foreach (Rhino.Geometry.Intersect.IntersectionEvent j in tempIntersection)
-                {
-                    intersectParam.Add(j.ParameterA);
-                }
-            }
-
-            return intersectParam;
         }
     }
 }

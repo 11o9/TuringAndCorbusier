@@ -131,7 +131,13 @@ namespace TuringAndCorbusier
 
             ////////////////////////////////////////////////////////////////////////////////////////
 
+            #region parking
             //parking lot
+            ParkingModule pm = new ParkingModule();
+            
+            //1.setups for parking
+            #region setup
+            //parking curves setting
             Curve parkingLine = inlineCurve.Offset(Plane.WorldXY,cores[0][0].CoreType.GetDepth()/2, 1, CurveOffsetCornerStyle.Sharp)[0];
             Curve[] parkingLineSegments = parkingLine.DuplicateSegments();
             Curve[] shortSegments = parkingLineSegments.OrderBy(n => n.GetLength()).Take(2).ToArray();
@@ -139,30 +145,41 @@ namespace TuringAndCorbusier
             List<Line> toLine = shortSegments.Select(n => new Line(n.PointAtStart - n.TangentAtStart * n.GetLength(), n.PointAtEnd + n.TangentAtStart * n.GetLength())).ToList();
             //둘중 하나 역으로
             toLine[1] = new Line(toLine[1].To, toLine[1].From);
-            ////뒷줄 복사
-            //Line additionalLine = new Line(toLine[1].From + (toLine[1].From - toLine[0].From), toLine[1].To + (toLine[1].To - toLine[0].To));
-            //toLine.Add(additionalLine);
+            List<Curve> parkingCurves = toLine.Select(n => n.ToNurbsCurve() as Curve).ToList();
 
-            double lineDistance = toLine[0].From.DistanceTo(toLine[1].From);
+            Vector3d setBack = parkingCurves.Count > 0 ? parkingCurves[0].TangentAtStart : Vector3d.Zero;
+            setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+            parkingCurves.ForEach(n => n.Translate(setBack * width / 2));
 
 
-            // 일정 길이 이상 멀어지면 급격히 느려지는 현상 있어서 길이 제한
-
-            while (lineDistance >= 64000)
+            //obstacles setting
+            
+            List<Curve> obstacles = cores[0].Select(n => n.DrawOutline(width)).ToList();
+            for (int i = 0; i < obstacles.Count; i++)
             {
-                lineDistance = lineDistance / 2;
-                List<Line> midline = new List<Line>(toLine);
-                Vector3d dir = toLine[1].To - toLine[0].To;
-                dir.Unitize();
-                midline = midline.Select(n => new Line(n.From + dir * lineDistance, n.To + dir * lineDistance)).ToList();
-
-                toLine.AddRange(midline);
-                int count = toLine.Count;
+                obstacles[i].Translate(cores[0][i].YDirection * (cores[0][i].CoreType.GetDepth() - width) / 2);
             }
 
+            //distance setting
+            double lineDistance = toLine[0].From.DistanceTo(toLine[1].From);
 
-            ParkingLotOnEarth parkingLotOnEarth = GetParking(toLine, plot, cores, lineDistance, parameterSet.CoreType.GetDepth());//new ParkingLotOnEarth();// new ParkingLotOnEarth(ParkingLineMaker.parkingLineMaker(this.GetAGType, cores, plot, parameters[2], midlineCurve)); //parkingLotOnEarthMaker(boundary, household, parameterSet.CoreType.GetWidth(), parameterSet.CoreType.GetDepth(), coreOutlines);
+            //coredepth
+            double coreDepth = parameterSet.CoreType.GetDepth();
+
+            #endregion  
+
+            //p3 parking setting
+            pm.ParkingLines = parkingCurves;
+            pm.Obstacles = obstacles;
+            pm.Boundary = plot.Boundary;
+            pm.Distance = lineDistance;
+            pm.CoreDepth = coreDepth;
+            pm.AddBack = true;
+
+            ParkingLotOnEarth parkingLotOnEarth = pm.GetParking();
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
+            #endregion
+
 
             List<Curve> aptLines = new List<Curve>();
             aptLines.Add(midlineCurve);
@@ -1466,533 +1483,6 @@ namespace TuringAndCorbusier
             buildingOutlinesB.Add(new Polyline(buildingPoints).ToNurbsCurve());
             buildingOutlines.Add(buildingOutlinesB);
             return buildingOutlines;
-        }
-
-        //new parking
-        private ParkingLotOnEarth GetParking(List<Line> parkingLines,Plot plot, List<List<Core>> cpss,double distance,double coreDepth)
-        {
-         
-            //pattern3 한정.. ㅅㅂ
-            double apartDistance = distance;
-            ParkingLotOnEarth parkingLot;
-            //parking start line == core start line
-            List<Curve> parkingStartLine = parkingLines.Select(n => n.ToNurbsCurve() as Curve).ToList();
-            if (parkingStartLine.Count != 0)
-            {
-                Vector3d setBack = parkingStartLine[0].TangentAtStart;
-                setBack.Rotate(-Math.PI / 2, Vector3d.ZAxis);
-                parkingStartLine.ForEach(n => n.Translate(setBack * coreDepth / 2));
-
-                //parking
-                ParkingMaster pm = new ParkingMaster(plot.Boundary, parkingStartLine, apartDistance, coreDepth,true);
-
-                //pattern3한정
-                pm.AddBack();
-
-                pm.CalculateParkingScore();
-
-                //check core collision
-                List<Curve> firstFloorCores = cpss[0].Select(n => n.DrawOutline(5000)).ToList();
-                for (int i = 0; i < firstFloorCores.Count; i++)
-                {
-                    firstFloorCores[i].Translate(cpss[0][i].YDirection * (cpss[0][i].CoreType.GetDepth() - 5000) / 2);
-                }
-                List<Curve> parkable = new List<Curve>();
-                foreach (Curve park in pm.parkingCells)
-                {
-                    bool collision = false;
-                    foreach (Curve core in firstFloorCores)
-                    {
-                        //collision 생기거나
-                        if (Curve.PlanarCurveCollision(park, core, Plane.WorldXY, 0))
-                        {
-                            collision = true;
-                            break;
-                        }
-                        //내포,외포 하거나
-                        else if (Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.AInsideB || Curve.PlanarClosedCurveRelationship(park, core, Plane.WorldXY, 0) == RegionContainment.BInsideA)
-                        {
-                            collision = true;
-                            break;
-                        }
-                    }
-
-                    if (!collision)
-                        parkable.Add(park);
-                }
-
-                List<ParkingLine> pls = new List<ParkingLine>();
-                if (pm.parkingCells != null)
-                    pls = parkable.Select(n => new ParkingLine(n)).ToList();
-
-                parkingLot = new ParkingLotOnEarth(new List<List<ParkingLine>>() { pls });
-            }
-            else
-            {
-                parkingLot = new ParkingLotOnEarth();
-            }
-
-            return parkingLot;
-
-        }
-        private List<ParkingLine> parkingLotMaker(List<List<Core>> core, ParameterSet parameterSet, Curve plotCurve)
-        {
-            //////////////////
-            List<Point3d> coreOri = new List<Point3d>();
-            List<Vector3d> coreVecX = new List<Vector3d>();
-            List<Vector3d> coreVecY = new List<Vector3d>();
-            for (int i = 0; i < core.Count; i++)
-            {
-                for (int j = 0; j < core[i].Count; j++)
-                {
-                    coreOri.Add(core[i][j].Origin);
-                    coreVecX.Add(core[i][j].XDirection);
-                    coreVecY.Add(core[i][j].YDirection);
-                }
-            }
-
-            List<Rectangle3d> coreShape = new List<Rectangle3d>();
-            for (int i = 0; i < coreOri.Count; i++)
-            {
-                Point3d end = new Point3d(coreOri[i]);
-                Plane cor = new Plane(end, coreVecX[i], coreVecY[i]);
-                coreShape.Add(new Rectangle3d(cor, parameterSet.CoreType.GetDepth(), parameterSet.CoreType.GetWidth()));
-                //coreOri.Add(end);
-            }
-            ///////////////////
-            Line firstLine;
-            List<double> distance = new List<double>();
-
-
-            if (coreOri.Count() == 4)
-            {
-                Point3d firstPoint = new Point3d(coreOri[0]);
-                firstPoint.Transform(Transform.Translation(coreVecY[0] * parameterSet.CoreType.GetWidth()));
-
-                Point3d secondPoint = new Point3d(firstPoint);
-                secondPoint.Transform(Transform.Translation(coreVecX[0] * parameterSet.CoreType.GetDepth() * 10));
-                Point3d thirdPoint = new Point3d(coreOri[2]);
-
-                firstLine = new Line(firstPoint, secondPoint);
-
-                Point3d tempDistPoint = firstLine.ClosestPoint(thirdPoint, true);
-                distance.Add(tempDistPoint.DistanceTo(thirdPoint));
-            }
-            else if (coreOri.Count() == 2)
-            {
-                Point3d firstPoint = new Point3d(coreOri[0]);
-                firstPoint.Transform(Transform.Translation(coreVecY[0] * parameterSet.CoreType.GetWidth()));
-
-                Point3d secondPoint = new Point3d(firstPoint);
-                secondPoint.Transform(Transform.Translation(coreVecX[0] * parameterSet.CoreType.GetDepth() * 10));
-                Point3d thirdPoint = new Point3d(coreOri[1]);
-
-                Vector3d tempVector = new Vector3d(coreOri[1] - coreOri[0]);
-                double theta = Vector3d.VectorAngle(tempVector, coreVecY[0]);
-
-                double tempFactor = tempVector.Length * Math.Cos(theta) - 2 * parameterSet.CoreType.GetWidth();
-
-
-                firstLine = new Line(firstPoint, secondPoint);
-
-                Point3d tempDistPoint = firstLine.ClosestPoint(thirdPoint, true);
-                distance.Add(tempDistPoint.DistanceTo(thirdPoint));
-
-                if (tempFactor <= 3000)
-                {
-                    return new List<ParkingLine>();
-                }
-            }
-            else
-            {
-                return new List<ParkingLine>();
-            }
-
-
-
-            Vector3d directionVector1 = new Vector3d(firstLine.PointAt(1) - firstLine.PointAt(0));
-            Vector3d directionVector2 = new Vector3d(firstLine.PointAt(0) - coreOri[0]);
-
-            if (Vector3d.CrossProduct(directionVector1, directionVector2).Z < 0)
-            {
-                firstLine = new Line(firstLine.PointAt(1), firstLine.PointAt(0));
-            }
-
-            List<double> parkingLotOffset = new List<double>();
-            parkingLotOffset.Add(0);
-            List<int> parkingLotType = new List<int>();
-            parkingLotType.Add(0);
-
-            bool currentEncounterRoad = false;
-            int currentDistanceNum = 0;
-
-            int loopChecker = 0;
-
-            while (currentDistanceNum < distance.Count())
-            {
-                loopChecker += 1;
-                double lastOffset = parkingLotOffset[parkingLotOffset.Count() - 1];
-                double l = distance[currentDistanceNum] - lastOffset - parameterSet.CoreType.GetWidth();
-
-                if (distance[currentDistanceNum] - lastOffset < 5000)
-                {
-                    currentDistanceNum = currentDistanceNum + 1;
-                }
-                else
-                {
-                    if (currentEncounterRoad == false)
-                    {
-                        if (l > 17000)
-                        {
-                            parkingLotOffset.Add(lastOffset + 11000);
-                            parkingLotType.Add(0);
-                            currentEncounterRoad = true;
-                        }
-                        else if (l > 14000)
-                        {
-                            parkingLotOffset.Add(lastOffset + 8000);
-                            parkingLotType.Add(1);
-                            currentEncounterRoad = true;
-                        }
-                        else
-                        {
-                            if (l + parameterSet.CoreType.GetWidth() > 16000)
-                            {
-                                parkingLotOffset.Add(distance[currentDistanceNum] - 5000);
-                                parkingLotOffset.Add(distance[currentDistanceNum]);
-                                parkingLotType.Add(0);
-                                parkingLotType.Add(0);
-                                currentEncounterRoad = false;
-                            }
-                            else
-                            {
-                                if (l > 3000)
-                                {
-                                    parkingLotOffset.Add(lastOffset + 11000);
-                                    parkingLotOffset.Add(lastOffset + 16000);
-                                    parkingLotType.Add(0);
-                                    parkingLotType.Add(0);
-                                    currentEncounterRoad = false;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (l > 8000)
-                        {
-                            parkingLotOffset.Add(lastOffset + 5000);
-                            parkingLotType.Add(0);
-                            currentEncounterRoad = false;
-                        }
-                        else if (l > 6000)
-                        {
-                            parkingLotOffset.Add(lastOffset + 11000);
-                            parkingLotType.Add(0);
-                            currentEncounterRoad = true;
-                        }
-                    }
-
-                    lastOffset = parkingLotOffset[parkingLotOffset.Count() - 1];
-
-                    if (lastOffset > distance[currentDistanceNum])
-                    {
-                        currentDistanceNum = currentDistanceNum + 1;
-                    }
-                }
-            }
-
-            List<Curve> parkingLotBase = new List<Curve>();
-            Curve firstCurve = firstLine.ToNurbsCurve();
-
-            foreach (double i in parkingLotOffset)
-            {
-                if (i == 0)
-                {
-                    parkingLotBase.Add(firstCurve);
-                }
-                else
-                {
-                    parkingLotBase.Add(firstCurve.Offset(Plane.WorldXY, -i, 0, CurveOffsetCornerStyle.None)[0]);
-                }
-            }
-
-            //20160114 추가분 시작부분 추가
-
-            Curve firstParkingLotBaseCurve = parkingLotBase[0];
-            Curve lastParkingLotBaseCurve = parkingLotBase[parkingLotBase.Count() - 1];
-
-            double[] firstCurveOffsetDistance = { 16000, 22000 };
-            List<Brep> offsettedFirstBase = new List<Brep>();
-
-            foreach (double i in firstCurveOffsetDistance)
-            {
-                Curve tempCurve = firstParkingLotBaseCurve.Offset(Plane.WorldXY, i, 0, CurveOffsetCornerStyle.None)[0];
-                Curve secondCurve = firstParkingLotBaseCurve.Offset(Plane.WorldXY, 50000, 0, CurveOffsetCornerStyle.None)[0];
-
-                Curve[] tempLoftBase = { tempCurve, secondCurve };
-
-                offsettedFirstBase.Add(Brep.CreateFromLoft(tempLoftBase, Point3d.Unset, Point3d.Unset, LoftType.Straight, false)[0]);
-            }
-
-            List<double> intersectLength = new List<double>();
-
-            foreach (Brep i in offsettedFirstBase)
-            {
-                Curve[] tempOutCurves;
-                Point3d[] tempOutPts;
-
-                Rhino.Geometry.Intersect.Intersection.CurveBrep(plotCurve, i, 0.1, out tempOutCurves, out tempOutPts);
-
-                double tempOutput = 0;
-
-                foreach (Curve j in tempOutCurves)
-                {
-                    tempOutput = tempOutput + j.GetLength();
-                }
-
-                intersectLength.Add(tempOutput);
-            }
-
-            int selectNth_First = 0;
-
-            for (int i = 1; i < intersectLength.Count(); i++)
-            {
-                if (intersectLength[i] / intersectLength[0] > 0.5)
-                {
-                    selectNth_First += 1;
-                }
-            }
-
-            if (selectNth_First == 0)
-            {
-                parkingLotBase.Add(firstParkingLotBaseCurve.Offset(Plane.WorldXY, 11000, 0, CurveOffsetCornerStyle.None)[0]);
-                parkingLotType.Add(0);
-            }
-            else if (selectNth_First == 1)
-            {
-                parkingLotBase.Add(firstParkingLotBaseCurve.Offset(Plane.WorldXY, 5000, 0, CurveOffsetCornerStyle.None)[0]);
-                parkingLotType.Add(0);
-                parkingLotBase.Add(firstParkingLotBaseCurve.Offset(Plane.WorldXY, 16000, 0, CurveOffsetCornerStyle.None)[0]);
-                parkingLotType.Add(0);
-            }
-
-
-            //20160115 추가분 끝부분 추가
-
-            parkingLotBase.Add(lastParkingLotBaseCurve.Offset(Plane.WorldXY, -11000, 0, CurveOffsetCornerStyle.None)[0]);
-            parkingLotType.Add(0);
-
-            //기준선으로부터 쓸 수 있는 선 추출
-
-            List<Rectangle3d> unnestedCoreList = new List<Rectangle3d>(coreShape);
-
-            List<Curve> extendedCore = new List<Curve>();
-
-            foreach (Rectangle3d i in unnestedCoreList)
-            {
-                Plane tempPlane = new Plane((i.PointAt(0) + i.PointAt(2)) / 2, (i.PointAt(1) + i.PointAt(2)) / 2, (i.PointAt(3) + i.PointAt(2) / 2));
-                double tempScaleFactor = (parameterSet.CoreType.GetDepth() / 2 + 5200) / (parameterSet.CoreType.GetDepth() / 2);
-                i.Transform(Transform.Scale(tempPlane, 1, tempScaleFactor, 1));
-                extendedCore.Add(i.ToNurbsCurve());
-            }
-
-            List<List<Curve>> parkingLotCurves = new List<List<Curve>>();
-
-            for (int i = 0; i < parkingLotBase.Count; i++)
-            {
-                double tempExtend = (new Vector3d(plotCurve.GetBoundingBox(true).Max - plotCurve.GetBoundingBox(true).Min)).Length;
-
-                Curve tempExtendedCurve = parkingLotBase[i].Extend(CurveEnd.Both, tempExtend, CurveExtensionStyle.Line);
-
-                List<double> splitterSet = SplitWithRegions(tempExtendedCurve, extendedCore);
-
-                var tempIntersection = Rhino.Geometry.Intersect.Intersection.CurveCurve(tempExtendedCurve, plotCurve, 0.1, 0.1);
-
-                for (int j = 0; j < tempIntersection.Count(); j++)
-                {
-                    splitterSet.Add(tempIntersection[j].ParameterA);
-                }
-
-                Curve[] tempShatteredCurve = tempExtendedCurve.Split(splitterSet);
-
-                List<Curve> tempUsableCurve = new List<Curve>();
-
-                for (int j = 0; j < tempShatteredCurve.Length; j++)
-                {
-                    if (j % 2 == 1)
-                    {
-                        tempUsableCurve.Add(tempShatteredCurve[j]);
-                    }
-                }
-
-                parkingLotCurves.Add(tempUsableCurve);
-            }
-
-            //쓸 수 있는 선 2 (5000mm 이상으로 그릴 수 있는 2300mm이상길이의 선분 추출)
-
-            List<List<Curve>> usableParkingLotCurve = new List<List<Curve>>();
-
-            List<Point3d> testTest = new List<Point3d>();
-
-            for (int i = 0; i < parkingLotCurves.Count(); i++)
-            {
-                List<Curve> tempCurveSet = parkingLotCurves[i];
-
-                List<Curve> tempUsableParts = new List<Curve>();
-
-                foreach (Curve j in tempCurveSet)
-                {
-                    double tempOffsetDistance = 0;
-
-                    if (parkingLotType[i] == 0)
-                        tempOffsetDistance = 5000;
-                    else
-                        tempOffsetDistance = 2000;
-
-                    Curve[] tempLoftCurves = { j, j.Offset(Plane.WorldXY, tempOffsetDistance, 0, CurveOffsetCornerStyle.None)[0] };
-
-                    Brep tempBrep = Brep.CreateFromLoft(tempLoftCurves, Point3d.Unset, Point3d.Unset, LoftType.Straight, false)[0];
-
-                    Curve[] tempOutCurve;
-                    Point3d[] tempOutPoint;
-
-                    Rhino.Geometry.Intersect.Intersection.CurveBrep(plotCurve, tempBrep, 0.1, out tempOutCurve, out tempOutPoint);
-
-                    List<double> tempSplitDomain = new List<double>();
-
-                    foreach (Curve k in tempOutCurve)
-                    {
-                        List<double> divideDomain = new List<double>();
-                        List<Point3d> dividePts = new List<Point3d>();
-
-                        Polyline tempPLine;
-                        k.TryGetPolyline(out tempPLine);
-                        Line[] tempSegments = tempPLine.GetSegments();
-
-                        for (int l = 0; l < tempSegments.Length; l++)
-                        {
-                            for (double m = 0; m < 1; m += 2000 / tempSegments[l].Length)
-                            {
-                                dividePts.Add(tempSegments[l].PointAt(m));
-                            }
-                        }
-
-                        dividePts.Add(k.PointAt(k.Domain.T1));
-
-                        foreach (Point3d l in dividePts)
-                        {
-                            double tempSplitDomainContent = 0;
-
-                            j.ClosestPoint(l, out tempSplitDomainContent);
-
-                            tempSplitDomain.Add(tempSplitDomainContent);
-                        }
-
-                        foreach (Point3d l in dividePts)
-                        {
-                            testTest.Add(l);
-                        }
-                    }
-
-                    Curve[] tempShatteredCurve = j.Split(tempSplitDomain);
-
-                    double tempMinimumLength = 0;
-
-                    if (parkingLotType[i] == 0)
-                        tempMinimumLength = 2300;
-                    else
-                        tempMinimumLength = 6000;
-
-                    foreach (Curve k in tempShatteredCurve)
-                    {
-                        if (k.GetLength() > tempMinimumLength)
-                            tempUsableParts.Add(k);
-                    }
-                }
-
-                usableParkingLotCurve.Add(tempUsableParts);
-            }
-
-
-            // 주차창 생성
-
-            List<Rectangle3d> parkingLots = new List<Rectangle3d>();
-
-            for (int h = 0; h < usableParkingLotCurve.Count(); h++)
-            {
-                List<Curve> tempCurve = usableParkingLotCurve[h];
-
-                if (parkingLotType[h] == 0)
-                {
-                    foreach (Curve i in tempCurve)
-                    {
-                        Vector3d tempVector = new Vector3d(i.PointAt(i.Domain.T0) - i.PointAt(i.Domain.T1));
-                        Vector3d tempCopyVector = new Vector3d(tempVector);
-                        tempCopyVector.Transform(Transform.Rotation(Math.PI / 2, new Point3d(0, 0, 0)));
-
-                        int tempCount = (int)(i.GetLength() - i.GetLength() % 2300) / 2300;
-
-                        for (int j = 0; j < tempCount; j++)
-                        {
-                            double tempBaseParameter;
-                            i.LengthParameter(2300 * j, out tempBaseParameter);
-
-                            Point3d tempBasePoint = i.PointAt(tempBaseParameter);
-                            Plane tempPlane = new Plane(tempBasePoint, tempVector, tempCopyVector);
-
-                            Rectangle3d myRect = new Rectangle3d(tempPlane, -2300, 5000);
-
-                            parkingLots.Add(myRect);
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (Curve i in tempCurve)
-                    {
-                        Vector3d tempVector = new Vector3d(i.PointAt(i.Domain.T0) - i.PointAt(i.Domain.T1));
-                        Vector3d tempCopyVector = new Vector3d(tempVector);
-                        tempCopyVector.Transform(Transform.Rotation(Math.PI / 2, new Point3d(0, 0, 0)));
-
-                        int tempCount = (int)(i.GetLength() - i.GetLength() % 6000) / 6000;
-
-                        for (int j = 0; j < tempCount; j++)
-                        {
-                            double tempBaseParameter;
-                            i.LengthParameter(6000 * j, out tempBaseParameter);
-
-                            Point3d tempBasePoint = i.PointAt(tempBaseParameter);
-                            Plane tempPlane = new Plane(tempBasePoint, tempVector, tempCopyVector);
-
-                            Rectangle3d myRect = new Rectangle3d(tempPlane, -6000, 2000);
-
-                            parkingLots.Add(myRect);
-                        }
-                    }
-                }
-            }
-
-            List<ParkingLine> parkingLotsOut = new List<ParkingLine>();
-
-            for (int i = 0; i < parkingLots.Count; i++)
-            {
-                parkingLotsOut.Add(new ParkingLine(parkingLots[i]));
-            }
-
-            return parkingLotsOut;
-        }
-        public List<double> SplitWithRegions(Curve target, List<Curve> cutter)
-        {
-            List<double> intersectParam = new List<double>();
-            foreach (Curve i in cutter)
-            {
-                var tempIntersection = Rhino.Geometry.Intersect.Intersection.CurveCurve(target, i, 0.1, 0.1);
-                foreach (Rhino.Geometry.Intersect.IntersectionEvent j in tempIntersection)
-                    intersectParam.Add(j.ParameterA);
-            }
-
-            return intersectParam;
         }
     }
 }

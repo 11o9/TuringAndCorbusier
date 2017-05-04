@@ -94,6 +94,10 @@ namespace TuringAndCorbusier
                     else
                     {
                         double parameterForGene = (tempMaxInput[j] - tempMinInput[j]) * myRandom.NextDouble() + tempMinInput[j];
+
+                        //width - 100씩
+                        if (j == 2)
+                            parameterForGene = Math.Round(parameterForGene / 100) * 100;
                         oneGene[j] = parameterForGene;
                     }
 
@@ -550,6 +554,9 @@ namespace TuringAndCorbusier
                 mutatedParameter = Math.Min(ag.MaxInput[i], mutatedParameter);
                 if(i <= 1)
                     mutatedParameter = Math.Floor(mutatedParameter);
+                //width - 100 씩
+                if (i == 2)
+                    mutatedParameter = Math.Round(mutatedParameter / 100) * 100;
                 newGene.Add(mutatedParameter);
                 
             }
