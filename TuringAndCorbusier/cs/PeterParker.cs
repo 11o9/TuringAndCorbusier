@@ -146,8 +146,6 @@ namespace TuringAndCorbusier
 
     public class ParkingResultContainer
     {
-
-
         ParkingLineType lineType;
         Curve Boundary;
         List<Curve> aptLines;
@@ -278,7 +276,7 @@ namespace TuringAndCorbusier
                 result.AddRange(parkingResult.GetCurves(origins[i]));
                 partitions.AddRange(parkingResult.GetParkingLines(origins[i]));
             }
-
+           
             var widths = parkingResult.widths();
             var heights = parkingResult.heights();
 

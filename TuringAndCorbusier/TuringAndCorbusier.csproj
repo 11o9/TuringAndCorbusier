@@ -140,6 +140,22 @@
     <Compile Include="Reports\xmlUnitReport.xaml.cs">
       <DependentUpon>xmlUnitReport.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utility\CCXTools.cs" />
+    <Compile Include="Utility\CurveTools.cs" />
+    <Compile Include="Utility\DoubleTools.cs" />
+    <Compile Include="Utility\DrawingTools.cs" />
+    <Compile Include="Utility\Extended\CurveExt.cs" />
+    <Compile Include="Utility\Extended\EtcExt.cs" />
+    <Compile Include="Utility\Extended\PolylineExt.cs" />
+    <Compile Include="Utility\IsoDrawer\InitialPointFinder.cs" />
+    <Compile Include="Utility\IsoDrawer\InnerIsoDrawer.cs" />
+    <Compile Include="Utility\IsoDrawer\InnerIsoDrawerDS.cs" />
+    <Compile Include="Utility\PCXTools.cs" />
+    <Compile Include="Utility\PointTools.cs" />
+    <Compile Include="Utility\PolylineTools.cs" />
+    <Compile Include="Utility\RectangleTools.cs" />
+    <Compile Include="Utility\VectorSet.cs" />
+    <Compile Include="Utility\VectorTools.cs" />
     <Compile Include="xaml\Corbusier.xaml.cs">
       <DependentUpon>Corbusier.xaml</DependentUpon>
     </Compile>
