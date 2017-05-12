@@ -494,16 +494,25 @@ namespace TuringAndCorbusier
             pm.CoreDepth = coreDepth;
             pm.AddFront = true;
 
+            //한줄짜리일때 주차 변형
+            if (aptLines.Count == 1)
+            {
+                pm.UseInnerLoop = false;
+                pm.LineType = ParkingLineType.SingleOneline;
+            }
             //get parking
             ParkingLotOnEarth parkingLot = pm.GetParking();
 
-
-            //line distance
-            ParkingLotUnderGround parkingLotUnderGroud = new ParkingLotUnderGround();
             #endregion
 
+
+            //finalize
+            Apartment result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, new ParkingLotUnderGround(), new List<List<Curve>>(), aptLines);
+            Finalizer finalizer = new Finalizer(result);
+            result = finalizer.Finilize();
+            //ParkingDistributor.Distribute(ref result);
             //하아..
-            var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
+            //var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
             result.BuildingGroupCount = buildingnum;
             result.topReg = wholeRegulationHigh;
             return result;

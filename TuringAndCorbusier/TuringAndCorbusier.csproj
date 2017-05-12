@@ -94,6 +94,7 @@
     <Compile Include="cs\DataManager.cs" />
     <Compile Include="cs\Egg.cs" />
     <Compile Include="cs\FinalizeApartmentGeneratorOutput.cs" />
+    <Compile Include="cs\Finalizer.cs" />
     <Compile Include="cs\KDG.cs" />
     <Compile Include="cs\LoadManager.cs" />
     <Compile Include="cs\ParkingLineMaker.cs" />

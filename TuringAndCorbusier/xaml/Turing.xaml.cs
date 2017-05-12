@@ -159,7 +159,7 @@ namespace TuringAndCorbusier
 
             List<Curve> tempCurves = MainPanel_AGOutputList[stackPanel.Children.IndexOf(sender as System.Windows.Controls.Button)].drawEachHouse();
             tempCurves.AddRange(MainPanel_AGOutputList[stackPanel.Children.IndexOf(sender as System.Windows.Controls.Button)].drawEachCore());
-
+            
             List<NurbsCurve> tempParkingLot = new List<NurbsCurve>();
 
             for(int i = 0; i < MainPanel_AGOutputList[tempIndex].ParkingLotOnEarth.ParkingLines.Count(); i++)
@@ -169,6 +169,9 @@ namespace TuringAndCorbusier
                     tempParkingLot.Add(MainPanel_AGOutputList[tempIndex].ParkingLotOnEarth.ParkingLines[i][j].Boundary.ToNurbsCurve());
                 }
             }
+
+            if(MainPanel_AGOutputList[tempIndex].ParkingLotUnderGround.Ramp != null)
+                tempParkingLot.Add(MainPanel_AGOutputList[tempIndex].ParkingLotUnderGround.Ramp.ToNurbsCurve());
 
             Curve[] tempParkingLotArr = Curve.JoinCurves(tempParkingLot);
 

@@ -14,7 +14,8 @@ namespace TuringAndCorbusier
         Default = 0,
         SingleLine,
         DoubleLine,
-        PerpOnly
+        PerpOnly,
+        SingleOneline
     }
 
     /// <summary>
@@ -454,6 +455,9 @@ namespace TuringAndCorbusier
                 case ParkingLineType.SingleLine:
                     parkingTypeSelected = new double[] { 0, 2, 4, 6 }.Select(n => (ParkingType)n).ToList();
                     break;
+                case ParkingLineType.SingleOneline:
+                    parkingTypeSelected = new double[] { 0, 2, 4, 6 }.Select(n => (ParkingType)n).ToList();
+                    break;
                 default:
                     break;
             }
@@ -465,7 +469,7 @@ namespace TuringAndCorbusier
                 PeterParker current = wait.Dequeue();
                 for (int i = 0; i < (int)ParkingType.Max; i++)
                 {
-                    if(lineType == ParkingLineType.Default)
+                    if(lineType == ParkingLineType.Default || lineType == ParkingLineType.SingleOneline)
                         if ((current.LeftLength() == current.totalLength) && coreDepth > new Parking((ParkingType)i).height)
                             continue;
 

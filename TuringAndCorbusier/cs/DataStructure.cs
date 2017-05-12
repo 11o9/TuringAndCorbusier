@@ -706,12 +706,27 @@ namespace TuringAndCorbusier
             this.Green = Green;
             this.buildingOutline = buildingOutline;
             this.AptLines = aptLines;
+        }
 
+        public Apartment(Apartment other)
+        {
+            ///////복사
 
-
-
-
-
+            this.AGtype = other.AGtype;
+            this.Plot = other.Plot;
+            this.BuildingType = other.BuildingType;
+            this.ParameterSet = other.ParameterSet;
+            this.Target = other.Target;
+            this.Core = other.Core;
+            this.Household = other.Household;
+            this.HouseholdStatistics = getHouseholdStatistics(other.Household);
+            this.Commercial = other.Commercial;
+            this.PublicFacility = other.PublicFacility;
+            this.ParkingLotOnEarth = other.ParkingLotOnEarth;
+            this.ParkingLotUnderGround = other.ParkingLotUnderGround;
+            this.Green = other.Green;
+            this.buildingOutline = other.buildingOutline;
+            this.AptLines = other.AptLines;
         }
 
         public double GetTargetAccuracy()
@@ -2668,7 +2683,7 @@ namespace TuringAndCorbusier
         }
 
         //프로퍼티
-
+        public Curve Ramp { get; set; }
         public int Count { get; private set; }
         public double ParkingArea { get; private set; }
         public int Floors { get; private set; }
