@@ -103,6 +103,75 @@ namespace TuringAndCorbusier
         enum RampScale
         { Under50 = 0, Over50 = 1 }
 
+        //ramp와 겹치는 지상 주차 제거
+
+        //지상주차수 체크
+
+        //목표주차 미달?
+
+        //지하주차 추가
+
+        // 지하주차 규모 체크
+
+        // 지하주차 규모 초과?
+        //새 램프
+        // 지하주차 규모 충분
+        //끝
+
+        //목표주차 충분
+
+        //끝
+
+            //something changed = true
+        public bool OverlapCheck(ref Apartment apt)
+        {
+            ParkingLotOnEarth gp = apt.ParkingLotOnEarth;
+            ParkingLotUnderGround ugp = apt.ParkingLotUnderGround;
+
+            if (gp.ParkingLines.Count <= 0)
+                return false;
+
+            Curve ramp = ugp.Ramp;
+            Stack<int> removeIndex = new Stack<int>();
+            for (int i = 0; i < gp.ParkingLines[0].Count; i++)
+            {
+                var pccr = Curve.PlanarClosedCurveRelationship(ramp, gp.ParkingLines[0][i].Boundary.ToNurbsCurve(), Plane.WorldXY, 0);
+                if (pccr != RegionContainment.Disjoint)
+                {
+                    removeIndex.Push(i);
+                }
+            }
+
+            int overlapCount = removeIndex.Count;
+
+            while (removeIndex.Count > 0)
+            {
+                int index = removeIndex.Pop();
+                apt.ParkingLotOnEarth.ParkingLines[0].RemoveAt(index);
+            }
+
+
+            if (ugp.Count + overlapCount > 50 && ugp.Count <= 50)
+            {
+                //지하 50대 미만이었다가 초과하게되면? 다시생성
+                this.require = ugp.Count + overlapCount;
+                Calculate();
+                apt.ParkingLotUnderGround = new ParkingLotUnderGround((int)eachFloorParkingCount * floors, eachFloorArea * floors, floors);
+                return true;
+            }
+
+            else
+            {
+                //그밖의경우
+                this.require = ugp.Count + overlapCount;
+                Calculate();
+                apt.ParkingLotUnderGround = new ParkingLotUnderGround((int)eachFloorParkingCount * floors, eachFloorArea * floors, floors);
+                apt.ParkingLotUnderGround.Ramp = ramp;
+                return false;
+            }
+
+        }
+
         public Curve DrawRamp(Plot plot, Vector3d lineAxis, List<Curve> obstacles)
         {
             //규모 판별 - 50 이상? 미만? 너비 3.3 or 6.5 , 내반경 5 or 6

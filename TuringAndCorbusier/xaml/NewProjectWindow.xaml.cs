@@ -612,6 +612,8 @@ namespace TuringAndCorbusier
             if (TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.boundary.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.CounterClockwise)
                 TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.boundary.Reverse();
 
+
+
             Curve[] boundarysegs = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.boundary.DuplicateSegments();
 
      
@@ -672,6 +674,7 @@ namespace TuringAndCorbusier
             Corbusier.conduitLineDisplay.Enabled = false;
             TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings = Corbusier.conduitLines.Select(n => n.RoadWidth * 1000).ToArray();      //    .RoadWidth.Select(n=>n*1000).ToArray();
             TuringAndCorbusierPlugIn.InstanceClass.plot.UpdateSimplifiedSurroundings();
+            //TuringAndCorbusierPlugIn.InstanceClass.plot.Adjust();
             UIManager.getInstance().SnapSetter(UIManager.SnapMode.Current);
             ButtonStateCheck(ButtonState.None);
             RhinoDoc.ActiveDoc.Views.Redraw();

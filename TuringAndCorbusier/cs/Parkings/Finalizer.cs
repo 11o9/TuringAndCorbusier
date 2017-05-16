@@ -93,9 +93,26 @@ namespace TuringAndCorbusier
                             if (ramp == null)
                                 return Reduce();
 
+                           
                             apt.ParkingLotUnderGround = new ParkingLotUnderGround((int)ugpm.EachFloorParkingCount * ugpm.Floors, ugpm.EachFloorArea * ugpm.Floors, ugpm.Floors);
                             apt.ParkingLotUnderGround.Ramp = ramp;
-                            return apt;//with new ugp
+
+                            //overlap check & replace parkings (ref)
+                            while (true)
+                            {
+                                bool overlapResult = ugpm.OverlapCheck(ref apt);
+                                if (overlapResult)
+                                {
+                                    ramp = ugpm.DrawRamp(apt.Plot, aptdir, obstacles);
+                                    apt.ParkingLotUnderGround.Ramp = ramp;
+                                    //something changed
+                                    //re finalize
+                                }
+                                else
+                                {
+                                    return apt;//with new ugp
+                                }
+                            }
                         }
                         else
                         {

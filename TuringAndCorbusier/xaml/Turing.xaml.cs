@@ -590,11 +590,11 @@ namespace TuringAndCorbusier
               
 
                     Reports.wpfSection testSectionPage = new Reports.wpfSection();
-                    DrawSection drawsection = new DrawSection(MainPanel_AGOutputList[tempIndex]);
+                    //DrawSection drawsection = new DrawSection(MainPanel_AGOutputList[tempIndex]);
 
                 try
                 {
-                    testSectionPage.setPlan(drawsection.Draw());
+                    //testSectionPage.setPlan(drawsection.Draw());
                     fps.Add(testSectionPage.fixedPage);
                     pagename.Add("sectionPage");
                 }

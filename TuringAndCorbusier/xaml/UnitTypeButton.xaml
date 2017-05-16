@@ -28,7 +28,7 @@
         <TextBox x:Name="mandatory_Input" Margin="372,15,90,15" TextChanged="mandatory_Input_TextChanged"/>
         <TextBlock x:Name="percentage" Text="비율" Margin="366,13,10,2" FontSize="15" TextAlignment="Left" Visibility="Hidden"/>
         <TextBlock Text="비율" FontSize="15" Margin="180,13,242,12" Visibility="Hidden"></TextBlock>
-        <TextBox x:Name="Input" Text="" FontSize="15" Margin="248,13,174,12" TextChanged="Input_TextChanged" Visibility="Hidden"></TextBox>
+        <TextBox x:Name="Input" Text="" FontSize="15" Margin="418,14,59,11" TextChanged="Input_TextChanged"/>
 
     </Grid>
 </UserControl>

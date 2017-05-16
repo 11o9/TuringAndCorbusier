@@ -85,6 +85,8 @@ namespace TuringAndCorbusier
         public List<Point3d> simplifiedBoundary;
         public int[] simplifiedSurroundings;
         public List<List<Point3d>> layout;
+        public List<Point3d> originalBoundary;
+        public double[] originalSurroundings;
 
         public SerializablePlot()
         { }
@@ -118,6 +120,10 @@ namespace TuringAndCorbusier
             plot.SimplifiedBoundary = new Polyline(Closed(simplifiedBoundary)).ToNurbsCurve();
             plot.SimplifiedSurroundings = simplifiedSurroundings;
             plot.layout = layout.Select(n => new LineCurve(n[0], n[1]) as Curve).ToList();
+
+            plot.OriginalBoundary = new Polyline(Closed(originalBoundary)).ToNurbsCurve();
+            if(originalSurroundings!=null)
+            plot.OriginalRoadwidths = originalSurroundings.ToList();
             return plot;
         }
 
