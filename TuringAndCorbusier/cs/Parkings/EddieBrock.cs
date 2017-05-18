@@ -206,6 +206,8 @@ namespace TuringAndCorbusier
                         if (l * offsetTick > roads[i].GetLength())
                             break;
                         Curve tempRamp = DrawLineRamp(roads[i], lineAxis, j, scale,l*offsetTick);
+                        if (tempRamp == null)
+                            continue;
                         bool collCheck = CollisionCheck(tempRamp, obstacles);
                         RegionContainment isInside = Curve.PlanarClosedCurveRelationship(tempRamp, innerBoundary, Plane.WorldXY, 0);
                         if (collCheck && isInside == RegionContainment.AInsideB)
@@ -232,7 +234,8 @@ namespace TuringAndCorbusier
                                 break;
                             double beforeRamp = 10000 - k * 1000;
                             Curve tempRamp = DrawCurvedRamp(roads[i], lineAxis, j, scale, beforeRamp, l*offsetTick);
-
+                            if (tempRamp == null)
+                                continue;
                             bool collCheck = CollisionCheck(tempRamp, obstacles);
                             RegionContainment isInside = Curve.PlanarClosedCurveRelationship(tempRamp, innerBoundary, Plane.WorldXY, 0);
                             if (collCheck && isInside == RegionContainment.AInsideB)
@@ -427,7 +430,12 @@ namespace TuringAndCorbusier
             PolylineCurve plc3 = new PolylineCurve(new Point3d[] { eighth, ninth });
             Curve[] curvesToJoin = new Curve[] { plc1, arc1, plc2, arc2, plc3 };
             //Rhino.RhinoDoc.ActiveDoc.Objects.Add(Curve.JoinCurves(curvesToJoin)[0]);
-            return Curve.JoinCurves(curvesToJoin)[0];
+            var joined = Curve.JoinCurves(curvesToJoin);
+            if (joined.Length > 0)
+                return joined[0];
+            else
+                return null;
+
             //return plc;
         }
 

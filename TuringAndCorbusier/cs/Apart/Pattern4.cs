@@ -1243,6 +1243,9 @@ namespace TuringAndCorbusier
                     oneCore.Origin = oneCore.Origin + Vector3d.ZAxis * tempStoryHeight;
                     oneCore.Stories = i;
 
+                    //임시 면적
+                    oneCore.Area = randomCoreType.GetDepth() * randomCoreType.GetWidth();
+
                     cpB.Add(oneCore);
                 }
                 core.Add(cpB);

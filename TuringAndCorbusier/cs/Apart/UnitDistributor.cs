@@ -579,7 +579,7 @@ namespace TuringAndCorbusier
             return towers / 2 + (int)Math.Ceiling((double)corridors / 8);
         }
 
-        public double ExclusiveAreaSum()
+        public double SupplyAreaSum()
         {
             return Container.Units.Sum(n => n.Area);
         }

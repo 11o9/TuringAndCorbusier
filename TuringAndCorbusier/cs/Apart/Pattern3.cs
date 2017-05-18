@@ -124,6 +124,29 @@ namespace TuringAndCorbusier
             List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, midlinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
 
 
+            //복도면적..?
+
+            double eachfloorCorridorArea = inlineCurve.GetLength() * Consts.corridorWidth - (Consts.corridorWidth * Consts.corridorWidth)*4;
+            double corridorAreaSum = eachfloorCorridorArea * storiesHigh;
+            
+            foreach (var hhh in households)
+            {
+                double tempFloorAreaSum = 0;
+                foreach (var hh in hhh)
+                    foreach (var h in hh)
+                        tempFloorAreaSum += h.ExclusiveArea;
+
+                foreach (var hh in hhh)
+                    foreach (var h in hh)
+                    {
+                        double areaRate = h.ExclusiveArea / tempFloorAreaSum;
+                        h.CorridorArea = eachfloorCorridorArea * areaRate;
+                    }
+            }
+
+
+
+
             //building outlines
             Polyline outlinePolyline;
             outlineCurve.TryGetPolyline(out outlinePolyline);
@@ -244,7 +267,7 @@ namespace TuringAndCorbusier
                 coreXVectors.Add(Vector3d.Multiply(courtX, 1));
                 coreYVectors.Add(Vector3d.Multiply(courtY, -1));
             }
-
+        
             //stack
             List<List<Core>> outputCores = new List<List<Core>>();
 
@@ -258,6 +281,9 @@ namespace TuringAndCorbusier
                     Core oneCore = new Core(coreOrigins[j], coreXVectors[j], coreYVectors[j], randomCoreType, storiesHigh, randomCoreType.GetDepth() - 0);
                     oneCore.Origin = oneCore.Origin + Vector3d.ZAxis * tempStoryHeight;
                     oneCore.Stories = i;
+
+                    //임시 면적
+                    oneCore.Area = coreWidth * coreDepth;
 
                     currentFloorCores.Add(oneCore);
                 }

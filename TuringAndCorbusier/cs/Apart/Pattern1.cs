@@ -533,7 +533,7 @@ namespace TuringAndCorbusier
         //Parameter 최소값 ~ 최대값 {storiesHigh, storiesLow, width, angle, moveFactor}
         private double[] minInput = { 3, 3, 5000, 0, 0 };
         //private double[] minInput = { 6, 6, 10500, 0, 0 };
-        private double[] maxInput = { 6, 6, 10500, 2 * Math.PI, 1 };
+        private double[] maxInput = { 6, 6, 13000, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         private double[] GAparameterset = { 0.1, 0.05, 3, 120, 5, 3, 1 }; //원본
@@ -962,19 +962,22 @@ namespace TuringAndCorbusier
             // 잠깐 코어가 몇개 들어가는지 어떻게 계산하지? 1층 코어를 더해줘야하는디..
 
             double expectedFA = 0;
-
+            double expectedCV = 0;
             foreach (ApartLine line in distributor.aptLines)
             {
                 int coreCount = line.CoreCount(); //맞을지모르겠음
                 double coreOnly = corearea * coreCount;
                 double eachFloor = line.FloorAreaSum();
                 expectedFA += eachFloor * floors + coreOnly;
+
+                double cv = line.SupplyAreaSum();
+                expectedCV += cv;
             }
 
 
             //면적 초과분 (1층코어 + 각 층 면적)  -  기준 면적 (1층코어 + 각 층 면적) = 오차 면적 (각 층 면적 d) / 층수 = d
             //코어개수는 변하지 않으므로.
-            double legalFA = ((TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio*0.99) / 100) * plotArea;
+            double legalFA = ((TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio*0.999) / 100) * plotArea;
 
             if (expectedFA >= legalFA)
             {
@@ -987,6 +990,8 @@ namespace TuringAndCorbusier
                 lengthToReduce /= floors;
                 //length
                 lengthToReduce /= aptWidth;
+                //service
+                lengthToReduce *= Consts.balconyRate_Tower;
 
                 foreach(ApartLine line in distributor.aptLines)
                 {
@@ -994,12 +999,38 @@ namespace TuringAndCorbusier
 
                     lengthToReduce = line.ContractUnit(lengthToReduce);
 
-                    if (lengthToReduce <= 1) //tolerance
+                    if (lengthToReduce <= 0.1) //tolerance
                         break;
                 }
+
+                if (lengthToReduce >=0.1)
+                    lengthToReduce = lengthToReduce;
                  
             }
 
+
+            //건폐율 제한
+            double legalCV = ((TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage * 0.999) / 100) * plotArea;
+            if (expectedCV >= legalCV)
+            {
+                //fordebug
+                double expectedCVR = expectedCV / plotArea;
+                double legalCVR = legalCV / plotArea;
+
+                double lengthToReduce = expectedCV - legalCV;
+                //length
+                lengthToReduce /= aptWidth;
+                foreach (ApartLine line in distributor.aptLines)
+                {
+                    //line 에 lengthToReduce 넣고 뺌
+
+                    lengthToReduce = line.ContractUnit(lengthToReduce);
+
+                    if (lengthToReduce <= 0.1) //tolerance
+                        break;
+                }
+
+            }
             foreach (ApartLine line in distributor.aptLines)
             {
                 //POSITION 먼저 구해야 정렬된 TYPE 값 얻음
