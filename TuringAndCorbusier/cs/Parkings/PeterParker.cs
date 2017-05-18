@@ -384,7 +384,6 @@ namespace TuringAndCorbusier
             return results;
         }
 
-
         public bool IsInside(Curve c, Curve d)
         {
             var endPoints = d.DuplicateSegments().Select(n => n.PointAtStart).ToList();
@@ -402,7 +401,6 @@ namespace TuringAndCorbusier
                 return true;
 
         }
-
 
         //test//
         public List<string> widths()
@@ -450,7 +448,7 @@ namespace TuringAndCorbusier
                     parkingTypeSelected = new double[] { 1, 3, 5, 7}.Select(n => (ParkingType)n).ToList();
                     break;
                 case ParkingLineType.PerpOnly:
-                    parkingTypeSelected = new double[] {6,7}.Select(n => (ParkingType)n).ToList();
+                    parkingTypeSelected = new double[] { 6, 7 }.Select(n => (ParkingType)n).ToList();
                     break;
                 case ParkingLineType.SingleLine:
                     parkingTypeSelected = new double[] { 0, 2, 4, 6 }.Select(n => (ParkingType)n).ToList();

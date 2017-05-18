@@ -10,58 +10,116 @@ namespace TuringAndCorbusier
     {
         public List<ApartLine> aptLines;
         List<Unit> units;
-        double[] unitrates;
+        //double[] unitrates;
         double[] added;
 
-        public UnitDistributor(List<double> aptLineLengths, List<Unit> units, List<double> unitRates)
+        public UnitDistributor(List<double> aptLineLengths, List<Unit> units)
         {
             aptLines = aptLineLengths.Select(n => new ApartLine(n)).ToList();
             this.units = units;
-            added = units.Select(n => 0.0).ToArray();
-            unitrates = unitRates.ToArray();
+            //added = units.Select(n => 0.0).ToArray();
         }
 
-        public void DistributeByRate()
+        public void DistributeUnit()
         {
-            for (int k = 0; k < aptLines.Count; k++)
+
+            int suppliedSum = 0;
+            //각 아파트 라인마다
+            for (int i = 0; i < aptLines.Count; i++)
             {
+
                 while (true)
                 {
-                    double minValue = double.MaxValue;
-                    int minIndex = -1;
-                    for (int i = 0; i < unitrates.Length; i++)
+                    //int selectedUnit = -1;
+                    List<double> expectedValues = new List<double>();
+
+                    //목표 비율 = unit.rate
+                    //현재 비율 = unit.supplied / supplied.Sum
+                    List<double> targetRate = units.Select(n => n.Rate).ToList();
+                    List<double> tempRate = suppliedSum != 0 ?  //공급 0이 아니면
+                        units.Select(n => (double)n.Supplied / suppliedSum).ToList() //유닛별 공급 / 총 공급 으로 비율 계산 
+                        : targetRate.Select(n => (double)0).ToList(); //다 0
+
+                    for (int j = 0; j < units.Count; j++)
                     {
-                        double[] tempPrediction = new double[unitrates.Length];
+                        //[j] 골랐을때 예상 비율 = j 유닛 : supplied + 1 / supplied.Sum +1 , 선택 안한 유닛 : supplied / supplied.Sum + 1
+                        //현재 비율 - 예상 비율 의 절대값의 합이 가장 작은 경우 선택.
+                        List<double> expectedRate = units.Select(n => (double)n.Supplied).ToList();
+                        expectedRate[j] += 1;
 
-                        for (int j = 0; j < tempPrediction.Length; j++)
+                        expectedRate = expectedRate.Select(n => n / (suppliedSum + 1)).ToList();
+
+                        for (int k = 0; k < expectedRate.Count; k++)
                         {
-                            //선택한비율 index와 예측비율값 칸 index 같으면 +1 값 아니면 그대로
-                            tempPrediction[j] = (added[j] + ((j == i) ? 1 : 0)) / (added.Sum() + 1);
-                        }
-                        double[] different = new double[tempPrediction.Length];
-                        for (int j = 0; j < different.Length; j++)
-                        {
-                            different[j] = Math.Abs(tempPrediction[j] - unitrates[j]);
+                            expectedRate[k] = Math.Abs(expectedRate[k] - targetRate[k]);
                         }
 
-                        if (minValue > different.Sum())
-                        {
-                            minValue = different.Sum();
-                            minIndex = i;
-                        }
+                        double distance = expectedRate.Sum();
+                        expectedValues.Add(distance);
+                        //예상값에 추가
                     }
 
+                    //필수 유닛 - unit.required > unit.supplied 인 세대 우선 배분한다.
+                    //필수 유닛 분배 완료 - 모든? 유형에 기회 제공 (면적 가변 유닛으로)
+
+
+                    List<bool> satisfyReq = units.Select(n => n.Required <= n.Supplied ? true : false).ToList();
+                    int minIndex = 0;
+                    double minValue = double.MaxValue;
+                    //필요는 모두 만족
+                    Unit unitToAdd;
+                    var trueOnly = satisfyReq.Where(n => n).ToList();
+                    if (trueOnly.Count == satisfyReq.Count)
+                    {
+                        for (int j = 0; j < expectedValues.Count; j++)
+                        {
+                            //순차적으로 최소값 인덱스 탐색
+                            if (expectedValues[j] < minValue)
+                            {
+                                minIndex = j;
+                                minValue = expectedValues[j];
+                            }
+                        }
+
+                        //가변유닛
+                        unitToAdd = units[minIndex].GetFixed(false);
+                    }
+                    else
+                    //아님
+                    {
+                        for (int j = 0; j < expectedValues.Count; j++)
+                        {
+                            //순차적으로 최소값 & 불충족 인덱스 탐색
+                            if (expectedValues[j] < minValue && !satisfyReq[j])
+                            {
+                                minIndex = j;
+                                minValue = expectedValues[j];
+                            }
+                        }
+
+                        //고정유닛
+                        unitToAdd = units[minIndex].GetFixed(true);
+                    }
+
+                    //units[minIndex] 추가.
+
+
+                    //더이상 공간이 안남을때까지 반복,
+                    //
 
                     //유닛 넣기
                     //성공 - 다음
                     //실패 - 1. 작은면적 들어갈 공간 있음 - 넣음
                     //       2. 작은면적 들어갈 공간 없음 - 끝
-                    if (minIndex == -1)
-                        minIndex = 0;
-                    var result = aptLines[k].Add(units[minIndex]);
+                    //if (minIndex == -1)
+                    //    minIndex = 0;
+
+                    var result = aptLines[i].Add(unitToAdd);
                     if (result)
                     {
-                        added[minIndex]++;
+                        units[minIndex].Supplied++;
+                        suppliedSum++;
+                        //added[minIndex]++;
                         //RhinoApp.WriteLine("{0} index added(by rate), result : {1},{2}", minIndex, added[0], added[1]);
                     }
 
@@ -69,12 +127,14 @@ namespace TuringAndCorbusier
                     {
 
                         bool nothingAdded = true;
-                        for (int i = units.Count - 1; i >= 0; i--)
+                        for (int j = units.Count - 1; j >= 0; j--)
                         {
-                            var addResult = aptLines[k].Add(units[i]);
+                            unitToAdd = units[j].GetFixed(false);
+                            var addResult = aptLines[i].Add(unitToAdd);
                             if (addResult)
                             {
-                                added[i]++;
+                                units[j].Supplied++;
+                                suppliedSum++;
                                 nothingAdded = false;
                                 break;
                             }
@@ -83,26 +143,28 @@ namespace TuringAndCorbusier
                         if (nothingAdded)
                         {
                             //홀수 tower 체크
-                            int towerCount = aptLines[k].Units.GetTypes().Where(n => n == UnitType.Tower).Count();
+                            int towerCount = aptLines[i].Container.GetTypes().Where(n => n == UnitType.Tower).Count();
 
                             //타워가 홀수개 존재하면
                             if (towerCount % 2 != 0)
                             {
-                                int towerindex = aptLines[k].Units.Contains.FindIndex(n => n.Type == UnitType.Tower);
-                                aptLines[k].Units.Contains.RemoveAt(towerindex);
+                                int towerindex = aptLines[i].Container.Units.FindIndex(n => n.Type == UnitType.Tower);
+                                aptLines[i].Container.Units.RemoveAt(towerindex);
 
 
-                                for (int i = units.Count - 1; i >= 0; i--)
+                                for (int j = units.Count - 1; j >= 0; j--)
                                 {
-                                    if (units[i].Type == UnitType.Tower)
+                                    if (units[j].Type == UnitType.Tower)
                                         continue;
 
                                     while (true)
                                     {
-                                        var addResult = aptLines[k].Add(units[i]);
+                                        unitToAdd = units[j].GetFixed(false);
+                                        var addResult = aptLines[i].Add(unitToAdd);
                                         if (addResult)
                                         {
-                                            added[i]++;
+                                            units[j].Supplied++;
+                                            suppliedSum++;
                                             nothingAdded = false;
                                         }
                                         else
@@ -118,6 +180,108 @@ namespace TuringAndCorbusier
                     }
                 }
             }
+
+            aptLines = aptLines;
+        }
+
+        //not used
+        public void DistributeByRate()
+        {
+            //for (int k = 0; k < aptLines.Count; k++)
+            //{
+            //    while (true)
+            //    {
+            //        double minValue = double.MaxValue;
+            //        int minIndex = -1;
+            //        for (int i = 0; i < units.Count; i++)
+            //        {
+            //            double[] tempPrediction = units.Select(n => n.Rate).ToArray();
+
+            //            for (int j = 0; j < tempPrediction.Length; j++)
+            //            {
+            //                //선택한비율 index와 예측비율값 칸 index 같으면 +1 값 아니면 그대로
+            //                tempPrediction[j] = (added[j] + ((j == i) ? 1 : 0)) / (added.Sum() + 1);
+            //            }
+            //            double[] different = new double[tempPrediction.Length];
+            //            for (int j = 0; j < different.Length; j++)
+            //            {
+            //                different[j] = Math.Abs(tempPrediction[j] - units[j].Rate);
+            //            }
+
+            //            if (minValue > different.Sum())
+            //            {
+            //                minValue = different.Sum();
+            //                minIndex = i;
+            //            }
+            //        }
+
+
+            //        //유닛 넣기
+            //        //성공 - 다음
+            //        //실패 - 1. 작은면적 들어갈 공간 있음 - 넣음
+            //        //       2. 작은면적 들어갈 공간 없음 - 끝
+            //        if (minIndex == -1)
+            //            minIndex = 0;
+            //        var result = aptLines[k].Add(units[minIndex]);
+            //        if (result)
+            //        {
+            //            added[minIndex]++;
+            //            //RhinoApp.WriteLine("{0} index added(by rate), result : {1},{2}", minIndex, added[0], added[1]);
+            //        }
+
+            //        else
+            //        {
+
+            //            bool nothingAdded = true;
+            //            for (int i = units.Count - 1; i >= 0; i--)
+            //            {
+            //                var addResult = aptLines[k].Add(units[i]);
+            //                if (addResult)
+            //                {
+            //                    added[i]++;
+            //                    nothingAdded = false;
+            //                    break;
+            //                }
+            //            }
+
+            //            if (nothingAdded)
+            //            {
+            //                //홀수 tower 체크
+            //                int towerCount = aptLines[k].Container.GetTypes().Where(n => n == UnitType.Tower).Count();
+
+            //                //타워가 홀수개 존재하면
+            //                if (towerCount % 2 != 0)
+            //                {
+            //                    int towerindex = aptLines[k].Container.Units.FindIndex(n => n.Type == UnitType.Tower);
+            //                    aptLines[k].Container.Units.RemoveAt(towerindex);
+
+
+            //                    for (int i = units.Count - 1; i >= 0; i--)
+            //                    {
+            //                        if (units[i].Type == UnitType.Tower)
+            //                            continue;
+
+            //                        while (true)
+            //                        {
+            //                            var addResult = aptLines[k].Add(units[i]);
+            //                            if (addResult)
+            //                            {
+            //                                added[i]++;
+            //                                nothingAdded = false;
+            //                            }
+            //                            else
+            //                                break;
+            //                        }
+            //                    }
+
+            //                }
+            //                //RhinoApp.WriteLine("Nothing Added, Finish at {0}", k);
+            //                if (nothingAdded)
+            //                    break;
+            //            }
+            //        }
+            //    }
+            //}
         }
 
     }
@@ -131,55 +295,55 @@ namespace TuringAndCorbusier
 
     class UnitCollection
     {
-        public List<Unit> Contains { get; set; }
+        public List<Unit> Units { get; set; }
         public double Length { get { return GetLengthSum(); } }
         bool sorted = false;
         public UnitCollection()
         {
-            Contains = new List<Unit>();
+            Units = new List<Unit>();
         }
 
         public List<UnitType> GetTypes()
         {
             //SandwichClearanceAppropriately();
-            return Contains.Select(n => n.Type).ToList();
+            return Units.Select(n => n.Type).ToList();
         }
 
         double GetLengthSum()
         {
-            return Contains.Sum(n => n.Length);
+            return Units.Sum(n => n.Length);
         }
 
         public void Add(Unit unit)
         {
-            int insertIndex = Contains.Count - 1;
+            int insertIndex = Units.Count - 1;
 
             if (insertIndex == -1)
             {
-                Contains.Add(unit);
+                Units.Add(unit);
                 return;
             }
 
-            for (int i = 0; i < Contains.Count; i++)
+            for (int i = 0; i < Units.Count; i++)
             {
-                if (Contains[i].Type == unit.Type)
+                if (Units[i].Type == unit.Type)
                 {
                     insertIndex = i;
                     break;
                 }
 
-                if (i == Contains.Count - 1)
+                if (i == Units.Count - 1)
                 {
-                    Contains.Add(unit);
+                    Units.Add(unit);
                     return;
                 }
             }
-            Contains.Insert(insertIndex, unit);
+            Units.Insert(insertIndex, unit);
         }
 
         public void Remove(Unit unit)
         {
-            Contains.Remove(unit);
+            Units.Remove(unit);
         }
 
         public List<double> Positions()
@@ -187,9 +351,9 @@ namespace TuringAndCorbusier
             SandwichClearanceAppropriately();
             List<double> positions = new List<double>();
             positions.Add(0);
-            for (int i = 0; i < Contains.Count; i++)
+            for (int i = 0; i < Units.Count; i++)
             {
-                double position = Contains.Take(i + 1).Sum(n => n.Length);
+                double position = Units.Take(i + 1).Sum(n => n.Length);
                 positions.Add(position);
             }
             //positions.Add(Length);
@@ -199,7 +363,7 @@ namespace TuringAndCorbusier
         public List<bool> Clearances()
         {
             SandwichClearanceAppropriately();
-            return Contains.Select(n => n.Type == UnitType.Clearance ? true : false).ToList();
+            return Units.Select(n => n.Type == UnitType.Clearance ? true : false).ToList();
         }
 
         void SandwichClearanceAppropriately()
@@ -209,18 +373,18 @@ namespace TuringAndCorbusier
 
             sorted = true;
 
-            Contains.Sort((Unit a, Unit b) => ((int)a.Type).CompareTo((int)b.Type));
+            Units.Sort((Unit a, Unit b) => ((int)a.Type).CompareTo((int)b.Type));
 
             //패티 숫자를 구한다. add 하면서 자동으로 넣어준 패티들.
-            int pattyCount = Contains.Where(n => n.Type == UnitType.Clearance).Count();
+            int pattyCount = Units.Where(n => n.Type == UnitType.Clearance).Count();
 
             //번 길이!
-            double corridorBunLength = Contains.Where(n => n.Type == UnitType.Corridor).Sum(n => n.Length);
-            double towerBunLength = Contains.Where(n => n.Type == UnitType.Tower).Sum(n => n.Length);
+            double corridorBunLength = Units.Where(n => n.Type == UnitType.Corridor).Sum(n => n.Length);
+            double towerBunLength = Units.Where(n => n.Type == UnitType.Tower).Sum(n => n.Length);
 
             //각 번의 요소 count, 나중에 끼워넣을 위치 구하기 위함
-            int corridorCount = Contains.Where(n => n.Type == UnitType.Corridor).Count();
-            int towerCount = Contains.Where(n => n.Type == UnitType.Tower).Count();
+            int corridorCount = Units.Where(n => n.Type == UnitType.Corridor).Count();
+            int towerCount = Units.Where(n => n.Type == UnitType.Tower).Count();
 
             //번 별로 필요한 패티 숫자
             int corridorBurgerPattyCount = (int)Math.Floor((corridorBunLength / 70000));
@@ -240,8 +404,8 @@ namespace TuringAndCorbusier
             //    while (corridorBurgerPattyCount + towerBurgerPattyCount < pattyCount)
             //    {
             //        pattyCount--;
-            //        if (Contains.Last().Type == UnitType.Clearance)
-            //            Contains.RemoveAt(Contains.Count - 1);
+            //        if (Units.Last().Type == UnitType.Clearance)
+            //            Units.RemoveAt(Units.Count - 1);
 
             //    }
             //}
@@ -251,8 +415,8 @@ namespace TuringAndCorbusier
             if (corridorCount != 0 && towerCount != 0 && Length >= 70000)
             {
                 int[] corr = GetStartEnd(UnitType.Corridor);
-                Contains.Insert(corr[1] + 1, new Unit(0, 5000, UnitType.Clearance));
-                Contains.RemoveAt(Contains.Count - 1);
+                Units.Insert(corr[1] + 1, new Unit(UnitType.Clearance));
+                Units.RemoveAt(Units.Count - 1);
             }
 
             //corridor 번의 시작/끝
@@ -269,8 +433,8 @@ namespace TuringAndCorbusier
                 //끝 인덱스 + 누적 추가분
                 if (index >= corridorIndex[1] + 1 + i)
                     index = corridorIndex[1] + 1 + i;
-                Contains.Insert(index, new Unit(0, 5000, UnitType.Clearance));
-                Contains.RemoveAt(Contains.Count - 1);
+                Units.Insert(index, new Unit(UnitType.Clearance));
+                Units.RemoveAt(Units.Count - 1);
 
             }
 
@@ -288,11 +452,11 @@ namespace TuringAndCorbusier
                 if (index >= towerIndex[1] + 1 + i)
                     index = towerIndex[1] + 1 + i;
 
-                if (index == Contains.Count)
+                if (index == Units.Count)
                     break;
 
-                Contains.Insert(index, new Unit(0, 5000, UnitType.Clearance));
-                Contains.RemoveAt(Contains.Count - 1);
+                Units.Insert(index, new Unit(UnitType.Clearance));
+                Units.RemoveAt(Units.Count - 1);
             }
 
 
@@ -303,9 +467,9 @@ namespace TuringAndCorbusier
         {
             int[] indexes = new int[2] { -1, -1 };
 
-            for (int i = 0; i < Contains.Count; i++)
+            for (int i = 0; i < Units.Count; i++)
             {
-                if (Contains[i].Type == type)
+                if (Units[i].Type == type)
                 {
                     if (indexes[0] == -1)
                         indexes[0] = i;
@@ -315,24 +479,34 @@ namespace TuringAndCorbusier
 
             return indexes;
         }
+
+        public List<Unit> ExpandableUnits()
+        {
+            return Units.Where(n => !n.AreaFixed && n.Maximum - n.Area > 0).ToList();
+        }
+
+        public List<Unit> ContractableUnits()
+        {
+            return Units.Where(n => !n.AreaFixed && n.Area - n.Minimum > 0).ToList();
+        }
     }
 
     class ApartLine
     {
         public double TotalLength { get; set; }
-        public UnitCollection Units { get; set; }
+        public UnitCollection Container { get; set; }
         public double LeftLength { get { return GetLeftLength(); } }
         double tempClearancePredict = 0;
         public ApartLine(double length)
         {
             TotalLength = length;
-            Units = new UnitCollection();
+            Container = new UnitCollection();
         }
 
         double GetLeftLength()
         {
             return
-              TotalLength - Units.Length;
+              TotalLength - Container.Length;
         }
 
         public bool Add(Unit unit)
@@ -340,18 +514,18 @@ namespace TuringAndCorbusier
 
             if (LeftLength >= unit.Length)
             {
-                Units.Add(unit);
+                Container.Add(unit);
 
                 if (ClearancePredict() != tempClearancePredict && unit.Type != UnitType.Clearance)
                 {
                     tempClearancePredict = ClearancePredict();
-                    Unit clearance = new Unit(0, 5000, UnitType.Clearance);
-                    Units.Add(clearance);
+                    Unit clearance = new Unit(UnitType.Clearance);
+                    Container.Add(clearance);
 
                     if (LeftLength < 0)
                     {
-                        Units.Remove(unit);
-                        Units.Remove(clearance);
+                        Container.Remove(unit);
+                        Container.Remove(clearance);
                         return false;
                     }
                 }
@@ -371,19 +545,185 @@ namespace TuringAndCorbusier
             double div = tempLength / 70000;
             return Math.Floor(div);
         }
+
+        public void ExpandUnits()
+        {
+            double tolerance = 5;
+            double tempLeftLength = LeftLength;
+            while (true)
+            {
+                List<Unit> expandables = Container.ExpandableUnits();
+
+                if (expandables.Count == 0)
+                    break;
+                if (tempLeftLength <= tolerance)
+                    break;
+
+                double avr = tempLeftLength / expandables.Count;
+
+                for (int i = 0; i < expandables.Count; i++)
+                {
+                    //평균값만큼 확장 후 남은값 받음
+                    double left = expandables[i].Expand(avr);
+                    //tempLeftLength 에서 확장한 값 만큼 
+                    tempLeftLength -= (avr - left);
+                }
+            }
+        }
+
+        public int CoreCount()
+        {
+            int towers = Container.Units.Where(n => n.Type == UnitType.Tower).Count();
+            int corridors = Container.Units.Where(n => n.Type == UnitType.Corridor).Count();
+
+            return towers / 2 + (int)Math.Ceiling((double)corridors / 8);
+        }
+
+        public double ExclusiveAreaSum()
+        {
+            return Container.Units.Sum(n => n.Area);
+        }
+
+        public double ContractUnit(double length)
+        {
+            double tolerance = 5;
+            double tempLeftLength = length;
+            while (true)
+            {
+                List<Unit> contractable = Container.ContractableUnits();
+
+                if (contractable.Count == 0)
+                    break;
+                if (tempLeftLength <= tolerance)
+                    break;
+
+                double avr = tempLeftLength / contractable.Count;
+
+                for (int i = 0; i < contractable.Count; i++)
+                {
+                    //평균값만큼 축소 후 남은값 받음
+                    double left = contractable[i].Contract(avr);
+                    //tempLeftLength 에서 축소한 값 만큼 
+                    tempLeftLength -= (avr - left);
+                }
+            }
+
+            return tempLeftLength;
+        }
+
     }
 
-    class Unit
+    public class Unit
     {
         public double Length { get; set; }
         public double Area { get; set; }
+        public double Rate { get; set; }
         public UnitType Type { get; set; }
+        public double Maximum { get; set; }
+        public double Minimum { get; set; }
+        public bool AreaFixed { get; set; }
+        public int Required { get; set; }
+        public int Supplied { get; set; }
 
-        public Unit(double area, double length, UnitType type)
+        public Unit(UnitType type)
         {
-            Length = length;
-            Area = area;
+            Length = 5000;
+            Area = 0;
             Type = type;
+            AreaFixed = true;
+        }
+
+        public Unit()
+        {
+           
+        }
+
+        public void Initialize()
+        {
+            if (Area < Consts.AreaLimit)
+                Type = UnitType.Corridor;
+            else
+                Type = UnitType.Tower;
+
+            Supplied = 0; 
+        }
+
+        public Unit GetFixed(bool areaLock)
+        {
+            Unit fixedUnit = new Unit();
+            fixedUnit.Area = this.Area;
+            fixedUnit.Maximum = this.Maximum;
+            fixedUnit.Minimum = this.Minimum;
+            fixedUnit.Length = this.Length;
+            fixedUnit.AreaFixed = areaLock;
+            fixedUnit.Type = this.Type;
+
+
+            if (areaLock)
+            {
+                fixedUnit.Maximum = fixedUnit.Area;
+                fixedUnit.Minimum = fixedUnit.Area;
+            }
+
+            return fixedUnit;
+            //아마 rate,required,supplied 는 필요없을듯
+        }
+
+        //d 만큼 expand. expand 하고 남은 길이 만큼 return
+        public double Expand(double length)
+        {
+            //고정 유닛이라면 그대로 리턴
+            if (AreaFixed)
+                return length;
+
+            double width = Area / Length;
+            double expandable = (Maximum - Area)/width;
+            if (expandable <= length)
+            {
+                //면적변경
+                Area = Maximum;
+                //길이변경
+                Length += expandable;
+
+                return length - expandable;
+            }
+            else
+            {
+                //면적변경
+                Area = Area + length * width;
+                //길이변경
+                Length += length;
+                return 0;
+            }
+
+
+
+        }
+
+        public double Contract(double length)
+        {
+            //고정 유닛이라면 그대로 리턴
+            if (AreaFixed)
+                return length;
+
+            double width = Area / Length;
+            double contractable = (Area - Minimum)/width;
+            if (contractable <= length)
+            {
+                Area = Minimum;
+                //길이변경
+                Length -= contractable;
+                return length - contractable;
+            }
+            else
+            {
+                Area = Area - length * width;
+                //길이변경
+                Length -= length;
+                return 0;
+            }
+
+
         }
     }
 

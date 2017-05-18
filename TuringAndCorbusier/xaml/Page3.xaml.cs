@@ -276,8 +276,18 @@ namespace TuringAndCorbusier
 
             NumOfParking.Text = (agOutput.ParkingLotOnEarth.GetCount() + agOutput.ParkingLotUnderGround.Count).ToString() + "대";
 
-            
-            var ta = agOutput.Target.Area;
+
+            List<double> firstFloorHHArea = new List<double>();
+            for (int i = 0; i < agOutput.Household[0].Count; i++)
+            {
+                for (int j = 0; j < agOutput.Household[0][i].Count; j++)
+                {
+                    double round = Math.Round(agOutput.Household[0][i][j].ExclusiveArea / 1000000);
+                    if (!firstFloorHHArea.Contains(round))
+                        firstFloorHHArea.Add(round);
+                }
+            }
+            var ta = firstFloorHHArea.OrderBy(n=>n).ToList();
             int[] type = new int[ta.Count];
             type = type.Select(n => 0).ToArray();
             foreach (var hh in agOutput.Household)
@@ -288,7 +298,8 @@ namespace TuringAndCorbusier
                     {
                         for (int i = 0; i < ta.Count; i++)
                         {
-                            if (x.ExclusiveArea <= ta[i]*1000000  + 10000)
+                            double round = Math.Round(x.ExclusiveArea / 1000000);
+                            if (round == ta[i])
                             {
                                 type[i]++;
                                 break;
@@ -299,7 +310,7 @@ namespace TuringAndCorbusier
 
             }
 
-            TextBlock[] title = new TextBlock[] { most1, most2, most3, most4, most5 };
+            TextBlock[] title = new TextBlock[] { most1,    most2,    most3,    most4,    most5    };
             TextBlock[] count = new TextBlock[] { nummost1, nummost2, nummost3, nummost4, nummost5 };
 
 

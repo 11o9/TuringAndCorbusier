@@ -7,7 +7,7 @@ using TuringAndCorbusier.Utility;
 namespace TuringAndCorbusier
 {
     //Eddie Brock - 1대 베놈
-    //Peter Parker : Eddie Brock = Ground Parking : UnderGround Parking = Spider Man : Venom
+    //Peter Parker : Eddie Brock = Ground Parking : UnderGround Parking
 
     class UnderGroundParkingConsts
     {
@@ -132,6 +132,9 @@ namespace TuringAndCorbusier
                 return false;
 
             Curve ramp = ugp.Ramp;
+            if (ramp == null)
+                return false;
+
             Stack<int> removeIndex = new Stack<int>();
             for (int i = 0; i < gp.ParkingLines[0].Count; i++)
             {

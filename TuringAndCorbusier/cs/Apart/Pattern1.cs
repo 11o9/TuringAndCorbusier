@@ -29,9 +29,9 @@ namespace TuringAndCorbusier
             double moveFactor = parameters[4];
             Regulation regulationHigh = new Regulation(storiesHigh);
             Regulation regulationLow = new Regulation(storiesHigh, storiesLow);
-            List<double> ratio = target.Ratio;
-            List<double> area = target.Area.Select(n => n / 0.91 * 1000 * 1000).ToList();
-            double areaLimit = Consts.AreaLimit;
+            //List<double> ratio = target.Ratio;
+            //List<double> area = target.Area.Select(n => n / 0.91 * 1000 * 1000).ToList();
+            //double areaLimit = Consts.AreaLimit;
             BuildingType buildingType = regulationHigh.BuildingType;
             List<double> areaLength = new List<double>();
 
@@ -41,26 +41,29 @@ namespace TuringAndCorbusier
             double corearea = coreWidth * coreDepth;
 
 
-            for (int i = 0; i < area.Count; i++)
-            {
-                if (area[i] < areaLimit)
-                {
-                    //서비스면적 10%
-                    area[i] = area[i] * Consts.balconyRate_Corridor;
-                    //코어&복도
-                    area[i] = area[i] * (1 + Consts.corridorWidth / (width - Consts.corridorWidth));
+            //for (int i = 0; i < area.Count; i++)
+            //{
+            //    if (area[i] < areaLimit)
+            //    {
+            //        //서비스면적 10%
+            //        area[i] = area[i] * Consts.balconyRate_Corridor;
+            //        //코어&복도
+            //        area[i] = area[i] * (1 + Consts.corridorWidth / (width - Consts.corridorWidth));
 
-                }
-                else
-                {
+            //    }
+            //    else
+            //    {
 
-                    //서비스면적 18%
-                    area[i] = area[i] * Consts.balconyRate_Tower;
-                    //코어&복도
-                    area[i] += corearea / 2;
+            //        //서비스면적 18%
+            //        area[i] = area[i] * Consts.balconyRate_Tower;
+            //        //코어&복도
+            //        area[i] += corearea / 2;
 
-                }
-            }
+            //    }
+            //}
+
+            //최고층수 추가, 목표세대수 / 층수 해서 라인 수 찾으려고.
+            List<Unit> units = target.ToUnit(width, corearea, storiesHigh);
 
             while (true)
             {
@@ -81,10 +84,10 @@ namespace TuringAndCorbusier
 
             ///////////////////////////
             //sort lists before start//
-            RhinoList<double> ratioRL = new RhinoList<double>(ratio);
-            ratioRL.Sort(area.ToArray());
-            ratio = ratioRL.ToList();
-            area.Sort();
+            //RhinoList<double> ratioRL = new RhinoList<double>(ratio);
+            //ratioRL.Sort(area.ToArray());
+            //ratio = ratioRL.ToList();
+            //area.Sort();
             ///////////////////////////
 
             //입력 "대지경계" 부분
@@ -147,7 +150,9 @@ namespace TuringAndCorbusier
 
             #region UnitPacking
             List<List<UnitType>> isclearance;
-            List<List<double>> lengths = AptPacking(area, aptLines.Select(n => n.GetLength()).ToList(), ratio, width, corearea, out isclearance);
+            List<List<double>> lengths = AptPacking(units, aptLines.Select(n => n.GetLength()).ToList(), width, corearea, storiesHigh, plot.GetArea(), out isclearance);
+            
+            
             //shorten
             for (int i = 0; i < aptLines.Count; i++)
             {
@@ -887,71 +892,16 @@ namespace TuringAndCorbusier
         //
 
 
-        private List<Line> baselineMaker(Curve regCurve, ParameterSet parameterSet)
-        {
-            Curve regulationCurve = regCurve.DuplicateCurve();
-            double[] parameters = parameterSet.Parameters;
-            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
-            double storiesLow = Math.Min((int)parameters[0], (int)parameters[1]);
-            double width = parameters[2];
-            double angleRadian = parameters[3];
-            double moveFactor = parameters[4];
-            Regulation regulationHigh = new Regulation(storiesHigh);
-
-            Polyline regulationPolyline;
-            regulationCurve.TryGetPolyline(out regulationPolyline);
-            List<Point3d> check = new List<Point3d>(regulationPolyline);
-
-            //create raw baselines
-            double alpha = 10;
-            regulationCurve.Rotate(angleRadian, Vector3d.ZAxis, Point3d.Origin);
-            var boundingbox = regulationCurve.GetBoundingBox(false);
-            Point3d minP = boundingbox.Min;
-            Point3d maxP = boundingbox.Max;
-            //double yPos = minP.Y + moveFactor * (width + regulationHigh.DistanceLL + Consts.corridorWidth);//corridor!!!!!!
-            double yPos = minP.Y + moveFactor * (width + regulationHigh.DistanceLL);
-            List<Line> rawLines = new List<Line>();
-            while (yPos < maxP.Y)
-            {
-                rawLines.Add(new Line(new Point3d(minP.X - alpha, yPos, 0), new Point3d(maxP.X + alpha, yPos, 0)));
-                //yPos += width + regulationHigh.DistanceLL + Consts.corridorWidth;//corridor!!!!!!
-                yPos += width + regulationHigh.DistanceLL;
-            }
-            List<Line> rawLinesTemp = new List<Line>();
-
-            for (int i = 0; i < rawLines.Count; i++)
-            {
-                Line lineTemp = rawLines[i];
-                lineTemp.Transform(Transform.Rotation(-angleRadian, Vector3d.ZAxis, Point3d.Origin));
-                rawLinesTemp.Add(lineTemp);
-            }
-            rawLines = rawLinesTemp;
-
-            return rawLines;
-        }
-
-
         ///////////////////////////////
         //////////  outputs  //////////
-        ///////////////////////////////
 
-        private double exclusiveAreaCalculatorAG1(double xa, double xb, double ya, double yb, double targetArea, double balconyDepth)
-        {
-            double exclusiveArea = xa * ya - xb * yb;
 
-            exclusiveArea -= (xa + xa - xb) * balconyDepth;
-
-            if (targetArea <= Consts.AreaLimit)
-            {
-                exclusiveArea += (xa - xb) * balconyDepth;
-            }
-
-            return exclusiveArea;
-        }
-
-        private List<List<double>> AptPacking(List<double> unit, List<double> aptLine, List<double> unitRate, double aptWidth, double corearea, out List<List<UnitType>> isclearance)
+        private List<List<double>> AptPacking(List<Unit> unitlist, List<double> aptLine, double aptWidth, double corearea, double floors, double plotArea, out List<List<UnitType>> isclearance)
         {
             #region 비율 조정
+
+            List<double> unit = unitlist.Select(n => n.Area).ToList();
+            List<double> unitRate = unitlist.Select(n => n.Rate).ToList();
 
             double[] eachUnitLength = unit.Select(n => n / aptWidth).ToArray();
             double[] eachUnitLengthbyRate = new double[eachUnitLength.Length];
@@ -987,36 +937,72 @@ namespace TuringAndCorbusier
             double[] balancedRate = balanced.ToList().Select(n => Math.Round(n / balanced.Sum() * 100, 2)).ToArray();
             #endregion
 
+            //remap rate
+            for (int i = 0; i < unitlist.Count; i++)
+            {
+                unitlist[i].Rate = balancedRate[i] / 100;
+            }
 
 
             List<double> aptLineLengths = aptLine;
-            List<Unit> units = new List<Unit>();
 
-            for (int i = 0; i < eachUnitLength.Length; i++)
-            {
-                UnitType type = unit[i] > Consts.AreaLimit ? UnitType.Tower : UnitType.Corridor;
-                Unit tempunit = new Unit(unit[i], eachUnitLength[i], type);
-                units.Add(tempunit);
-            }
-
-            //Unit unit1 = new Unit(20, 5234, UnitType.Corridor);
-            //Unit unit2 = new Unit(55, 12324, UnitType.Tower);
-            //Unit unit3 = new Unit(70, 17065, UnitType.Tower);
-            List<double> rates = balancedRate.Select(n => (double)n / 100).ToList();
-
-
-            UnitDistributor distributor = new UnitDistributor(aptLineLengths, units, rates);
-            distributor.DistributeByRate();
-
+            UnitDistributor distributor = new UnitDistributor(aptLineLengths, unitlist);
+            //distributor.DistributeByRate(); not in use
+            distributor.DistributeUnit();
             List<List<UnitType>> types = new List<List<UnitType>>();
             List<List<double>> positions = new List<List<double>>();
+
+            // 확장
+            foreach (ApartLine line in distributor.aptLines)
+            {
+                line.ExpandUnits();
+            }
+
+            // 용적률 계산.. 하려면 대지면적 알아야.......
+            // 잠깐 코어가 몇개 들어가는지 어떻게 계산하지? 1층 코어를 더해줘야하는디..
+
+            double expectedFA = 0;
+
+            foreach (ApartLine line in distributor.aptLines)
+            {
+                int coreCount = line.CoreCount(); //맞을지모르겠음
+                double coreOnly = corearea * coreCount;
+                double eachFloor = line.ExclusiveAreaSum();
+                expectedFA += eachFloor * floors + coreOnly;
+                
+            }
+            //면적 초과분 (1층코어 + 각 층 면적)  -  기준 면적 (1층코어 + 각 층 면적) = 오차 면적 (각 층 면적 d) / 층수 = d
+            //코어개수는 변하지 않으므로.
+            double legalFA = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio / 100 * plotArea;
+
+            if (expectedFA >= legalFA)
+            {
+                //area
+                double lengthToReduce = expectedFA - legalFA;
+                //eachfloor
+                lengthToReduce /= floors;
+                //length
+                lengthToReduce /= aptWidth;
+
+                foreach(ApartLine line in distributor.aptLines)
+                {
+                    //line 에 lengthToReduce 넣고 뺌
+
+                    lengthToReduce = line.ContractUnit(lengthToReduce);
+
+                    if (lengthToReduce <= 0)
+                        break;
+                }
+                 
+            }
+
             foreach (ApartLine line in distributor.aptLines)
             {
                 //POSITION 먼저 구해야 정렬된 TYPE 값 얻음
-                var thisLinePositions = line.Units.Positions();
+                var thisLinePositions = line.Container.Positions();
                 positions.Add(thisLinePositions);
 
-                var thisLineClearances = line.Units.GetTypes();
+                var thisLineClearances = line.Container.GetTypes();
                 types.Add(thisLineClearances.ToList());
             }
 
@@ -1222,6 +1208,10 @@ namespace TuringAndCorbusier
             return positions;
 
         }
+
+
+
+
     }
         
 }

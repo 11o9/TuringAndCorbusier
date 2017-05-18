@@ -91,21 +91,21 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="cs\DataManager.cs" />
+    <Compile Include="cs\Common\DataManager.cs" />
     <Compile Include="cs\NotUsed\Egg.cs" />
     <Compile Include="cs\NotUsed\FinalizeApartmentGeneratorOutput.cs" />
     <Compile Include="cs\Parkings\Finalizer.cs" />
     <Compile Include="cs\Input\Gagak.cs" />
     <Compile Include="cs\Input\KDG.cs" />
-    <Compile Include="cs\LoadManager.cs" />
+    <Compile Include="cs\Common\LoadManager.cs" />
     <Compile Include="cs\NotUsed\ParkingLineMaker.cs" />
     <Compile Include="cs\Parkings\PeterParker.cs" />
-    <Compile Include="cs\RegulationCheck.cs" />
+    <Compile Include="cs\NotUsed\RegulationCheck.cs" />
     <Compile Include="cs\Input\RetreatBuildingLine.cs" />
     <Compile Include="cs\Drawing\SectionDrawer.cs" />
     <Compile Include="cs\Drawing\TypicalPlan.cs" />
-    <Compile Include="cs\UIManager.cs" />
-    <Compile Include="cs\CalculateScore.cs" />
+    <Compile Include="cs\Common\UIManager.cs" />
+    <Compile Include="cs\NotUsed\CalculateScore.cs" />
     <Compile Include="cs\Apart\UnitDistributor.cs" />
     <Compile Include="cs\Parkings\EddieBrock.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -119,7 +119,7 @@
       <DependentUpon>realReportBase.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reports\ReportBase.cs" />
-    <Compile Include="cs\CommonFunc.cs" />
+    <Compile Include="cs\Common\CommonFunc.cs" />
     <Compile Include="Reports\section.xaml.cs">
       <DependentUpon>section.xaml</DependentUpon>
     </Compile>
@@ -164,15 +164,15 @@
       <DependentUpon>Corbusier.xaml</DependentUpon>
     </Compile>
     <Compile Include="cs\Drawing\CorePlan.cs" />
-    <Compile Include="cs\DataStructure.cs" />
-    <Compile Include="cs\Datastructure_Settings.cs" />
+    <Compile Include="cs\Common\DataStructure.cs" />
+    <Compile Include="cs\Common\Datastructure_Settings.cs" />
     <Compile Include="cs\Drawing\Elevation.cs" />
     <Compile Include="xaml\errorMessage.xaml.cs">
       <DependentUpon>errorMessage.xaml</DependentUpon>
     </Compile>
     <Compile Include="cs\Drawing\FloorPlan.cs" />
     <Compile Include="cs\GA\GiantAnteater.cs" />
-    <Compile Include="cs\MakeBuildings.cs" />
+    <Compile Include="cs\Common\MakeBuildings.cs" />
     <Compile Include="xaml\FindForm.xaml.cs">
       <DependentUpon>FindForm.xaml</DependentUpon>
     </Compile>
@@ -194,15 +194,15 @@
     <Compile Include="cs\Apart\Pattern1.cs" />
     <Compile Include="cs\Apart\Pattern3.cs" />
     <Compile Include="cs\Apart\Pattern4.cs" />
-    <Compile Include="cs\PdfExport.cs" />
+    <Compile Include="cs\NotUsed\PdfExport.cs" />
     <Compile Include="xaml\plotAreaError.xaml.cs">
       <DependentUpon>plotAreaError.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reports\ReportNavigation.xaml.cs">
       <DependentUpon>ReportNavigation.xaml</DependentUpon>
     </Compile>
-    <Compile Include="cs\RhinoWindowSetUp.cs" />
-    <Compile Include="cs\RoadWidthSettings.cs" />
+    <Compile Include="cs\Common\RhinoWindowSetUp.cs" />
+    <Compile Include="cs\Common\RoadWidthSettings.cs" />
     <Compile Include="cs\Drawing\Section.cs" />
     <Compile Include="xaml\SlopeSetting.xaml.cs">
       <DependentUpon>SlopeSetting.xaml</DependentUpon>

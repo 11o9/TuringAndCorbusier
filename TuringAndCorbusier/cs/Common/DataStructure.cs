@@ -664,6 +664,65 @@ namespace TuringAndCorbusier
             this.domain = domains;
             this.mandatoryCount = mandatories;
         }
+
+        public List<Unit> ToUnit(double width,double coreArea, double stories)
+        {
+            //except wall area
+
+            List<double> exclusiveArea = ExclusiveArea(area, width, coreArea);
+            List<double> exclusiveMax = ExclusiveArea(domain.Select(n => n.Max).ToList(), width, coreArea);
+            List<double> exclusiveMin = ExclusiveArea(domain.Select(n => n.Min).ToList(), width, coreArea);
+
+            List<Unit> units = new List<Unit>();
+            for (int i = 0; i < exclusiveArea.Count; i++)
+            {
+                Unit tempUnit = new Unit();
+                tempUnit.Area = exclusiveArea[i];
+                tempUnit.Minimum = exclusiveMin[i];
+                tempUnit.Maximum = exclusiveMax[i];
+                tempUnit.Rate = ratio[i];
+                tempUnit.Required = (int)Math.Ceiling((double)mandatoryCount[i] / stories); // 필요 유닛 수를 예상 층수로 나눔.
+                tempUnit.Initialize();
+                tempUnit.Length = exclusiveArea[i] / width;
+                units.Add(tempUnit);
+            }
+
+            return units;
+           
+        }
+
+        private List<double> ExclusiveArea(List<double> area, double width, double coreArea)
+        {
+            List<double> exclusiveArea = area.Select(n => n / 0.91).ToList();
+
+            //m2 to mm2
+            exclusiveArea = exclusiveArea.Select(n => n * 1000 * 1000).ToList();
+
+
+            for (int i = 0; i < exclusiveArea.Count; i++)
+            {
+                if (exclusiveArea[i] < Consts.AreaLimit)
+                {
+                    //서비스면적 10%
+                    exclusiveArea[i] = exclusiveArea[i] * Consts.balconyRate_Corridor;
+                    //코어&복도
+                    exclusiveArea[i] = exclusiveArea[i] * (1 + Consts.corridorWidth / (width - Consts.corridorWidth));
+                }
+                else
+                {
+
+                    //서비스면적 18%
+                    exclusiveArea[i] = exclusiveArea[i] * Consts.balconyRate_Tower;
+                    //코어&복도
+                    exclusiveArea[i] += coreArea / 2;
+                }
+            }
+
+            return exclusiveArea;
+        }
+
+ 
+
         //Field, 필드
 
         private List<double> area = new List<double>();
@@ -884,7 +943,7 @@ namespace TuringAndCorbusier
                     }
                 }
             }
-
+            all = all.OrderBy(n => n.ExclusiveArea).ToList();
             List<Household> hhpDistinct = new List<Household>();
             List<int> hhpCount = new List<int>();
 
