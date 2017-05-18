@@ -967,16 +967,20 @@ namespace TuringAndCorbusier
             {
                 int coreCount = line.CoreCount(); //맞을지모르겠음
                 double coreOnly = corearea * coreCount;
-                double eachFloor = line.ExclusiveAreaSum();
+                double eachFloor = line.FloorAreaSum();
                 expectedFA += eachFloor * floors + coreOnly;
-                
             }
+
+
             //면적 초과분 (1층코어 + 각 층 면적)  -  기준 면적 (1층코어 + 각 층 면적) = 오차 면적 (각 층 면적 d) / 층수 = d
             //코어개수는 변하지 않으므로.
-            double legalFA = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio / 100 * plotArea;
+            double legalFA = ((TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio*0.99) / 100) * plotArea;
 
             if (expectedFA >= legalFA)
             {
+                //fordebug
+                double expectedFAR = expectedFA / plotArea;
+                double legalFAR = legalFA / plotArea;
                 //area
                 double lengthToReduce = expectedFA - legalFA;
                 //eachfloor
@@ -990,7 +994,7 @@ namespace TuringAndCorbusier
 
                     lengthToReduce = line.ContractUnit(lengthToReduce);
 
-                    if (lengthToReduce <= 0)
+                    if (lengthToReduce <= 1) //tolerance
                         break;
                 }
                  

@@ -669,21 +669,24 @@ namespace TuringAndCorbusier
         {
             //except wall area
 
-            List<double> exclusiveArea = ExclusiveArea(area, width, coreArea);
-            List<double> exclusiveMax = ExclusiveArea(domain.Select(n => n.Max).ToList(), width, coreArea);
-            List<double> exclusiveMin = ExclusiveArea(domain.Select(n => n.Min).ToList(), width, coreArea);
+            List<double> SupplyTemp = SupplyArea(area, width, coreArea);
+            List<double> SupplyMax = SupplyArea(domain.Select(n => n.Max).ToList(), width, coreArea);
+            List<double> SupplyMin = SupplyArea(domain.Select(n => n.Min).ToList(), width, coreArea);
 
             List<Unit> units = new List<Unit>();
-            for (int i = 0; i < exclusiveArea.Count; i++)
+            for (int i = 0; i < SupplyTemp.Count; i++)
             {
                 Unit tempUnit = new Unit();
-                tempUnit.Area = exclusiveArea[i];
-                tempUnit.Minimum = exclusiveMin[i];
-                tempUnit.Maximum = exclusiveMax[i];
+                tempUnit.Area = SupplyTemp[i];
+                tempUnit.Minimum = SupplyMin[i];
+                tempUnit.Maximum = SupplyMax[i];
                 tempUnit.Rate = ratio[i];
                 tempUnit.Required = (int)Math.Ceiling((double)mandatoryCount[i] / stories); // 필요 유닛 수를 예상 층수로 나눔.
                 tempUnit.Initialize();
-                tempUnit.Length = exclusiveArea[i] / width;
+                tempUnit.Length = SupplyTemp[i] / width;
+                tempUnit.CoreArea = coreArea / 2;
+                //if(tempUnit.Type == UnitType.Corridor) 아....복도진짜 ㅋ
+                //    coreArea = Consts.corridorWidth / (width - Consts.corridorWidth) * SupplyTemp[i]
                 units.Add(tempUnit);
             }
 
@@ -691,38 +694,32 @@ namespace TuringAndCorbusier
            
         }
 
-        private List<double> ExclusiveArea(List<double> area, double width, double coreArea)
+        private List<double> SupplyArea(List<double> area, double width, double coreArea)
         {
-            List<double> exclusiveArea = area.Select(n => n / 0.91).ToList();
+            List<double> supplyArea = area.Select(n => n / 0.91).ToList();
 
             //m2 to mm2
-            exclusiveArea = exclusiveArea.Select(n => n * 1000 * 1000).ToList();
+            supplyArea = supplyArea.Select(n => n * 1000 * 1000).ToList();
 
-
-            for (int i = 0; i < exclusiveArea.Count; i++)
+            for (int i = 0; i < supplyArea.Count; i++)
             {
-                if (exclusiveArea[i] < Consts.AreaLimit)
+                if (supplyArea[i] < Consts.AreaLimit)
                 {
                     //서비스면적 10%
-                    exclusiveArea[i] = exclusiveArea[i] * Consts.balconyRate_Corridor;
+                    supplyArea[i] = supplyArea[i] * Consts.balconyRate_Corridor;
                     //코어&복도
-                    exclusiveArea[i] = exclusiveArea[i] * (1 + Consts.corridorWidth / (width - Consts.corridorWidth));
+                    supplyArea[i] = supplyArea[i] * (1 + Consts.corridorWidth / (width - Consts.corridorWidth));
                 }
                 else
                 {
-
                     //서비스면적 18%
-                    exclusiveArea[i] = exclusiveArea[i] * Consts.balconyRate_Tower;
+                    supplyArea[i] = supplyArea[i] * Consts.balconyRate_Tower;
                     //코어&복도
-                    exclusiveArea[i] += coreArea / 2;
+                    supplyArea[i] += coreArea / 2;
                 }
             }
-
-            return exclusiveArea;
+            return supplyArea;
         }
-
- 
-
         //Field, 필드
 
         private List<double> area = new List<double>();

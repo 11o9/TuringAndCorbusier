@@ -584,6 +584,11 @@ namespace TuringAndCorbusier
             return Container.Units.Sum(n => n.Area);
         }
 
+        public double FloorAreaSum()
+        {
+            return Container.Units.Sum(n => n.FloorArea);
+        }
+
         public double ContractUnit(double length)
         {
             double tolerance = 5;
@@ -615,6 +620,7 @@ namespace TuringAndCorbusier
 
     public class Unit
     {
+        public double FloorArea { get { return GetFloorArea(); } }
         public double Length { get; set; }
         public double Area { get; set; }
         public double Rate { get; set; }
@@ -624,6 +630,7 @@ namespace TuringAndCorbusier
         public bool AreaFixed { get; set; }
         public int Required { get; set; }
         public int Supplied { get; set; }
+        public double CoreArea { get ; set; }
 
         public Unit(UnitType type)
         {
@@ -657,7 +664,7 @@ namespace TuringAndCorbusier
             fixedUnit.Length = this.Length;
             fixedUnit.AreaFixed = areaLock;
             fixedUnit.Type = this.Type;
-
+            fixedUnit.CoreArea = this.CoreArea;
 
             if (areaLock)
             {
@@ -724,6 +731,20 @@ namespace TuringAndCorbusier
             }
 
 
+        }
+
+        private double GetFloorArea()
+        {
+            double area = Area;
+            area -= CoreArea;
+            if (Type == UnitType.Tower)
+                area /= Consts.balconyRate_Tower;
+            else if (Type == UnitType.Corridor)
+                area /= Consts.balconyRate_Corridor;
+
+            area += CoreArea;
+
+            return area;
         }
     }
 
