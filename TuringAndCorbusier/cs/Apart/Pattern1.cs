@@ -21,6 +21,13 @@ namespace TuringAndCorbusier
 
             //입력"값" 부분
             randomCoreType = GetRandomCoreType();
+            double pilotiHeight = Consts.PilotiHeight;
+            if (parameterSet.using1F)
+            {
+                randomCoreType = parameterSet.fixedCoreType;
+                pilotiHeight = 0;
+            }
+
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
             double storiesLow = Math.Min((int)parameters[0], (int)parameters[1]);
@@ -65,21 +72,36 @@ namespace TuringAndCorbusier
             //최고층수 추가, 목표세대수 / 층수 해서 라인 수 찾으려고.
             List<Unit> units = target.ToUnit(width, corearea, storiesHigh);
 
-            while (true)
+
+
+            if (parameterSet.using1F)
             {
-                //var lightingv = regulationHigh.byLightingCurve(plot, angleRadian)[0].ClosedCurveOrientation(Vector3d.ZAxis);
-                //var plotv = plot.Boundary.ClosedCurveOrientation(Vector3d.ZAxis);
                 if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
-                //if (lightingv != plotv)
                 {
-                    storiesHigh--;
-                    if (storiesHigh <= storiesLow)
-                        break;
-                    regulationHigh = new Regulation(storiesHigh);
-                    regulationLow = new Regulation(storiesHigh, storiesLow);
+                    return null;
                 }
-                else
-                    break;
+
+                regulationHigh = new Regulation(storiesHigh,true);
+                regulationLow = new Regulation(storiesHigh, storiesLow,true);
+            }
+            else
+            {
+                while (true)
+                {
+                    //var lightingv = regulationHigh.byLightingCurve(plot, angleRadian)[0].ClosedCurveOrientation(Vector3d.ZAxis);
+                    //var plotv = plot.Boundary.ClosedCurveOrientation(Vector3d.ZAxis);
+                    if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
+                    //if (lightingv != plotv)
+                    {
+                        storiesHigh--;
+                        if (storiesHigh <= storiesLow)
+                            break;
+                        regulationHigh = new Regulation(storiesHigh);
+                        regulationLow = new Regulation(storiesHigh, storiesLow);
+                    }
+                    else
+                        break;
+                }
             }
 
             ///////////////////////////
@@ -360,7 +382,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < storiesHigh; i++)
             {
 
-                double tempStoryHeight = Consts.PilotiHeight + i * Consts.FloorHeight;
+                double tempStoryHeight = pilotiHeight + i * Consts.FloorHeight;
                 Regulation tempStoryReg = new Regulation(storiesHigh, i);
                 Curve[] Reg = wholeRegulationHigh;
 
@@ -395,7 +417,10 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < storiesHigh + 2; i++)
             {
-                double tempStoryHeight = (i == 0) ? 0 : Consts.PilotiHeight + Consts.FloorHeight * (i - 1);
+                //1층 사용시 필로티코어 만들지 않음.
+                if (parameterSet.using1F && i == 0)
+                    continue;
+                double tempStoryHeight = (i == 0) ? 0 : pilotiHeight + Consts.FloorHeight * (i - 1);
                 Regulation tempStoryReg = new Regulation(storiesHigh, i);
                 Curve[] Reg = tempStoryReg.JoinRegulations(plot, angleRadian);
                 List<Core> tempfloor = new List<Core>();
@@ -495,7 +520,7 @@ namespace TuringAndCorbusier
             pm.ParkingLines = parkingCurves; // 만약 라인마다 다른 depth로 뽑고싶다면 따로따로
             pm.Obstacles = obstacles;
             pm.Boundary = plot.Boundary;
-            pm.Distance = width + (storiesHigh * Consts.FloorHeight/* + Consts.PilotiHeight*/) * 0.8;
+            pm.Distance = width + (storiesHigh * Consts.FloorHeight/* + pilotiHeight*/) * 0.8;
             pm.CoreDepth = coreDepth;
             pm.AddFront = true;
 
@@ -507,14 +532,26 @@ namespace TuringAndCorbusier
             }
             //get parking
             ParkingLotOnEarth parkingLot = pm.GetParking();
+            //if using1f
+            if (parameterSet.using1F)
+                parkingLot = new ParkingLotOnEarth();
 
             #endregion
 
 
             //finalize
             Apartment result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, new ParkingLotUnderGround(), new List<List<Curve>>(), aptLines);
-            Finalizer finalizer = new Finalizer(result);
-            result = finalizer.Finilize();
+
+            if (parameterSet.using1F)
+            {
+
+            }
+            else
+            {
+                Finalizer finalizer = new Finalizer(result);
+                result = finalizer.Finilize();
+            }
+            
             //ParkingDistributor.Distribute(ref result);
             //하아..
             //var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
@@ -977,7 +1014,13 @@ namespace TuringAndCorbusier
 
             //면적 초과분 (1층코어 + 각 층 면적)  -  기준 면적 (1층코어 + 각 층 면적) = 오차 면적 (각 층 면적 d) / 층수 = d
             //코어개수는 변하지 않으므로.
+
             double legalFA = ((TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio*0.999) / 100) * plotArea;
+
+            //3종에서 용적률 오차 맞춰주기위함   252%정도로 나오니까 249로 강제 변환
+            if (TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio == 250)
+                legalFA *= (double)249 / 252;
+
 
             if (expectedFA >= legalFA)
             {

@@ -614,8 +614,8 @@ namespace TuringAndCorbusier
 
         double[] thisParameters;
         double height;
-
-
+        public bool using1F = false;
+        public CoreType fixedCoreType = null;
         //Method, 메소드
 
         //Property, 속성
@@ -818,6 +818,82 @@ namespace TuringAndCorbusier
             this.AptLines = other.AptLines;
         }
 
+        public double GetParkingScore()
+        {
+            if (ParkingLotUnderGround.Count + ParkingLotOnEarth.GetCount() == 0)
+                return 0;
+
+            if (GetLegalParkingLotOfCommercial() + GetLegalParkingLotofHousing() == 1)
+                return 0;
+
+            double totalParkingScore = (double)(ParkingLotOnEarth.GetCount() + ParkingLotUnderGround.Count) / (GetLegalParkingLotOfCommercial() + GetLegalParkingLotofHousing());
+
+            if (totalParkingScore >= 1)
+                totalParkingScore = 1;
+
+            double groundParkingScore = ParkingLotOnEarth.GetCount() / (ParkingLotOnEarth.GetCount() + ParkingLotUnderGround.Count);
+            return totalParkingScore * 5 + groundParkingScore;
+        }
+        public double GetAxisAccuracy()
+        {
+
+            if (AptLines.Count == 0)
+                return 0;
+
+            Vector3d aptAxis = AptLines[0].TangentAtStart;
+            //double angleTolerance = Math.PI * (double)5 / 180;
+            if (aptAxis == Vector3d.Unset)
+                return 0;
+
+            if (GetGrossArea() == 0)
+                return 0;
+
+            Curve innerRect;
+            Polyline plotPoly = new Polyline();
+            plot.Boundary.TryGetPolyline(out plotPoly);
+            Utility.InnerIsoDrawer isoDrawer = new Utility.InnerIsoDrawer(plotPoly, 2000, 0);
+            Utility.Isothetic iso = isoDrawer.Draw();
+            innerRect = iso.Outline.ToNurbsCurve();
+
+            Vector3d[] innerRectAxis = innerRect.DuplicateSegments().Select(n => n.TangentAtStart).ToArray();
+
+            double minimum = Math.PI;
+            
+            for (int i = 0; i < innerRectAxis.Length; i++)
+            {
+                double tempAngle = Vector3d.VectorAngle(aptAxis, innerRectAxis[i], Plane.WorldXY);
+                if (tempAngle < minimum)
+                {
+                    minimum = tempAngle;
+                }    
+            }
+
+            double resultValue = Math.Round(Math.PI - minimum, 2);
+            if (resultValue > Math.PI)
+                resultValue = Math.PI;
+
+            else
+            {
+                if (resultValue < Math.PI / 4)
+                {
+
+                }
+                else if (resultValue < Math.PI / 2)
+                {
+                    resultValue = Math.Abs(Math.PI / 2 - resultValue);
+                }
+                else if (resultValue < Math.PI / 4 * 3)
+                {
+                    resultValue = resultValue - Math.PI / 2;
+                }
+                else
+                {
+                    resultValue = Math.Abs(Math.PI - resultValue);
+                }
+            }
+
+            return ((Math.PI - resultValue) / Math.PI)*10;
+        }
         public double GetTargetAccuracy()
         {
             var target = Target.Area.OrderByDescending(n => n);
@@ -1312,6 +1388,9 @@ namespace TuringAndCorbusier
 
         public double GetCoreAreaOnEarthSum() ///////////////////////////////////// commercial, public 포함
         {
+            if (this.ParameterSet.using1F)
+                return 0;
+
             double coreAreaSum = Core[0].Sum(n=>n.GetArea());
 
             return coreAreaSum;
@@ -2230,6 +2309,63 @@ namespace TuringAndCorbusier
             totalheight = storiesHigh;
         }
 
+        public Regulation(double stories, bool using1F)
+        {
+            this.height = using1F ? 0 : Consts.PilotiHeight + Consts.FloorHeight * stories;
+            high = true;
+            if (stories >= 7) // apartment
+            {
+                this.distanceFromRoad = 3000;
+                this.distanceFromPlot = 3000;
+                this.BuildingType = BuildingType.Apartment;
+            }
+
+            else if (stories >= 5)//apartment(완화)
+            {
+                this.distanceFromRoad = 1500;
+                this.distanceFromPlot = 1500;
+                this.BuildingType = BuildingType.Apartment;
+            }
+            else//rowhouse
+            {
+                this.distanceFromRoad = 1000;
+                this.distanceFromPlot = 750;
+                this.BuildingType = BuildingType.RowHouses;
+            }
+
+
+
+            totalheight = stories;
+        }
+
+        //stories = max tempheight = tempstory?
+        public Regulation(double storiesHigh, double storiesLow, bool using1F)
+        {
+            this.height = using1F?0:Consts.PilotiHeight + Consts.FloorHeight * (storiesLow);
+
+            if (storiesHigh >= 7) // apartment
+            {
+                this.distanceFromRoad = 3000;
+                this.distanceFromPlot = 3000;
+                this.BuildingType = BuildingType.Apartment;
+            }
+            else if (storiesHigh >= 5)//apartment(완화)
+            {
+                this.distanceFromRoad = 1500;
+                this.distanceFromPlot = 1500;
+                this.BuildingType = BuildingType.Apartment;
+            }
+            else//rowhouse
+            {
+                this.distanceFromRoad = 1000;
+                this.distanceFromPlot = 750;
+                this.BuildingType = BuildingType.RowHouses;
+            }
+
+            totalheight = storiesHigh;
+        }
+
+
         //Field, 필드
         public double totalheight;
         public double height;
@@ -2342,10 +2478,6 @@ namespace TuringAndCorbusier
             return merged[0];
 
         }
-
-    
-
-
         public Curve[] fromSurroundingsCurve(Plot plot)
         {
             //법규적용(대지안의 공지)
@@ -2473,6 +2605,8 @@ namespace TuringAndCorbusier
             //return copy.Select(n => n[0]).ToArray();
             //plot의 boundary, maxfloor, roadwidths, plottype 사용 , 도로중심선
         }
+
+        //not used
         public Curve[] fromNorthCurve2(Plot plot)
         {
             Curve roadCenter = RoadCenterLines(plot);
@@ -2551,7 +2685,6 @@ namespace TuringAndCorbusier
             return new Curve[] { fromNorthCurve };
         }
       
-
         //채광방향 사선 규칙입니다.
         public Curve[] byLightingCurve(Plot plot, double angle)
         {

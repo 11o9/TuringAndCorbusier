@@ -154,7 +154,7 @@ namespace TuringAndCorbusier
                         //WriteLine("[{0}]Can Using1F...", depth);
                         //WriteLine("[{0}]Using 1F...", depth);
                         //지상주차 계산도 다시 해야함.
-                        Apartment using1f = new Apartment(apt);
+                        Apartment using1f = Add1F(apt);
                         Finalizer fnz = new Finalizer(using1f,depth);
                         fnz.setBacked = true;
                         fnz.using1f = true;
@@ -221,6 +221,26 @@ namespace TuringAndCorbusier
         //    else
         //        return false;
         //}
+
+        Apartment Add1F(Apartment apt)
+        {
+            bool canAdd1F = apt.Household.Count < 6;
+            if (!canAdd1F)
+                return apt;
+
+            if (apt.Core.Count == 0 || apt.Core[0].Count == 0)
+                return apt;
+            
+            ParameterSet temp = apt.ParameterSet;
+            temp.using1F = true;
+            temp.fixedCoreType = apt.Core[0][0].CoreType;
+            temp.Parameters[0]++;
+            temp.Parameters[1]++;
+
+            AG1 newAG = new AG1();
+            Apartment newApart = newAG.generator(apt.Plot, temp, apt.Target);
+            return newApart == null ? apt : newApart;
+        }
 
         Apartment Reduce()
         {

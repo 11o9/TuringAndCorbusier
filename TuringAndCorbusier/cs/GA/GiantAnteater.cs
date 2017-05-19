@@ -340,6 +340,7 @@ namespace TuringAndCorbusier
             List<double> grossAreaRatio = new List<double>();
             List<double> parkinglotRatio = new List<double>();
             List<double> targetAccuracy = new List<double>();
+            List<double> axisAccuracy = new List<double>();
             bool drawSomeThing = false;
             int i = 0;
 
@@ -347,7 +348,7 @@ namespace TuringAndCorbusier
             {
                 drawSomeThing = true;
             }
-            , drawSomeThing, TimeSpan.Zero, TimeSpan.FromMilliseconds(500));
+            , drawSomeThing, TimeSpan.Zero, TimeSpan.FromMilliseconds(1000));
 
             List<Apartment> agOutToDrawList = new List<Apartment>();
             List<double> agOutToDrawGrossAreaList = new List<double>();
@@ -356,10 +357,9 @@ namespace TuringAndCorbusier
             {
                 Apartment tempOutput = ag.generator(plot, gene[i], target);
                 grossAreaRatio.Add(tempOutput.GetGrossAreaRatio());
-                targetAccuracy.Add(tempOutput.GetTargetAccuracy());
-                double tempRatio = (tempOutput.ParkingLotOnEarth.GetCount() + tempOutput.ParkingLotUnderGround.Count) / (tempOutput.GetLegalParkingLotOfCommercial() + tempOutput.GetLegalParkingLotofHousing());
-                parkinglotRatio.Add(tempRatio);
-
+                //targetAccuracy.Add(tempOutput.GetTargetAccuracy());
+                parkinglotRatio.Add(tempOutput.GetParkingScore());
+                axisAccuracy.Add(tempOutput.GetAxisAccuracy());
                 TuringAndCorbusierPlugIn.InstanceClass.page3.currentProgressFactor += 1;
                 TuringAndCorbusierPlugIn.InstanceClass.page3.updateProGressBar(TuringAndCorbusierPlugIn.InstanceClass.page3.currentProgressFactor.ToString() + "/" + TuringAndCorbusierPlugIn.InstanceClass.page3.currentWorkQuantity.ToString() + " 진행중");
 
@@ -387,7 +387,7 @@ namespace TuringAndCorbusier
             //법정 용적률에 근접한 유전자가 가장 높은 값 받음,
             // -0 ~ -5 최대값 받음
             //넘어가면 * 0.01 포인트 마이너스
-            //낮이면 *0.1포인트 마이너스
+            //낮으면 *0.1포인트 마이너스
 
             List<double> points = new List<double>();
             for (int r = 0; r < grossAreaRatio.Count; r++)
@@ -411,7 +411,7 @@ namespace TuringAndCorbusier
             double Cworst = FARList.First;
             double Cbest = FARList.Last;
             double k = fitnessFactor;
-            List<double> fitness = new List<double>(points);
+            List<double> fitness = new List<double>();
             //double Cworst = tempGAR[0];
             //double Cbest = tempGAR[gene.Count - 1];
             //double k = fitnessFactor;
@@ -423,37 +423,42 @@ namespace TuringAndCorbusier
 
 
             double targetWeight = 0.4;
-            double CworstT = targetAccuracy.Min();
-            double CbestT = targetAccuracy.Max();
+            //double CworstT = targetAccuracy.Min();
+            //double CbestT = targetAccuracy.Max();
 
             //fitnessvalue rate
             //연면적 1 : 주차율(?) 0.3 : 유닛정확도 : 0.4
 
 
             //for test 
-            //string url = @"C://Users//user//Desktop//test";
-            //System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
+            string url = @"C://Users//user//Desktop//test";
+            System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
 
-            //string filename = "//garojutacklog" + (dinfo.GetFiles().Length+1).ToString() + ".csv";
-            //System.IO.FileStream fs = new System.IO.FileStream(url+filename, System.IO.FileMode.CreateNew);
-            //fs.Close();
-            //fs.Dispose();
-            //System.IO.StreamWriter w = new System.IO.StreamWriter(fs.Name);
+            string filename = "//garojutacklogV2" + (dinfo.GetFiles().Length + 1).ToString() + ".csv";
+            System.IO.FileStream fs = new System.IO.FileStream(url + filename, System.IO.FileMode.CreateNew);
+            fs.Close();
+            fs.Dispose();
+            System.IO.StreamWriter w = new System.IO.StreamWriter(fs.Name);
+            string column = "용적률" + "," + "용적률점수" + "," + "주차점수" + "," + "축점수" + "," + "합계" + "," + "1층사용여부";
+            w.WriteLine(column);
             for (int j = 0; j < gene.Count; j++)
             {
-                
+                double farfitnessVal = points[j]*10;
+                double parkkingfitnessVal = parkinglotRatio[j];
+                double axisfitnessVal = axisAccuracy[j];
+
                 //double farfitnessVal = ((grossAreaRatio[j] - Cbest) * (k - 1) / k + (Cbest - Cworst) + 0.01) / (Cbest - Cworst + 0.01);
                 //double parkingval = ((parkinglotRatio[j] - CbestR) * (k - 1) / k + (CbestR - CworstR) + 0.01) / (CbestR - CworstR + 0.01) * parkingWeight;
                 //double targetval = ((targetAccuracy[j] - CbestT) * (k - 1) / k + (CbestT - CworstT) + 0.01) / (CbestT - CworstT + 0.01) * targetWeight;
               
-                //fitness.Add(farfitnessVal + parkingval + targetval);
+                fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal);
                 //for test
-                //string format = grossAreaRatio[j].ToString() + "," + farfitnessVal.ToString() + "," + parkinglotRatio[j] + "," + parkingval + "," + targetval + "," + (farfitnessVal+parkingval+targetval).ToString();
-                //w.WriteLine(format);
+                string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString();
+                w.WriteLine(format);
             }
             //for test
-            //w.Close();
-            //w.Dispose();
+            w.Close();
+            w.Dispose();
 
 
             //tempGAR.Reverse();
