@@ -431,16 +431,16 @@ namespace TuringAndCorbusier
 
 
             //for test 
-            string url = @"C://Users//user//Desktop//test";
-            System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
+            //string url = @"C://Users//user//Desktop//test";
+            //System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
 
-            string filename = "//garojutacklogV2" + (dinfo.GetFiles().Length + 1).ToString() + ".csv";
-            System.IO.FileStream fs = new System.IO.FileStream(url + filename, System.IO.FileMode.CreateNew);
-            fs.Close();
-            fs.Dispose();
-            System.IO.StreamWriter w = new System.IO.StreamWriter(fs.Name);
-            string column = "용적률" + "," + "용적률점수" + "," + "주차점수" + "," + "축점수" + "," + "합계" + "," + "1층사용여부";
-            w.WriteLine(column);
+            //string filename = "//garojutacklogV2" + (dinfo.GetFiles().Length + 1).ToString() + ".csv";
+            //System.IO.FileStream fs = new System.IO.FileStream(url + filename, System.IO.FileMode.CreateNew);
+            //fs.Close();
+            //fs.Dispose();
+            //System.IO.StreamWriter w = new System.IO.StreamWriter(fs.Name);
+            //string column = "용적률" + "," + "용적률점수" + "," + "주차점수" + "," + "축점수" + "," + "합계" + "," + "1층사용여부";
+            //w.WriteLine(column);
             for (int j = 0; j < gene.Count; j++)
             {
                 double farfitnessVal = points[j]*10;
@@ -453,12 +453,12 @@ namespace TuringAndCorbusier
               
                 fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal);
                 //for test
-                string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString();
-                w.WriteLine(format);
+                //string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString();
+                //w.WriteLine(format);
             }
             //for test
-            w.Close();
-            w.Dispose();
+            //w.Close();
+            //w.Dispose();
 
 
             //tempGAR.Reverse();

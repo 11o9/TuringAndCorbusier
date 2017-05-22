@@ -936,7 +936,6 @@ namespace TuringAndCorbusier
                 clearCorner = 0;
 
                 //start
-
                 double val = 0;
                 houseEndVals.Add(val);
                 for (int i = 0; i < unallocated.Count; i++)
@@ -974,7 +973,6 @@ namespace TuringAndCorbusier
                 }
                 for (int i = 0; i < mappedVals.Count - 1; i++)
                 {
-
                     if ((int)mappedVals[i] == (int)(mappedVals[(i + 1)] - 0.001))
                     {
                         double avrg = (mappedVals[i] + mappedVals[(i + 1)]) / 2;
@@ -995,6 +993,9 @@ namespace TuringAndCorbusier
                         }
                         else
                         {
+                            if (homeOri.Count == unallocated.Count)
+                                break;
+
                             if (i % 3 == 0)
                             {
                                 homeOri.Add(eOri);
@@ -1084,31 +1085,17 @@ namespace TuringAndCorbusier
                 {
                     trigger = 0;
                 }
+
+                //debug
+                if (unallocated.Count != homeOri.Count)
+                { }
+
                 if (trigger != 0 || clearCorner != 0)
                 {
                     unallocated.Add(unallocated[0]);
                     unallocated.RemoveAt(0);
                 }
-            }
 
-            if (counter == unallocated.Count)
-            {
-                corePoint.Clear();
-                coreVecX.Clear();
-                coreVecY.Clear();
-
-                homeOri.Clear();
-                homeVecX.Clear();
-                homeVecY.Clear();
-
-                xa.Clear();
-                xb.Clear();
-                ya.Clear();
-                yb.Clear();
-
-                homeShapeType.Clear();
-                wallFactors.Clear();
-                exclusiveArea.Clear();
             }
 
             //windows
@@ -1249,7 +1236,29 @@ namespace TuringAndCorbusier
                     cpB.Add(oneCore);
                 }
                 core.Add(cpB);
-            }          
+            }
+
+
+            //renew
+            if (counter == unallocated.Count)
+            {
+                corePoint.Clear();
+                coreVecX.Clear();
+                coreVecY.Clear();
+
+                homeOri.Clear();
+                homeVecX.Clear();
+                homeVecY.Clear();
+
+                xa.Clear();
+                xb.Clear();
+                ya.Clear();
+                yb.Clear();
+
+                homeShapeType.Clear();
+                wallFactors.Clear();
+                exclusiveArea.Clear();
+            }
         }
 
         ///////////////////////////////
