@@ -431,8 +431,8 @@ namespace TuringAndCorbusier
 
 
             //for test 
-            string url = @"C://Users//user//Desktop//test";
-            System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
+            //string url = @"C://Users//user//Desktop//test";
+            //System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
 
             string filename = "//garojutacklogV2" + (dinfo.GetFiles().Length + 1).ToString() + ".csv";
             System.IO.FileStream fs = new System.IO.FileStream(url + filename, System.IO.FileMode.CreateNew);
@@ -461,8 +461,8 @@ namespace TuringAndCorbusier
                 w.WriteLine(format);
             }
             //for test
-            w.Close();
-            w.Dispose();
+            //w.Close();
+            //w.Dispose();
 
 
             //tempGAR.Reverse();

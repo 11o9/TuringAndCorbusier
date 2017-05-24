@@ -864,14 +864,14 @@ namespace TuringAndCorbusier
             double coreWidth = randomCoreType.GetWidth();
             double width = parameterSet.Parameters[2];
 
+            List<int> allocated = new List<int>();
+
             List<double> houseEndVals = new List<double>();
             List<Point3d> houseEndPoints = new List<Point3d>();
-            List<Vector3d> houseEndPerps = new List<Vector3d>();
 
             List<double> coreEndVals = new List<double>();
             List<Point3d> coreEndPoints = new List<Point3d>();
-            List<Vector3d> coreEndPerps = new List<Vector3d>();
-
+            
             List<int> coreType = new List<int>();
             List<Point3d> corePoint = new List<Point3d>();
             List<Vector3d> coreVecX = new List<Vector3d>();
@@ -904,15 +904,16 @@ namespace TuringAndCorbusier
             int counter = 0;
             double trigger = 1;
             int clearCorner = 1;
-            double narrowEnd = 1200;
+            double shortEdgeLimit = 3300;
             double cornerThreshold = 1500;
+            bool IsNextPartDrawable = true;
+            int currentUnitIndex = 0;
 
             while (counter < unallocated.Count && (trigger != 0 || clearCorner != 0))
             {
                 //initialize
                 houseEndVals.Clear();
                 houseEndPoints.Clear();
-                houseEndPerps.Clear();
 
                 coreType.Clear();
                 corePoint.Clear();
@@ -936,8 +937,11 @@ namespace TuringAndCorbusier
                 trigger = 1;
                 clearCorner = 0;
 
-                //start
+                IsNextPartDrawable = true;
+                currentUnitIndex = 0;
+                allocated.Clear();
 
+                //start
                 double val = 0;
                 houseEndVals.Add(val);
                 for (int i = 0; i < unallocated.Count; i++)
@@ -959,11 +963,6 @@ namespace TuringAndCorbusier
                     }
                 }
                 List<double> mappedVals = new List<double>(valMapper(lines, houseEndVals));
-                for (int i = 0; i < mappedVals.Count; i++)
-                {
-                    houseEndPoints.Add(centerline.PointAt(mappedVals[i]));
-                    houseEndPerps.Add(centerline.TangentAt(mappedVals[i]));
-                }
 
                 int counter2 = 0;
                 for (int i = 0; i < mappedVals.Count - 1; i++)
@@ -973,36 +972,74 @@ namespace TuringAndCorbusier
                         counter2 += 1;
                     }
                 }
+
                 for (int i = 0; i < mappedVals.Count - 1; i++)
                 {
-
-                    if ((int)mappedVals[i] == (int)(mappedVals[(i + 1)] - 0.001))
+                    if ((int)mappedVals[i] == (int)(mappedVals[(i + 1)] - 0.001))  //is not corner
                     {
                         double avrg = (mappedVals[i] + mappedVals[(i + 1)]) / 2;
                         Point3d midOri = centerline.PointAt(avrg);
                         Point3d sOri = centerline.PointAt(mappedVals[i]);
                         Point3d eOri = centerline.PointAt(mappedVals[i + 1]);
+
+                        //코너 빼기 판정용
+                        Point3d currentLineEnd = centerline.PointAt(Math.Ceiling(mappedVals[i + 1]));
+                        double eOriToLineEnd = eOri.DistanceTo(currentLineEnd); 
+                        bool isToLineEndEnough = eOriToLineEnd + width/2> shortEdgeLimit;
+
                         Vector3d midVec = centerline.TangentAt(avrg);
                         Vector3d verticalVec = midVec;
                         verticalVec.Rotate(Math.PI / 2, new Vector3d(0, 0, 1));
                         midOri.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
                         sOri.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
                         eOri.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
-                        if (i % 3 == 1)
+
+                        if (i % 3 == 1) //if it is core
                         {
+                            if (!IsNextPartDrawable)
+                            {
+                                IsNextPartDrawable = false;
+                                continue;
+                            }
+
                             corePoint.Add(sOri);
                             coreVecX.Add(Vector3d.Multiply(midVec, 1));
                             coreVecY.Add(Vector3d.Multiply(verticalVec, -1));
+
+                            if (!isToLineEndEnough)
+                                IsNextPartDrawable = false;
                         }
-                        else
+                        else //if it is household
                         {
-                            if (i % 3 == 0)
+                            if (currentUnitIndex == unallocated.Count)
+                                break;
+
+                            if (!IsNextPartDrawable)
                             {
-                                homeOri.Add(eOri);
+                                IsNextPartDrawable = true;
+                                currentUnitIndex++;
+                                continue;
                             }
-                            else
+
+                            if (i % 3 == 0) //if it is formerPart
                             {
+                                //if (!isToLineEndEnough)
+                                //{
+                                //    IsNextPartDrawable = false;
+                                //    currentUnitIndex++;
+                                //    continue;
+                                //}
+
+                                allocated.Add(unallocated[currentUnitIndex]);
+                                homeOri.Add(eOri);
+                                currentUnitIndex++;
+                            }
+
+                            else //if it is laterPart
+                            {
+                                allocated.Add(unallocated[currentUnitIndex]);
                                 homeOri.Add(sOri);
+                                currentUnitIndex++;
                             }
 
                             homeVecX.Add(Vector3d.Multiply(midVec, (i % 3) - 1));
@@ -1014,102 +1051,164 @@ namespace TuringAndCorbusier
                             homeShapeType.Add(0);
                             wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 0.5 }));
                             exclusiveArea.Add(exclusiveAreaCalculatorAG4Edge(xa[xa.Count - 1], xb[xb.Count - 1], ya[ya.Count - 1], yb[yb.Count - 1], Consts.balconyDepth));
+
+                            if (!isToLineEndEnough)
+                            {
+                                IsNextPartDrawable = false;
+                                continue;
+                            }
+
+                            IsNextPartDrawable = true;
                         }
                     }
-                    else
+
+
+                    else //if it is corner
                     {
                         Point3d checkP = lines[(int)mappedVals[i]].PointAt(1);
-                        Vector3d v1 = new Vector3d(houseEndPoints[i] - checkP);
-                        Vector3d v2 = new Vector3d(houseEndPoints[(i + 1) % mappedVals.Count] - checkP);
+                        Point3d sOri = centerline.PointAt(mappedVals[i]);
+                        Point3d eOri = centerline.PointAt(mappedVals[i + 1]);
+
+                        Vector3d v1 = new Vector3d(sOri - checkP);
+                        Vector3d v2 = new Vector3d(eOri - checkP);
                         double l1 = v1.Length;
                         double l2 = v2.Length;
-                        if (Math.Max(l1, l2) < width / 2)
-                        {
-                            counter2 += 1;
-                        }
+
+                        bool isAspectRatioReasonable = Math.Min(l1, l2) / Math.Max(l1, l2) > 1 / 4;
 
                         v1.Unitize();
                         v2.Unitize();
-                        checkP.Transform(Transform.Translation(Vector3d.Add(Vector3d.Multiply(v1, width / 2), Vector3d.Multiply(v2, width / 2))));
-                        homeOri.Add(checkP);
-                        homeShapeType.Add(1);
-                        if (i % 3 == 2)
+
+                        if (i % 3 == 1) //if it is core
                         {
-                            v1.Reverse();
-                            homeVecX.Add(v1);
-                            homeVecY.Add(v2);
-
-                            xa.Add(l1 + width / 2);
-                            xb.Add(l1 - width / 2);
-                            ya.Add(l2 + width / 2);
-                            yb.Add(l2 - width / 2);
-
-                            if (l1 - width / 2 < narrowEnd)
+                            if (!IsNextPartDrawable)
                             {
-                                counter2 += 1;
+                                IsNextPartDrawable = false;
+                                continue;
                             }
+
+                            corePoint.Add(sOri);
+                            coreVecX.Add(Vector3d.Multiply(-v1, 1));
+                            coreVecY.Add(Vector3d.Multiply(-v2, -1));
+                            IsNextPartDrawable = false;
+                            continue;
                         }
-                        else
+
+                        if (currentUnitIndex == unallocated.Count)
+                            break;
+
+                        if (i % 3 == 2) //if it is later part
                         {
-                            v2.Reverse();
-                            homeVecX.Add(v2);
-                            homeVecY.Add(v1);
-
-                            xa.Add(l2 + width / 2);
-                            xb.Add(l2 - width / 2);
-                            ya.Add(l1 + width / 2);
-                            yb.Add(l1 - width / 2);
-
-                            if (l2 - width / 2 < narrowEnd)
+                            if (!IsNextPartDrawable || !isAspectRatioReasonable)
                             {
-                                counter2 += 1;
+                                IsNextPartDrawable = true;
+                                currentUnitIndex++;
+                                continue;
                             }
+
+                            if (l1  <= width / 2) //코너 정사각형 안쪽으로 코어가 더 파고 들어갔을 때
+                            {
+                                checkP.Transform(Transform.Translation(v1 * l1 + v2 * l2));
+                                homeOri.Add(checkP);
+                                v1.Reverse();
+
+                                homeVecX.Add(v1);
+                                homeVecY.Add(v2);
+
+                                xa.Add(l1 + width / 2);
+                                xb.Add(0);
+                                ya.Add(l2 + width / 2);
+                                yb.Add(0);
+
+                                wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
+                            }
+
+                            else
+                            {
+                                checkP.Transform(Transform.Translation(v1 * l1 + v2 * l2));
+                                homeOri.Add(checkP);
+                                v1.Reverse();
+
+                                homeVecX.Add(v1);
+                                homeVecY.Add(v2);
+
+                                xa.Add(l1 + width / 2);
+                                xb.Add(0);
+                                ya.Add(l2 + width / 2);
+                                yb.Add(0);
+
+                                wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
+
+                                //xa.Add(l1 + width / 2);
+                                //xb.Add(l1- width / 2);
+                                //ya.Add(l2 + width / 2);
+                                //yb.Add(l2 - width / 2);
+
+                                //wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 0.5, 1 }));
+                            }
+
+                            allocated.Add(unallocated[currentUnitIndex]);
+                            currentUnitIndex++;
+                        }
+                        else //if it is former part
+                        {
+                            if (!IsNextPartDrawable || !isAspectRatioReasonable)
+                            {
+                                IsNextPartDrawable = true;
+                                currentUnitIndex++;
+                                continue;
+                            }
+
+    
+                            if (l1 <= width / 2) //코너 정사각형 안쪽으로 이전 세대가 더 파고 들어갔을 때
+                            {
+                                checkP.Transform(Transform.Translation(v1 * l1 + v2 * l2));
+                                homeOri.Add(checkP);
+                                v1.Reverse();
+
+                                homeVecX.Add(v1);
+                                homeVecY.Add(v2);
+
+                                xa.Add(l1 + width / 2);
+                                xb.Add(0);
+                                ya.Add(l2 + width / 2);
+                                yb.Add(0);
+
+                                wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
+                            }
+
+                            else
+                            {
+                                checkP.Transform(Transform.Translation(v1 * l1 + v2 * l2));
+                                homeOri.Add(checkP);
+                                v1.Reverse();
+
+                                homeVecX.Add(v1);
+                                homeVecY.Add(v2);
+
+                                xa.Add(l1 + width / 2);
+                                xb.Add(0);
+                                ya.Add(l2 + width / 2);
+                                yb.Add(0);
+
+                                wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
+                                //xa.Add(l1 + width / 2);
+                                //xb.Add(l1 - width / 2);
+                                //ya.Add(l2 + width / 2);
+                                //yb.Add(l2 - width / 2);
+
+                                //wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 0.5, 1 }));
+                            }
+
+                            allocated.Add(unallocated[currentUnitIndex]);
+                            currentUnitIndex++;
                         }
 
-                        if (l2 - width / 2 > 0)
-                        {
-                            wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 0.5, 1 }));
-                        }
-                        else if (l2 - width / 2 == 0)
-                        {
-                            wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
-                        }
-                        else
-                        {
-                            wallFactors.Add(new List<double>(new double[] { 0, 1, 1, 1, 0.5, 1 }));
-                        }
                         exclusiveArea.Add(exclusiveAreaCalculatorAG4Edge(xa[xa.Count - 1], xb[xb.Count - 1], ya[ya.Count - 1], yb[yb.Count - 1], Consts.balconyDepth));
+                        homeShapeType.Add(1);
+                        IsNextPartDrawable = true;
                     }
                 }
-                if (counter2 == 0)
-                {
-                    trigger = 0;
-                }
-                if (trigger != 0 || clearCorner != 0)
-                {
-                    unallocated.Add(unallocated[0]);
-                    unallocated.RemoveAt(0);
-                }
-            }
-
-            if (counter == unallocated.Count)
-            {
-                corePoint.Clear();
-                coreVecX.Clear();
-                coreVecY.Clear();
-
-                homeOri.Clear();
-                homeVecX.Clear();
-                homeVecY.Clear();
-
-                xa.Clear();
-                xb.Clear();
-                ya.Clear();
-                yb.Clear();
-
-                homeShapeType.Clear();
-                wallFactors.Clear();
-                exclusiveArea.Clear();
             }
 
             //windows
@@ -1163,7 +1262,7 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < homeOri.Count; i++)
             {
-                hhpS.Add(new Household(homeOri[i], homeVecX[i], homeVecY[i], xa[i], xb[i], ya[i], yb[i], unallocated[i], exclusiveArea[i], winBuilding[i], entBuilding[i], wallFactors[i]));
+                hhpS.Add(new Household(homeOri[i], homeVecX[i], homeVecY[i], xa[i], xb[i], ya[i], yb[i], allocated[i], exclusiveArea[i], winBuilding[i], entBuilding[i], wallFactors[i]));
             }
 
             for (int j = 0; j < storiesHigh; j++)
@@ -1250,7 +1349,33 @@ namespace TuringAndCorbusier
                     cpB.Add(oneCore);
                 }
                 core.Add(cpB);
-            }          
+            }
+
+
+            //renew
+            if (counter == unallocated.Count)
+            {
+                corePoint.Clear();
+                coreVecX.Clear();
+                coreVecY.Clear();
+
+                homeOri.Clear();
+                homeVecX.Clear();
+                homeVecY.Clear();
+
+                xa.Clear();
+                xb.Clear();
+                ya.Clear();
+                yb.Clear();
+
+                homeShapeType.Clear();
+                wallFactors.Clear();
+                exclusiveArea.Clear();
+
+                allocated.Clear();
+                IsNextPartDrawable = true;
+                currentUnitIndex = 0;
+            }
         }
 
         ///////////////////////////////
@@ -1268,7 +1393,7 @@ namespace TuringAndCorbusier
         private double exclusiveAreaCalculatorAG4Edge(double xa, double xb, double ya, double yb, double balconyDepth)
         {
             double exclusiveArea = xa * ya - xb * yb;
-            exclusiveArea -= (xa + xa - xb) * balconyDepth;
+            exclusiveArea -= (xa - xb) * balconyDepth;
             return exclusiveArea;
         }
 
