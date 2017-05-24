@@ -3618,12 +3618,17 @@ namespace TuringAndCorbusier
             }
 
             Curve combinationCurve;
-            if (Curve.JoinCurves(usableCrvs).Length != 0)
-                combinationCurve = Curve.JoinCurves(usableCrvs)[0];
-            else
-            {
+            //if (Curve.JoinCurves(usableCrvs).Length != 0)
+            //    combinationCurve = Curve.JoinCurves(usableCrvs)[0];
+            //else
+            //{
+            //    combinationCurve = firstCurve;
+            //}
+            var result = NewJoin(usableCrvs);
+            if (result.Count == 0)
                 combinationCurve = firstCurve;
-            }
+            else
+                combinationCurve = result[0];
 
             return combinationCurve;
         }

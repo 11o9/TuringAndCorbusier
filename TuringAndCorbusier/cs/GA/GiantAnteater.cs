@@ -201,12 +201,12 @@ namespace TuringAndCorbusier
 
             //best 1
             Apartment bestOutput = ag.generator(plot, bestGene, target);
-            //return new Apartment[] { bestOutput }.ToList();
+            return new Apartment[] { bestOutput }.ToList();
 
             //best 5
             //var uniqueGenes = offspringGenes.Distinct();
             Apartment[] bestOutputs = offspringGenes.Take(5).Select(n => ag.generator(plot, n, target)).ToArray();
-            return bestOutputs.ToList();
+            //return bestOutputs.ToList();
 
 
             //best 10
@@ -439,7 +439,7 @@ namespace TuringAndCorbusier
             fs.Close();
             fs.Dispose();
             System.IO.StreamWriter w = new System.IO.StreamWriter(fs.Name);
-            string column = "용적률" + "," + "용적률점수" + "," + "주차점수" + "," + "축점수" + "," + "합계" + "," + "1층사용여부";
+            string column = "FAR" + "," + "FARPoint" + "," + "ParkingPoint" + "," + "AxisPoint" + "," + "Sum" + "," + "Use1F" + ",UseSetback";
             w.WriteLine(column);
             for (int j = 0; j < gene.Count; j++)
             {
@@ -450,10 +450,14 @@ namespace TuringAndCorbusier
                 //double farfitnessVal = ((grossAreaRatio[j] - Cbest) * (k - 1) / k + (Cbest - Cworst) + 0.01) / (Cbest - Cworst + 0.01);
                 //double parkingval = ((parkinglotRatio[j] - CbestR) * (k - 1) / k + (CbestR - CworstR) + 0.01) / (CbestR - CworstR + 0.01) * parkingWeight;
                 //double targetval = ((targetAccuracy[j] - CbestT) * (k - 1) / k + (CbestT - CworstT) + 0.01) / (CbestT - CworstT + 0.01) * targetWeight;
-              
-                fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal);
+
+                //setback test
+                double setbackBonus = 0;
+                //if (gene[j].setback)
+                //    setbackBonus = 100;
+                fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus);
                 //for test
-                string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString();
+                string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString() + "," + gene[j].setback.ToString();
                 w.WriteLine(format);
             }
             //for test

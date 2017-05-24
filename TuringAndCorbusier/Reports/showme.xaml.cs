@@ -50,6 +50,7 @@ namespace Reports
         string xpspath = "xps\\";
         string root = "Export";
         string projectpath = "";
+
         List<string> _pagename = new List<string>();
         List<string> _pageurls = new List<string>();
         List<string> _pdfurls = new List<string>();

@@ -615,6 +615,7 @@ namespace TuringAndCorbusier
         double[] thisParameters;
         double height;
         public bool using1F = false;
+        public bool setback = false;
         public CoreType fixedCoreType = null;
         //Method, 메소드
 
@@ -2066,6 +2067,121 @@ namespace TuringAndCorbusier
             return GetArea() * 0.09;
         }
 
+        public bool Contract(Curve testCurve)
+        {
+            if (testCurve.PointAtStart.Z != Origin.Z)
+                testCurve.Translate(Vector3d.ZAxis * (Origin.Z - testCurve.PointAtStart.Z));
+            
+            if (testCurve.Contains(Origin) == PointContainment.Outside)
+                return false;
+
+            Curve tempOutline = GetOutline();
+
+            var intersection = Curve.CreateBooleanIntersection(tempOutline, testCurve);
+
+            if (intersection.Length != 1)
+                return false;
+
+            if (intersection[0] == tempOutline)
+                return true;
+
+            Curve onlyOne = intersection[0];
+            //if (AreaMassProperties.Compute(onlyOne).Area < GetArea() / 2)
+            //    return false;
+
+            Point3d origin = Origin;
+            Point3d test1 = origin + XDirection * (XLengthA-XLengthB);
+            Point3d test2 = origin - XDirection * XLengthB;
+
+            //back side
+
+            Curve testline = new LineCurve(test1, test1 + YDirection * YLengthB);
+            Curve testline0 = new LineCurve(test2, test2 + YDirection * YLengthB);
+
+            DebugPoints.Add(testline.PointAtEnd);
+            DebugPoints.Add(testline0.PointAtEnd);
+
+
+            var inter1 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline, 0, 0);
+            var inter2 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline0, 0, 0);
+
+            double minDistanceBack = double.MaxValue;
+
+            foreach (var e in inter1)
+            {
+                Point3d p = e.PointA;
+                DebugPoints.Add(p);
+                double distance = p.DistanceTo(testline.PointAtStart);
+                if (minDistanceBack > distance)
+                    minDistanceBack = distance;
+            }
+
+            foreach (var e in inter2)
+            {
+                Point3d p = e.PointA;
+                DebugPoints.Add(p);
+                double distance = p.DistanceTo(testline0.PointAtStart);
+                if (minDistanceBack > distance)
+                    minDistanceBack = distance;
+            }
+
+          
+
+            //front side
+
+            Curve testline1 = new LineCurve(test1, test1 - YDirection * (YLengthA - YLengthB));
+            Curve testline2 = new LineCurve(test2, test2 - YDirection * (YLengthA - YLengthB));
+
+            var int1 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline1, 0, 0);
+            var int2 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline2, 0, 0);
+
+            DebugPoints.Add(test1);
+            DebugPoints.Add(test2);
+
+            DebugPoints.Add(testline1.PointAtEnd);
+            DebugPoints.Add(testline2.PointAtEnd);
+
+            
+
+            double minDistanceFront = double.MaxValue;
+
+            foreach (var e in int1)
+            {
+                Point3d p = e.PointA;
+                DebugPoints.Add(p);
+                double distance = p.DistanceTo(testline1.PointAtStart);
+                if(minDistanceFront > distance)
+                    minDistanceFront = distance;
+            }
+
+            foreach (var e in int2)
+            {
+                Point3d p = e.PointA;
+                DebugPoints.Add(p);
+                double distance = p.DistanceTo(testline2.PointAtStart);
+                if (minDistanceFront > distance)
+                    minDistanceFront = distance;
+            }
+
+            if (minDistanceFront == double.MaxValue && minDistanceBack == double.MaxValue) // no intersection
+                return true;
+
+            //double before = GetArea();
+            if (minDistanceBack != double.MaxValue)
+            {
+                double diff = YLengthB - minDistanceBack;
+                YLengthB = minDistanceBack;
+                YLengthA -= diff;
+            }
+
+            if(minDistanceFront != double.MaxValue)
+                YLengthA = minDistanceFront + YLengthB;
+            //if (GetArea() < before * 0.5)
+            //    return false;
+
+            return true;
+        }
+        public List<Point3d> DebugPoints = new List<Point3d>();
         //Property, 속성
         public int BuildingGroupNum { get { return indexer[0]; } }
         public Point3d Origin { get; set; }
@@ -2251,6 +2367,7 @@ namespace TuringAndCorbusier
     {
 
         bool high = false;
+        double fakeHeight = 0;
         //Constructor, 생성자
 
         public Regulation(double stories)
@@ -2365,6 +2482,17 @@ namespace TuringAndCorbusier
             totalheight = storiesHigh;
         }
 
+        //층수,동간거리 : 최상층 기준, 동간거리를 제외한 법규 : 최상층-1 기준 
+        public void Fake()
+        {
+            fakeHeight = Consts.FloorHeight;
+        }
+
+        public void UnFake()
+        {
+            fakeHeight = 0;
+        }
+
 
         //Field, 필드
         public double totalheight;
@@ -2394,10 +2522,10 @@ namespace TuringAndCorbusier
                 Curve temp = segments[i];
                 var v = temp.TangentAtStart;
                 v.Rotate(Math.PI / 2, Vector3d.ZAxis);
-                if(roadwidths[j] == 21000)
-                    temp.Translate(v * 500000);
+                if (roadwidths[j] == 21000)
+                { }
                 else
-                    temp.Translate(v * roadwidths[j]/2);
+                    temp.Translate(v * roadwidths[j] / 2);
                 segments[i] = temp;
             }
 
@@ -2570,7 +2698,7 @@ namespace TuringAndCorbusier
         }
         public Curve[] fromNorthCurve(Plot plot)
         {
-            Curve roadCenter = RoadCenterLines(plot);
+            //Curve roadCenter = RoadCenterLines(plot);
             
             double t = -1;
 
@@ -2587,25 +2715,168 @@ namespace TuringAndCorbusier
 
             double tempHeight = height;//숫자 -> 나중에 변수로
 
-            var tempRoadLine = roadCenter.DuplicateCurve();
-            if (tempHeight < 9000)//숫자 -> 나중에 변수로
-                tempRoadLine.Translate(Vector3d.YAxis * t * 1500);//숫자 -> 나중에 변수로
-            else
-                tempRoadLine.Translate(Vector3d.YAxis * t * (tempHeight - Consts.PilotiHeight) / 2);
+            var tempRoadLine = plot.Boundary.DuplicateSegments();
 
-            var newCurve = Curve.CreateBooleanIntersection(tempRoadLine, plot.Boundary);
+            for (int i = 0; i < tempRoadLine.Length; i++)
+            {
+                if (tempRoadLine[i].TangentAtStart.X <= 0)
+                    continue;
+
+                double roadCenter = -plot.Surroundings[i] / 2;
+                double moveDistance = roadCenter * t;
+
+                if (tempHeight < 9000)//숫자 -> 나중에 변수로
+                    moveDistance += 1500;
+                else
+                    moveDistance += tempHeight / 2;
+
+                if (moveDistance < 0)
+                    moveDistance = 0;
+
+                if (plot.Surroundings[i] == 21000)
+                    moveDistance = 0;
+
+               
+
+                tempRoadLine[i].Translate(Vector3d.YAxis * t * moveDistance);//숫자 -> 나중에 변수로
+            }
+
+
+            List<Point3d> wholePoints = new List<Point3d>();
+
+            Point3d last = Point3d.Unset;
+            for (int i = 0; i < tempRoadLine.Length; i++)
+            {
+                if (tempRoadLine[i].PointAtStart != last)
+                {
+                    last = tempRoadLine[i].PointAtStart;
+                    wholePoints.Add(last);
+                }
+                if (tempRoadLine[i].PointAtEnd != last)
+                {
+                    last = tempRoadLine[i].PointAtEnd;
+                    wholePoints.Add(last);
+                }
+            }
+
+            Curve wholeCurve = new Polyline(wholePoints).ToNurbsCurve();
+
+            List<TypeParam> tps = new List<TypeParam>();
+            foreach (var p in wholeCurve.DuplicateSegments())
+            {
+                tps.Add(new TypeParam(p.Domain.Min, false));
+            }
+            tps.Add(new TypeParam(wholeCurve.Domain.Max, false));
+
+            var self = Rhino.Geometry.Intersect.Intersection.CurveSelf(wholeCurve, 0);
+            foreach (var e in self)
+            {
+                tps.Add(new TypeParam(e.ParameterA, true));
+                tps.Add(new TypeParam(e.ParameterB, true));
+            }
+
+            tps = tps.OrderBy(n => n.Parameter).ToList();
+
+
+
+
+            //일조 영향 안받는 면을 통과한 선을 잘라버린다. 찾아서.
+
+            //find immune
+            //Curve[] boundarySegs = plot.Boundary.DuplicateSegments();
+            //List<Curve> immune = new List<Curve>();
+            //for (int i = 0; i < boundarySegs.Length; i++)
+            //{
+            //    int j = i % plot.Surroundings.Length;
+            //    if (plot.Surroundings[j] == 21000)
+            //        immune.Add(boundarySegs[j]);
+            //}
+
+
+            //cut
+
+       
+
+            //라인 돌면서 파라미터 저장
+            //이뮨과 교차하는 커브의 경우 교차점의 파라미터도 저장
+            //
+            //Curve[] tempRoadLineSegments = tempRoadLine;
+            //List<TypeParam> curveParameters = new List<TypeParam>();
+            //for (int i = 0; i < tempRoadLineSegments.Length; i++)
+            //{
+            //    curveParameters.Add(new TypeParam(tempRoadLineSegments[i].Domain.Min,false));
+
+            //    for (int j = 0; j < immune.Count; j++)
+            //    {
+            //        var itsc = Rhino.Geometry.Intersect.Intersection.CurveCurve(tempRoadLineSegments[i], immune[j], 0, 0);
+            //        foreach (var e in itsc)
+            //        {
+            //            curveParameters.Add(new TypeParam(e.ParameterA, true));
+            //        }
+            //    }
+            //}
+            //curveParameters.Add(new TypeParam(tempRoadLineSegments.Last().Domain.Max,false));
+
+            List<double> GroupA = new List<double>();
+            List<double> GroupB = new List<double>();
+
+            bool groupSwitch = true;
+            foreach (var tp in tps)
+            {
+                if (tp.IsIntersectionParameter)
+                {
+                    GroupA.Add(tp.Parameter);
+                    GroupB.Add(tp.Parameter);
+                    groupSwitch = !groupSwitch;
+
+                }
+                else
+                {
+                    if (groupSwitch)
+                        GroupA.Add(tp.Parameter);
+                    else
+                        GroupB.Add(tp.Parameter);
+                }
+            }
+
+            GroupA.Add(GroupA[0]);
+            GroupB.Add(GroupB[0]);
+
+            Curve resultA = new PolylineCurve(GroupA.Select(n => wholeCurve.PointAt(n)));
+            Curve resultB = new PolylineCurve(GroupB.Select(n => wholeCurve.PointAt(n)));
+
+            //tempRoadLine = GroupA.Count > GroupB.Count?new PolylineCurve(GroupA.Select(n=>tempRoadLine.PointAt(n))):new PolylineCurve(GroupB.Select(n => tempRoadLine.PointAt(n)));
+            if (Curve.CreateBooleanDifference(resultA, plot.Boundary).Length == 0)
+                return new Curve[] { resultA };
+
+            if (Curve.CreateBooleanDifference(resultB, plot.Boundary).Length == 0)
+                return new Curve[] { resultB };
+
+            //var newCurve = Curve.CreateBooleanIntersection(tempRoadLine, plot.Boundary);
+
+            return new Curve[] { };
 
             //for (int j = 0; j < newCurve.Length; j++)
             //    newCurve[j].Translate(Vector3d.ZAxis * tempHeight);
 
             //Rhino.RhinoDoc.ActiveDoc.Objects.Add(tempRoadLine);
-            return newCurve;
+            //return newCurve;
            
 
             //return copy.Select(n => n[0]).ToArray();
             //plot의 boundary, maxfloor, roadwidths, plottype 사용 , 도로중심선
         }
+        private class TypeParam
+        {
+            public double Parameter = 0;
+            public bool IsIntersectionParameter = false;
 
+            public TypeParam(double parameter, bool isIntersectionParameter)
+            {
+                Parameter = parameter;
+                IsIntersectionParameter = isIntersectionParameter;
+            }
+        }
         //not used
         public Curve[] fromNorthCurve2(Plot plot)
         {
@@ -2684,7 +2955,7 @@ namespace TuringAndCorbusier
             Curve fromNorthCurve = (new Polyline(distanceFromNorthPts)).ToNurbsCurve();
             return new Curve[] { fromNorthCurve };
         }
-      
+       
         //채광방향 사선 규칙입니다.
         public Curve[] byLightingCurve(Plot plot, double angle)
         {
@@ -2698,15 +2969,16 @@ namespace TuringAndCorbusier
 
             //법규적용 인접대지경계선(채광창)
             Curve roadCenter = RoadCenterLines(plot);
-            Curve[] plotArr = roadCenter.DuplicateSegments();
+            Curve[] plotArr = plot.Boundary.DuplicateSegments(); //roadCenter.DuplicateSegments();
+
             //대지 경계선을 구성 선분들로 분할합니다.
             Curve x = plot.Boundary;
 
             Curve[] plotArrExtended = new Curve[plotArr.Length];
             Array.Copy(plotArr, plotArrExtended, plotArr.Length);
 
-            double length = roadCenter.GetBoundingBox(false).Diagonal.Length;
-            var cp = AreaMassProperties.Compute(roadCenter).Centroid;
+            double length = x.GetBoundingBox(false).Diagonal.Length;
+            var cp = AreaMassProperties.Compute(x).Centroid;
             Vector3d dir = new Vector3d(Math.Cos(-angle), Math.Sin(-angle), 0);
             Curve baseline = new LineCurve(cp - dir * length, cp + dir * length);
             //아파트 라인 기준 각도로 기준 선을 뽑습니다 (- angle(Radian) 만큼 회전)
@@ -2718,6 +2990,13 @@ namespace TuringAndCorbusier
             //분할해둔 구성 선분들마다 , 이격거리 - 도로 너비/2 만큼씩 기준선 에 수직인 기준 벡터 방향으로 움직여줍니다.
             for (int i = 0; i < plotArrExtended.Length; i++)
             {
+                int k = 1;
+                double roadWidth = plot.Surroundings[i] / 2;
+                if (roadWidth == 21000)
+                    k = 0;
+                double eachDistance = (distance - roadWidth)*k;
+                if (eachDistance < 0)
+                    eachDistance = 0;
 
                 //기준 벡터 구하기
                 //각 구성선분의 양 끝 점에서 기준선으로부터 최단거리의 점을 구하고, 방향 벡터를 구합니다.
@@ -2742,23 +3021,23 @@ namespace TuringAndCorbusier
 
                 Curve pre = plotArrExtended[i].DuplicateCurve();
                 //특정 테스트 포인트가 도형 내부에 존재 한다면, 해당 방향으로 선을 움직입니다.
-                if (roadCenter.Contains(vstest) == PointContainment.Inside)
+                if (x.Contains(vstest) == PointContainment.Inside)
                 {
                     //v = vs
-                    pre.Transform(Transform.Translation(vs * distance));
+                    pre.Transform(Transform.Translation(vs * eachDistance));
                     plotArrExtended[i] = pre;
                 }
-                else if (roadCenter.Contains(vetest) == PointContainment.Inside)
+                else if (x.Contains(vetest) == PointContainment.Inside)
                 {
                     //v = ve
-                    pre.Transform(Transform.Translation(ve * distance));
+                    pre.Transform(Transform.Translation(ve * eachDistance));
                     plotArrExtended[i] = pre;
                 }
                 //내부의 점이 하나도 찍히지 않는 선..  기준 선보다 위쪽 or 아래쪽에 쏠려있는 선에 대해서.
                 //어떤 예외가 또 있을지 잘 모르겠다.
                 else
                 {
-                    pre.Transform(Transform.Translation(-vs * distance));
+                    pre.Transform(Transform.Translation(-vs * eachDistance));
                     plotArrExtended[i] = pre;
                 }
 
@@ -2820,8 +3099,8 @@ namespace TuringAndCorbusier
 
         public double DistanceFromRoad { get { return distanceFromRoad; } }
         public double DistanceFromPlot { get { return distanceFromPlot; } }
-        public double DistanceFromNorth { get { return distanceFromNorth * height; } }
-        public double DistanceByLighting { get { return distanceByLighting * (height - Consts.PilotiHeight); } }
+        public double DistanceFromNorth { get { return distanceFromNorth * (height-fakeHeight); } }
+        public double DistanceByLighting { get { return distanceByLighting * ((height-fakeHeight) - Consts.PilotiHeight); } }
         public double DistanceLW { get { return distanceLW * height; } }
         public double DistanceLL { get { return distanceLL * height; } }
         public double DistanceWW { get { return distanceWW; } }
@@ -3189,6 +3468,7 @@ namespace TuringAndCorbusier
     {
         public string dimension = "";
         public Point3d dimPoint;
+        public List<Point3d> debugPoints = new List<Point3d>();
         public CurveConduit()
         {
             this.CurveToDisplay = new List<Curve>();
@@ -3224,6 +3504,17 @@ namespace TuringAndCorbusier
                 e.Display.DrawCurve(i, displayColor);
                 if (dimension != "")
                     e.Display.DrawDot(i.PointAtNormalizedLength(0.5), dimension);
+            }
+
+            for (int i = 0; i < debugPoints.Count;i++)
+            {
+                //if (i < 2)//points end
+                    e.Display.DrawPoint(debugPoints[i], PointStyle.X, 10, System.Drawing.Color.Green);
+                //else if(i<4)//points start
+                //    e.Display.DrawPoint(debugPoints[i], PointStyle.X, 10, System.Drawing.Color.Gold);
+                //else
+                //    e.Display.DrawPoint(debugPoints[i], PointStyle.X, 10, System.Drawing.Color.Azure);
+
             }
         }
 

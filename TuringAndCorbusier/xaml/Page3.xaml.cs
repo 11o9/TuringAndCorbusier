@@ -91,8 +91,10 @@ namespace TuringAndCorbusier
             return result;
         }
 
-        private void AddButtonMethod(Apartment agOutput)
+        private bool AddButtonMethod(Apartment agOutput)
         {
+            if (agOutput.AptLines.Count == 0)
+                return false;
             double grossAreaRatio = agOutput.GetGrossAreaRatio();
             double buildingCoverage = agOutput.GetBuildingCoverage();
             int buildingNums = agOutput.Household.Count;
@@ -172,25 +174,27 @@ namespace TuringAndCorbusier
             btn.MouseDoubleClick += StackButton_DoubleClick;
 
             stackPanel.Children.Add(btn);
+
+            return true;
         }
 
-        public void AddButtonToStackPanel(Apartment agOutput)
+        public bool AddButtonToStackPanel(Apartment agOutput)
         {
             int similarIndex;
             if (checkHasSimilarPattern(agOutput, out similarIndex))
             {
                 if (tempOutput[similarIndex].GetGrossAreaRatio() < agOutput.GetGrossAreaRatio())
                 {
-                    AddButtonMethod(agOutput);
+                    return AddButtonMethod(agOutput);
                 }
                 else
                 {
-                    return;
+                    return false;
                 }
             }
             else
             {
-                AddButtonMethod(agOutput);
+                return AddButtonMethod(agOutput);
             }
         }
 
@@ -388,9 +392,12 @@ namespace TuringAndCorbusier
 
                     for (int i = 0; i < tempTempOutputs.Count; i++)
                     {
-                        this.AddButtonToStackPanel(tempTempOutputs[i]);
-                        this.tempOutput.Add(tempTempOutputs[i]);
-                        this.tempAGName.Add(tempAGname);
+                        bool addResult = this.AddButtonToStackPanel(tempTempOutputs[i]);
+                        if (addResult)
+                        {
+                            this.tempOutput.Add(tempTempOutputs[i]);
+                            this.tempAGName.Add(tempAGname);
+                        }
                     }
             }
                 catch (Exception ex)
@@ -420,9 +427,12 @@ namespace TuringAndCorbusier
                         for (int k = 0; k < tempTempOutputs.Count; k++)
                         {
 
-                            this.AddButtonToStackPanel(tempTempOutputs[k]);
-                            this.tempOutput.Add(tempTempOutputs[k]);
-                            this.tempAGName.Add(tempAGname);
+                            bool addResult = this.AddButtonToStackPanel(tempTempOutputs[k]);
+                            if (addResult)
+                            {
+                                this.tempOutput.Add(tempTempOutputs[k]);
+                                this.tempAGName.Add(tempAGname);
+                            }
 
                         }
 
@@ -517,7 +527,7 @@ namespace TuringAndCorbusier
             List<Curve> aptCurves = outputToPreview.drawEachHouse();
             aptCurves.AddRange(outputToPreview.drawEachCore());
             aptCurves.AddRange(outputToPreview.AptLines);
-            
+
             //aptCurves.AddRange(outputToPreview.topReg);
             List<Curve> lotCurves = new List<Curve>();
 
@@ -531,6 +541,17 @@ namespace TuringAndCorbusier
 
             this.building2DPreview.CurveToDisplay = aptCurves;
             this.parkingLotPreview.CurveToDisplay = lotCurves;
+
+            List<Point3d> debugs = new List<Point3d>();
+            if (outputToPreview.Household.Count != 0)
+            { 
+                foreach (var hh in outputToPreview.Household.Last())
+                {
+                    foreach (var h in hh)
+                        debugs.AddRange(h.DebugPoints);
+                }
+                building2DPreview.debugPoints = debugs;
+            }
             /*
             textPreview.Enabled = true;
             */

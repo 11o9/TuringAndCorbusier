@@ -138,7 +138,7 @@ namespace TuringAndCorbusier
                 {
                     //WriteLine("[{0}]Can Set Back...", depth);
                     //WriteLine("[{0}]Set Back...", depth);
-                    Apartment setBacked = new Apartment(apt);
+                    Apartment setBacked = SetBack(apt);
                     Finalizer fnz = new Finalizer(setBacked, depth);
                     fnz.setBacked = true;
                     //set back and Recursive
@@ -237,10 +237,63 @@ namespace TuringAndCorbusier
             temp.Parameters[0]++;
             temp.Parameters[1]++;
 
-            AG1 newAG = new AG1();
-            Apartment newApart = newAG.generator(apt.Plot, temp, apt.Target);
-            return newApart == null ? apt : newApart;
+            //가능하면 agtype enum으로 만들면 ..
+            switch (apt.AGtype)
+            {
+                case "PT-1":
+                    AG1 ag1 = new AG1();
+                    Apartment a1 = ag1.generator(apt.Plot, temp, apt.Target);
+                    return a1 == null ? apt : a1;
+                //case "PT-3"://미구현
+                //    AG3 ag3 = new AG3();
+                //    Apartment a3 = ag3.generator(apt.Plot, temp, apt.Target);
+                //    return a3 == null ? apt : a3;
+                //case "PT-4"://미구현
+                //    AG1 ag4 = new AG1();
+                //    Apartment a4 = ag4.generator(apt.Plot, temp, apt.Target);
+                //    return a4 == null ? apt : a4;
+                default:
+                    return apt;
+            }
+           
         }
+
+        Apartment SetBack(Apartment apt)
+        {
+            bool canSetBack = apt.Household.Count < 6;
+            if (!canSetBack)
+                return apt;
+
+            if (apt.Core.Count == 0 || apt.Core[0].Count == 0)
+                return apt;
+
+            ParameterSet temp = apt.ParameterSet;
+            temp.setback = true;
+            temp.fixedCoreType = apt.Core[0][0].CoreType;
+            temp.Parameters[0]++;
+            temp.Parameters[1]++;
+
+            //가능하면 agtype enum으로 만들면 ..
+            switch (apt.AGtype)
+            {
+                case "PT-1":
+                    AG1 ag1 = new AG1();
+                    Apartment a1 = ag1.generator(apt.Plot, temp, apt.Target);
+                    return a1 == null ? apt : a1;
+                //case "PT-3"://미구현
+                //    AG3 ag3 = new AG3();
+                //    Apartment a3 = ag3.generator(apt.Plot, temp, apt.Target);
+                //    return a3 == null ? apt : a3;
+                //case "PT-4"://미구현
+                //    AG1 ag4 = new AG1();
+                //    Apartment a4 = ag4.generator(apt.Plot, temp, apt.Target);
+                //    return a4 == null ? apt : a4;
+                default:
+                    return apt;
+            }
+
+        }
+
 
         Apartment Reduce()
         {

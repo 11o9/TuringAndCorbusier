@@ -56,7 +56,8 @@ namespace TuringAndCorbusier
             //basic settings
             Polyline centerpolyline = maxPolylineFinder(plot, regulationHigh, plotArr, parameterSet);
             Curve centerline = centerpolyline.ToNurbsCurve();
-
+            if (centerline == null)
+                return new Apartment(plot);
             if (centerline.GetLength() > plot.Boundary.GetLength())
                 return new Apartment(plot);
 

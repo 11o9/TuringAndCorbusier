@@ -74,15 +74,28 @@ namespace TuringAndCorbusier
 
 
 
-            if (parameterSet.using1F)
+            if (parameterSet.using1F && !parameterSet.setback)
             {
                 if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
                 {
                     return null;
                 }
 
-                regulationHigh = new Regulation(storiesHigh,true);
-                regulationLow = new Regulation(storiesHigh, storiesLow,true);
+                regulationHigh = new Regulation(storiesHigh, true);
+                regulationLow = new Regulation(storiesHigh, storiesLow, true);
+            }
+            else if (parameterSet.setback && !parameterSet.using1F)
+            {
+                if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
+                {
+                    return null;
+                }
+                //최상층 법규선 - 동간거리 사용
+                regulationHigh = new Regulation(storiesHigh);
+
+                //최상층 바로 아래층 법규선 - 동간거리 제외한 각종 법규선 사용하여 최상층까지 올림
+                regulationHigh.Fake();
+                //마지막에 최상층과 최상층법규선 대조, 외곽선 후퇴. //unfake
             }
             else
             {
@@ -435,6 +448,105 @@ namespace TuringAndCorbusier
                 }
                 cpss.Add(tempfloor);
             }
+
+
+
+
+            if (parameterSet.setback)
+            {
+
+                if (hhps.Count == 0 || cpss.Count <= 3)
+                { }
+                else
+                {
+                    //최상층 외곽선 후퇴옵션 사용하는 경우 최상층 조정...?
+                    //용적 제대로 나올지 미지수
+
+                    List<Household> topHouses = new List<Household>();
+                    hhps.Last().ToList().ForEach(n => topHouses.AddRange(n));
+
+                    List<Core> topCores = cpss.Last().ToList();
+
+                    regulationHigh.UnFake();
+                    Curve[] topNorth = regulationHigh.fromNorthCurve(plot);
+
+                    //일조사선 걸리는 코어들 제거, 연결된 house 제거
+                    List<Curve> topCoreOutlines = topCores.Select(n => n.DrawOutline()).ToList();
+                    topCoreOutlines.ForEach(n => n.Translate(Vector3d.ZAxis * -n.PointAtStart.Z));
+                    List<bool> remove = new List<bool>();
+                    topCoreOutlines.ForEach(n => remove.Add(false));
+
+                    for (int i = 0; i < topNorth.Length; i++)
+                    {
+                        Curve tempNorth = topNorth[i];
+                        for (int j = 0; j < topCoreOutlines.Count; j++)
+                        {
+                            if (remove[j])
+                                continue;
+                            var collision = Curve.PlanarCurveCollision(tempNorth, topCoreOutlines[j], Plane.WorldXY, 0);
+                            if (collision)
+                                remove[j] = true;
+                        }
+                    }
+
+                    for (int i = remove.Count - 1; i >= 0; i--)
+                    {
+                        if (remove[i])
+                        {
+                            foreach (var hh in hhps.Last())
+                            {
+                                List<int> toRemove = new List<int>();
+                                foreach (var h in hh)
+                                {
+                                    Curve outline = h.GetOutline();
+                                    Curve coreoutline = cpss[cpss.Count - 2][i].DrawOutline();
+                                    var col = Curve.PlanarCurveCollision(outline, coreoutline, Plane.WorldXY, 0);
+                                    if (col)
+                                    {
+                                        toRemove.Add(hh.IndexOf(h));
+                                    }
+                                }
+
+                                for (int j = toRemove.Count - 1; j >= 0; j--)
+                                {
+                                    hh.RemoveAt(toRemove[j]);
+                                }
+                            }
+                            cpss.Last().RemoveAt(i);
+                            //cpss[cpss.Count - 2].RemoveAt(i);
+                        }
+                    }
+                    northHigh = regulationHigh.fromNorthCurve(plot);
+                    surroundingsHigh = regulationHigh.fromSurroundingsCurve(plot);
+                    lightingHigh = regulationHigh.byLightingCurve(plot, angleRadian);
+                    wholeRegulationHigh = CommonFunc.JoinRegulations(northHigh, surroundingsHigh, lightingHigh);
+
+                    if (wholeRegulationHigh.Length == 1)
+                    {
+                        foreach (var hh in hhps.Last())
+                        {
+                            List<int> removeIndex = new List<int>();
+                            foreach (var h in hh)
+                            {
+                                var contractResult = h.Contract(wholeRegulationHigh[0]);
+                                if (!contractResult)
+                                    removeIndex.Add(hh.IndexOf(h));
+                            }
+
+                            for (int i = removeIndex.Count - 1; i >= 0; i--)
+                            {
+                                hh.RemoveAt(removeIndex[i]);
+                            }
+                        }
+
+                        if (hhps.Last().Count == 0)
+                            hhps.RemoveAt(hhps.Count - 1);
+                    }
+                }
+
+
+            }
+
             #endregion
 
             #region parkingregacy
@@ -542,7 +654,7 @@ namespace TuringAndCorbusier
             //finalize
             Apartment result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, new ParkingLotUnderGround(), new List<List<Curve>>(), aptLines);
 
-            if (parameterSet.using1F)
+            if (parameterSet.using1F||parameterSet.setback)
             {
 
             }

@@ -56,6 +56,24 @@ namespace TuringAndCorbusier
             //////////  maximum rectangle  //////////
             /////////////////////////////////////////
 
+            //Polyline debug = regulationBoundaryMaker(boundary, regulationHigh, plot, angleRadian);
+            //Curve[] north = regulationHigh.byLightingCurve(plot,angleRadian);
+            //for (int i = 0; i < north.Length; i++)
+            //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(north[i], new Rhino.DocObjects.ObjectAttributes()
+            //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Red });
+
+            //Curve[] surr = regulationHigh.byLightingCurve(plot,angleRadian+Math.PI/2);
+            //for (int i = 0; i < surr.Length; i++)
+            //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(surr[i], new Rhino.DocObjects.ObjectAttributes()
+            //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Gold });
+
+            //Curve roadcenter = regulationHigh.RoadCenterLines(plot);
+            //Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(roadcenter, new Rhino.DocObjects.ObjectAttributes()
+            //{ ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Green });
+
+            //if (debug.Count != 0)
+            //    Rhino.RhinoDoc.ActiveDoc.Objects.Add(debug.ToNurbsCurve());
+
             bool valid;
             Rectangle3d outlineRect = maxInnerRect(boundary, regulationHigh, plot, width, randomCoreType, out valid);
             if (!valid)
@@ -509,7 +527,7 @@ namespace TuringAndCorbusier
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation , fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         //private double[] GAparameterset = { 0.8, 0.05, 1, 20, 4, 10, 1 };
-        private double[] GAparameterset = { 0.2, 0.03, 1, 10, 2, 3, 1 };
+        private double[] GAparameterset = { 0.2, 0.03, 1, 5, 5, 3, 1 };
 
         public override string GetAGType
         {
@@ -720,17 +738,24 @@ namespace TuringAndCorbusier
             Curve[] northHigh = regulationHigh.fromNorthCurve(plot);
 
             //법규 : 인접대지경계선(채광창)
-            Curve lighting1 = byLightingCurve(plot, regulationHigh, plotArr, angleRadian);
-            Curve lighting2 = byLightingCurve(plot, regulationHigh, plotArr, angleRadian + Math.PI / 2);
-            Curve lightingHigh = CommonFunc.joinRegulations(lighting1, lighting2);
+            
 
+
+            Curve[] lighting1 = regulationHigh.byLightingCurve(plot, angleRadian);
+            Curve[] lighting2 = regulationHigh.byLightingCurve(plot, angleRadian + Math.PI / 2);
+            //Curve[] lightingHigh = CommonFunc.JoinRegulation(lighting1, lighting2);
+
+            Curve[] lightingHigh = CommonFunc.JoinRegulations(new Curve[] { plot.Boundary }, lighting1, lighting2);
             //일부 조건(대지안의공지, 일조에 의한 높이제한)을 만족하는 경계선
             //모든 조건(대지안의공지, 일조에 의한 높이제한, 인접대지경계선)을 만족하는 경계선
-            Curve partialRegulationHigh = CommonFunc.joinRegulations(surroundingsHigh[0], northHigh[0]);
-            Curve wholeRegulationHigh = CommonFunc.joinRegulations(partialRegulationHigh, lightingHigh);
+            //Curve partialRegulationHigh = CommonFunc.joinRegulations(surroundingsHigh[0], northHigh[0]);
+            Curve[] wholeRegulationHigh = CommonFunc.JoinRegulations(surroundingsHigh, northHigh, lightingHigh);
+
+            if (wholeRegulationHigh.Length == 0)
+                return new Polyline();
 
             Polyline output;
-            wholeRegulationHigh.TryGetPolyline(out output);
+            wholeRegulationHigh[0].TryGetPolyline(out output);
             return output;
         }
 
@@ -748,6 +773,8 @@ namespace TuringAndCorbusier
             for (int i = 0; i < angles.Count; i++)
             {
                 Polyline boundaryClone = regulationBoundaryMaker(boundary.ToNurbsCurve(), regulationHigh, plot, -angles[i]);
+                if (boundaryClone.Count == 0)
+                    continue;
                 //Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(boundaryClone.ToNurbsCurve());
                 Point3d pointClone = new Point3d(iniPoint);
                 boundaryClone.Transform(Transform.Rotation(angles[i], Point3d.Origin));
@@ -801,6 +828,8 @@ namespace TuringAndCorbusier
             for (int i = 0; i < angles.Count; i++)
             {
                 Polyline boundaryClone = regulationBoundaryMaker(boundary.ToNurbsCurve(), regulationHigh, plot, -angles[i]);
+                if (boundaryClone.Count == 0)
+                    continue;
                 boundaryClone.Transform(Transform.Rotation(angles[i], Point3d.Origin));
                 List<Point3d> points = searchPoint(boundaryClone, boundaryClone.BoundingBox.Center, boundaryClone.BoundingBox.Diagonal.X, boundaryClone.BoundingBox.Diagonal.Y, gridRes);
                 for (int j = 0; j < points.Count; j++)
