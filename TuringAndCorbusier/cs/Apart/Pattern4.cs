@@ -1087,6 +1087,7 @@ namespace TuringAndCorbusier
                                 continue;
                             }
 
+                            sOri.Transform(Transform.Translation(-v2 * width / 2));
                             corePoint.Add(sOri);
                             coreVecX.Add(Vector3d.Multiply(-v1, 1));
                             coreVecY.Add(Vector3d.Multiply(-v2, -1));
