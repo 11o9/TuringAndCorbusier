@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Rhino.Geometry;
 using System.Collections;
+using TuringAndCorbusier.Utility;
 
 namespace TuringAndCorbusier
 {
@@ -40,8 +41,10 @@ namespace TuringAndCorbusier
         {
             double height = Consts.FloorHeight;
             Curve outline = hhp.GetOutline();
+            Polyline outPoly = CurveTools.ToPolyline(outline);            
 
             Brep x = Extrusion.Create(outline, height, true).ToBrep();
+
             double windowSide = 300;
             double windowLow = 300;
             double windowHeight = 2100;
