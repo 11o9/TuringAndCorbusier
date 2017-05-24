@@ -434,6 +434,7 @@ namespace TuringAndCorbusier
             //string url = @"C://Users//user//Desktop//test";
             //System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
 
+           
             //string filename = "//garojutacklogV2" + (dinfo.GetFiles().Length + 1).ToString() + ".csv";
             //System.IO.FileStream fs = new System.IO.FileStream(url + filename, System.IO.FileMode.CreateNew);
             //fs.Close();
@@ -457,7 +458,8 @@ namespace TuringAndCorbusier
                 //    setbackBonus = 100;
                 fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus);
                 //for test
-                string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString() + "," + gene[j].setback.ToString();
+            
+                //string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString() + "," + gene[j].setback.ToString();
                 //w.WriteLine(format);
             }
             //for test

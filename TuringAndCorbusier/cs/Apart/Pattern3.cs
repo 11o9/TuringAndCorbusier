@@ -88,12 +88,12 @@ namespace TuringAndCorbusier
                 outlineCurve.Reverse();
             }
 
-            //create midline and inner line
-            Curve midlineCurve = outlineCurve.Offset(Plane.WorldXY, width / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+            //create centerLine and inner line
+            Curve centerLineCurve = outlineCurve.Offset(Plane.WorldXY, width / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
             Curve inlineCurve = outlineCurve.Offset(Plane.WorldXY, width, 1, CurveOffsetCornerStyle.Sharp)[0];
 
             //calculate typeNum and created list of unallocated houses
-            List<int> typeNum = numberOfHousesForEachType(areaLength, ratio, midlineCurve);
+            List<int> typeNum = numberOfHousesForEachType(areaLength, ratio, centerLineCurve);
             List<int> unallocated = new List<int>();
             for (int i = 0; i < typeNum.Count; i++)
             {
@@ -106,15 +106,15 @@ namespace TuringAndCorbusier
 
             //initiate rectangle
 
-            Polyline midlinePolyline;
-            midlineCurve.TryGetPolyline(out midlinePolyline);
-            Curve[] lines = midlineCurve.DuplicateSegments();
+            Polyline centerLinePolyline;
+            centerLineCurve.TryGetPolyline(out centerLinePolyline);
+            Curve[] lines = centerLineCurve.DuplicateSegments();
             int clockwise = 1;
             if (lines[0].GetLength() > lines[1].GetLength())
             {
                 Array.Reverse(lines);
-                midlineCurve.Reverse();
-                midlinePolyline.Reverse();
+                centerLineCurve.Reverse();
+                centerLinePolyline.Reverse();
                 clockwise = -clockwise;
 
                 for (int i = 0; i < lines.Length; i++)
@@ -132,21 +132,21 @@ namespace TuringAndCorbusier
 
             //find parameters of end points
             List<int> targetAreaIndices = new List<int>();
-            List<double> parametersOnCurve = new List<double>(houseEndParameters(unallocated, areaLength, midlineCurve, width, out targetAreaIndices));
+            List<double> parametersOnCurve = GetHouseEndParameters(unallocated, areaLength, centerLineCurve, width, out targetAreaIndices);
 
             ///////////////////////////////
             //////////  outputs  //////////
             ///////////////////////////////
 
             List<List<Core>> cores = MakeCores(parameterSet, inlineCurve, WWregBool);
-            List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, midlinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
+            List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, centerLinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
 
 
             //복도면적..?
 
-            double eachfloorCorridorArea = inlineCurve.GetLength() * Consts.corridorWidth - (Consts.corridorWidth * Consts.corridorWidth)*4;
+            double eachfloorCorridorArea = inlineCurve.GetLength() * Consts.corridorWidth - (Consts.corridorWidth * Consts.corridorWidth) * 4;
             double corridorAreaSum = eachfloorCorridorArea * storiesHigh;
-            
+
             foreach (var hhh in households)
             {
                 double tempFloorAreaSum = 0;
@@ -175,11 +175,11 @@ namespace TuringAndCorbusier
             #region parking
             //parking lot
             ParkingModule pm = new ParkingModule();
-            
+
             //1.setups for parking
             #region setup
             //parking curves setting
-            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY,cores[0][0].CoreType.GetDepth()/2, 1, CurveOffsetCornerStyle.Sharp)[0];
+            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY, cores[0][0].CoreType.GetDepth() / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
             Curve[] parkingLineSegments = parkingLine.DuplicateSegments();
             Curve[] shortSegments = parkingLineSegments.OrderBy(n => n.GetLength()).Take(2).ToArray();
             //세배 길이의 라인으로
@@ -194,7 +194,7 @@ namespace TuringAndCorbusier
 
 
             //obstacles setting
-            
+
             List<Curve> obstacles = cores[0].Select(n => n.DrawOutline(width)).ToList();
             for (int i = 0; i < obstacles.Count; i++)
             {
@@ -223,12 +223,12 @@ namespace TuringAndCorbusier
 
 
             List<Curve> aptLines = new List<Curve>();
-            aptLines.Add(midlineCurve);
+            aptLines.Add(centerLineCurve);
 
             Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
             return result;
 
-            
+
         }
 
         #region New Apartment Generating Methods
@@ -285,11 +285,11 @@ namespace TuringAndCorbusier
                 coreXVectors.Add(Vector3d.Multiply(courtX, 1));
                 coreYVectors.Add(Vector3d.Multiply(courtY, -1));
             }
-        
+
             //stack
             List<List<Core>> outputCores = new List<List<Core>>();
 
-            for (int i = 0; i < storiesHigh+2; i++)
+            for (int i = 0; i < storiesHigh + 2; i++)
             {
                 double tempStoryHeight = (i == 0) ? 0 : Consts.PilotiHeight + Consts.FloorHeight * (i - 1);
                 List<Core> currentFloorCores = new List<Core>();
@@ -312,7 +312,7 @@ namespace TuringAndCorbusier
             return outputCores;
         }
 
-        private List<List<List<Household>>> MakeHouseholds(ParameterSet parameterSet, Curve[] lines, Polyline midline, List<double> mappedVals, List<int> targetAreaType, int typeN)
+        private List<List<List<Household>>> MakeHouseholds(ParameterSet parameterSet, Curve[] lines, Polyline centerLine, List<double> mappedVals, List<int> targetAreaType, int typeN)
         {
             //initial settings
             double[] parameters = parameterSet.Parameters;
@@ -320,15 +320,8 @@ namespace TuringAndCorbusier
             double width = parameters[2];
             double coreWidth = randomCoreType.GetWidth();
             double coreDepth = randomCoreType.GetDepth();
-            int cornerOrEdge = 0;
+            bool isCorner = false;
 
-            List<Point3d> houseEndPoints = new List<Point3d>();
-            List<Vector3d> houseEndPerps = new List<Vector3d>();
-            for (int i = 0; i < mappedVals.Count; i++)
-            {
-                houseEndPoints.Add(midline.PointAt(mappedVals[i]));
-                houseEndPerps.Add(midline.TangentAt(mappedVals[i]));
-            }
             List<double> minCornerCheck = new List<double>();
             int entranceLength = 2000;
             int entranceCheck = 0;
@@ -353,8 +346,8 @@ namespace TuringAndCorbusier
                 if ((int)(mappedVals[i] - 0.01) == (int)(mappedVals[(i + 1) % mappedVals.Count] - 0.01)) // if not corner
                 {
                     double avrg = (mappedVals[i] + mappedVals[(i + 1) % mappedVals.Count]) / 2.0;
-                    Point3d midOri = midline.PointAt(avrg);
-                    Vector3d midVec = midline.TangentAt(avrg);
+                    Point3d midOri = centerLine.PointAt(avrg);
+                    Vector3d midVec = centerLine.TangentAt(avrg);
                     minCornerCheck.Add(Consts.corridorWidth + 0.1);
                     Vector3d verticalVec = midVec;
                     verticalVec.Rotate(-Math.PI / 2, new Vector3d(0, 0, 1));
@@ -365,8 +358,8 @@ namespace TuringAndCorbusier
                     //int randInt = r.Next(10) % 2;
                     int randInt = 1;
                     List<Point3d> selOri = new List<Point3d>();
-                    selOri.Add(midline.PointAt(mappedVals[i]));
-                    selOri.Add(midline.PointAt(mappedVals[(i + 1) % mappedVals.Count]));
+                    selOri.Add(centerLine.PointAt(mappedVals[i]));
+                    selOri.Add(centerLine.PointAt(mappedVals[(i + 1) % mappedVals.Count]));
                     xaH = selOri[0].DistanceTo(selOri[1]);
                     xbH = 0;
                     yaH = width;
@@ -401,15 +394,18 @@ namespace TuringAndCorbusier
                     ent.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH / 2)));
 
                     //this is edge type
-                    cornerOrEdge = 1;
+                    isCorner = false;
 
                     wallFactor = new List<double>(new double[] { 1, 0.5, 1, 0.5 });
                 }
                 else //if is corner
                 {
                     Point3d checkP = lines[(int)(mappedVals[i] - 0.01)].PointAtEnd;
-                    Vector3d v1 = new Vector3d(houseEndPoints[i] - checkP);
-                    Vector3d v2 = new Vector3d(houseEndPoints[(i + 1) % mappedVals.Count] - checkP);
+                    Point3d sOri = centerLine.PointAt(mappedVals[i]);
+                    Point3d eOri = centerLine.PointAt(mappedVals[(mappedVals.Count + i + 1) % mappedVals.Count]);
+
+                    Vector3d v1 = new Vector3d(sOri - checkP);
+                    Vector3d v2 = new Vector3d(eOri - checkP);
                     double l1 = v1.Length;
                     double l2 = v2.Length;
                     minCornerCheck.Add(Math.Max(l1, l2));
@@ -459,7 +455,7 @@ namespace TuringAndCorbusier
                     ent.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH / 2)));
 
                     //this is corner type
-                    cornerOrEdge = 0;
+                    isCorner = true;
 
                     if (ybH > 0)
                         wallFactor = new List<double>(new double[] { 1, 0.5, 1, 1, 0.5, 1 });
@@ -470,7 +466,7 @@ namespace TuringAndCorbusier
                 }
                 if (entranceCheck == 0 && minCornerCheck.Min() > Consts.corridorWidth)
                 {
-                    if (cornerOrEdge == 0)
+                    if (isCorner)
                     {
                         Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Corner(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
                         outputS.Add(tempHP);
@@ -738,7 +734,7 @@ namespace TuringAndCorbusier
             Curve[] northHigh = regulationHigh.fromNorthCurve(plot);
 
             //법규 : 인접대지경계선(채광창)
-            
+
 
 
             Curve[] lighting1 = regulationHigh.byLightingCurve(plot, angleRadian);
@@ -799,7 +795,7 @@ namespace TuringAndCorbusier
                                 double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
                                 if (area / CommonFunc.getArea(plot.Boundary) < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage / 100)
                                 {
-                                    
+
                                     bestArea = widthTemp * widthTemp / ratios[k];
                                     solWidth = widthTemp;
                                     solAngle = angles[i];
@@ -970,10 +966,10 @@ namespace TuringAndCorbusier
             var box = boundary.BoundingBox;
 
             //get max height and max width
-            Line midlineY = new Line(new Point3d(point.X, box.Min.Y - alpha, 0), new Point3d(point.X, box.Max.Y + alpha, 0));
-            Line midlineX = new Line(new Point3d(box.Min.X - alpha, point.Y, 0), new Point3d(box.Max.X + alpha, point.Y, 0));
-            List<Point3d> widthP = new List<Point3d>(intersectionPoints(midlineX, boundary));
-            List<Point3d> heightP = new List<Point3d>(intersectionPoints(midlineY, boundary));
+            Line centerLineY = new Line(new Point3d(point.X, box.Min.Y - alpha, 0), new Point3d(point.X, box.Max.Y + alpha, 0));
+            Line centerLineX = new Line(new Point3d(box.Min.X - alpha, point.Y, 0), new Point3d(box.Max.X + alpha, point.Y, 0));
+            List<Point3d> widthP = new List<Point3d>(intersectionPoints(centerLineX, boundary));
+            List<Point3d> heightP = new List<Point3d>(intersectionPoints(centerLineY, boundary));
             List<double> widthV = new List<double>();
             List<double> heightV = new List<double>();
             foreach (Point3d k in widthP)
@@ -1129,12 +1125,12 @@ namespace TuringAndCorbusier
             }
             return n;
         }
-        private List<double> houseEndParameters(List<int> unallocatedLengthIndices, List<double> areaLength, Curve midlineCurve, double width, out List<int> targetAreaIndices)
+        private List<double> GetHouseEndParameters(List<int> unallocatedLengthIndices, List<double> areaLength, Curve centerLineCurve, double width, out List<int> targetAreaIndices)
         {
             //
-            List<Curve> midLineSegments = midlineCurve.DuplicateSegments().ToList();
-            Polyline midlinePolyline;
-            midlineCurve.TryGetPolyline(out midlinePolyline);
+            List<Curve> centerLineSegments = centerLineCurve.DuplicateSegments().ToList();
+            Polyline centerLinePolyline;
+            centerLineCurve.TryGetPolyline(out centerLinePolyline);
 
             //at least (entranceLength)mm of wall facing corridor needed to put entrance
 
@@ -1152,7 +1148,7 @@ namespace TuringAndCorbusier
             {
                 sourceL += areaLength[unallocatedLengthIndices[i]];
             }
-            double targetL = midlineCurve.GetLength();
+            double targetL = centerLineCurve.GetLength();
             double stretchRatio = targetL / sourceL;
             List<double> stretchedLength = new List<double>();
             for (int i = 0; i < areaLength.Count; i++)
@@ -1160,39 +1156,42 @@ namespace TuringAndCorbusier
                 stretchedLength.Add(areaLength[i] * stretchRatio);
             }
 
-            //junction 1 : less than 10 houses, or not
+
+            //less than 10 units
+            #region Less10Case
             if (5 < unallocatedLengthIndices.Count && unallocatedLengthIndices.Count < 10)
             {
+
                 List<int> indices = new List<int>();
                 //junction 2 : specific solutions for 6~9 houses
                 if (unallocatedLengthIndices.Count == 6)
                 {
                     indices = new int[] { 4, 0, 3, 5, 1, 2 }.ToList();
-                    val = midLineSegments[0].GetLength() / 2;
+                    val = centerLineSegments[0].GetLength() / 2;
                 }
                 else if (unallocatedLengthIndices.Count == 7)
                 {
                     indices = new int[] { 0, 2, 5, 6, 4, 3, 1 }.ToList();
-                    val = midLineSegments[0].GetLength() / 2;
+                    val = centerLineSegments[0].GetLength() / 2;
                 }
                 else if (unallocatedLengthIndices.Count == 8)
                 {
                     indices = new int[] { 5, 0, 7, 2, 6, 1, 4, 3 }.ToList();
-                    val = (midLineSegments[0].GetLength() + midLineSegments[1].GetLength() / 2) 
+                    val = (centerLineSegments[0].GetLength() + centerLineSegments[1].GetLength() / 2)
                         - stretchedLength[unallocatedLengthIndices[indices[0]]] - stretchedLength[unallocatedLengthIndices[indices[1]]];
                 }
                 else if (unallocatedLengthIndices.Count == 9)
                 {
                     //junction 3 : rectangle ratio
-                    if (midLineSegments[1].GetLength() / midLineSegments[0].GetLength() > nineHouseR)
+                    if (centerLineSegments[1].GetLength() / centerLineSegments[0].GetLength() > nineHouseR)
                     {
                         indices = new int[] { 0, 7, 4, 3, 8, 2, 5, 6, 1 }.ToList();
-                        val = midLineSegments[0].GetLength() / 2;
+                        val = centerLineSegments[0].GetLength() / 2;
                     }
                     else
                     {
                         indices = new int[] { 6, 7, 8, 5, 4, 1, 0, 2, 3 }.ToList();
-                        val = (midLineSegments[0].GetLength() + midLineSegments[1].GetLength() / 2)
+                        val = (centerLineSegments[0].GetLength() + centerLineSegments[1].GetLength() / 2)
                             - stretchedLength[unallocatedLengthIndices[indices[0]]] - stretchedLength[unallocatedLengthIndices[indices[1]]];
                     }
                 }
@@ -1209,28 +1208,35 @@ namespace TuringAndCorbusier
                 for (int i = 0; i < unallocatedLengthIndices.Count - 1; i++)
                 {
                     val += stretchedLength[unallocatedLengthIndices[indices[i]]];
-                    houseEndVals.Add(val % ((midLineSegments[0].GetLength() + midLineSegments[1].GetLength()) * 2));
+                    houseEndVals.Add(val % ((centerLineSegments[0].GetLength() + centerLineSegments[1].GetLength()) * 2));
                 }
-                mappedVals = new List<double>(valMapper(midLineSegments[0].GetLength(), midLineSegments[1].GetLength(), houseEndVals));
+                mappedVals = new List<double>(valMapper(centerLineSegments[0].GetLength(), centerLineSegments[1].GetLength(), houseEndVals));
+
             }
+            #endregion Less10Case
+
+            //more than 10 units
+            #region More10Case
             else if (10 <= unallocatedLengthIndices.Count)
             {
                 double cornerMinLength = 1500;
+                double minCornerUnitEdgeLength = width / 2 + cornerMinLength;
 
                 //preserve top 4 areas for corners
+                unallocatedLengthIndices.Sort((a, b) => -a.CompareTo(b));
                 List<int> cornerIndices = unallocatedLengthIndices.Take(4).ToList();
                 unallocatedLengthIndices.RemoveRange(0, 4);
 
                 //put others on edges
-                List<double> edgeLength = midLineSegments.Select(n => n.GetLength()).ToList();
+                List<double> edgeLength = centerLineSegments.Select(n => n.GetLength()).ToList();
                 List<List<int>> edgeIndices = new List<List<int>>();
                 for (int i = 0; i < 4; i++)
                 {
                     List<int> blank = new List<int>();
                     edgeIndices.Add(blank);
                 }
-                
-                
+
+
                 foreach (int i in unallocatedLengthIndices)
                 {
                     int longestRemainEdgeIndex = edgeLength.IndexOf(edgeLength.Max());
@@ -1242,8 +1248,8 @@ namespace TuringAndCorbusier
                 List<double> leftLengthAtCorner = new List<double>();
 
                 for (int i = 0; i < 4; i++)
-                    leftLengthAtCorner.Add(edgeLength[i] / 2 + edgeLength[(i + 3) % 4] / 2);
-                
+                    leftLengthAtCorner.Add(edgeLength[i] / 2 + edgeLength[(4 + i -1) % 4] / 2);
+
                 cornerIndices.Sort((a, b) => leftLengthAtCorner[a].CompareTo(leftLengthAtCorner[b]));
 
 
@@ -1283,11 +1289,16 @@ namespace TuringAndCorbusier
                 List<double> targetEdgeL = new List<double>();
                 for (int i = 0; i < 4; i++)
                 {
-                    targetEdgeL.Add(midLineSegments[i].GetLength() - edgeStart[i] - edgeEnd[i]);
+                  
+                    if (edgeStart[i] < minCornerUnitEdgeLength)
+                        edgeStart[i] = minCornerUnitEdgeLength;
+
+                    double currentTargetEdgeLength = centerLineSegments[i].GetLength() - edgeStart[i] - edgeEnd[i];
+                    targetEdgeL.Add(currentTargetEdgeLength);
                 }
 
                 List<double> stretchEdgeRatio = new List<double>();
-                for (int i = 0; i < midLineSegments.Count; i++)
+                for (int i = 0; i < centerLineSegments.Count; i++)
                 {
                     stretchEdgeRatio.Add(targetEdgeL[i] / sourceEdgeL[i]);
                 }
@@ -1309,7 +1320,7 @@ namespace TuringAndCorbusier
                     val = edgeStart[i];
                     for (int j = 0; j < i; j++)
                     {
-                        val += midLineSegments[j].GetLength();
+                        val += centerLineSegments[j].GetLength();
                     }
                     houseEndVals.Add(val);
                     for (int j = 0; j < edgeIndices[i].Count; j++)
@@ -1328,11 +1339,13 @@ namespace TuringAndCorbusier
                         targetAreaIndices.Add(edgeIndices[i][j]);
                     }
                     targetAreaIndices.Add(cornerIndices[i]);
-                    //***혹시 여기서 i가 아니라 i+1이 들어가야 할 수도 있으니 나중에 확인할 것.
+                    //***혹시 여기서 i가 아니라 i+1이 들어가야 할 수도 있으니 나중에 확인할 것. 
                 }
 
-                mappedVals = new List<double>(valMapper(midLineSegments[0].GetLength(), midLineSegments[1].GetLength(), houseEndVals));
+                mappedVals = new List<double>(valMapper(centerLineSegments[0].GetLength(), centerLineSegments[1].GetLength(), houseEndVals));
             }
+            #endregion More10Case
+
             else//which means, less than 6 houses
             {
                 targetAreaIndices = new List<int>();
@@ -1371,14 +1384,14 @@ namespace TuringAndCorbusier
             List<int> edgeNum = edgeIndices.Select(n => n.Count).ToList();
             double deviation = double.PositiveInfinity;
 
-          
+
             List<double> adjustableLength = new List<double>();   //Secure min Length.
             for (int i = 0; i < 4; i++)
             {
                 adjustableLength.Add(cornerLength[i] - 2 * minL - width);
             }
 
-           
+
             List<double> solution = new List<double>();  //Set intitial solution.
             for (int i = 0; i < 4; i++)
             {
@@ -1392,8 +1405,8 @@ namespace TuringAndCorbusier
                 for (int i = 0; i < 4; i++)
                 {
                     double resoultionCurrent = adjustableLength[i] / Math.Pow(2, token + 1) / resolutionCount;
-
                     double deviationCurrent = deviation;
+
                     List<double> solutionHere = new List<double>(solution);
 
                     for (int j = 0; j < 2 * resolutionCount + 1; j++)
@@ -1454,7 +1467,7 @@ namespace TuringAndCorbusier
                 }
                 double average = fitnessVal.Average();
                 double sumOfSquaresOfDifferences = fitnessVal.Select(val => (val - average) * (val - average)).Sum();
-                double deviationNew= Math.Sqrt(sumOfSquaresOfDifferences / fitnessVal.Count); 
+                double deviationNew = Math.Sqrt(sumOfSquaresOfDifferences / fitnessVal.Count);
 
                 //find the best solution in this 'for loop'
                 if (deviationNew < deviationCorner)
