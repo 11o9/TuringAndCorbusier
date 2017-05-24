@@ -634,9 +634,13 @@ namespace TuringAndCorbusier
         {
             double[] tempArea = { 55, 85 };
             double[] tempRatio = { 1, 1 };
+            Interval[] tempDomains = { new Interval(50, 59), new Interval(80, 90) };
+            int[] tempMandatories = { 0, 0 };
 
             this.area = tempArea.ToList();
             this.ratio = tempRatio.ToList();
+            this.domain = tempDomains.ToList();
+            this.mandatoryCount = tempMandatories.ToList();
         }
 
         public Target(List<double> targetArea)
@@ -2722,7 +2726,7 @@ namespace TuringAndCorbusier
                 if (tempRoadLine[i].TangentAtStart.X <= 0)
                     continue;
 
-                double roadCenter = -plot.Surroundings[i] / 2;
+                double roadCenter = plot.Surroundings[i] / 2;
                 double moveDistance = roadCenter * t;
 
                 if (tempHeight < 9000)//숫자 -> 나중에 변수로

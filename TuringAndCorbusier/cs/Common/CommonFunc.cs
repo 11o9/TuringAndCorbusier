@@ -3573,7 +3573,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < first.Length; i++)
             {
                 for (int j = 0; j < second.Length; j++)
-                {
+                { 
                     var intersections = Curve.CreateBooleanIntersection(first[i], second[j]);
                     if (intersections.Length > 0)
                         result1.AddRange(intersections);
