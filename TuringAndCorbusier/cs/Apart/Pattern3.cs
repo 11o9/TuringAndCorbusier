@@ -64,14 +64,19 @@ namespace TuringAndCorbusier
             /////////////////////////////////////////
 
             //Polyline debug = regulationBoundaryMaker(boundary, regulationHigh, plot, angleRadian);
-            //Curve[] north = regulationHigh.byLightingCurve(plot,angleRadian);
+            //Curve[] north = regulationHigh.byLightingCurve(plot, angleRadian);
             //for (int i = 0; i < north.Length; i++)
             //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(north[i], new Rhino.DocObjects.ObjectAttributes()
             //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Red });
 
-            //Curve[] surr = regulationHigh.byLightingCurve(plot,angleRadian+Math.PI/2);
+            //Curve[] surr = regulationHigh.byLightingCurve(plot, angleRadian + Math.PI / 2);
             //for (int i = 0; i < surr.Length; i++)
             //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(surr[i], new Rhino.DocObjects.ObjectAttributes()
+            //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Gold });
+
+            //Curve[] surr2 = regulationHigh.byLightingCurve(plot, angleRadian);
+            //for (int i = 0; i < surr2.Length; i++)
+            //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(surr2[i], new Rhino.DocObjects.ObjectAttributes()
             //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Gold });
 
             //Curve roadcenter = regulationHigh.RoadCenterLines(plot);
@@ -79,7 +84,7 @@ namespace TuringAndCorbusier
             //{ ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Green });
 
             //if (debug.Count != 0)
-            //    Rhino.RhinoDoc.ActiveDoc.Objects.Add(debug.ToNurbsCurve());
+                //Rhino.RhinoDoc.ActiveDoc.Objects.Add(debug.ToNurbsCurve());
 
             bool valid;
             Rectangle3d outlineRect = maxInnerRect(boundary, regulationHigh, plot, width, randomCoreType, out valid);
@@ -780,7 +785,8 @@ namespace TuringAndCorbusier
                 return new Polyline();
 
             Polyline output;
-            wholeRegulationHigh[0].TryGetPolyline(out output);
+            Curve regulationMax = wholeRegulationHigh.OrderByDescending(n => AreaMassProperties.Compute(n).Area).ToList()[0];
+            regulationMax.TryGetPolyline(out output);
             return output;
         }
 
@@ -818,7 +824,7 @@ namespace TuringAndCorbusier
                         {
                             double widthTemp = widthFinder(boundaryClone, bestArea, ratios[k], points[j], minSearchWidth, maxSearchWidth, binaryIterNum);
 
-                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + core.GetDepth() + regulationHigh.DistanceLW < Math.Min(widthTemp, widthTemp / ratios[k]))
+                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + Consts.corridorWidth + core.GetDepth() + regulationHigh.DistanceLW < Math.Min(widthTemp, widthTemp / ratios[k]))
                             {
                                 double t = aptWidth + Consts.corridorWidth;
                                 double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
@@ -871,8 +877,12 @@ namespace TuringAndCorbusier
                         {
                             double widthTemp = widthFinder(boundaryClone, bestArea, ratios[k], points[j], minSearchWidth, maxSearchWidth, binaryIterNum);
                             //Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(rectMaker(angles[i], points[j], ratios[k], widthTemp).ToNurbsCurve());
-                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + core.GetDepth() + regulationHigh.DistanceLW < Math.Min(widthTemp, widthTemp / ratios[k]))
+                            double lw = regulationHigh.DistanceLW;
+                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + core.GetDepth() + lw < Math.Min(widthTemp, widthTemp / ratios[k]))
+                            //if(true)
                             {
+                            
+
                                 double t = aptWidth + Consts.corridorWidth;
                                 double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
                                 if (area / CommonFunc.getArea(plot.Boundary) < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage / 100)

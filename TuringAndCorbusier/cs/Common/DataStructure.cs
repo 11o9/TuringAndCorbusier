@@ -2101,11 +2101,12 @@ namespace TuringAndCorbusier
             if (intersection[0] == tempOutline)
                 return true;
 
-            Curve onlyOne = intersection[0];
-            //if (AreaMassProperties.Compute(onlyOne).Area < GetArea() / 2)
-            //    return false;
-
             Point3d origin = Origin;
+
+
+            
+
+
             Point3d test1 = origin + XDirection * (XLengthA-XLengthB);
             Point3d test2 = origin - XDirection * XLengthB;
 
@@ -2114,8 +2115,21 @@ namespace TuringAndCorbusier
             Curve testline = new LineCurve(test1, test1 + YDirection * YLengthB);
             Curve testline0 = new LineCurve(test2, test2 + YDirection * YLengthB);
 
+            List<Curve> testLines = new List<Curve>{ testline, testline0 };
+
+
+            //for (int i = 0; i < testLines.Count; i++)
+            //{
+            //    Curve tempTestCurve = testLines[i];
+            //    DebugPoints.Add(tempTestCurve.PointAtEnd);
+            //    var inter = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, tempTestCurve, 0, 0);
+
+            //}
+
             DebugPoints.Add(testline.PointAtEnd);
             DebugPoints.Add(testline0.PointAtEnd);
+
+
 
 
             var inter1 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline, 0, 0);
@@ -3114,14 +3128,15 @@ namespace TuringAndCorbusier
             Curve resultA = new PolylineCurve(GroupA.Select(n => wholeCurve.PointAt(n)));
             Curve resultB = new PolylineCurve(GroupB.Select(n => wholeCurve.PointAt(n)));
 
+            Curve test = new PolylineCurve();
             //Rhino.RhinoDoc.ActiveDoc.Objects.Add(resultA);
             //Rhino.RhinoDoc.ActiveDoc.Objects.Add(resultB);
             var checkSelfA = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultA, 0);
-            if (checkSelfA.Count == 0)
+            if (GroupA.Count>0)
                 return new Curve[] { resultA };
 
             var checkSelfB = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultB, 0);
-            if (checkSelfB.Count == 0)
+            if (GroupB.Count > 0)
                 return new Curve[] { resultB };
             //tempRoadLine = GroupA.Count > GroupB.Count?new PolylineCurve(GroupA.Select(n=>tempRoadLine.PointAt(n))):new PolylineCurve(GroupB.Select(n => tempRoadLine.PointAt(n)));
             if (Curve.CreateBooleanDifference(resultA, plot.Boundary).Length == 0)
@@ -3173,8 +3188,8 @@ namespace TuringAndCorbusier
         public double DistanceFromPlot { get { return distanceFromPlot; } }
         public double DistanceFromNorth { get { return distanceFromNorth * (height-fakeHeight); } }
         public double DistanceByLighting { get { return distanceByLighting * ((height-fakeHeight) - Consts.PilotiHeight); } }
-        public double DistanceLW { get { return distanceLW * height; } }
-        public double DistanceLL { get { return distanceLL * height; } }
+        public double DistanceLW { get { return distanceLW * ((height - fakeHeight) - Consts.PilotiHeight); ; } }
+        public double DistanceLL { get { return distanceLL *  ((height-fakeHeight) - Consts.PilotiHeight);; } }
         public double DistanceWW { get { return distanceWW; } }
         public double Lightingk { get { return distanceByLighting; } }
         public BuildingType BuildingType { get; private set; }
