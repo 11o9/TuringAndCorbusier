@@ -34,6 +34,8 @@ namespace TuringAndCorbusier
                 output.Add(DrawCore(cp));
             }
 
+            output.AddRange(DrawCorridor(agOut));
+
             return output;
         }
 
@@ -141,7 +143,7 @@ namespace TuringAndCorbusier
 
         }
 
-            public static Brep DrawCore(Core hhp)
+        public static Brep DrawCore(Core hhp)
         {
             double height = hhp.Stories == 0 ? Consts.PilotiHeight : Consts.FloorHeight;
             Vector3d x = hhp.XDirection;
@@ -157,315 +159,42 @@ namespace TuringAndCorbusier
             
         }
 
-        public static List<List<Brep>> makeBuildings(Apartment agOut, bool drawComplexModeling)
+        public static List<Brep> DrawCorridor(Apartment apartment)
         {
-            //description//
-            //first List<Brep> : each house outline wall
-            //second List<Brep> : each core
-            //third List<Brep> : whole window
-            //fourth List<Brep> : each window detail
-            List<List<Brep>> output = new List<List<Brep>>();
+            List<Brep> output = new List<Brep>();
 
-            //create core outlines
-            List<List<Curve>> coreOutline = new List<List<Curve>>();
-            for (int i = 0; i < agOut.Core.Count; i++)
+            #region P3Corridor
+            if (apartment.AGtype == "PT-3")
             {
-                List<Curve> coreOutlineTemp = new List<Curve>();
-                for (int j = 0; j < agOut.Core[i].Count; j++)
+                List<Brep> courtCorridorBrep = new List<Brep>();
+                List<Curve> centerLine = apartment.AptLines;
+                double width = apartment.ParameterSet.Parameters[2];
+
+                for (int i = 0; i < apartment.Household.Count; i++)
                 {
-                    List<Point3d> outlinePoints = new List<Point3d>();
-
-                    Point3d pt = new Point3d(agOut.Core[i][j].Origin);
-                    Vector3d x = new Vector3d(agOut.Core[i][j].XDirection);
-                    Vector3d y = new Vector3d(agOut.Core[i][j].YDirection);
-                    double width = agOut.Core[i][j].CoreType.GetWidth();
-                    double depth = agOut.Core[i][j].CoreType.GetDepth();
-
-                    outlinePoints.Add(pt);
-                    pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
-                    outlinePoints.Add(pt);
-                    pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
-                    outlinePoints.Add(pt);
-                    pt.Transform(Transform.Translation(Vector3d.Multiply(x, -width)));
-                    outlinePoints.Add(pt);
-                    pt.Transform(Transform.Translation(Vector3d.Multiply(y, -depth)));
-                    outlinePoints.Add(pt);
-
-                    Polyline outlinePolyline = new Polyline(outlinePoints);
-                    Curve outlineCurve = outlinePolyline.ToNurbsCurve();
-                    coreOutlineTemp.Add(outlineCurve);
-                }
-                coreOutline.Add(coreOutlineTemp);
-            }
-
-            //create building outlines
-            List<List<Curve>> buildingOutline = agOut.buildingOutline;
-
-            //create house outlines
-            List<List<List<Curve>>> houseOutline = new List<List<List<Curve>>>();
-
-            for (int i = 0; i < agOut.Household.Count; i++)
-            {
-                List<List<Curve>> houseOutline_i = new List<List<Curve>>();
-                for (int j = 0; j < agOut.Household[i].Count; j++)
-                {
-                    List<Curve> houseOutline_j = new List<Curve>();
-
-                    for (int k = 0; k < agOut.Household[i][j].Count(); k++)
+                    for (int j = 0; j < apartment.Household[i].Count; j++)
                     {
-                        List<Point3d> outlinePoints = new List<Point3d>();
-                        Point3d pt = new Point3d(agOut.Household[i][j][k].Origin);
-                        Vector3d x = new Vector3d(agOut.Household[i][j][k].XDirection);
-                        Vector3d y = new Vector3d(agOut.Household[i][j][k].YDirection);
-                        double xa = agOut.Household[i][j][k].XLengthA;
-                        double xb = agOut.Household[i][j][k].XLengthB;
-                        double ya = agOut.Household[i][j][k].YLengthA;
-                        double yb = agOut.Household[i][j][k].YLengthB;
+                        List<Household> currentDongHouseholds = apartment.Household[i][j];
+                        Curve currentCenterLine = centerLine[j];
+                        Curve currentInnerLine = currentCenterLine.Offset(Plane.WorldXY, width / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+                        Curve corridorOutline = currentInnerLine.Offset(Plane.WorldXY, Consts.corridorWidth, 1, CurveOffsetCornerStyle.Sharp)[0];
 
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(y, yb)));
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(x, xa - xb)));
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(y, -ya)));
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(x, -xa)));
-                        outlinePoints.Add(pt);
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(y, ya - yb)));
-                        outlinePoints.Add(pt);
+                        Brep corridorFloorBrep = Brep.CreatePlanarBreps(new List<Curve> { currentInnerLine, corridorOutline }).First();
+                        Surface corridorWallSurface = Surface.CreateExtrusion(corridorOutline, Vector3d.Multiply(Vector3d.ZAxis, Consts.corridorWallHeight));
+                        Brep corridorWallBrep = corridorWallSurface.ToBrep();
 
-                        outlinePoints = Point3d.CullDuplicates(outlinePoints, 1).ToList();
-
-                        pt.Transform(Transform.Translation(Vector3d.Multiply(x, xb)));
-                        outlinePoints.Add(pt);
-
-                        Polyline outlinePolyline = new Polyline(outlinePoints);
-                        Curve outlineCurve = outlinePolyline.ToNurbsCurve();
-                        houseOutline_j.Add(outlineCurve);
-                    }
-
-                    houseOutline_i.Add(houseOutline_j);
-                }
-
-                houseOutline.Add(houseOutline_i);
-            }
-
-            //create window lines
-            List<List<List<List<Line>>>> windowLines = agOut.getLightingWindow();
-
-            //constants
-            double pilotiHeight = Consts.PilotiHeight;
-            double storiesHeight = Consts.FloorHeight;
-            int stories = (int)agOut.ParameterSet.Stories;
-
-            double windowSide = 300;
-            double windowLow = 300;
-            double windowHeight = 2100;
-            double windowDepth = 200;
-
-
-            //draw
-
-            //make each house brep
-            List<Brep> houseBrep = new List<Brep>();
-            for (int i = 0; i < houseOutline.Count; i++)
-            {
-
-                for (int j = 0; j < houseOutline[i].Count; j++)
-                {
-
-                    for (int k = 0; k < houseOutline[i][j].Count(); k++)
-                    {
-
-                        //make each house block
-                        Surface tempSurface = Surface.CreateExtrusion(houseOutline[i][j][k], Vector3d.Multiply(Vector3d.ZAxis, storiesHeight));
-                        Brep tempBrep = tempSurface.ToBrep().CapPlanarHoles(1);
-
-                        //make windows
-                        List<Curve> windows = new List<Curve>();
-                        for (int l = 0; l < windowLines[i][j][k].Count; l++)
-                        {
-                            Line tempLine = windowLines[i][j][k][l];
-
-                            Point3d midPoint = tempLine.PointAt(0.5);
-                            Vector3d windowVec = tempLine.UnitTangent;
-                            windowVec.Rotate(Math.PI / 2, Vector3d.ZAxis);
-                            midPoint.Transform(Transform.Translation(Vector3d.Multiply(windowVec, 10)));
-
-                            if (houseOutline[i][j][k].Contains(midPoint) == Rhino.Geometry.PointContainment.Inside)
-                            {
-                                tempLine.Flip();
-                            }
-
-                            tempLine.Extend(-windowSide, -windowSide);
-
-                            Curve tempCurve = tempLine.ToNurbsCurve();
-                            tempCurve.Translate(Vector3d.Multiply(Vector3d.ZAxis, windowLow));
-                            Point3d pt1 = tempCurve.PointAtStart;
-                            Point3d pt2 = tempCurve.PointAtEnd;
-                            Point3d pt3 = tempCurve.PointAtEnd;
-                            pt3.Transform(Transform.Translation(Vector3d.Multiply(Vector3d.ZAxis, windowHeight)));
-                            Point3d pt4 = tempCurve.PointAtStart;
-                            pt4.Transform(Transform.Translation(Vector3d.Multiply(Vector3d.ZAxis, windowHeight)));
-                            Point3d pt5 = tempCurve.PointAtStart;
-                            List<Point3d> windowPoints = new List<Point3d>();
-                            windowPoints.Add(pt1);
-                            windowPoints.Add(pt2);
-                            windowPoints.Add(pt3);
-                            windowPoints.Add(pt4);
-                            windowPoints.Add(pt5);
-                            Polyline windowPolyline = new Polyline(windowPoints);
-                            windows.Add(windowPolyline.ToNurbsCurve());
-
-                        }
-                        //punch holes
-
-                        Brep withHoles = tempBrep;
-
-                        for (int l = 0; l < windows.Count; l++)
-                        {
-                            Plane windowPlane;
-                            windows[l].TryGetPlane(out windowPlane);
-                            Vector3d windowNormal = windowPlane.Normal;
-                            Curve windowCurve = windows[l].Duplicate() as Curve;
-                            windowCurve.Translate(Vector3d.Multiply(windowNormal, windowDepth));
-                            Surface windowSurface = Surface.CreateExtrusion(windowCurve, Vector3d.Multiply(windowNormal, -windowDepth * 2));
-                            Brep windowBrep = windowSurface.ToBrep();
-                            Brep[] withHolesTemp = withHoles.Split(windowBrep, 1);
-
-                            if (withHolesTemp.Length != 0)
-                            {
-                                withHoles = withHolesTemp[0];
-                            }
-
-                            Curve duplicatedWindowCurve = (windows[l].Duplicate() as Curve);
-                            duplicatedWindowCurve.Transform(Transform.Translation(windowNormal * (windowDepth - 100)));
-
-                            Curve windowCurveBottom = duplicatedWindowCurve.DuplicateSegments()[0];
-                            Curve heightCurve = duplicatedWindowCurve.DuplicateSegments()[1];
-
-                            houseBrep.AddRange(DrawWindowAll(windowCurveBottom, heightCurve.GetLength(), drawComplexModeling));
-
-                            Curve[] tempLoftBase = { windows[l], duplicatedWindowCurve };
-
-                            Curve pathCurve = new LineCurve(Point3d.Origin, new Point3d(windowNormal * (-windowDepth + 100)));
-                            houseBrep.Add(Brep.JoinBreps(Brep.CreateFromLoft(tempLoftBase, Point3d.Unset, Point3d.Unset, LoftType.Normal, false), 0)[0]);
-                        }
-
-                        houseBrep.Add(withHoles);
-
+                        corridorWallBrep.Translate(Vector3d.Multiply(Vector3d.ZAxis, currentDongHouseholds[0].Origin.Z));
+                        corridorFloorBrep.Translate(Vector3d.Multiply(Vector3d.ZAxis, currentDongHouseholds[0].Origin.Z));
+                        courtCorridorBrep.Add(corridorWallBrep);
+                        courtCorridorBrep.Add(corridorFloorBrep);
                     }
                 }
+                output = courtCorridorBrep;
             }
-
-
-
-            output.Add(houseBrep);
-
-            //make each core brep
-            List<List<Brep>> coreBrep = new List<List<Brep>>();
-            for (int i = 0; i < coreOutline.Count; i++)
-            {
-                List<Brep> coreBrepTemp = new List<Brep>();
-                for (int j = 0; j < coreOutline[i].Count; j++)
-                {
-                    Surface tempSurface = Surface.CreateExtrusion(coreOutline[i][j], Vector3d.Multiply(Vector3d.ZAxis, storiesHeight * (agOut.Core[i][j].Stories + 1) + pilotiHeight));
-
-                    Brep tempBrep = tempSurface.ToBrep().CapPlanarHoles(1);
-                    coreBrepTemp.Add(tempBrep);
-                }
-                coreBrep.Add(coreBrepTemp);
-            }
-
-            List<Brep> coreBrepOut = new List<Brep>();
-            for (int i = 0; i < coreBrep.Count; i++)
-            {
-                for (int j = 0; j < coreBrep[i].Count; j++)
-                {
-                    coreBrepOut.Add(coreBrep[i][j]);
-                }
-            }
-            output.Add(coreBrepOut);
-
-
-
-            //make corridor
-
-            if (agOut.AGtype == "PT-1")
-            {
-
-                List<Brep> corridorBrep = new List<Brep>();
-                List<Curve> aptLines = agOut.AptLines;
-
-                for (int i = 0; i < aptLines.Count; i++)
-                {
-
-                    try
-                    {
-                        if (agOut.Target.Area[agOut.Household[i][0][0].HouseholdSizeType] * 1000 * 1000 < Consts.AreaLimit)
-                        {
-
-                            for (int j = 0; j < agOut.Household[i].Count; j++)
-                            {
-                                double corridorLength = 0;
-                                Point3d startPoint = agOut.Household[i][j][0].Origin + agOut.Household[i][j][0].XDirection * agOut.Household[i][j][0].XLengthA;
-                                for (int k = 0; k < agOut.Household[i][j].Count; k++)
-                                {
-                                    corridorLength += agOut.Household[i][j][k].XLengthA;
-                                }
-
-                                Vector3d tangentVec = aptLines[i].TangentAtStart;
-                                Vector3d verticalVec = new Vector3d(tangentVec);
-                                verticalVec.Rotate(Math.PI / 2, Vector3d.ZAxis);
-                                double width = agOut.ParameterSet.Parameters[2];
-
-                                Point3d pt2 = new Point3d(startPoint.X,startPoint.Y,0) + verticalVec * Consts.corridorWidth;
-                                //pt2.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, width / 2)));
-                                Point3d pt1 = new Point3d(pt2);
-                                pt1.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, -Consts.corridorWidth)));
-                                Point3d pt4 = new Point3d(pt2);
-                                pt4.Transform(Transform.Translation(Vector3d.Multiply(tangentVec, corridorLength)));
-                                Point3d pt3 = new Point3d(pt4);
-                                pt3.Transform(Transform.Translation(Vector3d.Multiply(verticalVec, -Consts.corridorWidth)));
-
-                                List<Point3d> corridorWallPts = new List<Point3d>();
-                                corridorWallPts.Add(pt1);
-                                corridorWallPts.Add(pt2);
-                                corridorWallPts.Add(pt4);
-                                corridorWallPts.Add(pt3);
-                                Curve corridorCurve = new Polyline(corridorWallPts).ToNurbsCurve();
-                                Surface corridorWallSurface = Surface.CreateExtrusion(corridorCurve, Vector3d.Multiply(Vector3d.ZAxis, Consts.corridorWallHeight));
-                                Brep corridorWallBrep = corridorWallSurface.ToBrep();
-                                Line lineTemp = new Line(aptLines[i].PointAtStart, aptLines[i].PointAtEnd);
-                                //lineTemp.Transform(Transform.Translation(verticalVec * width / 2));
-                                Line corridorFloorline = new Line(pt2,pt4);
-
-                                Brep corridorFloorBrep = Surface.CreateExtrusion(corridorFloorline.ToNurbsCurve(), -verticalVec * Consts.corridorWidth).ToBrep();
-
-                                corridorWallBrep.Translate(Vector3d.Multiply(Vector3d.ZAxis, agOut.Household[i][j][0].Origin.Z));
-                                corridorFloorBrep.Translate(Vector3d.Multiply(Vector3d.ZAxis, agOut.Household[i][j][0].Origin.Z));
-                                corridorBrep.Add(corridorWallBrep);
-                                corridorBrep.Add(corridorFloorBrep);
-
-                            }
-                        }
-
-                    }
-
-                    catch (Exception)
-                    {
-                        continue;
-                    } 
-                }
-                output.Add(corridorBrep);
-            }
-
-
+            #endregion P3Corridor
 
             return output;
         }
-
-
 
         private static List<Brep> DrawWindowAll(Curve baseCurve, double height, bool drawComplexModeling)
         {
