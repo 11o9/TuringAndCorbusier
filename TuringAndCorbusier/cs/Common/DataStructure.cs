@@ -2103,41 +2103,109 @@ namespace TuringAndCorbusier
 
             Point3d origin = Origin;
 
-
             
+            //each side
+            for (int i = 0; i < MoveableEdge.Count; i++)
+            {
+                Curve moveAble = MoveableEdge[i].ToNurbsCurve();
 
 
-            Point3d test1 = origin + XDirection * (XLengthA-XLengthB);
-            Point3d test2 = origin - XDirection * XLengthB;
-
-            //back side
-
-            Curve testline = new LineCurve(test1, test1 + YDirection * YLengthB);
-            Curve testline0 = new LineCurve(test2, test2 + YDirection * YLengthB);
-
-            List<Curve> testLines = new List<Curve>{ testline, testline0 };
-
-
-            //for (int i = 0; i < testLines.Count; i++)
-            //{
-            //    Curve tempTestCurve = testLines[i];
-            //    DebugPoints.Add(tempTestCurve.PointAtEnd);
-            //    var inter = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, tempTestCurve, 0, 0);
-
-            //}
-
-            DebugPoints.Add(testline.PointAtEnd);
-            DebugPoints.Add(testline0.PointAtEnd);
+                //      ----front----
+                //      |           |
+                // ---- o           |
+                // |                |     
+                // |                |side    
+                // |                |
+                // |                |
+                // |                |
+                // -------back-------
 
 
+                Curve testLine1;
+                Curve testLine2;
+                List<Curve> testLines;
+                //front
+                if (moveAble.TangentAtStart == XDirection)
+                {
+                    Point3d p1 = origin;
+                    Point3d p2 = origin + XDirection * (XLengthA - XLengthB);
+                    Vector3d v = YDirection * YLengthB;
+                    testLine1 = new LineCurve(p1,p1+v);
+                    testLine2 = new LineCurve(p2,p2+v);
+                    testLines = new List<Curve> { testLine1, testLine2 };
+                }
 
+                //side                                                                                              
+                else if (moveAble.TangentAtStart == -YDirection)
+                {
+                    Point3d p1 = origin + YDirection * YLengthB;
+                    Point3d p2 = origin - YDirection * (YLengthA - YLengthB);
+                    Vector3d v = XDirection * (XLengthA - XLengthB);
+                    testLine1 = new LineCurve(p1, p1 + v);
+                    testLine2 = new LineCurve(p2, p2 + v);
+                    testLines = new List<Curve> { testLine1, testLine2 };
+                }
 
-            var inter1 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline, 0, 0);
-            var inter2 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline0, 0, 0);
+                //back
+                else if (moveAble.TangentAtStart == -XDirection)
+                {
+                    Point3d p1 = origin + XDirection * (XLengthA - XLengthB);
+                    Point3d p2 = origin - XDirection * XLengthB;
+                    Vector3d v = -YDirection * (YLengthA - YLengthB);
+                    testLine1 = new LineCurve(p1, p1 + v);
+                    testLine2 = new LineCurve(p2, p2 + v);
+                    testLines = new List<Curve> { testLine1, testLine2 };
+                }
+                else
+                    continue;
 
+                DebugPoints.Add(testLine1.PointAtEnd);
+                DebugPoints.Add(testLine1.PointAtStart);
+                DebugPoints.Add(testLine2.PointAtEnd);
+                DebugPoints.Add(testLine2.PointAtStart);
+
+                double minDistance = double.MaxValue;
+                for (int j = 0; j < testLines.Count; j++)
+                {
+                    double d = CalculateSetBackDistance(testCurve, testLines[j]);
+                    if (d < minDistance)
+                        minDistance = d;
+                }
+
+                if (minDistance == double.MaxValue)
+                    continue;
+
+                //결과적용
+                if (moveAble.TangentAtStart == XDirection)
+                {
+
+                    YLengthA -= YLengthB - minDistance;
+                    YLengthB = minDistance;
+                    
+                }
+
+                //side                                                                                              
+                else if (moveAble.TangentAtStart == -YDirection)
+                {
+                    XLengthA -= XLengthA - XLengthB - minDistance;
+                }
+
+                //back
+                else if (moveAble.TangentAtStart == -XDirection)
+                {
+                    YLengthA -= YLengthA - YLengthB - minDistance;
+                }
+
+            }
+            return true;
+        }
+
+        private double CalculateSetBackDistance(Curve testCurve, Curve testline)
+        {
+            var inter = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline, 0, 0);
             double minDistanceBack = double.MaxValue;
 
-            foreach (var e in inter1)
+            foreach (var e in inter)
             {
                 Point3d p = e.PointA;
                 DebugPoints.Add(p);
@@ -2146,71 +2214,7 @@ namespace TuringAndCorbusier
                     minDistanceBack = distance;
             }
 
-            foreach (var e in inter2)
-            {
-                Point3d p = e.PointA;
-                DebugPoints.Add(p);
-                double distance = p.DistanceTo(testline0.PointAtStart);
-                if (minDistanceBack > distance)
-                    minDistanceBack = distance;
-            }
-
-          
-
-            //front side
-
-            Curve testline1 = new LineCurve(test1, test1 - YDirection * (YLengthA - YLengthB));
-            Curve testline2 = new LineCurve(test2, test2 - YDirection * (YLengthA - YLengthB));
-
-            var int1 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline1, 0, 0);
-            var int2 = Rhino.Geometry.Intersect.Intersection.CurveCurve(testCurve, testline2, 0, 0);
-
-            DebugPoints.Add(test1);
-            DebugPoints.Add(test2);
-
-            DebugPoints.Add(testline1.PointAtEnd);
-            DebugPoints.Add(testline2.PointAtEnd);
-
-            
-
-            double minDistanceFront = double.MaxValue;
-
-            foreach (var e in int1)
-            {
-                Point3d p = e.PointA;
-                DebugPoints.Add(p);
-                double distance = p.DistanceTo(testline1.PointAtStart);
-                if(minDistanceFront > distance)
-                    minDistanceFront = distance;
-            }
-
-            foreach (var e in int2)
-            {
-                Point3d p = e.PointA;
-                DebugPoints.Add(p);
-                double distance = p.DistanceTo(testline2.PointAtStart);
-                if (minDistanceFront > distance)
-                    minDistanceFront = distance;
-            }
-
-            if (minDistanceFront == double.MaxValue && minDistanceBack == double.MaxValue) // no intersection
-                return true;
-
-            //double before = GetArea();
-            if (minDistanceBack != double.MaxValue)
-            {
-                double diff = YLengthB - minDistanceBack;
-                YLengthB = minDistanceBack;
-                YLengthA -= diff;
-            }
-
-
-            if(minDistanceFront != double.MaxValue)
-                YLengthA = minDistanceFront + YLengthB;
-            //if (GetArea() < before * 0.5)
-            //    return false;
-
-            return true;
+            return minDistanceBack;
         }
 
         public void MoveLightingAndMoveAble()

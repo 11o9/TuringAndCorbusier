@@ -201,11 +201,11 @@ namespace TuringAndCorbusier
 
             //best 1
             Apartment bestOutput = ag.generator(plot, bestGene, target);
-            return new Apartment[] { bestOutput }.ToList();
+            //return new Apartment[] { bestOutput }.ToList();
 
             //best 5
             //var uniqueGenes = offspringGenes.Distinct();
-            Apartment[] bestOutputs = offspringGenes.Take(5).Select(n => ag.generator(plot, n, target)).ToArray();
+            //Apartment[] bestOutputs = offspringGenes.Take(5).Select(n => ag.generator(plot, n, target)).ToArray();
             //return bestOutputs.ToList();
 
 
@@ -216,8 +216,8 @@ namespace TuringAndCorbusier
             //return bestOutputs.ToList();
 
             //all
-            //Apartment[] bestOutputs = offspringGenes.Select(n=>ag.generator(plot, n, target)).ToArray();
-            //return bestOutputs.ToList();
+            Apartment[] bestOutputs = offspringGenes.Select(n => ag.generator(plot, n, target)).ToArray();
+            return bestOutputs.ToList();
 
             if (bestOutput.ParameterSet == null)
                 return FinalizeApartment.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
@@ -454,8 +454,8 @@ namespace TuringAndCorbusier
 
                 //setback test
                 double setbackBonus = 0;
-                //if (gene[j].setback)
-                //    setbackBonus = 100;
+                if (gene[j].setback)
+                    setbackBonus = 1000;
                 fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus);
                 //for test
             
