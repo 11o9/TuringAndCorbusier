@@ -1352,30 +1352,32 @@ namespace TuringAndCorbusier
             }
             return mappedVals;
         }
-        private List<double> valMapper(double a, double b, List<double> source)
+        private List<double> valMapper(double centerRectWidth, double centerRectHeight, List<double> startToHouseEndPtLengths)
         {
-            double half = a + b;
-            List<double> target = new List<double>();
-            for (int i = 0; i < source.Count; i++)
+            double centerRectLength = 2*(centerRectWidth + centerRectHeight);
+            List<double> mappedValue = new List<double>();
+            for (int i = 0; i < startToHouseEndPtLengths.Count; i++)
             {
-                int aa = (int)(source[i] / half);
-                double aaa = source[i] - half * aa;
-                double aaaa = 0;
-                int aaaaa = 0;
-                if (aaa > a)
+                int rectHalfIndex = (int)(startToHouseEndPtLengths[i] / (centerRectLength/2))%2;
+                double halfStartToHouseEndPt = startToHouseEndPtLengths[i] - (centerRectLength/2) * rectHalfIndex;
+                double endParamOnCurrentLine = 0;
+                int lineParamOnHalf = 0;
+
+                bool isOnHeight = halfStartToHouseEndPt > centerRectWidth;
+                if (isOnHeight)
                 {
-                    aaaaa = 1;
-                    aaa -= a;
-                    aaaa = aaa / b;
+                    lineParamOnHalf = 1;
+                    halfStartToHouseEndPt -= centerRectWidth;
+                    endParamOnCurrentLine = halfStartToHouseEndPt / centerRectHeight;
                 }
                 else
                 {
-                    aaaaa = 0;
-                    aaaa = aaa / a;
+                    lineParamOnHalf = 0;
+                    endParamOnCurrentLine = halfStartToHouseEndPt / centerRectWidth;
                 }
-                target.Add((aa * 2 + aaaaa + aaaa) % (2 * half));
+                mappedValue.Add((rectHalfIndex * 2 + lineParamOnHalf + endParamOnCurrentLine) % 4);
             }
-            return target;
+            return mappedValue;
         }
 
         private List<double> pushpush(double width, List<double> edgeLength, List<double> cornerLength, List<List<int>> edgeIndices, double minL, int resolutionCount, int iterationCount)

@@ -2717,7 +2717,7 @@ namespace TuringAndCorbusier
                 t = 0;
             }
 
-            double tempHeight = height;//숫자 -> 나중에 변수로
+            double tempHeight = height;
 
             var tempRoadLine = plot.Boundary.DuplicateSegments();
 
@@ -2742,7 +2742,7 @@ namespace TuringAndCorbusier
 
                
 
-                tempRoadLine[i].Translate(Vector3d.YAxis * t * moveDistance);//숫자 -> 나중에 변수로
+                tempRoadLine[i].Translate(Vector3d.YAxis * t * moveDistance);
             }
 
 
@@ -2843,8 +2843,10 @@ namespace TuringAndCorbusier
                 }
             }
 
-            GroupA.Add(GroupA[0]);
-            GroupB.Add(GroupB[0]);
+            if (GroupA.Count != 0)
+                GroupA.Add(GroupA[0]);
+            if (GroupB.Count != 0)
+                GroupB.Add(GroupB[0]);
 
             Curve resultA = new PolylineCurve(GroupA.Select(n => wholeCurve.PointAt(n)));
             Curve resultB = new PolylineCurve(GroupB.Select(n => wholeCurve.PointAt(n)));
