@@ -8,6 +8,14 @@ namespace TuringAndCorbusier
 {
     public class CorePlan
     {
+
+        //프로퍼티
+
+        public List<Curve> walls { get; private set; }
+        public List<Curve> normals { get; private set; }
+        public List<Curve> others { get; private set; }
+        public List<Curve> groundFloor { get; private set; }
+
         //생성자
 
         private CorePlan()
@@ -100,13 +108,6 @@ namespace TuringAndCorbusier
             else
                 return "&";
         }
-
-        //프로퍼티
-
-        public List<Curve> walls { get; private set; }
-        public List<Curve> normals { get; private set; }
-        public List<Curve> others { get; private set; }
-        public List<Curve> groundFloor { get; private set; }
 
     }
 }

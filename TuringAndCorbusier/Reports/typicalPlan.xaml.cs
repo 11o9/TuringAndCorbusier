@@ -18,11 +18,10 @@ namespace Reports
         public wpfTypicalPlan(Interval floorInterval)
         {
             InitializeComponent();
-
             this.SetTitle(floorInterval);
         }
 
-        private typicalPlan typicalPlanValue;
+        private TypicalPlan typicalPlanValue;
         private double scaleFactor = 0;
         private System.Windows.Point origin = new System.Windows.Point();
 
@@ -38,13 +37,13 @@ namespace Reports
             }
         }
 
-        public typicalPlan SetTypicalPlan
+        public TypicalPlan SetTypicalPlan
         {
             set
             {
                 typicalPlanValue = value;
 
-                typicalPlan tempPlan = value;
+                TypicalPlan tempPlan = value;
 
                 Rectangle3d tempBoundingBox = new Rectangle3d(Plane.WorldXY, tempPlan.GetBoundingBox().Min, tempPlan.GetBoundingBox().Max);
                 Rectangle canvasRectangle = new Rectangle();
@@ -57,10 +56,12 @@ namespace Reports
                 origin = tempOrigin;
 
                 //doc.Objects.AddCurve(Boundary);
-
+                //주변 대지 그리기
                 PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, tempPlan.SurroundingSite, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
-                PlanDrawingFunction_90degree.drawBackGround(tempBoundingBox, tempPlan.Boundary, tempScaleFactor, tempOrigin, ref this.typicalPlan, new System.Windows.Media.SolidColorBrush(Color.FromRgb(240, 240, 240)));
-                PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, tempPlan.Boundary, tempScaleFactor, tempOrigin, ref this.typicalPlan, new System.Windows.Media.SolidColorBrush(Color.FromRgb(255, 0, 0)), 0.2);
+                //대지 내부 배경 색상
+                PlanDrawingFunction_90degree.drawBackGround(tempBoundingBox, tempPlan.Boundary, tempScaleFactor, tempOrigin, ref this.typicalPlan, new System.Windows.Media.SolidColorBrush(Color.FromRgb(255 , 255, 255)));
+                //대지선 빨간색으로 그리기
+                PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, tempPlan.Boundary, tempScaleFactor, tempOrigin, ref this.typicalPlan, new System.Windows.Media.SolidColorBrush(Color.FromRgb(102, 204, 0)), 5);
 
                 foreach (Text3d i in tempPlan.RoadWidth)
                 {
@@ -69,22 +70,29 @@ namespace Reports
 
                 foreach (FloorPlan i in tempPlan.UnitPlans)
                 {
-                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.doors, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
-                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.windows, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
-                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.tilings, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.1);
-                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.walls, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
-                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.caps, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
+                     //방 평면도에 문그리기
+                    //PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.doors, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
+                    //방 창문그리기
+                    //PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.windows, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
+                    //방 화장실 타일링 그리기
+                    //PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.tilings, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.1);
+                    //방 벽그리기
+                    //PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.walls, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
+                    //방 과 방 분리벽
+                    //PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.caps, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
                 }
+                
 
                 foreach (CorePlan i in tempPlan.CorePlans)
                 {
-                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.normals, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.1);
+                    //코어 계단과 엘리베이터 상세도면
+                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.normals, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.075);
+                    //코어 보이드 공간
                     PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.others, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.075);
-                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.walls, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
-
-                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.groundFloor, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
-
-
+                    //코어 벽
+                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.walls, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.075);
+                    //코어 복도
+                    PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, i.groundFloor, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.075);
                 }
 
                 if (typicalPlanValue.Floor == 1)

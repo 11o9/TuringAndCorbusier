@@ -271,7 +271,7 @@ namespace TuringAndCorbusier
             else
                 return (int)legalParkingLotByUnitSize;
         }
-
+        //--------------------------------아파트 정보 아웃풋----------------------------------//
         private static List<Apartment> duplicateAndReduceAGoutput(Apartment AGoutput, List<double> reducePercentage)
         {
             List<Apartment> output = new List<Apartment>();

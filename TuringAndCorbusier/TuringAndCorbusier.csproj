@@ -120,6 +120,9 @@
     </Compile>
     <Compile Include="Reports\ReportBase.cs" />
     <Compile Include="cs\Common\CommonFunc.cs" />
+    <Compile Include="Reports\reportCover.xaml.cs">
+      <DependentUpon>reportCover.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Reports\section.xaml.cs">
       <DependentUpon>section.xaml</DependentUpon>
     </Compile>
@@ -134,9 +137,6 @@
     </Compile>
     <Compile Include="Reports\xmlcover.xaml.cs">
       <DependentUpon>xmlcover.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Reports\birdeye.xaml.cs">
-      <DependentUpon>birdeye.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reports\xmlRegulationCheck.xaml.cs">
       <DependentUpon>xmlRegulationCheck.xaml</DependentUpon>
@@ -227,6 +227,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Reports\reportCover.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Reports\section.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -244,10 +248,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Reports\xmlcover.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Reports\birdeye.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

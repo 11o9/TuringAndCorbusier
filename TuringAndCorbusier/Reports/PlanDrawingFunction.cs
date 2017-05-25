@@ -27,7 +27,6 @@ namespace TuringAndCorbusier
             for (int i = 0; i < dimensions.Count; i++)
             {
                 FloorPlan.Dimension tempDimension = dimensions[i];
-
                 drawText(tempBoundingBox, tempDimension.NumberText, tempScaleFactor, tempOrigin, ref UnitPlanCanvas, 20, Brushes.Black);
                 List<Curve> dimensionCurves = tempDimension.ExtensionLine;
                 dimensionCurves.Add(tempDimension.DimensionLine);
@@ -305,6 +304,11 @@ namespace TuringAndCorbusier
 
                 }
             }
+        }
+
+        //JHL
+        public static void simpleDrawPlan()
+        {
 
         }
 

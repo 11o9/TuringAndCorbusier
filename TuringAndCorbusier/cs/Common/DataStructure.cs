@@ -4,6 +4,7 @@ using Rhino.Geometry;
 using System.Linq;
 using Rhino.Display;
 using System.IO;
+using Rhino;
 
 namespace TuringAndCorbusier
 {
@@ -762,21 +763,21 @@ namespace TuringAndCorbusier
         //Constructor, 생성자
         public Apartment(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<Core>> core, List<List<List<Household>>> household, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<List<Curve>> buildingOutline, List<Curve> aptLines)
         {
-            this.AGtype = AGType;
-            this.Plot = plot;
-            this.BuildingType = buildingType;
-            this.ParameterSet = parameterSet;
-            this.Target = target;
-            this.Core = core;
-            this.Household = household;
-            this.HouseholdStatistics = getHouseholdStatistics(household);
-            this.ParkingLotOnEarth = parkingOnEarth;
-            this.ParkingLotUnderGround = parkingUnderGround;
-            this.Green = Green;
-            this.buildingOutline = buildingOutline;
-            this.AptLines = aptLines;
+            this.AGtype = AGType; //가로주택 형
+            this.Plot = plot; //대지
+            this.BuildingType = buildingType; //건물 종류
+            this.ParameterSet = parameterSet; //유전자
+            this.Target = target; //목표 유닛
+            this.Core = core; //코어
+            this.Household = household; //방
+            this.HouseholdStatistics = getHouseholdStatistics(household); // 각 방의 정보
+            this.ParkingLotOnEarth = parkingOnEarth; //주차
+            this.ParkingLotUnderGround = parkingUnderGround;//지하 주차
+            this.Green = Green; //녹지
+            this.buildingOutline = buildingOutline; //
+            this.AptLines = aptLines; //축선
 
-            this.Commercial = new List<NonResidential>();
+            this.Commercial = new List<NonResidential>(); 
             this.PublicFacility = new List<NonResidential>();
 
         }
@@ -1225,6 +1226,7 @@ namespace TuringAndCorbusier
                     for (int j = 0; j < this.Core[i].Count; j++)
                     {
                         coreOutlines.Add(Core[i][j].DrawOutline());
+
                     }
                 }
             }
@@ -1234,6 +1236,29 @@ namespace TuringAndCorbusier
             }
 
             return coreOutlines;
+        }
+        //JHL 코어 디테일
+        public List<Curve> drawEachCoreDetail()
+        {
+            List<Curve> coreDetailOutlines = new List<Curve>();
+
+            try
+            {
+                for (int i = 0; i < this.Core.Count; i++)
+                {
+                    for (int j = 0; j < this.Core[i].Count; j++)
+                    {
+                        coreDetailOutlines.Add(Core[i][j].DrawCoreDetail());
+
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return coreDetailOutlines;
+            }
+
+            return coreDetailOutlines;
         }
 
         public List<Curve> drawEachHouse()
@@ -1260,6 +1285,32 @@ namespace TuringAndCorbusier
             }
 
             return houseOutlines;
+        }
+        //JHL---------기본 집 아웃라인 그리는 코드 인듯
+        public List<Curve> drawEachBalcony()
+        {
+            List<Curve> houseBalconyOutlines = new List<Curve>();
+
+            try
+            {
+                for (int i = 0; i < this.Household.Count; i++)
+                {
+                    for (int j = 0; j < this.Household[i].Count; j++)
+                    {
+                        for (int k = 0; k < this.Household[i][j].Count; k++)
+                        {
+                            houseBalconyOutlines.Add(this.Household[i][j][k].GetOutline());
+                        }
+
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return houseBalconyOutlines;
+            }
+
+            return houseBalconyOutlines;
         }
 
 
@@ -1724,10 +1775,10 @@ namespace TuringAndCorbusier
             return Area;
         }
 
+        
         public Curve DrawOutline()
         {
             List<Point3d> outlinePoints = new List<Point3d>();
-
 
             Point3d pt = new Point3d(Origin);
             Vector3d x = new Vector3d(XDirection);
@@ -1749,6 +1800,32 @@ namespace TuringAndCorbusier
             Curve outlineCurve = outlinePolyline.ToNurbsCurve();
             return outlineCurve;
         }
+        //JHL
+        public Curve DrawCoreDetail()
+        {
+            List<Point3d> outlinePoints = new List<Point3d>();
+
+            Point3d pt = new Point3d(Origin);
+            Vector3d x = new Vector3d(XDirection);
+            Vector3d y = new Vector3d(YDirection);
+            double width = CoreType.GetWidth();
+            double depth = CoreType.GetDepth();
+
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, -width)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, -depth)));
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
+            outlinePoints.Add(pt);
+
+            Polyline outlinePolyline = new Polyline(outlinePoints);
+            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
+            return outlineCurve;
+        }
+        //--------------------------------------------------------------------------//
 
         //주차배치용 확장
         public Curve DrawOutline(double aptWidth)
@@ -2027,8 +2104,11 @@ namespace TuringAndCorbusier
             Point3d pt = new Point3d(this.Origin);
             Vector3d x = new Vector3d(this.XDirection);
             Vector3d y = new Vector3d(this.YDirection);
+            //방 총 x 축 길이
             double xa = this.XLengthA;
+            //방 x 축 길이
             double xb = this.XLengthB;
+
             double ya = this.YLengthA;
             double yb = this.YLengthB;
 
@@ -2043,22 +2123,8 @@ namespace TuringAndCorbusier
             outlinePoints.Add(pt);
             pt.Transform(Transform.Translation(Vector3d.Multiply(y, ya - yb)));
             outlinePoints.Add(pt);
-
-            Point3d.CullDuplicates(outlinePoints, 0);
-
-            pt.Transform(Transform.Translation(Vector3d.Multiply(x, xb)));
-            outlinePoints.Add(pt);
-
-            Polyline outlinePolyline = new Polyline(outlinePoints);
-            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
-
-            if (outlineCurve.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.CounterClockwise)
-                outlineCurve.Reverse();
-
-            return outlineCurve;
-
         }
-
+           
 
         public double GetArea()
         {

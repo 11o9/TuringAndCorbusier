@@ -9,22 +9,21 @@ namespace TuringAndCorbusier
 {
     public class PlanDrawingFunction_90degree
     {
+        //방 orientation 방향 시계 반대 방향으로 정렬하기
         public static Household alignHousholdProperties(Household household)
         {
             Household tempHousehold = new Household(household);
-
             tempHousehold.XDirection = Vector3d.XAxis;
             tempHousehold.YDirection = Vector3d.YAxis;
-
             return tempHousehold;
         }
+
 
         public static void drawDimension(Rectangle3d tempBoundingBox, List<TuringAndCorbusier.FloorPlan.Dimension> dimensions, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas)
         {
             for (int i = 0; i < dimensions.Count; i++)
             {
                 FloorPlan.Dimension tempDimension = dimensions[i];
-
                 drawText(tempBoundingBox, tempDimension.NumberText, tempScaleFactor, tempOrigin, ref UnitPlanCanvas, 20, System.Windows.Media.Brushes.Black);
                 List<Curve> dimensionCurves = tempDimension.ExtensionLine;
                 dimensionCurves.Add(tempDimension.DimensionLine);
@@ -223,8 +222,6 @@ namespace TuringAndCorbusier
             foreach (Curve i in curveToDraw)
             {
                 Curve[] shatteredCurves = i.DuplicateSegments();
-
-
                 if (shatteredCurves.Length > 1)
                 {
                     foreach (Curve j in shatteredCurves)

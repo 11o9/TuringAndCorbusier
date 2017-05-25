@@ -15,7 +15,15 @@ namespace TuringAndCorbusier
             FloorPlanLibrary fpl = typeDetector(fpls, householdProperty, agType);
             double exWallThickness = 300; double inWallThickness = 200; double entDoorWidth = 900; double inDoorWidth = 900;
 
-            List<List<Curve>> wallCurves; List<List<Curve>> tilingCurves; List<List<Curve>> doorCurves; List<List<Curve>> windowCurves; List<List<Curve>> centerLines; List<Dimension> dimensions; List<List<Curve>> balconyLines; List<Curve> caps;
+            List<List<Curve>> wallCurves;
+            List<List<Curve>> tilingCurves;
+            List<List<Curve>> doorCurves;
+            List<List<Curve>> windowCurves;
+            List<List<Curve>> centerLines;
+            List<Dimension> dimensions;
+            List<List<Curve>> balconyLines;
+            List<Curve> caps;
+            //상세도면 그리는 코드 같음 
             try
             {
                 planDrawer(fpl, householdProperty, exWallThickness, inWallThickness, entDoorWidth, inDoorWidth, out wallCurves, out tilingCurves, out doorCurves, out windowCurves, agType);
@@ -96,6 +104,7 @@ namespace TuringAndCorbusier
             this.caps = caps;
             this.roomTags = roomTags;
         }
+
         //Field, 필드
         public Household householdProperty { get; private set; }
         public List<List<Curve>> walls { get; private set; }
@@ -440,6 +449,18 @@ namespace TuringAndCorbusier
         //////////////////////////
         /////////  main  /////////
         //////////////////////////
+        //------------------JHL
+        //household room outline
+        public void householdRoomOutlineDrawer(Household hhp, double exWallThickness, double inWallThickness,out List<Curve> household_roomOutline, string agType)
+        {
+            double xa = hhp.XLengthA;
+            double xb = hhp.XLengthB;
+            double ya = hhp.YLengthA;
+            double yb = hhp.YLengthB;
+
+            //rule : outer wall line is in [0] and inner wall line is in [1]
+            household_roomOutline = exWallMaker(xa, xb, ya, yb, hhp.WallFactor, exWallThickness, inWallThickness);
+            }
 
         private void planDrawer(FloorPlanLibrary fpl, Household hhp, double exWallThickness, double inWallThickness, double entDoorWidth, double inDoorWidth, out List<List<Curve>> wallCurves, out List<List<Curve>> tilingCurves, out List<List<Curve>> doorCurves, out List<List<Curve>> windowCurves, string agType)
         {
@@ -681,7 +702,7 @@ namespace TuringAndCorbusier
 
             windowCurves.AddRange(windowDetails);
         }
-
+        //--------JHL exterior wall-------------------------------------------//
         private List<Curve> exWallMaker(double xa, double xb, double ya, double yb, List<double> wallFactor, double exWallThickness, double inWallThickness)
         {
             //create house outline
@@ -716,6 +737,7 @@ namespace TuringAndCorbusier
 
             return output;
         }
+        //--------------------------------------------------------------//
         private Polyline alignPolylineOrientation(Polyline polyline)
         {
             Polyline output = new Polyline(polyline);

@@ -78,12 +78,16 @@ namespace TuringAndCorbusier
             //최고층수 추가, 목표세대수 / 층수 해서 라인 수 찾으려고.
             List<Unit> units = target.ToUnit(width, corearea, storiesHigh);
 
+         
 
             //#######################################################################################################################
             if (parameterSet.using1F && !parameterSet.setback)
             {
+               
                 if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
+           
                 {
+                 
                     return null;
                 }
 
@@ -121,7 +125,9 @@ namespace TuringAndCorbusier
                     }
                     else
                         break;
+                   
                 }
+        
             }
 
             ///////////////////////////
@@ -406,6 +412,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < storiesHigh; i++)
             {
 
+         
                 double tempStoryHeight = pilotiHeight + i * Consts.FloorHeight;
                 Regulation tempStoryReg = new Regulation(storiesHigh, i);
                 Curve[] Reg = wholeRegulationHigh;
@@ -442,6 +449,7 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < storiesHigh + 2; i++)
             {
+    
                 //1층 사용시 필로티코어 만들지 않음.
                 if (parameterSet.using1F && i == 0)
                     continue;
@@ -643,6 +651,7 @@ namespace TuringAndCorbusier
             pm.ParkingLines = parkingCurves; // 만약 라인마다 다른 depth로 뽑고싶다면 따로따로
             pm.Obstacles = obstacles;
             pm.Boundary = plot.Boundary;
+
             pm.Distance = width + (storiesHigh * Consts.FloorHeight/* + pilotiHeight*/) * 0.8;
             pm.CoreDepth = coreDepth;
             pm.AddFront = true;
