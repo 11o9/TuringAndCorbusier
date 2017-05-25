@@ -543,14 +543,19 @@ namespace TuringAndCorbusier
             this.parkingLotPreview.CurveToDisplay = lotCurves;
 
             List<Point3d> debugs = new List<Point3d>();
+            List<Point3d> origins = new List<Point3d>();
             if (outputToPreview.Household.Count != 0)
             { 
                 foreach (var hh in outputToPreview.Household.Last())
                 {
                     foreach (var h in hh)
+                    {
                         debugs.AddRange(h.DebugPoints);
+                        origins.Add(h.Origin);
+                    }
                 }
                 building2DPreview.debugPoints = debugs;
+                building2DPreview.HouseholdOrigins = origins;
             }
             /*
             textPreview.Enabled = true;

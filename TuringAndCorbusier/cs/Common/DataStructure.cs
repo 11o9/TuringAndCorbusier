@@ -1934,6 +1934,8 @@ namespace TuringAndCorbusier
             this.HouseholdSizeType = householdSizeType;
             //this.ExclusiveArea = exclusiveArea;
             //this.LightingEdge = lightingEdge;
+            this.LightingEdge = lightingEdge;
+            
             this.WallFactor = wallFactor;
             this.EntrancePoint = entrancePoint;
             this.CorridorArea = 0;
@@ -1961,6 +1963,9 @@ namespace TuringAndCorbusier
             this.EntrancePoint = household.EntrancePoint;
             this.CorridorArea = household.CorridorArea;
             this.isCorridorType = household.isCorridorType;
+            this.LightingEdge = new List<Line>(household.LightingEdge);
+            this.MoveableEdge = new List<Line>(household.MoveableEdge);
+
         }
         public Household(Household household,double downheight)
         {
@@ -1974,11 +1979,17 @@ namespace TuringAndCorbusier
             this.YLengthB = household.YLengthB;
             this.HouseholdSizeType = household.HouseholdSizeType;
             //this.ExclusiveArea = household.GetExclusiveArea() + household.GetWallArea();
-            household.LightingEdge.ForEach(n => n.Transform(Transform.Translation(-Vector3d.ZAxis * downheight)));
+           
             //this.LightingEdge = household.LightingEdge;
             this.WallFactor = household.WallFactor;
             this.EntrancePoint = household.EntrancePoint - Vector3d.ZAxis * downheight;
-            this.CorridorArea = household.CorridorArea; 
+            this.CorridorArea = household.CorridorArea;
+
+            this.LightingEdge = new List<Line>(household.LightingEdge);
+            this.MoveableEdge = new List<Line>(household.MoveableEdge);
+
+            LightingEdge.ForEach(n => n.Transform(Transform.Translation(-Vector3d.ZAxis * downheight)));
+            MoveableEdge.ForEach(n => n.Transform(Transform.Translation(-Vector3d.ZAxis * downheight)));
         }
         public override int GetHashCode()
         {
@@ -1998,6 +2009,7 @@ namespace TuringAndCorbusier
 
         //Method, 메소드
 
+        //not used
         public List<Line> GetLightingEdges()
         {
             //if (YLengthB == 0)
@@ -2178,12 +2190,30 @@ namespace TuringAndCorbusier
                 YLengthA -= diff;
             }
 
+
             if(minDistanceFront != double.MaxValue)
                 YLengthA = minDistanceFront + YLengthB;
             //if (GetArea() < before * 0.5)
             //    return false;
 
             return true;
+        }
+
+        public void MoveLightingAndMoveAble()
+        {
+            for ( int i = 0; i < MoveableEdge.Count; i++)
+            {
+                double height = Origin.Z - MoveableEdge[i].From.Z;
+                Line temp = new Line(MoveableEdge[i].From + Vector3d.ZAxis * height, MoveableEdge[i].To + Vector3d.ZAxis * height);
+                MoveableEdge[i] = temp;
+            }
+
+            for (int i = 0; i < LightingEdge.Count; i++)
+            {
+                double height = Origin.Z - LightingEdge[i].From.Z;
+                Line temp = new Line(LightingEdge[i].From + Vector3d.ZAxis * height, LightingEdge[i].To + Vector3d.ZAxis * height);
+                LightingEdge[i] = temp;
+            }
         }
         public List<Point3d> DebugPoints = new List<Point3d>();
         //Property, 속성
@@ -2199,7 +2229,8 @@ namespace TuringAndCorbusier
         //임시로 get public
         public double ExclusiveArea { get { return GetExclusiveArea(); }}
         //public List<int> ConnectedCoreIndex { get { return connectedCoreIndex; } }
-        public List<Line> LightingEdge { get { return GetLightingEdges(); } set{ } }
+        public List<Line> LightingEdge { get; set; }
+        public List<Line> MoveableEdge { get; set; }
         public List<double> WallFactor { get; set; }
         public Point3d EntrancePoint { get; set; }
         public double CorridorArea { get; set; }
@@ -2780,47 +2811,7 @@ namespace TuringAndCorbusier
             }
 
             tps = tps.OrderBy(n => n.Parameter).ToList();
-
-
-
-
-            //일조 영향 안받는 면을 통과한 선을 잘라버린다. 찾아서.
-
-            //find immune
-            //Curve[] boundarySegs = plot.Boundary.DuplicateSegments();
-            //List<Curve> immune = new List<Curve>();
-            //for (int i = 0; i < boundarySegs.Length; i++)
-            //{
-            //    int j = i % plot.Surroundings.Length;
-            //    if (plot.Surroundings[j] == 21000)
-            //        immune.Add(boundarySegs[j]);
-            //}
-
-
-            //cut
-
-       
-
-            //라인 돌면서 파라미터 저장
-            //이뮨과 교차하는 커브의 경우 교차점의 파라미터도 저장
-            //
-            //Curve[] tempRoadLineSegments = tempRoadLine;
-            //List<TypeParam> curveParameters = new List<TypeParam>();
-            //for (int i = 0; i < tempRoadLineSegments.Length; i++)
-            //{
-            //    curveParameters.Add(new TypeParam(tempRoadLineSegments[i].Domain.Min,false));
-
-            //    for (int j = 0; j < immune.Count; j++)
-            //    {
-            //        var itsc = Rhino.Geometry.Intersect.Intersection.CurveCurve(tempRoadLineSegments[i], immune[j], 0, 0);
-            //        foreach (var e in itsc)
-            //        {
-            //            curveParameters.Add(new TypeParam(e.ParameterA, true));
-            //        }
-            //    }
-            //}
-            //curveParameters.Add(new TypeParam(tempRoadLineSegments.Last().Domain.Max,false));
-
+            
             List<double> GroupA = new List<double>();
             List<double> GroupB = new List<double>();
 
@@ -2843,14 +2834,21 @@ namespace TuringAndCorbusier
                 }
             }
 
-            if (GroupA.Count != 0)
-                GroupA.Add(GroupA[0]);
-            if (GroupB.Count != 0)
-                GroupB.Add(GroupB[0]);
+            if(GroupA.Count>0)
+            GroupA.Add(GroupA[0]);
+            if (GroupB.Count > 0)
+            GroupB.Add(GroupB[0]);
 
             Curve resultA = new PolylineCurve(GroupA.Select(n => wholeCurve.PointAt(n)));
             Curve resultB = new PolylineCurve(GroupB.Select(n => wholeCurve.PointAt(n)));
 
+            var checkSelfA = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultA, 0);
+            if(checkSelfA.Count == 0)
+                return new Curve[] { resultA };
+
+            var checkSelfB = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultB, 0);
+            if (checkSelfB.Count == 0)
+                return new Curve[] { resultB };
             //tempRoadLine = GroupA.Count > GroupB.Count?new PolylineCurve(GroupA.Select(n=>tempRoadLine.PointAt(n))):new PolylineCurve(GroupB.Select(n => tempRoadLine.PointAt(n)));
             if (Curve.CreateBooleanDifference(resultA, plot.Boundary).Length == 0)
                 return new Curve[] { resultA };
@@ -2979,7 +2977,7 @@ namespace TuringAndCorbusier
 
             //대지 경계선을 구성 선분들로 분할합니다.
             Curve x = plot.Boundary;
-
+            var rotation = x.ClosedCurveOrientation(Vector3d.ZAxis);
             Curve[] plotArrExtended = new Curve[plotArr.Length];
             Array.Copy(plotArr, plotArrExtended, plotArr.Length);
 
@@ -3065,23 +3063,91 @@ namespace TuringAndCorbusier
             }
 
             topoly.Add(topoly[0]);
-            var tempcurve = new PolylineCurve(topoly);
-            var rotation = tempcurve.ClosedCurveOrientation(Vector3d.ZAxis);
 
-            var selfintersection = Rhino.Geometry.Intersect.Intersection.CurveSelf(tempcurve, 0);
-            var parameters = selfintersection.Select(n => n.ParameterA).ToList();
-            var spl = tempcurve.Split(parameters);
-            foreach (var s in spl)
-                s.MakeClosed(5);
-            var sameOrientations = spl.Where(n => n.ClosedCurveOrientation(Vector3d.ZAxis) == rotation).ToArray();
+            Curve wholeCurve = new PolylineCurve(topoly);
 
-            List<Curve> result = new List<Curve>();
-            for (int i = 0; i < sameOrientations.Length; i++)
+            List<TypeParam> tps = new List<TypeParam>();
+            foreach (var p in wholeCurve.DuplicateSegments())
             {
-                var newCurve = Curve.CreateBooleanIntersection(sameOrientations[i], plot.Boundary);
-                result.AddRange(newCurve);
+                tps.Add(new TypeParam(p.Domain.Min, false));
+            }
+            tps.Add(new TypeParam(wholeCurve.Domain.Max, false));
+
+            var self = Rhino.Geometry.Intersect.Intersection.CurveSelf(wholeCurve, 0);
+            foreach (var e in self)
+            {
+                tps.Add(new TypeParam(e.ParameterA, true));
+                tps.Add(new TypeParam(e.ParameterB, true));
             }
 
+            tps = tps.OrderBy(n => n.Parameter).ToList();
+
+            List<double> GroupA = new List<double>();
+            List<double> GroupB = new List<double>();
+
+            bool groupSwitch = true;
+            foreach (var tp in tps)
+            {
+                if (tp.IsIntersectionParameter)
+                {
+                    GroupA.Add(tp.Parameter);
+                    GroupB.Add(tp.Parameter);
+                    groupSwitch = !groupSwitch;
+
+                }
+                else
+                {
+                    if (groupSwitch)
+                        GroupA.Add(tp.Parameter);
+                    else
+                        GroupB.Add(tp.Parameter);
+                }
+            }
+
+            if (GroupA.Count > 0)
+                GroupA.Add(GroupA[0]);
+            if (GroupB.Count > 0)
+                GroupB.Add(GroupB[0]);
+
+
+
+            Curve resultA = new PolylineCurve(GroupA.Select(n => wholeCurve.PointAt(n)));
+            Curve resultB = new PolylineCurve(GroupB.Select(n => wholeCurve.PointAt(n)));
+
+            //Rhino.RhinoDoc.ActiveDoc.Objects.Add(resultA);
+            //Rhino.RhinoDoc.ActiveDoc.Objects.Add(resultB);
+            var checkSelfA = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultA, 0);
+            if (checkSelfA.Count == 0)
+                return new Curve[] { resultA };
+
+            var checkSelfB = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultB, 0);
+            if (checkSelfB.Count == 0)
+                return new Curve[] { resultB };
+            //tempRoadLine = GroupA.Count > GroupB.Count?new PolylineCurve(GroupA.Select(n=>tempRoadLine.PointAt(n))):new PolylineCurve(GroupB.Select(n => tempRoadLine.PointAt(n)));
+            if (Curve.CreateBooleanDifference(resultA, plot.Boundary).Length == 0)
+                return new Curve[] { resultA };
+
+            if (Curve.CreateBooleanDifference(resultB, plot.Boundary).Length == 0)
+                return new Curve[] { resultB };
+
+            #region dfasdf
+
+            return new Curve[] { };
+
+            //var selfintersection = Rhino.Geometry.Intersect.Intersection.CurveSelf(tempcurve, 0);
+            //var parameters = selfintersection.Select(n => n.ParameterA).ToList();
+            //var spl = tempcurve.Split(parameters);
+            //foreach (var s in spl)
+            //    s.MakeClosed(5);
+            //var sameOrientations = spl.Where(n => n.ClosedCurveOrientation(Vector3d.ZAxis) == rotation).ToArray();
+
+            //List<Curve> result = new List<Curve>();
+            //for (int i = 0; i < sameOrientations.Length; i++)
+            //{
+            //    var newCurve = Curve.CreateBooleanIntersection(sameOrientations[i], plot.Boundary);
+            //    result.AddRange(newCurve);
+            //}
+            #endregion
             //if (result.Count == 0)
             //{
             //    //?!
@@ -3091,7 +3157,7 @@ namespace TuringAndCorbusier
             //{
             //    var areas = result.Select(n => AreaMassProperties.Compute(n).Area);
             //}
-            return result.ToArray();
+            //return result.ToArray();
         }
 
      
@@ -3475,6 +3541,7 @@ namespace TuringAndCorbusier
         public string dimension = "";
         public Point3d dimPoint;
         public List<Point3d> debugPoints = new List<Point3d>();
+        public List<Point3d> HouseholdOrigins = new List<Point3d>();
         public CurveConduit()
         {
             this.CurveToDisplay = new List<Curve>();
@@ -3483,6 +3550,7 @@ namespace TuringAndCorbusier
         public CurveConduit(System.Drawing.Color displayColor)
         {
             this.displayColor = displayColor;
+            CurveToDisplay = new List<Curve>();
         }
 
         protected override void CalculateBoundingBox(CalculateBoundingBoxEventArgs e)
@@ -3521,6 +3589,11 @@ namespace TuringAndCorbusier
                 //else
                 //    e.Display.DrawPoint(debugPoints[i], PointStyle.X, 10, System.Drawing.Color.Azure);
 
+            }
+
+            for (int i = 0; i < HouseholdOrigins.Count; i++)
+            {
+                e.Display.DrawPoint(HouseholdOrigins[i], PointStyle.X, 10, System.Drawing.Color.Gold);
             }
         }
 

@@ -14,6 +14,13 @@ namespace TuringAndCorbusier
         {
             randomCoreType = GetRandomCoreType();
 
+
+            double pilotiHeight = Consts.PilotiHeight;
+            if (parameterSet.using1F)
+            {
+                randomCoreType = parameterSet.fixedCoreType;
+                pilotiHeight = 0;
+            }
             ///////////////////////////////////////////////
             //////////  common initial settings  //////////
             ///////////////////////////////////////////////
@@ -226,6 +233,17 @@ namespace TuringAndCorbusier
             aptLines.Add(centerLineCurve);
 
             Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
+
+            if (parameterSet.using1F || parameterSet.setback)
+            {
+
+            }
+            else
+            {
+                Finalizer finalizer = new Finalizer(result);
+                result = finalizer.Finilize();
+            }
+
             return result;
 
 
@@ -339,6 +357,7 @@ namespace TuringAndCorbusier
                 double yaH;
                 double ybH;
                 List<Line> windowsH = new List<Line>();
+                List<Line> moveableH = new List<Line>();
                 Point3d ent = new Point3d();
                 List<double> wallFactor;
                 //int targetAreaTypeH = new List<int>();
@@ -387,6 +406,7 @@ namespace TuringAndCorbusier
                     windowsH.Add(new Line(winPt1, winPt2));
                     ////////
                     windowsH.Add(new Line(winPt3, winPt4));
+                    moveableH.Add(new Line(winPt3, winPt4));
 
                     //entrance points
                     ent = new Point3d(homeOriH);
@@ -439,16 +459,23 @@ namespace TuringAndCorbusier
                         ybH = 0;
 
                     //windows
-                    Point3d winPt1 = homeOriH;
-                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH)));
-                    winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, ybH - yaH)));
-                    Point3d winPt2 = winPt1;
-                    winPt2.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, xaH)));
+                    Point3d winPt1 = homeOriH + homeVecYH * ybH + homeVecXH * (xaH - xbH);
+                    //winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH)));
+                    //winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, ybH - yaH)));
+                    //Point3d winPt2 = winPt1;
+                    //winPt2.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, xaH)));
+                    //Point3d winPt3 = winPt2;
+                    //Point3d winPt4 = winPt2;
+                    //winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, yaH)));
+                    Point3d winPt2 = winPt1 - homeVecYH * yaH;
                     Point3d winPt3 = winPt2;
-                    Point3d winPt4 = winPt2;
-                    winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, yaH)));
+                    Point3d winPt4 = winPt3 + homeVecXH * -xaH;
+
                     windowsH.Add(new Line(winPt1, winPt2));
                     windowsH.Add(new Line(winPt3, winPt4));
+
+                    //moveables == windows
+                    moveableH = windowsH;
 
                     //entrance points
                     ent = new Point3d(homeOriH);
@@ -469,12 +496,14 @@ namespace TuringAndCorbusier
                     if (isCorner)
                     {
                         Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Corner(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
+                        tempHP.MoveableEdge = moveableH;
                         outputS.Add(tempHP);
                         //cornerProperties[targetAreaType[i]].Add(tempHP);
                     }
                     else
                     {
                         Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Edge(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
+                        tempHP.MoveableEdge = moveableH;
                         outputS.Add(tempHP);
                         //edgeProperties[targetAreaType[i]].Add(tempHP);
                     }

@@ -11,6 +11,8 @@ namespace TuringAndCorbusier
 {
     class AG1 : ApartmentGeneratorBase
     {
+        CurveConduit regulationDebug = new CurveConduit(System.Drawing.Color.Red);
+        
 
 
         public override Apartment generator(Plot plot, ParameterSet parameterSet, Target target)
@@ -19,6 +21,7 @@ namespace TuringAndCorbusier
             //////////  common initial settings  //////////
             ///////////////////////////////////////////////
 
+            // for using 1F
             //입력"값" 부분
             randomCoreType = GetRandomCoreType();
             double pilotiHeight = Consts.PilotiHeight;
@@ -27,6 +30,8 @@ namespace TuringAndCorbusier
                 randomCoreType = parameterSet.fixedCoreType;
                 pilotiHeight = 0;
             }
+            //
+
 
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
@@ -141,7 +146,7 @@ namespace TuringAndCorbusier
             ///////////////////////////////////////////
             //////////  additional settings  //////////
             ///////////////////////////////////////////
-
+            
             //법규 : 인접대지경계선(채광창)
             Curve[] lightingHigh = regulationHigh.byLightingCurve(plot, angleRadian);
             Curve[] lightingLow = regulationLow.byLightingCurve(plot, angleRadian);
@@ -167,6 +172,10 @@ namespace TuringAndCorbusier
             Curve[] partialRegulationHigh = CommonFunc.JoinRegulation(surroundingsHigh, northHigh);
             Curve[] wholeRegulationHigh = CommonFunc.JoinRegulations(northHigh, surroundingsHigh, lightingHigh);
 
+
+            //regulation debug
+            regulationDebug.CurveToDisplay = lightingHigh.ToList();
+            regulationDebug.Enabled = true;
 
             ////////////////////////////////////
             //////////  apt baseline  //////////
@@ -412,6 +421,7 @@ namespace TuringAndCorbusier
                         {
                             var newhhp = new Household(x);
                             newhhp.Origin = x.Origin + Vector3d.ZAxis * tempStoryHeight;
+                            newhhp.MoveLightingAndMoveAble();
                             Curve outline = newhhp.GetOutline();
                             //법규체크?
                             var intersect = Rhino.Geometry.Intersect.Intersection.CurveCurve(r, outline, 0, 0);
@@ -685,7 +695,7 @@ namespace TuringAndCorbusier
         private double[] maxInput = { 6, 6, 13000, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
-        private double[] GAparameterset = { 0.1, 0.05, 3, 120, 5, 3, 1 }; //원본
+        private double[] GAparameterset = { 0.1, 0.05, 3, 1, 1, 3, 1 }; //원본
                                                                           //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
 
 

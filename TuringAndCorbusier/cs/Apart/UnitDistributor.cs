@@ -787,7 +787,7 @@ namespace TuringAndCorbusier
             temp.XDirection = XDirection;
             temp.YDirection = YDirection;
             temp.XLengthA = Length;
-
+            
             switch (type)
             {
                 case UnitType.Corridor:
@@ -798,6 +798,14 @@ namespace TuringAndCorbusier
                     temp.EntrancePoint = baseCurve.PointAtNormalizedLength(0.5) - temp.YDirection * Consts.corridorWidth;
                     temp.CorridorArea = Consts.corridorWidth * Length;
                     temp.indexer = new int[] { buildingnum, houseindex };
+
+                    //get lighting / movable edges
+                    Point3d pt11 = temp.Origin;
+                    Point3d pt12 = temp.Origin + temp.XDirection * temp.XLengthA;
+                    Point3d pt13 = pt12 + temp.YDirection * -temp.YLengthA;
+                    Point3d pt14 = pt13 - temp.XDirection * temp.XLengthA;
+                    temp.LightingEdge = new Line[] { new Line(pt11, pt12), new Line(pt13, pt14) }.ToList();
+                    temp.MoveableEdge = new Line[] { new Line(pt11, pt12), new Line(pt13, pt14) }.ToList();
                     break;
                 case UnitType.Tower:
                     temp.isCorridorType = false;
@@ -816,6 +824,13 @@ namespace TuringAndCorbusier
                     temp.EntrancePoint = temp.Origin - temp.YDirection * temp.YLengthB / 2;
                     temp.indexer = new int[] { buildingnum, houseindex };
 
+                    //get lighting / movable edges
+                    Point3d pt21 = temp.Origin + temp.YDirection * temp.YLengthB;
+                    Point3d pt22 = pt21 + temp.XDirection * (temp.XLengthA - temp.XLengthB);
+                    Point3d pt23 = pt22 + temp.YDirection * -temp.YLengthA;
+                    Point3d pt24 = pt23 - temp.XDirection * temp.XLengthA;
+                    temp.LightingEdge = new Line[] { new Line(pt21, pt22), new Line(pt23, pt24) }.ToList();
+                    temp.MoveableEdge = new Line[] { new Line(pt21, pt22), new Line(pt23, pt24) }.ToList();
                     break;
 
                 default:
