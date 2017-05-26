@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TuringAndCorbusier"
              mc:Ignorable="d" 
-             Height="400" Width="340" ResizeMode="NoResize"  AllowsTransparency="True" WindowStyle="None" Topmost="True"
+             Height="510" Width="340" ResizeMode="NoResize"  AllowsTransparency="True" WindowStyle="None" Topmost="True"
       Title="NewProjectWindow" MouseDown="Window_MouseDown">
 
     <Window.Resources>
@@ -71,14 +71,17 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="320"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="30*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220*"/>
         </Grid.ColumnDefinitions>
-        <Rectangle Fill="#FFE9E9E9" Opacity="0.8" Grid.RowSpan="4" />
+        <Rectangle Fill="#FFE9E9E9" Opacity="0.8" Grid.RowSpan="7" />
         <Rectangle Fill="#FF272729" Height="32" VerticalAlignment="Top" />
 
         <Border Height="32" VerticalAlignment="Top">
@@ -122,7 +125,7 @@
             </Grid>
         </Button>
 
-        <Button x:Name="Btn_Ok" Click="Btn_Ok_Click" Content="확인" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="0,3,16,0" Background="#FF4E4F4F" HorizontalAlignment="Right" Width="75"  Height="21" VerticalAlignment="Top" Grid.Row="3"/>
+        <Button x:Name="Btn_Ok" Click="Btn_Ok_Click" Content="확인" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="0,6,17,0" Background="#FF4E4F4F" HorizontalAlignment="Right" Width="75"  Height="21" VerticalAlignment="Top" Grid.Row="6"/>
 
         <TextBlock FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="13,47,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"><Run Text="프로젝트"/><Run Text=" "/><Run Text="명"/></TextBlock>
         <TextBox  x:Name="projectName" Text="프로젝트 명을 입력하세요" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="81,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="243" FontSize="13.333"/>
@@ -193,9 +196,21 @@
 
 
         </Grid>
-        <TextBlock x:Name="Reg" Text="법규 적용" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Grid.Row="1"/>
-        <CheckBox x:Name="NorthCheck" Content="일조 사선 무시" HorizontalAlignment="Left" Margin="81,3,0,0" Grid.Row="2" VerticalAlignment="Top" Visibility="Hidden"/>
-        <CheckBox x:Name="SpecialCase" Content="채광방향 높이제한 특례 적용 (높이 * 1/4)" HorizontalAlignment="Left" Margin="81,3,0,0" Grid.Row="1" VerticalAlignment="Top" />
+        <TextBlock x:Name="Reg" Text="법규 적용" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="25,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Grid.Row="1"/>
+        <CheckBox x:Name="NorthCheck" Content="일조 사선 무시" HorizontalAlignment="Left" Margin="81,3,0,0" Grid.Row="3" VerticalAlignment="Top" Visibility="Hidden"/>
+        <CheckBox x:Name="SpecialCase" Content="채광방향 높이제한 특례 적용 (높이 * 1/4)" HorizontalAlignment="Left" Margin="89,8,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+        <TextBlock  Text="대지안의공지" Grid.Row="2" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBlock  Text="인접대지로부터" Grid.Row="2" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="163,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBox x:Name="fromSurr" Style="{StaticResource textBoxStyle}" Grid.Row="2" Width="40" Height="20" Margin="261,10,39,2"></TextBox>
+        <TextBlock  Text="인접도로로부터" Grid.Row="3" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="163,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBox x:Name="fromRoad" Style="{StaticResource textBoxStyle}" Grid.Row="3" Width="40" Height="20" Margin="261,10,39,2"></TextBox>
+        <TextBlock  Text="채광창높이제한" Grid.Row="4" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBlock  Text="건물높이의" Grid.Row="4" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="187,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBox x:Name="fromLighting" Style="{StaticResource textBoxStyle}" Grid.Row="4" Width="40" Height="20" Margin="261,8,39,4"></TextBox>
+        <TextBlock  Text="인동거리" Grid.Row="5" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBlock  Text="건물높이의" Grid.Row="5" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="187,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBox x:Name="fromOtherBuilding" Style="{StaticResource textBoxStyle}" Grid.Row="5" Width="40" Height="20" Margin="261,8,39,4"></TextBox>
+
 
     </Grid>
 </Window>

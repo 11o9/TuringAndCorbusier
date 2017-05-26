@@ -112,7 +112,7 @@ namespace TuringAndCorbusier
             //{ ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Green });
 
             //if (debug.Count != 0)
-                //Rhino.RhinoDoc.ActiveDoc.Objects.Add(debug.ToNurbsCurve());
+            //    Rhino.RhinoDoc.ActiveDoc.Objects.Add(debug.ToNurbsCurve());
 
             bool valid;
             Rectangle3d outlineRect = maxInnerRect(boundary, regulationHigh, plot, width, randomCoreType, out valid);

@@ -47,6 +47,7 @@ namespace TuringAndCorbusier
 
             public static Reports.showme showmewindow = new Reports.showme();
 
+            public static RegulationSettings regSettings = new RegulationSettings();
             public static Settings_Page1 page1Settings = new Settings_Page1();
             public static Settings_Page2 page2Settings;
             public static List<FloorPlanLibrary> floorPlanLibrary = new List<FloorPlanLibrary>();

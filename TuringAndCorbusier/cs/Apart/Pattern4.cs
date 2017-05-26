@@ -208,7 +208,7 @@ namespace TuringAndCorbusier
 
         }
 
-       
+
         #region GA Sttings
         ///////////////////////////////////////////
         //////////  GA initial settings  //////////

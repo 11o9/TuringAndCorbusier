@@ -652,7 +652,7 @@ namespace TuringAndCorbusier
             pm.Obstacles = obstacles;
             pm.Boundary = plot.Boundary;
 
-            pm.Distance = width + (storiesHigh * Consts.FloorHeight/* + pilotiHeight*/) * 0.8;
+            pm.Distance = width + regulationHigh.DistanceLL;
             pm.CoreDepth = coreDepth;
             pm.AddFront = true;
 

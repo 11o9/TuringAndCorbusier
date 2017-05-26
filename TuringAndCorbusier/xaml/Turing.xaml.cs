@@ -1412,7 +1412,7 @@ namespace TuringAndCorbusier
                 return;
             }
 
-            ProjectData pd = new ProjectData() { projectName = outname, plot = new SerializablePlot(TuringAndCorbusierPlugIn.InstanceClass.plot,TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet), setting1=TuringAndCorbusierPlugIn.InstanceClass.page1Settings};
+            ProjectData pd = new ProjectData() { projectName = outname, plot = new SerializablePlot(TuringAndCorbusierPlugIn.InstanceClass.plot,TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet), setting1=TuringAndCorbusierPlugIn.InstanceClass.page1Settings, regsetting = TuringAndCorbusierPlugIn.InstanceClass.regSettings};
             dm.SaveData(pd);
             
         }
@@ -1440,8 +1440,9 @@ namespace TuringAndCorbusier
 
             if (pd.setting1 != null)
                 TuringAndCorbusierPlugIn.InstanceClass.page1Settings = pd.setting1;
-            
 
+            if (pd.regsetting != null)
+                TuringAndCorbusierPlugIn.InstanceClass.regSettings = pd.regsetting;
 
             //KDGinfo tempKDGinfo = new KDGinfo(pd.plot.ToPlot().Boundary, 1, false);
             if (TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet == null)

@@ -84,7 +84,8 @@ namespace TuringAndCorbusier
                 //height(total)
                 var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight;
                 //height(except pil)
-                var d3 = d2 * 0.8;
+
+                var d3 = d2 * TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation;
                 front2.Translate(v * d3);
                 back2.Translate(v * d3 * -1);
 
@@ -97,7 +98,7 @@ namespace TuringAndCorbusier
                 crvs.Add(centerline);
                 crvs.Add(anothercenterline);
 
-                dim = string.Format("h = {0} m, h * 0.8 = {1} m ", Math.Round(d2) / 1000, Math.Round(d3) / 1000);
+                dim = string.Format("h = {0} m, h * {2} = {1} m ", Math.Round(d2) / 1000, Math.Round(d3) / 1000 , TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation);
 
             }
 

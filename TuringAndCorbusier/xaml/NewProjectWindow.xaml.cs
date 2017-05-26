@@ -85,7 +85,6 @@ namespace TuringAndCorbusier
             Rhino.RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
-
         private void PlotType_2_Click(object sender, RoutedEventArgs e)
         {
             resetPlotTypeButton();
@@ -101,7 +100,6 @@ namespace TuringAndCorbusier
             RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
-
         private void PlotType_3_Click(object sender, RoutedEventArgs e)
         {
             resetPlotTypeButton();
@@ -149,7 +147,13 @@ namespace TuringAndCorbusier
             InitializeComponent();
 
 
-            
+            if (TuringAndCorbusierPlugIn.InstanceClass.regSettings != null)
+            {
+                fromRoad.Text = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceEase[0].ToString();
+                fromSurr.Text = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceEase[1].ToString();
+                fromLighting.Text = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting.ToString();
+                fromOtherBuilding.Text = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation.ToString();
+            }
 
 
             if (TuringAndCorbusierPlugIn.InstanceClass.page1Settings != null)
@@ -258,6 +262,8 @@ namespace TuringAndCorbusier
                 if (result == MessageBoxResult.No)
                     return false;
             }
+
+
             RhinoDoc.SelectObjects -= SelectSlopePoint;
 
             endWhileLoop = true;
@@ -278,6 +284,32 @@ namespace TuringAndCorbusier
                 TuringAndCorbusierPlugIn.InstanceClass.plot.isSpecialCase = true;
             else
                 TuringAndCorbusierPlugIn.InstanceClass.plot.isSpecialCase = false;
+
+            if (TuringAndCorbusierPlugIn.InstanceClass.regSettings != null)
+            {
+                double result = double.NaN;
+                if (double.TryParse(fromRoad.Text,out result))
+                {
+                    TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceEase[0] = result;
+                    result = double.NaN;
+                }
+                if (double.TryParse(fromSurr.Text, out result))
+                {
+                    TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceEase[1] = result;
+                    result = double.NaN;
+                }
+                if (double.TryParse(fromLighting.Text, out result))
+                {
+                    TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting = result;
+                    result = double.NaN;
+                }
+                if (double.TryParse(fromOtherBuilding.Text, out result))
+                {
+                    TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation = result;
+                    result = double.NaN;
+                }
+            }
+
 
             RhinoApp.SetFocusToMainWindow();
             //System.Windows.Forms.SendKeys.SendWait("{ESC}");

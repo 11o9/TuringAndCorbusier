@@ -2518,74 +2518,17 @@ namespace TuringAndCorbusier
 
     }
 
-    public class Regulation
 
+
+    public class Regulation
     {
 
         bool high = false;
         double fakeHeight = 0;
         //Constructor, 생성자
 
-        public Regulation(double stories)
+        public void Init(double stories)
         {
-            this.height = Consts.PilotiHeight + Consts.FloorHeight * stories;
-            high = true;
-            if (stories >= 7 ) // apartment
-            {
-                this.distanceFromRoad = 3000;
-                this.distanceFromPlot = 3000;
-                this.BuildingType = BuildingType.Apartment;
-            }
-
-            else if (stories >= 5)//apartment(완화)
-            {
-                this.distanceFromRoad = 1500;
-                this.distanceFromPlot = 1500;
-                this.BuildingType = BuildingType.Apartment;
-            }
-            else//rowhouse
-            {
-                this.distanceFromRoad = 1000;
-                this.distanceFromPlot = 750;
-                this.BuildingType = BuildingType.RowHouses;
-            }
-
-
-
-            totalheight = stories;
-        }
-
-        //stories = max tempheight = tempstory?
-        public Regulation(double storiesHigh,double storiesLow)
-        {
-            this.height = Consts.PilotiHeight + Consts.FloorHeight * (storiesLow);
-
-            if (storiesHigh >= 7) // apartment
-            {
-                this.distanceFromRoad = 3000;
-                this.distanceFromPlot = 3000;
-                this.BuildingType = BuildingType.Apartment;
-            }
-            else if (storiesHigh >= 5)//apartment(완화)
-            {
-                this.distanceFromRoad = 1500;
-                this.distanceFromPlot = 1500;
-                this.BuildingType = BuildingType.Apartment;
-            }
-            else//rowhouse
-            {
-                this.distanceFromRoad = 1000;
-                this.distanceFromPlot = 750;
-                this.BuildingType = BuildingType.RowHouses;
-            }
-
-            totalheight = storiesHigh;
-        }
-
-        public Regulation(double stories, bool using1F)
-        {
-            this.height = using1F ? 0 : Consts.PilotiHeight + Consts.FloorHeight * stories;
-            high = true;
             if (stories >= 7) // apartment
             {
                 this.distanceFromRoad = 3000;
@@ -2595,8 +2538,8 @@ namespace TuringAndCorbusier
 
             else if (stories >= 5)//apartment(완화)
             {
-                this.distanceFromRoad = 1500;
-                this.distanceFromPlot = 1500;
+                this.distanceFromRoad = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceEase[0];
+                this.distanceFromPlot = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceEase[1];
                 this.BuildingType = BuildingType.Apartment;
             }
             else//rowhouse
@@ -2606,8 +2549,31 @@ namespace TuringAndCorbusier
                 this.BuildingType = BuildingType.RowHouses;
             }
 
+            distanceLL = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation;
+            distanceByLighting = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting;
+        }
 
+        public Regulation(double stories)
+        {
+            this.height = Consts.PilotiHeight + Consts.FloorHeight * stories;
+            high = true;
+            Init(stories);
+            totalheight = stories;
+        }
 
+        //stories = max tempheight = tempstory?
+        public Regulation(double storiesHigh,double storiesLow)
+        {
+            this.height = Consts.PilotiHeight + Consts.FloorHeight * (storiesLow);
+            Init(storiesHigh);
+            totalheight = storiesHigh;
+        }
+
+        public Regulation(double stories, bool using1F)
+        {
+            this.height = using1F ? 0 : Consts.PilotiHeight + Consts.FloorHeight * stories;
+            high = true;
+            Init(stories);
             totalheight = stories;
         }
 
@@ -2615,26 +2581,7 @@ namespace TuringAndCorbusier
         public Regulation(double storiesHigh, double storiesLow, bool using1F)
         {
             this.height = using1F?0:Consts.PilotiHeight + Consts.FloorHeight * (storiesLow);
-
-            if (storiesHigh >= 7) // apartment
-            {
-                this.distanceFromRoad = 3000;
-                this.distanceFromPlot = 3000;
-                this.BuildingType = BuildingType.Apartment;
-            }
-            else if (storiesHigh >= 5)//apartment(완화)
-            {
-                this.distanceFromRoad = 1500;
-                this.distanceFromPlot = 1500;
-                this.BuildingType = BuildingType.Apartment;
-            }
-            else//rowhouse
-            {
-                this.distanceFromRoad = 1000;
-                this.distanceFromPlot = 750;
-                this.BuildingType = BuildingType.RowHouses;
-            }
-
+            Init(storiesHigh);
             totalheight = storiesHigh;
         }
 
@@ -2824,7 +2771,7 @@ namespace TuringAndCorbusier
                     {
                         Curve unextendedCurveH;
                         Curve unextendedCurveI;
-
+                        
                         if (distanceFromSurroundings[h] != 0)
                             unextendedCurveH = plotArr[h].Offset(Plane.WorldXY, distanceFromSurroundings[h], 0, CurveOffsetCornerStyle.None)[0];
                         else
@@ -2991,17 +2938,7 @@ namespace TuringAndCorbusier
             //return copy.Select(n => n[0]).ToArray();
             //plot의 boundary, maxfloor, roadwidths, plottype 사용 , 도로중심선
         }
-        private class TypeParam
-        {
-            public double Parameter = 0;
-            public bool IsIntersectionParameter = false;
-
-            public TypeParam(double parameter, bool isIntersectionParameter)
-            {
-                Parameter = parameter;
-                IsIntersectionParameter = isIntersectionParameter;
-            }
-        }
+       
         //not used
         public Curve[] fromNorthCurve2(Plot plot)
         {
@@ -3295,11 +3232,23 @@ namespace TuringAndCorbusier
         public double DistanceFromPlot { get { return distanceFromPlot; } }
         public double DistanceFromNorth { get { return distanceFromNorth * (height-fakeHeight); } }
         public double DistanceByLighting { get { return distanceByLighting * ((height-fakeHeight) - Consts.PilotiHeight); } }
-        public double DistanceLW { get { return distanceLW * ((height - fakeHeight) - Consts.PilotiHeight); ; } }
-        public double DistanceLL { get { return distanceLL *  ((height-fakeHeight) - Consts.PilotiHeight);; } }
+        public double DistanceLW { get { return distanceLW * ((height - fakeHeight) - Consts.PilotiHeight); } }
+        public double DistanceLL { get { return distanceLL * ((height - fakeHeight) - Consts.PilotiHeight); } }
         public double DistanceWW { get { return distanceWW; } }
         public double Lightingk { get { return distanceByLighting; } }
         public BuildingType BuildingType { get; private set; }
+
+        private class TypeParam
+        {
+            public double Parameter = 0;
+            public bool IsIntersectionParameter = false;
+
+            public TypeParam(double parameter, bool isIntersectionParameter)
+            {
+                Parameter = parameter;
+                IsIntersectionParameter = isIntersectionParameter;
+            }
+        }
     }
 
     public class ParkingLine

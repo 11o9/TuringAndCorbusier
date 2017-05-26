@@ -66,6 +66,7 @@ namespace TuringAndCorbusier
         public string projectName { get; set; }
         public SerializablePlot plot { get; set; }
         public Datastructure_Settings.Settings_Page1 setting1 { get; set; }
+        public Datastructure_Settings.RegulationSettings regsetting { get; set; }
         //public Datastructure_Settings.Settings_Page2 setting2 { get; set; }
         public ProjectData()
         {
