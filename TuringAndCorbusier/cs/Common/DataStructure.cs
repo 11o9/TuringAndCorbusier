@@ -1694,7 +1694,7 @@ namespace TuringAndCorbusier
             else if (this.coreType == CoreType.Parallel.ToString())
                 return 4860;
             else if (this.coreType == CoreType.Vertical.ToString())
-                return 8220;
+                return 9000;
             else if (this.coreType == CoreType.Folded.ToString())
                 return 5800;
             else if (this.coreType == CoreType.Vertical_AG1.ToString())
