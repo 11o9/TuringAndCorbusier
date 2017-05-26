@@ -35,27 +35,6 @@ namespace TuringAndCorbusier
 
         private Apartment tempOutput;
 
-        private void Button_Complex_Click(object sender, RoutedEventArgs e)
-        {
-            this.Hide();
-
-            List<List<Brep>> tempBreps = TuringAndCorbusier.MakeBuildings.makeBuildings(tempOutput, true);
-
-            foreach (List<Brep> i in tempBreps)
-            {
-                foreach (Brep j in i)
-                {
-                    RhinoDoc.ActiveDoc.Objects.AddBrep(j);
-
-                    RhinoApp.Wait();
-                }
-            }
-
-            RhinoDoc.ActiveDoc.Views.Redraw();
-
-            CloseWindow();
-        }
-
         private void Button_Simple_Click(object sender, RoutedEventArgs e)
         {
             this.Hide();

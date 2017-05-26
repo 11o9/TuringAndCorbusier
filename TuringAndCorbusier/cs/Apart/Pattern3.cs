@@ -611,13 +611,6 @@ namespace TuringAndCorbusier
 
                     //windows
                     Point3d winPt1 = homeOriH + homeVecYH * ybH + homeVecXH * (xaH - xbH);
-                    //winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH)));
-                    //winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, ybH - yaH)));
-                    //Point3d winPt2 = winPt1;
-                    //winPt2.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, xaH)));
-                    //Point3d winPt3 = winPt2;
-                    //Point3d winPt4 = winPt2;
-                    //winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, yaH)));
                     Point3d winPt2 = winPt1 - homeVecYH * yaH;
                     Point3d winPt3 = winPt2;
                     Point3d winPt4 = winPt3 + homeVecXH * -xaH;
@@ -1327,24 +1320,28 @@ namespace TuringAndCorbusier
             double nineHouseR = 1.5;
 
             //stretch
-            double sourceL = 0;
-            for (int i = 0; i < unallocatedLengthIndices.Count; i++)
-            {
-                sourceL += areaLength[unallocatedLengthIndices[i]];
-            }
-            double targetL = centerLineCurve.GetLength();
-            double stretchRatio = targetL / sourceL;
-            List<double> stretchedLength = new List<double>();
-            for (int i = 0; i < areaLength.Count; i++)
-            {
-                stretchedLength.Add(areaLength[i] * stretchRatio);
-            }
+ 
 
 
             //less than 10 units
             #region Less10Case
             if (5 < unallocatedLengthIndices.Count && unallocatedLengthIndices.Count < 10)
             {
+                unallocatedLengthIndices.Sort((a, b) => -a.CompareTo(b));
+
+                double sourceL = 0;
+                for (int i = 0; i < unallocatedLengthIndices.Count; i++)
+                {
+                    sourceL += areaLength[unallocatedLengthIndices[i]];
+                }
+                double targetL = centerLineCurve.GetLength();
+                double stretchRatio = targetL / sourceL;
+                List<double> stretchedLength = new List<double>();
+                for (int i = 0; i < areaLength.Count; i++)
+                {
+                    stretchedLength.Add(areaLength[i] * stretchRatio);
+                }
+              
 
                 List<int> indices = new List<int>();
                 //junction 2 : specific solutions for 6~9 houses
@@ -1377,6 +1374,7 @@ namespace TuringAndCorbusier
                         indices = new int[] { 6, 7, 8, 5, 4, 1, 0, 2, 3 }.ToList();
                         val = (centerLineSegments[0].GetLength() + centerLineSegments[1].GetLength() / 2)
                             - stretchedLength[unallocatedLengthIndices[indices[0]]] - stretchedLength[unallocatedLengthIndices[indices[1]]];
+
                     }
                 }
 
