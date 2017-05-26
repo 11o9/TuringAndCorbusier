@@ -903,8 +903,8 @@ namespace TuringAndCorbusier
             /////////////////////////////////////
 
             bool canLoop = true;
-            double shortEdgeLimit = 1500;
-            double cornerShortEdgeLimit = 6750;
+            double shortEdgeLimit = 3300;
+            double cornerShortEdgeLimit = 3300;
             int currentUnitIndex = 0;
             bool IsNextPartDrawable = true;
 
@@ -934,7 +934,7 @@ namespace TuringAndCorbusier
                         centerLineValue += centerLines[j].Length;
 
                         if (centerLineValue < preValue)
-                            preLineIndex = j + 1;
+                            preLineIndex = j+1;
 
                         if (centerLineValue < currentValue)
                             currentLineIndex = j+1;
@@ -953,12 +953,8 @@ namespace TuringAndCorbusier
                         for (int j = 0; j < currentLineIndex; j++)
                             currentLineValue += centerLines[j].Length;
 
-                        double preLineValue = 0;
-                        for (int j = 0; j < preLineIndex; j++)
-                            preLineValue += centerLines[j].Length;
-
                         double postEdgeLength = currentValue - currentLineValue;
-                        double preEdgeLength = preValue - preLineValue;
+                        double preEdgeLength =  currentLineValue - preValue;
 
                         double lengthToExtend = 0;
 
@@ -968,10 +964,7 @@ namespace TuringAndCorbusier
 
                         if (!isPreSecured)
                         {
-                            if(!isPostSecured)
-                                lengthToExtend = width / 2 - postEdgeLength;
-
-                            else if(!isPostEnoughSecured)
+                            if(!isPostEnoughSecured)
                                 lengthToExtend = width / 2 + shortEdgeLimit  - postEdgeLength;
                         }
 
@@ -982,6 +975,7 @@ namespace TuringAndCorbusier
                         }
 
                         currentValue += lengthToExtend;
+            
 
                         //extend corner and adjust next unit
                         if (i != unallocated.Count - 1)
