@@ -201,7 +201,7 @@ namespace TuringAndCorbusier
 
             //best 1
             Apartment bestOutput = ag.generator(plot, bestGene, target);
-            //return new Apartment[] { bestOutput }.ToList();
+            return new Apartment[] { bestOutput }.ToList();
 
             //best 5
             //var uniqueGenes = offspringGenes.Distinct();
@@ -454,12 +454,12 @@ namespace TuringAndCorbusier
 
                 //firstfloor test
                 double firstfloorBonus = 0;
-                if (gene[j].using1F)
-                    firstfloorBonus = 1000;
+                //if (gene[j].using1F)
+                //    firstfloorBonus = 1000;
                 //setback test
                 double setbackBonus = 0;
-                if (gene[j].setback)
-                    setbackBonus = 1000;
+                //if (gene[j].setback)
+                //    setbackBonus = 1000;
                 fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus + firstfloorBonus);
                 //for test
             

@@ -1869,6 +1869,7 @@ namespace TuringAndCorbusier
         {
             Household output = new Household(this.origin, this.xDirection, this.yDirection, this.XLengthA, this.XLengthB, this.YLengthA, this.YLengthB, this.HouseholdSizeType, this.ExclusiveArea, this.LightingEdge, this.EntrancePoint, this.WallFactor);
             output.isCorridorType = isCorridorType;
+            output.MoveableEdge = new List<Line>();
             return output;
         }
 
