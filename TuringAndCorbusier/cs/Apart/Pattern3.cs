@@ -465,13 +465,6 @@ namespace TuringAndCorbusier
 
                     //windows
                     Point3d winPt1 = homeOriH + homeVecYH * ybH + homeVecXH * (xaH - xbH);
-                    //winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xbH)));
-                    //winPt1.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, ybH - yaH)));
-                    //Point3d winPt2 = winPt1;
-                    //winPt2.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, xaH)));
-                    //Point3d winPt3 = winPt2;
-                    //Point3d winPt4 = winPt2;
-                    //winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecYH, yaH)));
                     Point3d winPt2 = winPt1 - homeVecYH * yaH;
                     Point3d winPt3 = winPt2;
                     Point3d winPt4 = winPt3 + homeVecXH * -xaH;

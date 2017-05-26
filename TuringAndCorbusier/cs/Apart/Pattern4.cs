@@ -858,11 +858,12 @@ namespace TuringAndCorbusier
             unallocated.Reverse();
             return unallocated;
         }
-        private void coreAndHouses(List<int> unallocated, List<double> stretchedLength, Target target, ParameterSet parameterSet, List<Line> lines, Curve centerline, out List<List<List<Household>>> household, out List<List<HouseholdStatistics>> householdStatistics, out List<List<Core>> core)
+        private void coreAndHouses(List<int> unallocated, List<double> stretchedLength, Target target, ParameterSet parameterSet, List<Line> centerLines, Curve centerline, out List<List<List<Household>>> household, out List<List<HouseholdStatistics>> householdStatistics, out List<List<Core>> core)
         {
             double storiesHigh = Math.Max((int)parameterSet.Parameters[0], (int)parameterSet.Parameters[1]);
             double coreWidth = randomCoreType.GetWidth();
             double width = parameterSet.Parameters[2];
+            double centerLineLength = centerline.GetLength();
 
             List<int> allocated = new List<int>();
 
@@ -901,79 +902,123 @@ namespace TuringAndCorbusier
 
             /////////////////////////////////////
 
-            int counter = 0;
-            double trigger = 1;
-            int clearCorner = 1;
-            double shortEdgeLimit = 3300;
-            double cornerThreshold = 1500;
-            bool IsNextPartDrawable = true;
+            bool canLoop = true;
+            double shortEdgeLimit = 1500;
+            double cornerShortEdgeLimit = 6750;
             int currentUnitIndex = 0;
+            bool IsNextPartDrawable = true;
 
-            while (counter < unallocated.Count && (trigger != 0 || clearCorner != 0))
+            while (canLoop)
             {
-                //initialize
-                houseEndVals.Clear();
-                houseEndPoints.Clear();
-
-                coreType.Clear();
-                corePoint.Clear();
-                coreVecX.Clear();
-                coreVecY.Clear();
-
-                homeOri.Clear();
-                homeVecX.Clear();
-                homeVecY.Clear();
-
-                xa.Clear();
-                xb.Clear();
-                ya.Clear();
-                yb.Clear();
-
-                homeShapeType.Clear();
-                wallFactors.Clear();
-                exclusiveArea.Clear();
-
-                counter += 1;
-                trigger = 1;
-                clearCorner = 0;
-
-                IsNextPartDrawable = true;
-                currentUnitIndex = 0;
-                allocated.Clear();
-
                 //start
-                double val = 0;
-                houseEndVals.Add(val);
+                double preValue = 0;
+                houseEndVals.Add(preValue);
+                double nextLength = stretchedLength[unallocated[0]];
+                int mappedHouseholdCount = 0;
+                bool isCorner = false;
+
                 for (int i = 0; i < unallocated.Count; i++)
                 {
-                    val += stretchedLength[unallocated[i]];
-                    houseEndVals.Add(val);
+                    double currentValue = preValue + nextLength;
+
+                    if (currentValue > centerLineLength)
+                        break;
+
+                    //line index check
+                    int preLineIndex = 0;
+                    int currentLineIndex = 0;
+
+                    double centerLineValue = 0;
+                    for (int j = 0; j < centerLines.Count; j++)
+                    {
+                        centerLineValue += centerLines[j].Length;
+
+                        if (centerLineValue < preValue)
+                            preLineIndex = j + 1;
+
+                        if (centerLineValue < currentValue)
+                            currentLineIndex = j+1;
+                    }
+
+                    if (currentLineIndex > preLineIndex)
+                        isCorner = true;
+                    else
+                        isCorner = false;
+          
+
+                    //add values
+                    if (isCorner)
+                    {
+                        double currentLineValue = 0;
+                        for (int j = 0; j < currentLineIndex; j++)
+                            currentLineValue += centerLines[j].Length;
+
+                        double preLineValue = 0;
+                        for (int j = 0; j < preLineIndex; j++)
+                            preLineValue += centerLines[j].Length;
+
+                        double postEdgeLength = currentValue - currentLineValue;
+                        double preEdgeLength = preValue - preLineValue;
+
+                        double lengthToExtend = 0;
+
+                        bool isPreSecured = preEdgeLength > width / 2;
+                        bool isPostSecured = postEdgeLength > width / 2;
+                        bool isPostEnoughSecured = postEdgeLength > width / 2 + shortEdgeLimit;
+
+                        if (!isPreSecured)
+                        {
+                            if(!isPostSecured)
+                                lengthToExtend = width / 2 - postEdgeLength;
+
+                            else if(!isPostEnoughSecured)
+                                lengthToExtend = width / 2 + shortEdgeLimit  - postEdgeLength;
+                        }
+
+                        else
+                        {
+                            if(!isPostSecured)
+                                lengthToExtend = width / 2 - postEdgeLength;
+                        }
+
+                        currentValue += lengthToExtend;
+
+                        //extend corner and adjust next unit
+                        if (i != unallocated.Count - 1)
+                        {
+                            double adjustedNextEdgeLength = stretchedLength[unallocated[i + 1]] - lengthToExtend;
+                            bool isValueAvailable = adjustedNextEdgeLength * width > Consts.minimumArea && adjustedNextEdgeLength > shortEdgeLimit;
+                            if (isValueAvailable)
+                                nextLength = adjustedNextEdgeLength;
+
+                            else
+                                unallocated.RemoveAt(i + 1);
+                        }
+                    }
+
+                    else
+                    {
+                        if(i != unallocated.Count - 1)
+                        nextLength = stretchedLength[unallocated[i + 1]];
+                    }
+
+                    houseEndVals.Add(currentValue);
+                    mappedHouseholdCount++;
+
+
+                    //corner
                     if (i % 2 == 0 && coreWidth != 0)
                     {
-                        val += coreWidth;
-                        houseEndVals.Add(val);
+                        currentValue += coreWidth;
+                        houseEndVals.Add(currentValue);
                     }
+
+                    preValue = currentValue;
                 }
 
-                for (int i = 0; i < houseEndVals.Count; i++)
-                {
-                    if ((lines[0].Length - cornerThreshold < houseEndVals[i] && lines[0].Length + cornerThreshold > houseEndVals[i]) || ((lines[0].Length + lines[1].Length) - cornerThreshold < houseEndVals[i] && (lines[0].Length + lines[1].Length) + cornerThreshold > houseEndVals[i]))
-                    {
-                        clearCorner += 1;
-                    }
-                }
-                List<double> mappedVals = new List<double>(valMapper(lines, houseEndVals));
+                List<double> mappedVals = new List<double>(valMapper(centerLines, houseEndVals));
 
-                int counter2 = 0;
-                for (int i = 0; i < mappedVals.Count - 1; i++)
-                {
-                    if (i % 3 == 1 && (int)mappedVals[i] != (int)mappedVals[i + 1])
-                    {
-                        counter2 += 1;
-                    }
-                }
-
-                for (int i = 0; i < mappedVals.Count - 1; i++)
+                for (int i = 0; i < mappedVals.Count-1; i++)
                 {
                     if ((int)mappedVals[i] == (int)(mappedVals[(i + 1)] - 0.001))  //is not corner
                     {
@@ -985,7 +1030,7 @@ namespace TuringAndCorbusier
                         //코너 빼기 판정용
                         Point3d currentLineEnd = centerline.PointAt(Math.Ceiling(mappedVals[i + 1]));
                         double eOriToLineEnd = eOri.DistanceTo(currentLineEnd); 
-                        bool isToLineEndEnough = eOriToLineEnd + width/2> shortEdgeLimit;
+                        bool isToLineEndEnough = eOriToLineEnd + width/2> cornerShortEdgeLimit;
 
                         Vector3d midVec = centerline.TangentAt(avrg);
                         Vector3d verticalVec = midVec;
@@ -1011,8 +1056,11 @@ namespace TuringAndCorbusier
                         }
                         else //if it is household
                         {
-                            if (currentUnitIndex == unallocated.Count)
+                            if (currentUnitIndex >= mappedHouseholdCount)
+                            {
+                                canLoop = false;
                                 break;
+                            }
 
                             if (!IsNextPartDrawable)
                             {
@@ -1023,13 +1071,6 @@ namespace TuringAndCorbusier
 
                             if (i % 3 == 0) //if it is formerPart
                             {
-                                //if (!isToLineEndEnough)
-                                //{
-                                //    IsNextPartDrawable = false;
-                                //    currentUnitIndex++;
-                                //    continue;
-                                //}
-
                                 allocated.Add(unallocated[currentUnitIndex]);
                                 homeOri.Add(eOri);
                                 currentUnitIndex++;
@@ -1052,7 +1093,7 @@ namespace TuringAndCorbusier
                             wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 0.5 }));
                             exclusiveArea.Add(exclusiveAreaCalculatorAG4Edge(xa[xa.Count - 1], xb[xb.Count - 1], ya[ya.Count - 1], yb[yb.Count - 1], Consts.balconyDepth));
 
-                            if (!isToLineEndEnough)
+                            if (!isToLineEndEnough && i%3!=0)
                             {
                                 IsNextPartDrawable = false;
                                 continue;
@@ -1065,7 +1106,7 @@ namespace TuringAndCorbusier
 
                     else //if it is corner
                     {
-                        Point3d checkP = lines[(int)mappedVals[i]].PointAt(1);
+                        Point3d checkP = centerLines[(int)mappedVals[i]].PointAt(1);
                         Point3d sOri = centerline.PointAt(mappedVals[i]);
                         Point3d eOri = centerline.PointAt(mappedVals[i + 1]);
 
@@ -1095,11 +1136,12 @@ namespace TuringAndCorbusier
                             continue;
                         }
 
-                        if (currentUnitIndex == unallocated.Count)
+                        if (currentUnitIndex >= mappedHouseholdCount)
+                        {
+                            canLoop = false;
                             break;
+                        }
 
-                        if (i % 3 == 2) //if it is later part
-                        {
                             if (!IsNextPartDrawable || !isAspectRatioReasonable)
                             {
                                 IsNextPartDrawable = true;
@@ -1107,103 +1149,42 @@ namespace TuringAndCorbusier
                                 continue;
                             }
 
-                            if (l1  <= width / 2) //코너 정사각형 안쪽으로 코어가 더 파고 들어갔을 때
-                            {
-                                checkP.Transform(Transform.Translation(v1 * l1 + v2 * l2));
-                                homeOri.Add(checkP);
-                                v1.Reverse();
-
-                                homeVecX.Add(v1);
-                                homeVecY.Add(v2);
-
-                                xa.Add(l1 + width / 2);
-                                xb.Add(0);
-                                ya.Add(l2 + width / 2);
-                                yb.Add(0);
-
-                                wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
-                            }
-
-                            else
-                            {
-                                checkP.Transform(Transform.Translation(v1 * l1 + v2 * l2));
-                                homeOri.Add(checkP);
-                                v1.Reverse();
-
-                                homeVecX.Add(v1);
-                                homeVecY.Add(v2);
-
-                                xa.Add(l1 + width / 2);
-                                xb.Add(0);
-                                ya.Add(l2 + width / 2);
-                                yb.Add(0);
-
-                                wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
-
-                                //xa.Add(l1 + width / 2);
-                                //xb.Add(l1- width / 2);
-                                //ya.Add(l2 + width / 2);
-                                //yb.Add(l2 - width / 2);
-
-                                //wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 0.5, 1 }));
-                            }
-
                             allocated.Add(unallocated[currentUnitIndex]);
                             currentUnitIndex++;
-                        }
-                        else //if it is former part
+
+                        checkP.Transform(Transform.Translation(v1 * width / 2 + v2 * width / 2));
+                        homeOri.Add(checkP);
+
+                        if (l1 > l2)
                         {
-                            if (!IsNextPartDrawable || !isAspectRatioReasonable)
-                            {
-                                IsNextPartDrawable = true;
-                                currentUnitIndex++;
-                                continue;
-                            }
-
-    
-                            if (l1 <= width / 2) //코너 정사각형 안쪽으로 이전 세대가 더 파고 들어갔을 때
-                            {
-                                checkP.Transform(Transform.Translation(v1 * l1 + v2 * l2));
-                                homeOri.Add(checkP);
-                                v1.Reverse();
-
-                                homeVecX.Add(v1);
-                                homeVecY.Add(v2);
-
-                                xa.Add(l1 + width / 2);
-                                xb.Add(0);
-                                ya.Add(l2 + width / 2);
-                                yb.Add(0);
-
-                                wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
-                            }
-
-                            else
-                            {
-                                checkP.Transform(Transform.Translation(v1 * l1 + v2 * l2));
-                                homeOri.Add(checkP);
-                                v1.Reverse();
-
-                                homeVecX.Add(v1);
-                                homeVecY.Add(v2);
-
-                                xa.Add(l1 + width / 2);
-                                xb.Add(0);
-                                ya.Add(l2 + width / 2);
-                                yb.Add(0);
-
-                                wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 1 }));
-                                //xa.Add(l1 + width / 2);
-                                //xb.Add(l1 - width / 2);
-                                //ya.Add(l2 + width / 2);
-                                //yb.Add(l2 - width / 2);
-
-                                //wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 1, 0.5, 1 }));
-                            }
-
-                            allocated.Add(unallocated[currentUnitIndex]);
-                            currentUnitIndex++;
+                            v1.Reverse();
+                            homeVecX.Add(v1);
+                            homeVecY.Add(v2);
                         }
+                        else
+                        {
+                            v2.Reverse();
+                            homeVecX.Add(v2);
+                            homeVecY.Add(v1);
+                        }
+
+                        xa.Add(Math.Max(l1, l2) + width / 2);
+                        xb.Add(Math.Max(l1, l2) - width / 2);
+                        ya.Add(Math.Min(l1, l2) + width / 2);
+                        double tempYb = Math.Min(l1, l2) - width / 2;
+
+
+                        if (Math.Abs(tempYb) < 10)
+                            tempYb = 0;
+
+                        yb.Add(tempYb);
+
+                        if (tempYb > 0)
+                            wallFactors.Add(new List<double>(new double[] { 1, 0.5, 1, 1, 0.5, 1 }));
+                        else if (tempYb == 0)
+                            wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 0.5, 1 }));
+                        else
+                            wallFactors.Add(new List<double>(new double[] { 0, 0.5, 1, 1, 0.5, 1 }));
 
                         exclusiveArea.Add(exclusiveAreaCalculatorAG4Edge(xa[xa.Count - 1], xb[xb.Count - 1], ya[ya.Count - 1], yb[yb.Count - 1], Consts.balconyDepth));
                         homeShapeType.Add(1);
@@ -1292,9 +1273,6 @@ namespace TuringAndCorbusier
                 household.Add(hhpB);
             }
 
-            //hhpB.Add(hhpS);
-          
-
 
             //household statistics
             householdStatistics = new List<List<HouseholdStatistics>>();
@@ -1311,11 +1289,11 @@ namespace TuringAndCorbusier
             {
                 if (homeShapeType[i] == 0)
                 {
-                    edgeProperties[unallocated[i]].Add(household[0][0][i]);
+                    edgeProperties[allocated[i]].Add(household[0][0][i]);
                 }
                 else
                 {
-                    cornerProperties[unallocated[i]].Add(household[0][0][i]);
+                    cornerProperties[allocated[i]].Add(household[0][0][i]);
                 }
             }
 
@@ -1350,32 +1328,6 @@ namespace TuringAndCorbusier
                     cpB.Add(oneCore);
                 }
                 core.Add(cpB);
-            }
-
-
-            //renew
-            if (counter == unallocated.Count)
-            {
-                corePoint.Clear();
-                coreVecX.Clear();
-                coreVecY.Clear();
-
-                homeOri.Clear();
-                homeVecX.Clear();
-                homeVecY.Clear();
-
-                xa.Clear();
-                xb.Clear();
-                ya.Clear();
-                yb.Clear();
-
-                homeShapeType.Clear();
-                wallFactors.Clear();
-                exclusiveArea.Clear();
-
-                allocated.Clear();
-                IsNextPartDrawable = true;
-                currentUnitIndex = 0;
             }
         }
 
