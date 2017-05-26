@@ -419,16 +419,45 @@ namespace TuringAndCorbusier
                     //Curve northLow = Regulation.fromNorthCurve(plot, regulationLow, plotArr);
 
                     //법규 : 인접대지경계선(채광창)
-                    Curve lighting1 = byLightingCurve(plot, regulationHigh, plotArr, angles[i]);
-                    Curve lighting2 = byLightingCurve(plot, regulationHigh, plotArr, angles[i] + Math.PI / 2);
-                    Curve lightingHigh = CommonFunc.joinRegulations(lighting1, lighting2);
+                    Curve[] lighting1 = regulationHigh.byLightingCurve(plot,angles[i]);
+                    Curve[] lighting2 = regulationHigh.byLightingCurve(plot, angles[i] + Math.PI / 2);
+                    Curve[] lightingHigh = CommonFunc.JoinRegulations(new Curve[] { plot.Boundary }, lighting1, lighting2);
 
                     //일부 조건(대지안의공지, 일조에 의한 높이제한)을 만족하는 경계선
                     //모든 조건(대지안의공지, 일조에의한 높이제한, 인접대지경계선)을 만족하는 경계선
-                    Curve partialRegulationHigh = CommonFunc.joinRegulations(surroundingsHigh[0], northHigh[0]);
-                    Curve wholeRegulationHigh = CommonFunc.joinRegulations(partialRegulationHigh, lightingHigh);
+                    //Curve partialRegulationHigh = CommonFunc.joinRegulations(surroundingsHigh[0], northHigh[0]);
+                    Curve[] wholeRegulationHigh = CommonFunc.JoinRegulations(northHigh, lightingHigh, surroundingsHigh);
 
-                    Curve outline = wholeRegulationHigh;
+
+
+                    //Curve[] north = regulationHigh.fromNorthCurve(plot);
+                    //for (int j = 0; j < north.Length; j++)
+                    //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(north[j], new Rhino.DocObjects.ObjectAttributes()
+                    //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Red });
+
+                    //Curve[] surr = regulationHigh.byLightingCurve(plot, angles[i] + Math.PI / 2);
+                    //for (int j = 0; j < surr.Length; j++)
+                    //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(surr[j], new Rhino.DocObjects.ObjectAttributes()
+                    //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Gold });
+
+                    //Curve[] surr2 = regulationHigh.byLightingCurve(plot, angles[i]);
+                    //for (int j = 0; j < surr2.Length; j++)
+                    //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(surr2[j], new Rhino.DocObjects.ObjectAttributes()
+                    //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Gold });
+
+                    //Curve roadcenter = regulationHigh.RoadCenterLines(plot);
+                    //Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(roadcenter, new Rhino.DocObjects.ObjectAttributes()
+                    //{ ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Green });
+
+                    if (wholeRegulationHigh.Length == 0)
+                        continue;
+
+                    Curve outline = wholeRegulationHigh.OrderByDescending(n => AreaMassProperties.Compute(n).Area).ToList()[0];
+
+                 
+
+         
+                    //Rhino.RhinoDoc.ActiveDoc.Objects.Add(outline);
 
                     //make boundingbox
                     Vector3d xVec = Vector3d.XAxis;
