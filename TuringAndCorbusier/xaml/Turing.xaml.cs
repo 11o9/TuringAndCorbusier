@@ -547,8 +547,6 @@ namespace TuringAndCorbusier
                 List<Curve> coreDetailOutline = MainPanel_AGOutputList[tempIndex].drawEachCoreDetail();
                 xmlBuildingInfo.SetHouseOutline(coreOutline,coreDetailOutline,houseOutline, tempTypicalPlan_FL0);
 
-               
-
                 fps.Add(xmlBuildingInfo.fixedPage);
                 pagename.Add("buildingReport");
                 
@@ -565,16 +563,17 @@ namespace TuringAndCorbusier
                 double publicFacilityArea = MainPanel_AGOutputList[tempIndex].GetPublicFacilityArea();
                 double serviceArea = -1000;
 
-                List<FloorPlan> floorPlans = (from i in uniqueHouseHoldProperties
-                                              select new FloorPlan(PlanDrawingFunction.alignHousholdProperties(i.ToHousehold()), MainPanel_planLibraries, MainPanel_AGOutputList[tempIndex].AGtype)).ToList();
+                //List<FloorPlan> floorPlans = (from i in uniqueHouseHoldProperties
+                //                              select new FloorPlan(PlanDrawingFunction.alignHousholdProperties(i.ToHousehold()), MainPanel_planLibraries, MainPanel_AGOutputList[tempIndex].AGtype)).ToList();
 
-                List<Rectangle3d> boundingBoxes = (from i in floorPlans
-                                                   select new Rectangle3d(Plane.WorldXY, i.GetBoundingBox().Min, i.GetBoundingBox().Max)).ToList();
+                //List<Rectangle3d> boundingBoxes = (from i in floorPlans
+                //                                   select new Rectangle3d(Plane.WorldXY, i.GetBoundingBox().Min, i.GetBoundingBox().Max)).ToList();
 
-                List<System.Windows.Point> origins = new List<System.Windows.Point>();
+                //List<System.Windows.Point> origins = new List<System.Windows.Point>();
 
-                double scaleFactor = PlanDrawingFunction.calculateMultipleScaleFactor(Reports.xmlUnitReport.GetCanvasRectangle(), boundingBoxes, out origins);
+                //double scaleFactor = PlanDrawingFunction.calculateMultipleScaleFactor(Reports.xmlUnitReport.GetCanvasRectangle(), boundingBoxes, out origins);
 
+                //JHL
                 for (int i = 0; i < uniqueHouseHoldProperties.Count(); i++)
                 {
                     Household i_Copy = new Household(uniqueHouseHoldProperties[i].ToHousehold());
@@ -588,23 +587,24 @@ namespace TuringAndCorbusier
                     double tempParkingLotArea = UGParkingLotAreaSum / MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum() * i_Copy.GetExclusiveArea();
                     tempCoreArea += uniqueHouseHoldProperties[i].CorridorArea;
                     Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport(i_Copy, typeString[i], tempCoreArea, tempParkingLotArea, publicFacilityArea, serviceArea, uniqueHouseHoldProperties[i].Count);
-                    unitReport.setUnitPlan(uniqueHouseHoldProperties[i], floorPlans[i], scaleFactor, origins[i], MainPanel_AGOutputList[tempIndex].AGtype);
+                    //unitReport.setUnitPlan(uniqueHouseHoldProperties[i], floorPlans[i], scaleFactor, origins[i], MainPanel_AGOutputList[tempIndex].AGtype);
 
                     fps.Add(unitReport.fixedPage);
                     pagename.Add("unitReport" + (i + 1).ToString());
                 }
 
+                //JHL
                 for (int i = 1; i < MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2; i++)
                 {
                     try
                     {
-                        Reports.wpfTypicalPlan testTypicalPlanPage = new Reports.wpfTypicalPlan(new Interval(i, i));
+                        Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(i, i));
                         TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
 
-                        testTypicalPlanPage.SetTypicalPlan = testTypicalPlan;
+                        floorPlanDrawing.SetHouseOutline(coreOutline, coreDetailOutline, houseOutline, testTypicalPlan, new Interval(i,i));
 
-                        fps.Add(testTypicalPlanPage.fixedPage);
-                        pagename.Add("typicalPlanPage" + i.ToString());
+                        fps.Add(floorPlanDrawing.fixedPage);
+                        pagename.Add("floorPlanDrawingPage" + i.ToString());
                     }
                     catch (System.Exception EX)
                     {
@@ -614,7 +614,7 @@ namespace TuringAndCorbusier
 
                 }
 
-                    Reports.wpfSection testSectionPage = new Reports.wpfSection();
+                    //Reports.wpfSection testSectionPage = new Reports.wpfSection();
                     //DrawSection drawsection = new DrawSection(MainPanel_AGOutputList[tempIndex]);
 
                 //try
@@ -633,7 +633,6 @@ namespace TuringAndCorbusier
                 //}
 
                 var a = TuringAndCorbusierPlugIn.InstanceClass.showmewindow.showmeinit(fps, pagename, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName, MainPanel_AGOutputList[tempIndex], ref MainPanel_reportspaths,tempIndex);
-
             }
             catch (System.Exception ex)
             {

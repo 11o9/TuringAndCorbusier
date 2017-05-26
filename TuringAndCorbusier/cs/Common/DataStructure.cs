@@ -2123,8 +2123,22 @@ namespace TuringAndCorbusier
             outlinePoints.Add(pt);
             pt.Transform(Transform.Translation(Vector3d.Multiply(y, ya - yb)));
             outlinePoints.Add(pt);
+
+            Point3d.CullDuplicates(outlinePoints, 0);
+
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, xb)));
+            outlinePoints.Add(pt);
+
+            Polyline outlinePolyline = new Polyline(outlinePoints);
+            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
+
+            if (outlineCurve.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.CounterClockwise)
+                outlineCurve.Reverse();
+
+            return outlineCurve;
+
         }
-           
+
 
         public double GetArea()
         {
