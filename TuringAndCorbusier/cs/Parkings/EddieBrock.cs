@@ -466,6 +466,7 @@ namespace TuringAndCorbusier
                 return false;
             if (isothetic == null)
                 return false;
+            
 
             //대지면적의 80%가 500m2 이하
             if (boundary.GetArea() * 0.8 < UnderGroundParkingConsts.MinimumArea)

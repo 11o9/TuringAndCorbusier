@@ -16,11 +16,14 @@ namespace TuringAndCorbusier
 
 
             double pilotiHeight = Consts.PilotiHeight;
+            //#######################################################################################################################
             if (parameterSet.using1F)
             {
                 randomCoreType = parameterSet.fixedCoreType;
                 pilotiHeight = 0;
             }
+            //#######################################################################################################################
+
             ///////////////////////////////////////////////
             //////////  common initial settings  //////////
             ///////////////////////////////////////////////
@@ -47,6 +50,31 @@ namespace TuringAndCorbusier
                     areaLength.Add(area[i] / width);
             }
 
+            //#######################################################################################################################
+            if (parameterSet.using1F && !parameterSet.setback)
+            {
+                if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
+                {
+                    return null;
+                }
+
+                regulationHigh = new Regulation(storiesHigh, true);
+                //regulationLow = new Regulation(storiesHigh, storiesLow, true);
+            }
+            else if (parameterSet.setback && !parameterSet.using1F)
+            {
+                if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
+                {
+                    return null;
+                }
+                //최상층 법규선 - 동간거리 사용
+                regulationHigh = new Regulation(storiesHigh);
+
+                //최상층 바로 아래층 법규선 - 동간거리 제외한 각종 법규선 사용하여 최상층까지 올림
+                regulationHigh.Fake();
+                //마지막에 최상층과 최상층법규선 대조, 외곽선 후퇴. //unfake
+            }
+            //#######################################################################################################################
 
             ///////////////////////////
             //sort lists before start//
@@ -154,6 +182,7 @@ namespace TuringAndCorbusier
             List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, centerLinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
 
 
+
             //복도면적..?
 
             double eachfloorCorridorArea = inlineCurve.GetLength() * Consts.corridorWidth - (Consts.corridorWidth * Consts.corridorWidth) * 4;
@@ -174,7 +203,101 @@ namespace TuringAndCorbusier
                     }
             }
 
+            //################################################################################################
+            if (parameterSet.setback)
+            {
 
+                if (households.Count == 0 || cores.Count <= 3)
+                { }
+                else
+                {
+                    //최상층 외곽선 후퇴옵션 사용하는 경우 최상층 조정...?
+                    //용적 제대로 나올지 미지수
+
+                    List<Household> topHouses = new List<Household>();
+                    households.Last().ToList().ForEach(n => topHouses.AddRange(n));
+
+                    List<Core> topCores = cores.Last().ToList();
+
+                    regulationHigh.UnFake();
+                    Curve[] topNorth = regulationHigh.fromNorthCurve(plot);
+
+                    //일조사선 걸리는 코어들 제거, 연결된 house 제거
+                    List<Curve> topCoreOutlines = topCores.Select(n => n.DrawOutline()).ToList();
+                    topCoreOutlines.ForEach(n => n.Translate(Vector3d.ZAxis * -n.PointAtStart.Z));
+                    List<bool> remove = new List<bool>();
+                    topCoreOutlines.ForEach(n => remove.Add(false));
+
+                    for (int i = 0; i < topNorth.Length; i++)
+                    {
+                        Curve tempNorth = topNorth[i];
+                        for (int j = 0; j < topCoreOutlines.Count; j++)
+                        {
+                            if (remove[j])
+                                continue;
+                            var collision = Curve.PlanarCurveCollision(tempNorth, topCoreOutlines[j], Plane.WorldXY, 0);
+                            if (collision)
+                                remove[j] = true;
+                        }
+                    }
+
+                    for (int i = remove.Count - 1; i >= 0; i--)
+                    {
+                        if (remove[i])
+                        {
+                            foreach (var hh in households.Last())
+                            {
+                                List<int> toRemove = new List<int>();
+                                foreach (var h in hh)
+                                {
+                                    Curve outline = h.GetOutline();
+                                    Curve coreoutline = cores[cores.Count - 2][i].DrawOutline();
+                                    var col = Curve.PlanarCurveCollision(outline, coreoutline, Plane.WorldXY, 0);
+                                    if (col)
+                                    {
+                                        toRemove.Add(hh.IndexOf(h));
+                                    }
+                                }
+
+                                for (int j = toRemove.Count - 1; j >= 0; j--)
+                                {
+                                    hh.RemoveAt(toRemove[j]);
+                                }
+                            }
+                            cores.Last().RemoveAt(i);
+                            //cpss[cpss.Count - 2].RemoveAt(i);
+                        }
+                    }
+
+                    Curve[] northHigh = regulationHigh.fromNorthCurve(plot);
+                    Curve[] surroundingsHigh = regulationHigh.fromSurroundingsCurve(plot);
+                    Curve[] lightingHigh = regulationHigh.byLightingCurve(plot, angleRadian);
+                    Curve[] wholeRegulationHigh = CommonFunc.JoinRegulations(northHigh, surroundingsHigh, lightingHigh);
+
+                    if (wholeRegulationHigh.Length == 1)
+                    {
+                        foreach (var hh in households.Last())
+                        {
+                            List<int> removeIndex = new List<int>();
+                            foreach (var h in hh)
+                            {
+                                var contractResult = h.Contract(wholeRegulationHigh[0]);
+                                if (!contractResult)
+                                    removeIndex.Add(hh.IndexOf(h));
+                            }
+
+                            for (int i = removeIndex.Count - 1; i >= 0; i--)
+                            {
+                                hh.RemoveAt(removeIndex[i]);
+                            }
+                        }
+
+                        if (households.Last().Count == 0)
+                            households.RemoveAt(households.Count - 1);
+                    }
+                }
+            }
+            //################################################################################################
 
 
             //building outlines
@@ -239,10 +362,13 @@ namespace TuringAndCorbusier
 
             Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
 
+            //#######################################################################################################################
             if (parameterSet.using1F || parameterSet.setback)
             {
 
             }
+            //#######################################################################################################################
+
             else
             {
                 Finalizer finalizer = new Finalizer(result);
@@ -257,6 +383,14 @@ namespace TuringAndCorbusier
         #region New Apartment Generating Methods
         private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve, bool WWregBool)
         {
+            double pilotiHeight = Consts.PilotiHeight;
+            //#######################################################################################################################
+            if (parameterSet.using1F)
+            {
+                randomCoreType = parameterSet.fixedCoreType;
+                pilotiHeight = 0;
+            }
+            //#######################################################################################################################
             //initial settings
             Polyline inlinePolyline;
             inlineCurve.TryGetPolyline(out inlinePolyline);
@@ -314,7 +448,11 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < storiesHigh + 2; i++)
             {
-                double tempStoryHeight = (i == 0) ? 0 : Consts.PilotiHeight + Consts.FloorHeight * (i - 1);
+                //1층 사용시 필로티코어 만들지 않음.
+                if (parameterSet.using1F && i == 0)
+                    continue;
+
+                double tempStoryHeight = (i == 0) ? 0 : pilotiHeight + Consts.FloorHeight * (i - 1);
                 List<Core> currentFloorCores = new List<Core>();
 
                 for (int j = 0; j < coreOrigins.Count; j++)
@@ -337,6 +475,14 @@ namespace TuringAndCorbusier
 
         private List<List<List<Household>>> MakeHouseholds(ParameterSet parameterSet, Curve[] lines, Polyline centerLine, List<double> mappedVals, List<int> targetAreaType, int typeN)
         {
+            double pilotiHeight = Consts.PilotiHeight;
+            //#######################################################################################################################
+            if (parameterSet.using1F)
+            {
+                randomCoreType = parameterSet.fixedCoreType;
+                pilotiHeight = 0;
+            }
+            //#######################################################################################################################
             //initial settings
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
@@ -480,7 +626,7 @@ namespace TuringAndCorbusier
                     windowsH.Add(new Line(winPt3, winPt4));
 
                     //moveables == windows
-                    moveableH = windowsH;
+                    moveableH = new List<Line>(windowsH);
 
                     //entrance points
                     ent = new Point3d(homeOriH);
@@ -501,14 +647,14 @@ namespace TuringAndCorbusier
                     if (isCorner)
                     {
                         Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Corner(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
-                        tempHP.MoveableEdge = moveableH;
+                        tempHP.MoveableEdge = new List<Line>(moveableH);
                         outputS.Add(tempHP);
                         //cornerProperties[targetAreaType[i]].Add(tempHP);
                     }
                     else
                     {
                         Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Edge(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
-                        tempHP.MoveableEdge = moveableH;
+                        tempHP.MoveableEdge = new List<Line>(moveableH);
                         outputS.Add(tempHP);
                         //edgeProperties[targetAreaType[i]].Add(tempHP);
                     }
@@ -524,18 +670,17 @@ namespace TuringAndCorbusier
                     Household hp = outputS[i];
                     Point3d ori = hp.Origin;
                     Point3d ent = hp.EntrancePoint;
-                    ori.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                    ent.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                    List<Line> win = hp.LightingEdge;
-                    List<Line> winNew = new List<Line>();
-                    for (int k = 0; k < win.Count; k++)
-                    {
-                        Line winTemp = win[k];
-                        winTemp.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                        winNew.Add(winTemp);
-                    }
+                    ori.Transform(Transform.Translation(Vector3d.Multiply(pilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
+                    ent.Transform(Transform.Translation(Vector3d.Multiply(pilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
+                    List<Line> win = new List<Line>(hp.LightingEdge); 
 
-                    outputSTemp.Add(new Household(ori, hp.XDirection, hp.YDirection, hp.XLengthA, hp.XLengthB, hp.YLengthA, hp.YLengthB, hp.HouseholdSizeType, hp.GetExclusiveArea() + hp.GetWallArea(), winNew, ent, hp.WallFactor));
+                    Household newTemp = new Household(ori, hp.XDirection, hp.YDirection, hp.XLengthA, hp.XLengthB, hp.YLengthA, hp.YLengthB, hp.HouseholdSizeType, hp.GetExclusiveArea() + hp.GetWallArea(), win, ent, hp.WallFactor);
+                    newTemp.MoveableEdge = new List<Line>(hp.MoveableEdge);
+
+                    //라이팅 등 위치 재조정
+                    newTemp.MoveLightingAndMoveAble();
+
+                    outputSTemp.Add(newTemp);
                 }
                 outputB.Add(outputSTemp);
                 output.Add(outputB);
@@ -557,7 +702,7 @@ namespace TuringAndCorbusier
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation , fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         //private double[] GAparameterset = { 0.8, 0.05, 1, 20, 4, 10, 1 };
-        private double[] GAparameterset = { 0.2, 0.03, 1, 5, 5, 3, 1 };
+        private double[] GAparameterset = { 0.2, 0.03, 1, 25, 1, 3, 1 };
 
         public override string GetAGType
         {

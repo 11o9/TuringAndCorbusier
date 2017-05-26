@@ -452,11 +452,15 @@ namespace TuringAndCorbusier
                 //double parkingval = ((parkinglotRatio[j] - CbestR) * (k - 1) / k + (CbestR - CworstR) + 0.01) / (CbestR - CworstR + 0.01) * parkingWeight;
                 //double targetval = ((targetAccuracy[j] - CbestT) * (k - 1) / k + (CbestT - CworstT) + 0.01) / (CbestT - CworstT + 0.01) * targetWeight;
 
+                //firstfloor test
+                double firstfloorBonus = 0;
+                if (gene[j].using1F)
+                    firstfloorBonus = 1000;
                 //setback test
                 double setbackBonus = 0;
                 if (gene[j].setback)
                     setbackBonus = 1000;
-                fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus);
+                fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus + firstfloorBonus);
                 //for test
             
                 //string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString() + "," + gene[j].setback.ToString();

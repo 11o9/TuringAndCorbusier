@@ -25,12 +25,13 @@ namespace TuringAndCorbusier
             //입력"값" 부분
             randomCoreType = GetRandomCoreType();
             double pilotiHeight = Consts.PilotiHeight;
+            //#######################################################################################################################
             if (parameterSet.using1F)
             {
                 randomCoreType = parameterSet.fixedCoreType;
                 pilotiHeight = 0;
             }
-            //
+            //#######################################################################################################################
 
 
             double[] parameters = parameterSet.Parameters;
@@ -78,7 +79,7 @@ namespace TuringAndCorbusier
             List<Unit> units = target.ToUnit(width, corearea, storiesHigh);
 
 
-
+            //#######################################################################################################################
             if (parameterSet.using1F && !parameterSet.setback)
             {
                 if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
@@ -102,6 +103,7 @@ namespace TuringAndCorbusier
                 regulationHigh.Fake();
                 //마지막에 최상층과 최상층법규선 대조, 외곽선 후퇴. //unfake
             }
+            //#######################################################################################################################
             else
             {
                 while (true)
@@ -461,7 +463,7 @@ namespace TuringAndCorbusier
 
 
 
-
+            //################################################################################################
             if (parameterSet.setback)
             {
 
@@ -553,9 +555,8 @@ namespace TuringAndCorbusier
                             hhps.RemoveAt(hhps.Count - 1);
                     }
                 }
-
-
             }
+            //################################################################################################
 
             #endregion
 
@@ -664,10 +665,13 @@ namespace TuringAndCorbusier
             //finalize
             Apartment result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, new ParkingLotUnderGround(), new List<List<Curve>>(), aptLines);
 
+            //#######################################################################################################################
             if (parameterSet.using1F||parameterSet.setback)
             {
 
             }
+            //#######################################################################################################################
+
             else
             {
                 Finalizer finalizer = new Finalizer(result);
@@ -695,7 +699,7 @@ namespace TuringAndCorbusier
         private double[] maxInput = { 6, 6, 13000, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
-        private double[] GAparameterset = { 0.1, 0.05, 3, 120, 6, 3, 1 }; //원본
+        private double[] GAparameterset = { 0.1, 0.05, 3, 120, 2, 3, 1 }; //원본
                                                                           //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
 
 
@@ -1080,7 +1084,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < balanced.Length; i++)
             {
                 //복도형
-                if (unit[i] <= Consts.minimumArea)
+                if (unit[i] <= Consts.AreaLimit)
                     balanced[i] = Math.Round(eachUnitrawCount[i]);
 
                 //그외

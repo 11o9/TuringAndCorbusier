@@ -55,7 +55,8 @@ namespace TuringAndCorbusier
                     //WriteLine("[{0}]UGP Check...", depth);
                     UnderGroundParkingModule ugpm = new UnderGroundParkingModule(apt.Plot.Boundary, (int)ugpRequired);
                     bool canUGP = ugpm.CheckPrecondition();
-                    if (canUGP)
+                    bool isNull = (apt.AptLines.Count == 0) ? true : false; 
+                    if (canUGP && !isNull)
                     {
                         //UnderGroundParkingModule ...
                         //WriteLine("[{0}]UGP Creating", depth);
@@ -134,7 +135,8 @@ namespace TuringAndCorbusier
             {
                 //WriteLine("[{0}]FAR Lack...", depth);
                 //WriteLine("[{0}]Check SetBack...", depth);
-                if (!setBacked)
+
+                if (setBacked)
                 {
                     //WriteLine("[{0}]Can Set Back...", depth);
                     //WriteLine("[{0}]Set Back...", depth);
@@ -145,28 +147,29 @@ namespace TuringAndCorbusier
                     //WriteLine("[{0}]return SetBack...", depth);
                     return fnz.Finilize();
                 }
-                else
+
+                //if (!setBacked && !using1f)
+                else if(using1f)
                 {
-                    //WriteLine("[{0}]Can't Set Back...", depth);
-                    //WriteLine("[{0}]Check Using1F...", depth);
-                    if (!using1f)
-                    {
+                    ////WriteLine("[{0}]Can't Set Back...", depth);
+                    ////WriteLine("[{0}]Check Using1F...", depth);
+                    //if (!using1f)
+                    //{
                         //WriteLine("[{0}]Can Using1F...", depth);
                         //WriteLine("[{0}]Using 1F...", depth);
                         //지상주차 계산도 다시 해야함.
-                        Apartment using1f = Add1F(apt);
-                        Finalizer fnz = new Finalizer(using1f,depth);
-                        fnz.setBacked = true;
-                        fnz.using1f = true;
-                        //use1f and Recursive
-                        //WriteLine("[{0}]return Using 1F...", depth);
-                        return fnz.Finilize();
-                    }
-                    else
-                    {
-                        //WriteLine("[{0}]can't do anything , return basic value", depth);
-                        return apt;
-                    }
+                    Apartment using1f = Add1F(apt);
+                    Finalizer fnz = new Finalizer(using1f,depth);
+                    fnz.using1f = true;
+                    //use1f and Recursive
+                    //WriteLine("[{0}]return Using 1F...", depth);
+                    return fnz.Finilize();
+                    //}
+                    //else
+                    //{
+                    //    //WriteLine("[{0}]can't do anything , return basic value", depth);
+                    //    return apt;
+                    //}
                 }
               
             }
@@ -176,9 +179,17 @@ namespace TuringAndCorbusier
 
         bool IsSuitable()
         {
-            //이미 해볼거 다 해봐서 방법이 없음 , 주차만들고 땡
-            if (setBacked && using1f)
+            //이미 한번 후처리 됨, 주차만들고 땡
+            if (setBacked || using1f)
                 return true;
+
+            //지금은 랜덤
+            Random rand = new Random();
+            double d = rand.NextDouble();
+            if (d < 0.5)
+                using1f = true;
+            else
+                setBacked = true;
 
             double tempFAR = apt.GetGrossAreaRatio();
             double FARlimit = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio;
@@ -244,10 +255,10 @@ namespace TuringAndCorbusier
                     AG1 ag1 = new AG1();
                     Apartment a1 = ag1.generator(apt.Plot, temp, apt.Target);
                     return a1 == null ? apt : a1;
-                //case "PT-3"://미구현
-                //    AG3 ag3 = new AG3();
-                //    Apartment a3 = ag3.generator(apt.Plot, temp, apt.Target);
-                //    return a3 == null ? apt : a3;
+                case "PT-3":
+                    AG3 ag3 = new AG3();
+                    Apartment a3 = ag3.generator(apt.Plot, temp, apt.Target);
+                    return a3 == null ? apt : a3;
                 //case "PT-4"://미구현
                 //    AG1 ag4 = new AG1();
                 //    Apartment a4 = ag4.generator(apt.Plot, temp, apt.Target);
@@ -280,10 +291,10 @@ namespace TuringAndCorbusier
                     AG1 ag1 = new AG1();
                     Apartment a1 = ag1.generator(apt.Plot, temp, apt.Target);
                     return a1 == null ? apt : a1;
-                //case "PT-3"://미구현
-                //    AG3 ag3 = new AG3();
-                //    Apartment a3 = ag3.generator(apt.Plot, temp, apt.Target);
-                //    return a3 == null ? apt : a3;
+                case "PT-3":
+                    AG3 ag3 = new AG3();
+                    Apartment a3 = ag3.generator(apt.Plot, temp, apt.Target);
+                    return a3 == null ? apt : a3;
                 //case "PT-4"://미구현
                 //    AG1 ag4 = new AG1();
                 //    Apartment a4 = ag4.generator(apt.Plot, temp, apt.Target);

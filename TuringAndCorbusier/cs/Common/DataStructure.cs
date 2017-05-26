@@ -2108,6 +2108,12 @@ namespace TuringAndCorbusier
             for (int i = 0; i < MoveableEdge.Count; i++)
             {
                 Curve moveAble = MoveableEdge[i].ToNurbsCurve();
+                int windowIndex = -1;
+                for (int j = 0; j < LightingEdge.Count; j++)
+                {
+                    if (moveAble.PointAtStart == LightingEdge[j].From && moveAble.PointAtEnd == LightingEdge[j].To)
+                        windowIndex = j;
+                }
 
 
                 //      ----front----
@@ -2125,7 +2131,7 @@ namespace TuringAndCorbusier
                 Curve testLine2;
                 List<Curve> testLines;
                 //front
-                if (moveAble.TangentAtStart == XDirection)
+                if (Vector3d.VectorAngle(moveAble.TangentAtStart,XDirection) <= 0.01*Math.PI)
                 {
                     Point3d p1 = origin;
                     Point3d p2 = origin + XDirection * (XLengthA - XLengthB);
@@ -2136,7 +2142,7 @@ namespace TuringAndCorbusier
                 }
 
                 //side                                                                                              
-                else if (moveAble.TangentAtStart == -YDirection)
+                else if (Vector3d.VectorAngle(moveAble.TangentAtStart, -YDirection) <= 0.01 * Math.PI)
                 {
                     Point3d p1 = origin + YDirection * YLengthB;
                     Point3d p2 = origin - YDirection * (YLengthA - YLengthB);
@@ -2147,7 +2153,7 @@ namespace TuringAndCorbusier
                 }
 
                 //back
-                else if (moveAble.TangentAtStart == -XDirection)
+                else if (Vector3d.VectorAngle(moveAble.TangentAtStart,-XDirection) <= 0.01*Math.PI)
                 {
                     Point3d p1 = origin + XDirection * (XLengthA - XLengthB);
                     Point3d p2 = origin - XDirection * XLengthB;
@@ -2176,23 +2182,39 @@ namespace TuringAndCorbusier
                     continue;
 
                 //결과적용
-                if (moveAble.TangentAtStart == XDirection)
+                if (Vector3d.VectorAngle(moveAble.TangentAtStart, XDirection) <= 0.01 * Math.PI)
                 {
-
+                    if (windowIndex != -1)
+                    {
+                        Vector3d v = YDirection * -(YLengthB - minDistance);
+                        Line l = LightingEdge[windowIndex];
+                        LightingEdge[windowIndex] = new Line(l.From + v, l.To + v);
+                    }
                     YLengthA -= YLengthB - minDistance;
                     YLengthB = minDistance;
-                    
                 }
 
                 //side                                                                                              
-                else if (moveAble.TangentAtStart == -YDirection)
+                else if (Vector3d.VectorAngle(moveAble.TangentAtStart, -YDirection) <= 0.01 * Math.PI)
                 {
+                    if (windowIndex != -1)
+                    {
+                        Vector3d v = XDirection * -(XLengthA - XLengthB - minDistance);
+                        Line l = LightingEdge[windowIndex];
+                        LightingEdge[windowIndex] = new Line(l.From + v, l.To + v);
+                    }
                     XLengthA -= XLengthA - XLengthB - minDistance;
                 }
 
                 //back
-                else if (moveAble.TangentAtStart == -XDirection)
+                else if (Vector3d.VectorAngle(moveAble.TangentAtStart, -XDirection) <= 0.01 * Math.PI)
                 {
+                    if (windowIndex != -1)
+                    {
+                        Vector3d v = YDirection * (YLengthA - YLengthB - minDistance);
+                        Line l = LightingEdge[windowIndex];
+                        LightingEdge[windowIndex] = new Line(l.From + v, l.To + v);
+                    }
                     YLengthA -= YLengthA - YLengthB - minDistance;
                 }
 
