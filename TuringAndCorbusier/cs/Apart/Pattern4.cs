@@ -1009,6 +1009,19 @@ namespace TuringAndCorbusier
                         houseEndVals.RemoveAt(houseEndVals.Count - 1);
                         houseEndVals.RemoveAt(houseEndVals.Count - 1);
                         mappedHouseholdCount--;
+
+                        double lengthOver = currentValue - centerLineLength;
+                        double previousLength = stretchedLength[unallocated[i - 1]];
+                        double reducedLength = previousLength;
+
+                        if (previousLength - lengthOver > cornerShortEdgeLimit)
+                        {
+                            reducedLength -= lengthOver;
+                            houseEndVals.Add(houseEndVals.Last() + reducedLength);
+                            houseEndVals.Add(houseEndVals.Last() + coreWidth);
+                            mappedHouseholdCount++;      
+                        }
+
                         break;
                     }
 
