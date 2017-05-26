@@ -2869,7 +2869,7 @@ namespace TuringAndCorbusier
                 t = 0;
             }
 
-            double tempHeight = height;
+            double tempHeight = height - fakeHeight;
 
             var tempRoadLine = plot.Boundary.DuplicateSegments();
 

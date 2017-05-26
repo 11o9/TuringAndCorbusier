@@ -383,6 +383,8 @@ namespace TuringAndCorbusier
         #region New Apartment Generating Methods
         private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve, bool WWregBool)
         {
+            //wwregbool 잠시 비활성화
+            WWregBool = false;
             double pilotiHeight = Consts.PilotiHeight;
             //#######################################################################################################################
             if (parameterSet.using1F)
