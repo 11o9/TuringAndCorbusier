@@ -2529,7 +2529,7 @@ namespace TuringAndCorbusier
 
         public void Init(double stories)
         {
-            if (stories >= TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor) // apartment
+            if (stories > TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor) // apartment
             {
                 this.distanceFromRoad = 3000;
                 this.distanceFromPlot = 3000;
@@ -3038,11 +3038,11 @@ namespace TuringAndCorbusier
         {
         
             //특례 적용 안하는경우 h * 0.5 , 8 층 이상인 경우
-            if (!plot.isSpecialCase || totalheight >= 7)
-                distanceByLighting = 0.5;
-            //특례 적용 하는 경우 h * 0.25
-            else 
-                distanceByLighting = 0.25;
+            //if (!plot.isSpecialCase || totalheight >= 7)
+            //    distanceByLighting = 0.5;
+            ////특례 적용 하는 경우 h * 0.25
+            //else 
+            //    distanceByLighting = 0.25;
 
             //법규적용 인접대지경계선(채광창)
             Curve roadCenter = RoadCenterLines(plot);

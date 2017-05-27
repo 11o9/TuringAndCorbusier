@@ -434,13 +434,13 @@ namespace TuringAndCorbusier
             //string url = @"C://Users//user//Desktop//test";
             //System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
 
-           
+
             //string filename = "//garojutacklogV2" + (dinfo.GetFiles().Length + 1).ToString() + ".csv";
             //System.IO.FileStream fs = new System.IO.FileStream(url + filename, System.IO.FileMode.CreateNew);
             //fs.Close();
             //fs.Dispose();
             //System.IO.StreamWriter w = new System.IO.StreamWriter(fs.Name);
-            //string column = "FAR" + "," + "FARPoint" + "," + "ParkingPoint" + "," + "AxisPoint" + "," + "Sum" + "," + "Use1F" + ",UseSetback";
+            //string column = "FAR" + "," + "Floors" + "," + "FARPoint" + "," + "ParkingPoint" + "," + "AxisPoint" + "," + "Sum" + "," + "Use1F" + ",UseSetback";
             //w.WriteLine(column);
             for (int j = 0; j < gene.Count; j++)
             {
@@ -462,8 +462,9 @@ namespace TuringAndCorbusier
                 //    setbackBonus = 1000;
                 fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus + firstfloorBonus);
                 //for test
-            
-                //string format = grossAreaRatio[j].ToString() + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal+ parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString() + "," + gene[j].setback.ToString();
+
+                //string format = grossAreaRatio[j].ToString() + "," + gene[j].Stories + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal + parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString() + "," + gene[j].setback.ToString();
+
                 //w.WriteLine(format);
             }
             //for test
