@@ -693,7 +693,7 @@ namespace TuringAndCorbusier
         //Parameter 최소값 ~ 최대값 {storiesHigh, storiesLow, width, angle, moveFactor}
         private double[] minInput = { 3, 3, 7000, 0, 0 };
         //private double[] minInput = { 6, 6, 10500, 0, 0 };
-        private double[] maxInput = { 6, 6, 10500, 2 * Math.PI, 1 };
+        private double[] maxInput = { TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, 10500, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation , fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         //private double[] GAparameterset = { 0.8, 0.05, 1, 20, 4, 10, 1 };

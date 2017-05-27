@@ -235,7 +235,7 @@ namespace TuringAndCorbusier
 
         Apartment Add1F(Apartment apt)
         {
-            bool canAdd1F = apt.Household.Count < 6;
+            bool canAdd1F = apt.Household.Count < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1;
             if (!canAdd1F)
                 return apt;
 
@@ -271,7 +271,7 @@ namespace TuringAndCorbusier
 
         Apartment SetBack(Apartment apt)
         {
-            bool canSetBack = apt.Household.Count < 6;
+            bool canSetBack = apt.Household.Count < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1;
             if (!canSetBack)
                 return apt;
 
