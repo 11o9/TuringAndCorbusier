@@ -54,6 +54,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GISData">
+      <HintPath>..\..\..\Documents\Visual Studio 2015\Projects\GISData\GISData\bin\Debug\GISData.dll</HintPath>
+    </Reference>
     <Reference Include="Grasshopper">
       <HintPath>..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
     </Reference>
@@ -108,6 +111,10 @@
     <Compile Include="cs\NotUsed\CalculateScore.cs" />
     <Compile Include="cs\Apart\UnitDistributor.cs" />
     <Compile Include="cs\Parkings\EddieBrock.cs" />
+    <Compile Include="cs\Server\ServerConnection.cs" />
+    <Compile Include="cs\Server\ServerUI.xaml.cs">
+      <DependentUpon>ServerUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -227,6 +234,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="cs\Server\ServerUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Reports\reportCover.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
