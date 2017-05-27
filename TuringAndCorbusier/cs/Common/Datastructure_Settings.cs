@@ -66,6 +66,7 @@ namespace TuringAndCorbusier
             public double[] DistanceRow = new double[] { 1000, 750 };
             public double DistanceLighting = 0.25;
             public double DistanceIndentation = 0.8;
+            public double EaseFloor = 7;
         }
     }
 }

@@ -2529,7 +2529,7 @@ namespace TuringAndCorbusier
 
         public void Init(double stories)
         {
-            if (stories >= 7) // apartment
+            if (stories >= TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor) // apartment
             {
                 this.distanceFromRoad = 3000;
                 this.distanceFromPlot = 3000;
@@ -2613,7 +2613,12 @@ namespace TuringAndCorbusier
         public Curve RoadCenterLines(Plot plot)
         {
             //plot 의 boundary 와 roads 를 사용.
-            var segments = plot.Boundary.DuplicateSegments();
+            Curve boundaryCopy = plot.Boundary.DuplicateCurve();
+
+            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.Clockwise)
+                boundaryCopy.Reverse();
+
+            var segments = boundaryCopy.DuplicateSegments();
 
             var roadwidths = plot.SimplifiedSurroundings.ToList();
 
@@ -2713,7 +2718,12 @@ namespace TuringAndCorbusier
         {
             //법규적용(대지안의 공지)
 
-            Curve[] plotArr = plot.Boundary.DuplicateSegments();
+            Curve boundaryCopy = plot.Boundary.DuplicateCurve();
+
+            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.Clockwise)
+                boundaryCopy.Reverse();
+
+            Curve[] plotArr = boundaryCopy.DuplicateSegments();
             //extend plotArr
             Curve[] plotArrExtended = new Curve[plotArr.Length];
             Array.Copy(plotArr, plotArrExtended, plotArr.Length);
@@ -2818,7 +2828,12 @@ namespace TuringAndCorbusier
 
             double tempHeight = height - fakeHeight;
 
-            var tempRoadLine = plot.Boundary.DuplicateSegments();
+            Curve boundaryCopy = plot.Boundary.DuplicateCurve();
+
+            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.Clockwise)
+                boundaryCopy.Reverse();
+
+            var tempRoadLine = boundaryCopy.DuplicateSegments();
 
             for (int i = 0; i < tempRoadLine.Length; i++)
             {
@@ -3031,10 +3046,17 @@ namespace TuringAndCorbusier
 
             //법규적용 인접대지경계선(채광창)
             Curve roadCenter = RoadCenterLines(plot);
-            Curve[] plotArr = plot.Boundary.DuplicateSegments(); //roadCenter.DuplicateSegments();
+
+
+            Curve boundaryCopy = plot.Boundary.DuplicateCurve();
+
+            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.Clockwise)
+                boundaryCopy.Reverse();
+
+            Curve[] plotArr = boundaryCopy.DuplicateSegments(); //roadCenter.DuplicateSegments();
 
             //대지 경계선을 구성 선분들로 분할합니다.
-            Curve x = plot.Boundary;
+            Curve x = boundaryCopy;
             var rotation = x.ClosedCurveOrientation(Vector3d.ZAxis);
             Curve[] plotArrExtended = new Curve[plotArr.Length];
             Array.Copy(plotArr, plotArrExtended, plotArr.Length);

@@ -153,6 +153,7 @@ namespace TuringAndCorbusier
                 fromSurr.Text = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceEase[1].ToString();
                 fromLighting.Text = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting.ToString();
                 fromOtherBuilding.Text = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation.ToString();
+                easeFloor.Text = TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor.ToString();
             }
 
 
@@ -306,6 +307,11 @@ namespace TuringAndCorbusier
                 if (double.TryParse(fromOtherBuilding.Text, out result))
                 {
                     TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation = result;
+                    result = double.NaN;
+                }
+                if (double.TryParse(easeFloor.Text, out result))
+                {
+                    TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor = result;
                     result = double.NaN;
                 }
             }

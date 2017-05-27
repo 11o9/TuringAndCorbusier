@@ -196,7 +196,10 @@
 
 
         </Grid>
-        <TextBlock x:Name="Reg" Text="법규 적용" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="25,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Grid.Row="1"/>
+        <TextBlock x:Name="Reg" Text="완화제한" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="25,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Grid.Row="1"/>
+        <TextBlock  Text="주거층수" Grid.Row="1" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="163,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBox x:Name="easeFloor" Style="{StaticResource textBoxStyle}" Grid.Row="1" Width="40" Height="20" Margin="261,10,39,2"></TextBox>
+
         <CheckBox x:Name="NorthCheck" Content="일조 사선 무시" HorizontalAlignment="Left" Margin="81,3,0,0" Grid.Row="3" VerticalAlignment="Top" Visibility="Hidden"/>
         <CheckBox x:Name="SpecialCase" Content="채광방향 높이제한 특례 적용 (높이 * 1/4)" HorizontalAlignment="Left" Margin="89,8,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
         <TextBlock  Text="대지안의공지" Grid.Row="2" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
