@@ -69,8 +69,9 @@ namespace TuringAndCorbusier
                 
                 this.ProjectAddress.Text = CommonFunc.getAddressFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList());
 
-                this.ProjectArea.Text = Math.Round(CommonFunc.GetManualAreaFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList()),2).ToString();
-    }
+                
+                this.ProjectArea.Text = Math.Round(CommonFunc.GetManualAreaFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList()), 2).ToString();
+            }
             catch (System.Exception)
             {
                 errorMessage tempError = new errorMessage("서버와 연결할 수 없습니다.");
@@ -190,6 +191,7 @@ namespace TuringAndCorbusier
             MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot(tempPlot, stories, using1F);
             MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLineDrawer.Lighting(tempPlot, stories, tempoutput, using1F);
             MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLineDrawer.Boundary(tempPlot, stories, using1F);
+      
             List<string> widthlog;
             MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.LawLineDrawer.ApartDistance(tempoutput, out widthlog);
             MainPanel_LawPreview_ApartDistance.dimension = widthlog;
@@ -279,6 +281,7 @@ namespace TuringAndCorbusier
             }
 
            
+
 
             /// <summary>
             /// 0518 민호 계산 시작시 newprojectwindow가 열려있으면 닫음
@@ -615,6 +618,22 @@ namespace TuringAndCorbusier
                         Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(i, i));
                         TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
                         floorPlanDrawing.SetHouseOutline(coreOutline, coreDetailOutline, houseOutline, testTypicalPlan, new Interval(i,i));
+                        //아파트 하우스 홀드 리스트 가져오기
+                        List<List<List<Household>>> householdTripleList = MainPanel_AGOutputList[tempIndex].Household;
+                        List<Household> householdList = new List<Household>();
+                        foreach (List<List<Household>> householdDoubleList in householdTripleList)
+                        {
+                            foreach(List<Household> tempHouseholdList in householdDoubleList)
+                            {
+                                foreach(Household household in tempHouseholdList)
+                                {
+                                    householdList.Add(household);
+                                }
+                            }
+                        }
+
+
+                        floorPlanDrawing.SetHouseOutline(coreOutline, coreDetailOutline, houseOutline, testTypicalPlan,householdList,new Interval(i, i));
 
                         fps.Add(floorPlanDrawing.fixedPage);
                         pagename.Add("floorPlanDrawingPage" + (i+1).ToString());

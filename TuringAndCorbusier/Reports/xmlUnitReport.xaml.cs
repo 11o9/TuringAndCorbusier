@@ -18,7 +18,7 @@ namespace Reports
 
         public xmlUnitReport()
         {
-
+            InitializeComponent();
         }
 
         public xmlUnitReport(Household houseHoldProperty, string typeString, double coreArea, double parkingLotArea, double publicFacilityArea, double serviceArea, int numOfThisType)
