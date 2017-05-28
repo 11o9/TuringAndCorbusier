@@ -67,7 +67,15 @@ namespace Reports
         {
           
         }
-
+        private void AddTextBlock(System.Windows.Point newCentroid)
+        {
+            TextBlock areaType = new TextBlock();
+            areaType.Text = "testing";
+            areaType.FontSize = 40;
+            typicalPlanCanvas.Children.Add(areaType);
+            Canvas.SetLeft(areaType,newCentroid.X);
+            Canvas.SetTop(areaType, newCentroid.Y);
+        }
         //--------JHL
         public void SetHouseOutline(List<Curve> coreOutline,List<Curve> coreDetail,List<Curve> houseOutline,TypicalPlan typicalPlan)
         {
@@ -79,6 +87,8 @@ namespace Reports
             List<FloorPlan> floorPlanList = typicalPlan.UnitPlans;
             List<Curve> coreDetailList = coreDetail;
             List<Curve> houseOutlineList = houseOutline;
+
+            List<Point3d> houseOutlinesCentroid = new List<Point3d>();
             Rectangle3d rectangleToFit = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
 
             Rectangle canvasRectangle = new Rectangle();
@@ -88,10 +98,26 @@ namespace Reports
             System.Windows.Point initialOriginPoint = new System.Windows.Point();
             double scaleFactor = PlanDrawingFunction.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
 
+            //JHL 글씨 넣기 위해 중심 점 구함 
+            foreach (Curve house in houseOutlineList)
+            {
+                houseOutlinesCentroid.Add(Rhino.Geometry.AreaMassProperties.Compute(house).Centroid);
+            }
+
+            
+            
+            
+
+
+
+            for (int i = 0; i < houseOutlinesCentroid.Count; i++)
+            {
+                System.Windows.Point newCentroid = PlanDrawingFunction.pointConverter(rectangleToFit, houseOutlinesCentroid[i], scaleFactor, initialOriginPoint);
+                this.AddTextBlock(newCentroid);
+            }
+
             PlanDrawingFunction.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray, 0.2);
             PlanDrawingFunction.drawPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 2);
-
-          
 
             foreach (Curve house in houseOutline)
             {

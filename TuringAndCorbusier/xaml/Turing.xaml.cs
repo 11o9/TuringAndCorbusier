@@ -598,17 +598,26 @@ namespace TuringAndCorbusier
                 }
 
                 //JHL
-                for (int i = 1; i < MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2; i++)
+                for (int i = 0; i < MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2; i++)
                 {
                     try
                     {
+                        if (i==0)
+                        {
+
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i+1);
+                            Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(1);
+                            floorPlanDrawing1.SetCoreOutline(coreOutline, coreDetailOutline, houseOutline, typicalCorePlan, new Interval(1, 1));
+                            fps.Add(floorPlanDrawing1.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                        }
+                        List<HouseholdStatistics> householeStatisticsList = MainPanel_AGOutputList[tempIndex].HouseholdStatistics;
                         Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(i, i));
                         TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
-
                         floorPlanDrawing.SetHouseOutline(coreOutline, coreDetailOutline, houseOutline, testTypicalPlan, new Interval(i,i));
 
                         fps.Add(floorPlanDrawing.fixedPage);
-                        pagename.Add("floorPlanDrawingPage" + i.ToString());
+                        pagename.Add("floorPlanDrawingPage" + (i+1).ToString());
                     }
                     catch (System.Exception EX)
                     {

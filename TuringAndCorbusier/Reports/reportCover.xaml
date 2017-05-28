@@ -39,8 +39,8 @@
                 <TextBlock  x:Name="address" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="846" FontFamily="NanumSquareOTF" />
                 <TextBlock  x:Name="plotType" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="884" FontFamily="NanumSquareOTF" />
                 <TextBlock  x:Name="plotArea_Usable" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="922" FontFamily="NanumSquareOTF" />
-                <TextBlock  x:Name="buildingCoverage" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="961" FontFamily="NanumSquareOTF" />
-                <TextBlock  x:Name="floorAreaRatio" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="1000" FontFamily="NanumSquareOTF" />
+                <TextBlock  x:Name="buildingCoverage" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="1000" FontFamily="NanumSquareOTF" />
+                <TextBlock  x:Name="floorAreaRatio" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="960" FontFamily="NanumSquareOTF" />
                 <TextBlock  x:Name="numOfHouseHolds" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="1035" FontFamily="NanumSquareOTF" />
 
 

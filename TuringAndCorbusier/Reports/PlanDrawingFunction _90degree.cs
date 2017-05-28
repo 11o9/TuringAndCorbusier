@@ -319,7 +319,6 @@ namespace TuringAndCorbusier
                         line.StrokeThickness = strokeThickness;
 
                         UnitPlanCanvas.Children.Add(line);
-
                     }
                 }
                 else
