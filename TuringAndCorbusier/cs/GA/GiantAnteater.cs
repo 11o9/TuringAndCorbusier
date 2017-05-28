@@ -356,6 +356,7 @@ namespace TuringAndCorbusier
             for (i = 0; i < gene.Count(); i++)
             {
                 Apartment tempOutput = ag.generator(plot, gene[i], target);
+
                 grossAreaRatio.Add(tempOutput.GetGrossAreaRatio());
                 //targetAccuracy.Add(tempOutput.GetTargetAccuracy());
                 parkinglotRatio.Add(tempOutput.GetParkingScore());

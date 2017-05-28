@@ -524,6 +524,7 @@ namespace TuringAndCorbusier
             //aptCurves.AddRange(outputToPreview.drawEachHouse());
             //aptCurves.AddRange(outputToPreview.drawCommercialArea());
             //aptCurves.AddRange(outputToPreview.drawPublicFacilities());
+
             List<Curve> aptCurves = outputToPreview.drawEachHouse();
             aptCurves.AddRange(outputToPreview.drawEachCore());
             aptCurves.AddRange(outputToPreview.AptLines);

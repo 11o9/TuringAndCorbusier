@@ -150,7 +150,7 @@ namespace TuringAndCorbusier
                 List<Curve> obstacles = core[0].Select(n => n.DrawOutline(width)).ToList();
                 for (int j = 0; j < obstacles.Count; j++)
                 {
-                    obstacles[j].Translate(core[0][j].YDirection * (core[0][j].CoreType.GetDepth() - width) / 2);
+                    obstacles[j].Translate(core[0][j].YDirection * (core[0][j].Depth - width) / 2);
                 }
                 if (i == 1)
                 {

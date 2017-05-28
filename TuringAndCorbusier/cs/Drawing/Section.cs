@@ -51,7 +51,7 @@ namespace TuringAndCorbusier
                 Core tempCoreProperty = cores[index[i]][0];
 
                 Point3d tempCoreStart = tempCoreProperty.Origin;
-                Point3d tempCoreEnd = tempCoreProperty.Origin + tempCoreProperty.YDirection * tempCoreProperty.CoreType.GetDepth();
+                Point3d tempCoreEnd = tempCoreProperty.Origin + tempCoreProperty.YDirection * tempCoreProperty.Depth;
 
                 double tempStartParam; double tempEndParam;
 

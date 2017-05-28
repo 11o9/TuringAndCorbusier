@@ -238,14 +238,17 @@ namespace TuringAndCorbusier
                     var front = output.Household.Last()[i][j].LightingEdge[0];
                     lightingEdgeFront.Add(front);
 
-                    var back = output.Household.Last()[i][j].LightingEdge[1];
-                    lightingEdgeBack.Add(back);
+                    if (output.Household.Last()[i][j].LightingEdge.Count > 1)
+                    {
+                        var back = output.Household.Last()[i][j].LightingEdge[1];
+                        lightingEdgeBack.Add(back);
+                    }
                 }
             }
 
 
 
-            if (lightingEdgeFront.Count == 0 || lightingEdgeBack.Count == 0)
+            if (lightingEdgeFront.Count == 0)
                 return new List<Curve>();
 
             double height = output.Household.Count * Consts.FloorHeight;
@@ -258,14 +261,16 @@ namespace TuringAndCorbusier
             frontv.Rotate(rotateAngle, Vector3d.ZAxis);
             frontv.Unitize();
 
-            foreach (var edge in lightingEdgeFront)
+            for (int i = 0; i < lightingEdgeFront.Count; i++)
             {
+                Line edge = lightingEdgeFront[i];
                 Line edge2 = new Line(edge.From + frontv * distance, edge.To + frontv * distance);
                 result.Add(new PolylineCurve(new Point3d[] { edge.From, edge.To, edge2.To, edge2.From, edge.From }));
             }
 
-            foreach (var edge in lightingEdgeBack)
+            for (int i = 0; i < lightingEdgeBack.Count; i++)
             {
+                Line edge = lightingEdgeBack[i];
                 Line edge2 = new Line(edge.From + -frontv * distance, edge.To + -frontv * distance);
                 result.Add(new PolylineCurve(new Point3d[] { edge.From, edge.To, edge2.To, edge2.From, edge.From }));
             }
@@ -1391,7 +1396,7 @@ namespace TuringAndCorbusier
                                 Point3d minpoint = Point3d.Unset;
                                 foreach (var cps in tempBuildingcps)
                                 {
-                                    var testpoint = cps.Origin + cps.XDirection * cps.CoreType.GetWidth() / 2 + cps.YDirection * cps.CoreType.GetDepth() / 2 + Vector3d.ZAxis * hhps.EntrancePoint.Z;
+                                    var testpoint = cps.Origin + cps.XDirection * cps.Width / 2 + cps.YDirection * cps.Depth / 2 + Vector3d.ZAxis * hhps.EntrancePoint.Z;
                                     var distance = testpoint.DistanceTo(hhps.EntrancePoint);
                                     if (distance < mindistance)
                                     {
@@ -1838,9 +1843,10 @@ namespace TuringAndCorbusier
 
                         for (int i = 0; i < tempRemoveCorePropertyIndex.Count(); i++)
                         {
-                            Core tempCore = core[tempApartmentIndex][tempRemoveCorePropertyIndex[i]];
+                            Core tempCore = new Core(core[tempApartmentIndex][tempRemoveCorePropertyIndex[i]]);
+                            tempCore.Stories = tempCore.Stories - 1;
 
-                            core[tempApartmentIndex][tempRemoveCorePropertyIndex[i]] = new Core(tempCore.Origin, tempCore.XDirection, tempCore.YDirection, tempCore.CoreType, tempCore.Stories - 1, tempCore.CoreInterpenetration);
+                            core[tempApartmentIndex][tempRemoveCorePropertyIndex[i]] = tempCore;
 
                             if (core[tempApartmentIndex][tempRemoveCorePropertyIndex[i]].Stories == 0) ////////////////////////////////////////////////////////////
                             {

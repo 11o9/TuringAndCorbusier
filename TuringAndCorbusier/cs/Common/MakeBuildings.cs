@@ -54,7 +54,7 @@ namespace TuringAndCorbusier
 
             List<Brep> wins = new List<Brep>();
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < hhp.LightingEdge.Count; i++)
             {
                 //Rhino.RhinoDoc.ActiveDoc.Objects.Add(hhp.LightingEdge[i].ToNurbsCurve());
                 //var c = hhp.LightingEdge[i].ToNurbsCurve().Trim(CurveEnd.Both, 300);
@@ -122,9 +122,6 @@ namespace TuringAndCorbusier
 
                 Curve pathCurve = new LineCurve(Point3d.Origin, new Point3d(windowNormal * (-windowDepth + 100)));
                 wins.Add(Brep.JoinBreps(Brep.CreateFromLoft(tempLoftBase, Point3d.Unset, Point3d.Unset, LoftType.Normal, false), 0)[0]);
-
-
-
             }
 
 
@@ -148,8 +145,8 @@ namespace TuringAndCorbusier
             double height = hhp.Stories == 0 ? Consts.PilotiHeight : Consts.FloorHeight;
             Vector3d x = hhp.XDirection;
             Vector3d y = hhp.YDirection;
-            double width = hhp.CoreType.GetWidth();
-            double depth = hhp.CoreType.GetDepth();
+            double width = hhp.Width;
+            double depth = hhp.Depth;
 
             PolylineCurve plc = new PolylineCurve(new Point3d[] { hhp.Origin, hhp.Origin + x * width, hhp.Origin + x * width + y * depth, hhp.Origin + y * depth, hhp.Origin });
 

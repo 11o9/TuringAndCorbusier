@@ -1209,9 +1209,9 @@ namespace TuringAndCorbusier
         private static Curve GetCoreBoundary(Core core)
         {
             Point3d firstPoint = core.Origin - core.YDirection * Consts.exWallThickness - core.XDirection * Consts.exWallThickness;
-            Point3d secondPoint = firstPoint + core.XDirection * (core.CoreType.GetWidth() + 2 * Consts.exWallThickness);
-            Point3d thirdPoint = secondPoint + core.YDirection * (core.CoreType.GetDepth() + 2 * Consts.exWallThickness);
-            Point3d fourthPoint = firstPoint + core.YDirection * (core.CoreType.GetDepth() + 2 * Consts.exWallThickness);
+            Point3d secondPoint = firstPoint + core.XDirection * (core.Width + 2 * Consts.exWallThickness);
+            Point3d thirdPoint = secondPoint + core.YDirection * (core.Depth + 2 * Consts.exWallThickness);
+            Point3d fourthPoint = firstPoint + core.YDirection * (core.Depth + 2 * Consts.exWallThickness);
 
             Point3d[] pointSet = { core.Origin, secondPoint, thirdPoint, fourthPoint, core.Origin };
 
@@ -1357,14 +1357,16 @@ namespace TuringAndCorbusier
                         if (getAngle(newXDirection, newYDirection) != Math.PI * 0.5)
                         {
                             newYDirection.Reverse();
-                            newOrigin.Transform(Transform.Translation(tempCore.YDirection * tempCore.CoreType.GetDepth()));
+                            newOrigin.Transform(Transform.Translation(tempCore.YDirection * tempCore.Depth));
                             tempIfSomethingIsChanged = true;
                         }
 
                         if (tempIfSomethingIsChanged == true)
                         {
-                            baseCore = new Core(newOrigin, newXDirection, newYDirection, tempCore.CoreType, tempCore.Stories, tempCore.CoreInterpenetration);
-                            output[i].Add(baseCore);
+                            baseCore = new Core(tempCore);
+                            baseCore.Origin = newOrigin;
+                            baseCore.XDirection = newXDirection;
+                            baseCore.YDirection = newYDirection;
                             isBaseAllocated = true;
                         }
                         else
@@ -1387,20 +1389,24 @@ namespace TuringAndCorbusier
                         if (baseCore.XDirection.IsParallelTo(tempCore.XDirection) == -1)
                         {
                             newXDirection.Reverse();
-                            newOrigin.Transform(Transform.Translation(tempCore.XDirection * tempCore.CoreType.GetWidth()));
+                            newOrigin.Transform(Transform.Translation(tempCore.XDirection * tempCore.Width));
                             tempIfSomethingIsChanged = true;
                         }
 
                         if (baseCore.YDirection.IsParallelTo(tempCore.YDirection) == -1)
                         {
                             newYDirection.Reverse();
-                            newOrigin.Transform(Transform.Translation(tempCore.YDirection * tempCore.CoreType.GetDepth()));
+                            newOrigin.Transform(Transform.Translation(tempCore.YDirection * tempCore.Depth));
                             tempIfSomethingIsChanged = true;
                         }
 
                         if (tempIfSomethingIsChanged)
                         {
-                            output[i].Add(new Core(newOrigin, newXDirection, newYDirection, tempCore.CoreType, tempCore.Stories, tempCore.CoreInterpenetration));
+                            Core changedCore = new Core(tempCore);
+                            baseCore.Origin = newOrigin;
+                            baseCore.XDirection = newXDirection;
+                            baseCore.YDirection = newYDirection;
+                            output[i].Add(changedCore);
                         }
                         else
                         {
@@ -1481,7 +1487,7 @@ namespace TuringAndCorbusier
                     {
                         unExtendedOutput.Add(new LineSD(cores[i][j].Origin, cores[i][j].XDirection / cores[i][j].XDirection.Length));
                         Yvector.Add(cores[i][j].YDirection);
-                        coreDepth = cores[i][j].CoreType.GetDepth();
+                        coreDepth = cores[i][j].Depth;
                     }
                     else if (cores[i][j] != null)
                     {

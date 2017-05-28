@@ -91,29 +91,6 @@ namespace TuringAndCorbusier
             //////////  maximum rectangle  //////////
             /////////////////////////////////////////
 
-            //Polyline debug = regulationBoundaryMaker(boundary, regulationHigh, plot, angleRadian);
-            //Curve[] north = regulationHigh.byLightingCurve(plot, angleRadian);
-            //for (int i = 0; i < north.Length; i++)
-            //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(north[i], new Rhino.DocObjects.ObjectAttributes()
-            //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Red });
-
-            //Curve[] surr = regulationHigh.byLightingCurve(plot, angleRadian + Math.PI / 2);
-            //for (int i = 0; i < surr.Length; i++)
-            //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(surr[i], new Rhino.DocObjects.ObjectAttributes()
-            //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Gold });
-
-            //Curve[] surr2 = regulationHigh.byLightingCurve(plot, angleRadian);
-            //for (int i = 0; i < surr2.Length; i++)
-            //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(surr2[i], new Rhino.DocObjects.ObjectAttributes()
-            //    { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Gold });
-
-            //Curve roadcenter = regulationHigh.RoadCenterLines(plot);
-            //Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(roadcenter, new Rhino.DocObjects.ObjectAttributes()
-            //{ ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Green });
-
-            //if (debug.Count != 0)
-            //    Rhino.RhinoDoc.ActiveDoc.Objects.Add(debug.ToNurbsCurve());
-
             bool valid;
             Rectangle3d outlineRect = maxInnerRect(boundary, regulationHigh, plot, width, randomCoreType, out valid);
             if (!valid)
@@ -121,6 +98,7 @@ namespace TuringAndCorbusier
                 isvalid = false;
                 return new Apartment(plot);
             }
+
             //create outline curve
             Curve outlineCurve = outlineRect.ToNurbsCurve();
             if ((int)outlineCurve.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
@@ -163,9 +141,6 @@ namespace TuringAndCorbusier
                 }
             }
 
-            //법규 : 최소 인동거리
-            bool WWregBool = regulationHigh.DistanceLL + 2 * randomCoreType.GetWidth() + width < Math.Min(lines[0].GetLength(), lines[1].GetLength());
-
             ////////////////////////////////////////
             //////////  apt distribution  //////////
             ////////////////////////////////////////
@@ -178,13 +153,18 @@ namespace TuringAndCorbusier
             //////////  outputs  //////////
             ///////////////////////////////
 
-            List<List<Core>> cores = MakeCores(parameterSet, inlineCurve, WWregBool);
+            //set right coreType
+            bool isSatisfingWW = regulationHigh.DistanceLL + 2 * randomCoreType.GetWidth() + width < Math.Min(lines[0].GetLength(), lines[1].GetLength());
+            bool isSquareCoreAvailable = width*2 +regulationHigh.DistanceLW + CoreType.Folded.GetDepth() < Math.Min(lines[0].GetLength(), lines[1].GetLength());
+            if (!isSquareCoreAvailable)
+                randomCoreType = CoreType.CourtShortEdge;
+
+   
+            //Draw cores and households
+            List<List<Core>> cores = MakeCores(parameterSet, inlineCurve, isSatisfingWW);
             List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, centerLinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
-
-
-
+           
             //복도면적..?
-
             double eachfloorCorridorArea = inlineCurve.GetLength() * Consts.corridorWidth - (Consts.corridorWidth * Consts.corridorWidth) * 4;
             double corridorAreaSum = eachfloorCorridorArea * storiesHigh;
 
@@ -206,95 +186,89 @@ namespace TuringAndCorbusier
             //################################################################################################
             if (parameterSet.setback)
             {
+                //최상층 외곽선 후퇴옵션 사용하는 경우 최상층 조정...?
+                //용적 제대로 나올지 미지수
 
-                if (households.Count == 0 || cores.Count <= 3)
-                { }
-                else
+                List<Household> topHouses = new List<Household>();
+                households.Last().ToList().ForEach(n => topHouses.AddRange(n));
+
+                List<Core> topCores = cores.Last().ToList();
+
+                regulationHigh.UnFake();
+                Curve[] topNorth = regulationHigh.fromNorthCurve(plot);
+
+                //일조사선 걸리는 코어들 제거, 연결된 house 제거
+                List<Curve> topCoreOutlines = topCores.Select(n => n.DrawOutline()).ToList();
+                topCoreOutlines.ForEach(n => n.Translate(Vector3d.ZAxis * -n.PointAtStart.Z));
+                List<bool> remove = new List<bool>();
+                topCoreOutlines.ForEach(n => remove.Add(false));
+
+                for (int i = 0; i < topNorth.Length; i++)
                 {
-                    //최상층 외곽선 후퇴옵션 사용하는 경우 최상층 조정...?
-                    //용적 제대로 나올지 미지수
-
-                    List<Household> topHouses = new List<Household>();
-                    households.Last().ToList().ForEach(n => topHouses.AddRange(n));
-
-                    List<Core> topCores = cores.Last().ToList();
-
-                    regulationHigh.UnFake();
-                    Curve[] topNorth = regulationHigh.fromNorthCurve(plot);
-
-                    //일조사선 걸리는 코어들 제거, 연결된 house 제거
-                    List<Curve> topCoreOutlines = topCores.Select(n => n.DrawOutline()).ToList();
-                    topCoreOutlines.ForEach(n => n.Translate(Vector3d.ZAxis * -n.PointAtStart.Z));
-                    List<bool> remove = new List<bool>();
-                    topCoreOutlines.ForEach(n => remove.Add(false));
-
-                    for (int i = 0; i < topNorth.Length; i++)
+                    Curve tempNorth = topNorth[i];
+                    for (int j = 0; j < topCoreOutlines.Count; j++)
                     {
-                        Curve tempNorth = topNorth[i];
-                        for (int j = 0; j < topCoreOutlines.Count; j++)
-                        {
-                            if (remove[j])
-                                continue;
-                            var collision = Curve.PlanarCurveCollision(tempNorth, topCoreOutlines[j], Plane.WorldXY, 0);
-                            if (collision)
-                                remove[j] = true;
-                        }
+                        if (remove[j])
+                            continue;
+                        var collision = Curve.PlanarCurveCollision(tempNorth, topCoreOutlines[j], Plane.WorldXY, 0);
+                        if (collision)
+                            remove[j] = true;
                     }
+                }
 
-                    for (int i = remove.Count - 1; i >= 0; i--)
-                    {
-                        if (remove[i])
-                        {
-                            foreach (var hh in households.Last())
-                            {
-                                List<int> toRemove = new List<int>();
-                                foreach (var h in hh)
-                                {
-                                    Curve outline = h.GetOutline();
-                                    Curve coreoutline = cores[cores.Count - 2][i].DrawOutline();
-                                    var col = Curve.PlanarCurveCollision(outline, coreoutline, Plane.WorldXY, 0);
-                                    if (col)
-                                    {
-                                        toRemove.Add(hh.IndexOf(h));
-                                    }
-                                }
-
-                                for (int j = toRemove.Count - 1; j >= 0; j--)
-                                {
-                                    hh.RemoveAt(toRemove[j]);
-                                }
-                            }
-                            cores.Last().RemoveAt(i);
-                            //cpss[cpss.Count - 2].RemoveAt(i);
-                        }
-                    }
-
-                    Curve[] northHigh = regulationHigh.fromNorthCurve(plot);
-                    Curve[] surroundingsHigh = regulationHigh.fromSurroundingsCurve(plot);
-                    Curve[] lightingHigh = regulationHigh.byLightingCurve(plot, angleRadian);
-                    Curve[] wholeRegulationHigh = CommonFunc.JoinRegulations(northHigh, surroundingsHigh, lightingHigh);
-
-                    if (wholeRegulationHigh.Length == 1)
+                for (int i = remove.Count - 1; i >= 0; i--)
+                {
+                    if (remove[i])
                     {
                         foreach (var hh in households.Last())
                         {
-                            List<int> removeIndex = new List<int>();
+                            List<int> toRemove = new List<int>();
                             foreach (var h in hh)
                             {
-                                var contractResult = h.Contract(wholeRegulationHigh[0]);
-                                if (!contractResult)
-                                    removeIndex.Add(hh.IndexOf(h));
+                                Curve outline = h.GetOutline();
+                                Curve coreoutline = cores[cores.Count - 2][i].DrawOutline();
+                                var col = Curve.PlanarCurveCollision(outline, coreoutline, Plane.WorldXY, 0);
+                                if (col)
+                                {
+                                    toRemove.Add(hh.IndexOf(h));
+                                }
                             }
 
-                            for (int i = removeIndex.Count - 1; i >= 0; i--)
+                            for (int j = toRemove.Count - 1; j >= 0; j--)
                             {
-                                hh.RemoveAt(removeIndex[i]);
+                                hh.RemoveAt(toRemove[j]);
                             }
                         }
-
-                        if (households.Last().Count == 0)
-                            households.RemoveAt(households.Count - 1);
+                        cores.Last().RemoveAt(i);
+                        //cpss[cpss.Count - 2].RemoveAt(i);
                     }
+                }
+
+                Curve[] northHigh = regulationHigh.fromNorthCurve(plot);
+                Curve[] surroundingsHigh = regulationHigh.fromSurroundingsCurve(plot);
+                Curve[] lightingHigh = regulationHigh.byLightingCurve(plot, angleRadian);
+                Curve[] wholeRegulationHigh = CommonFunc.JoinRegulations(northHigh, surroundingsHigh, lightingHigh);
+
+                if (wholeRegulationHigh.Length == 1)
+                {
+                    foreach (var hh in households.Last())
+                    {
+                        List<int> removeIndex = new List<int>();
+                        foreach (var h in hh)
+                        {
+                            var contractResult = h.Contract(wholeRegulationHigh[0]);
+                            if (!contractResult)
+                                removeIndex.Add(hh.IndexOf(h));
+                        }
+
+                        for (int i = removeIndex.Count - 1; i >= 0; i--)
+                        {
+                            hh.RemoveAt(removeIndex[i]);
+                        }
+                    }
+
+                    if (households.Last().Count == 0)
+                        households.RemoveAt(households.Count - 1);
                 }
             }
             //################################################################################################
@@ -306,7 +280,6 @@ namespace TuringAndCorbusier
             List<List<Curve>> buildingOutlines = buildingOutlineMakerAG3(outlinePolyline, width);
 
             ////////////////////////////////////////////////////////////////////////////////////////
-
             #region parking
             //parking lot
             ParkingModule pm = new ParkingModule();
@@ -314,7 +287,7 @@ namespace TuringAndCorbusier
             //1.setups for parking
             #region setup
             //parking curves setting
-            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY, cores[0][0].CoreType.GetDepth() / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY, cores[0][0].Depth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
             Curve[] parkingLineSegments = parkingLine.DuplicateSegments();
             Curve[] shortSegments = parkingLineSegments.OrderBy(n => n.GetLength()).Take(2).ToArray();
             //세배 길이의 라인으로
@@ -333,7 +306,7 @@ namespace TuringAndCorbusier
             List<Curve> obstacles = cores[0].Select(n => n.DrawOutline(width)).ToList();
             for (int i = 0; i < obstacles.Count; i++)
             {
-                obstacles[i].Translate(cores[0][i].YDirection * (cores[0][i].CoreType.GetDepth() - width) / 2);
+                obstacles[i].Translate(cores[0][i].YDirection * (cores[0][i].Depth - width) / 2);
             }
 
             //distance setting
@@ -342,8 +315,7 @@ namespace TuringAndCorbusier
             //coredepth
             double coreDepth = randomCoreType.GetDepth();
 
-            #endregion  
-
+            #endregion
             //p3 parking setting
             pm.ParkingLines = parkingCurves;
             pm.Obstacles = obstacles;
@@ -381,11 +353,12 @@ namespace TuringAndCorbusier
         }
 
         #region New Apartment Generating Methods
-        private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve, bool WWregBool)
+        private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve, bool isSatisfingWW)
         {
             //wwregbool 잠시 비활성화
-            WWregBool = false;
+            isSatisfingWW = false;
             double pilotiHeight = Consts.PilotiHeight;
+            
             //#######################################################################################################################
             if (parameterSet.using1F)
             {
@@ -393,24 +366,40 @@ namespace TuringAndCorbusier
                 pilotiHeight = 0;
             }
             //#######################################################################################################################
+            
             //initial settings
             Polyline inlinePolyline;
             inlineCurve.TryGetPolyline(out inlinePolyline);
             Curve[] lines = inlineCurve.DuplicateSegments();
+
+            //reverse Curve orientation & set index0 shortEdge
             if (lines[0].GetLength() > lines[1].GetLength())
             {
-                Array.Reverse(lines);
+                lines.Reverse();
                 for (int i = 0; i < lines.Length; i++)
                 {
                     lines[i].Reverse();
                 }
             }
 
+            Curve minEdge = lines[0];
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
             double width = parameters[2];
             double coreWidth = randomCoreType.GetWidth();
             double coreDepth = randomCoreType.GetDepth();
+            bool isShortEdgeOver16 = false;
+            if (randomCoreType == CoreType.CourtShortEdge)
+            {
+                coreWidth = minEdge.GetLength();
+                isSatisfingWW = false;
+                if (minEdge.GetLength() > 16000)
+                {
+                    isShortEdgeOver16 = true;
+                    coreWidth = CoreType.CourtShortEdge.GetWidth();
+                }
+            }
+
 
             Vector3d courtX = new Vector3d(lines[0].PointAtEnd - lines[0].PointAtStart);
             Vector3d courtY = new Vector3d(lines[3].PointAtStart - lines[3].PointAtEnd);
@@ -423,10 +412,13 @@ namespace TuringAndCorbusier
 
             //Draw groundFloor cores
             //1
-            coreOrigins.Add(lines[0].PointAtStart);
+            if(!isShortEdgeOver16)
+                coreOrigins.Add(lines[0].PointAtStart);
+            else
+                coreOrigins.Add((lines[0].PointAtStart + lines[0].PointAtEnd) / 2 - courtX * coreWidth);
             coreXVectors.Add(Vector3d.Multiply(courtX, 1));
             coreYVectors.Add(Vector3d.Multiply(courtY, 1));
-            if (WWregBool)
+            if (isSatisfingWW)
             {
                 //2
                 coreOrigins.Add(lines[1].PointAtStart);
@@ -434,10 +426,13 @@ namespace TuringAndCorbusier
                 coreYVectors.Add(Vector3d.Multiply(courtY, 1));
             }
             //3
-            coreOrigins.Add(lines[2].PointAtStart);
+            if (!isShortEdgeOver16)
+                coreOrigins.Add(lines[2].PointAtStart);
+            else
+                coreOrigins.Add((lines[2].PointAtStart + lines[0].PointAtEnd) / 2 - courtX * coreWidth);
             coreXVectors.Add(Vector3d.Multiply(courtX, -1));
             coreYVectors.Add(Vector3d.Multiply(courtY, -1));
-            if (WWregBool)
+            if (isSatisfingWW)
             {
                 //4
                 coreOrigins.Add(lines[3].PointAtStart);
@@ -445,8 +440,8 @@ namespace TuringAndCorbusier
                 coreYVectors.Add(Vector3d.Multiply(courtY, -1));
             }
 
-            //stack
-            List<List<Core>> outputCores = new List<List<Core>>();
+                //stack
+                List<List<Core>> outputCores = new List<List<Core>>();
 
             for (int i = 0; i < storiesHigh + 2; i++)
             {
@@ -459,9 +454,11 @@ namespace TuringAndCorbusier
 
                 for (int j = 0; j < coreOrigins.Count; j++)
                 {
-                    Core oneCore = new Core(coreOrigins[j], coreXVectors[j], coreYVectors[j], randomCoreType, storiesHigh, randomCoreType.GetDepth() - 0);
+                    Core oneCore = new Core(coreOrigins[j], coreXVectors[j], coreYVectors[j], randomCoreType, storiesHigh, coreDepth);
                     oneCore.Origin = oneCore.Origin + Vector3d.ZAxis * tempStoryHeight;
                     oneCore.Stories = i;
+                    oneCore.Width = coreWidth;
+                    oneCore.Depth = coreDepth;
 
                     //임시 면적
                     oneCore.Area = coreWidth * coreDepth;
@@ -485,6 +482,7 @@ namespace TuringAndCorbusier
                 pilotiHeight = 0;
             }
             //#######################################################################################################################
+
             //initial settings
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
@@ -492,6 +490,11 @@ namespace TuringAndCorbusier
             double coreWidth = randomCoreType.GetWidth();
             double coreDepth = randomCoreType.GetDepth();
             bool isCorner = false;
+
+            bool isShortEdgeCore = randomCoreType == CoreType.CourtShortEdge;
+            bool isOnShortEdge = false;
+            if (lines[0].GetLength() < lines[1].GetLength())
+                isOnShortEdge = true;
 
             List<double> minCornerCheck = new List<double>();
             int entranceLength = 2000;
@@ -556,6 +559,7 @@ namespace TuringAndCorbusier
                     Point3d winPt4 = winPt3;
                     winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xaH)));
                     ////////그런데, 복도 방향도 채광창 방향이라고 할 수 있을까?
+                    if(isShortEdgeCore && !isOnShortEdge)
                     windowsH.Add(new Line(winPt1, winPt2));
                     ////////
                     windowsH.Add(new Line(winPt3, winPt4));
@@ -573,6 +577,11 @@ namespace TuringAndCorbusier
                 }
                 else //if is corner
                 {
+                    if (isOnShortEdge)
+                        isOnShortEdge = false;
+                    else
+                        isOnShortEdge = true;
+
                     Point3d checkP = lines[(int)(mappedVals[i] - 0.01)].PointAtEnd;
                     Point3d sOri = centerLine.PointAt(mappedVals[i]);
                     Point3d eOri = centerLine.PointAt(mappedVals[(mappedVals.Count + i + 1) % mappedVals.Count]);
@@ -964,7 +973,7 @@ namespace TuringAndCorbusier
                         {
                             double widthTemp = widthFinder(boundaryClone, bestArea, ratios[k], points[j], minSearchWidth, maxSearchWidth, binaryIterNum);
 
-                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + Consts.corridorWidth + core.GetDepth() + regulationHigh.DistanceLW < Math.Min(widthTemp, widthTemp / ratios[k]))
+                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + Math.Max(CoreType.CourtShortEdge.GetWidth(),regulationHigh.DistanceLL)< Math.Min(widthTemp, widthTemp / ratios[k]))
                             {
                                 double t = aptWidth + Consts.corridorWidth;
                                 double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
@@ -1016,13 +1025,10 @@ namespace TuringAndCorbusier
                         if (minSearchWidth < maxSearchWidth)
                         {
                             double widthTemp = widthFinder(boundaryClone, bestArea, ratios[k], points[j], minSearchWidth, maxSearchWidth, binaryIterNum);
-                            //Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(rectMaker(angles[i], points[j], ratios[k], widthTemp).ToNurbsCurve());
-                            double lw = regulationHigh.DistanceLW;
-                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + core.GetDepth() + lw < Math.Min(widthTemp, widthTemp / ratios[k]))
+                            //Rhino.RhinoDoc.ActiveDoc.Objectrs.AddCurve(rectMaker(angles[i], points[j], ratios[k], widthTemp).ToNurbsCurve());
+                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + Math.Max(CoreType.CourtShortEdge.GetWidth(), regulationHigh.DistanceLL) < Math.Min(widthTemp, widthTemp / ratios[k]))
                             //if(true)
                             {
-                            
-
                                 double t = aptWidth + Consts.corridorWidth;
                                 double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
                                 if (area / CommonFunc.getArea(plot.Boundary) < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage / 100)

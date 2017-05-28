@@ -1660,16 +1660,6 @@ namespace TuringAndCorbusier
         private string coreType;
 
         //Method, 메소드
-
-        public static CoreType GerRandomCoreType()
-        {
-            Random myRandom = new Random();
-
-            string[] coreTypeString = { "Horizontal", "Parallel", "Vertical", "Folded", "Vertical_AG1" };
-
-            return new CoreType(coreTypeString[myRandom.Next(0, coreTypeString.Length)]);
-        }
-
         public double GetWidth()
         {
             if (this.coreType == CoreType.Horizontal.ToString())
@@ -1682,6 +1672,8 @@ namespace TuringAndCorbusier
                 return 6060;
             else if (this.coreType == CoreType.Vertical_AG1.ToString())
                 return 2500;
+            else if (this.coreType == CoreType.CourtShortEdge.ToString())
+                return 7600;
             else
                 return 0;
 
@@ -1699,6 +1691,8 @@ namespace TuringAndCorbusier
                 return 5800;
             else if (this.coreType == CoreType.Vertical_AG1.ToString())
                 return 7920;
+            else if (this.coreType == CoreType.CourtShortEdge.ToString())
+                return 4200;
             else
                 return 0;
         }
@@ -1716,6 +1710,7 @@ namespace TuringAndCorbusier
         public static CoreType Vertical { get { return new CoreType("Vertical"); } }
         public static CoreType Folded { get { return new CoreType("Folded"); } }
         public static CoreType Vertical_AG1 { get { return new CoreType("Vertical_AG1"); } }
+        public static CoreType CourtShortEdge { get { return new CoreType("CourtShortEdge"); } }
     }
 
     public class Core
@@ -1736,6 +1731,8 @@ namespace TuringAndCorbusier
             this.coreType = anotherCoreProperty.coreType;
             this.Stories = anotherCoreProperty.Stories;
             this.Area = anotherCoreProperty.Area;
+            this.width = anotherCoreProperty.width;
+            this.depth = anotherCoreProperty.depth;
         }
 
         public Core(Point3d origin, Vector3d xDirection, Vector3d yDirection, CoreType coreType, double stories, double coreInterpenetration)
@@ -1744,6 +1741,8 @@ namespace TuringAndCorbusier
             this.xDirection = xDirection;
             this.yDirection = yDirection;
             this.coreType = coreType;
+            this.width = coreType.GetWidth();
+            this.depth = coreType.GetDepth();
             this.Stories = stories;
 
         }
@@ -1754,6 +1753,8 @@ namespace TuringAndCorbusier
         private Vector3d xDirection;
         private Vector3d yDirection;
         private CoreType coreType;
+        private double width;
+        private double depth;
 
         //Method, 메소드
 
@@ -1783,8 +1784,6 @@ namespace TuringAndCorbusier
             Point3d pt = new Point3d(Origin);
             Vector3d x = new Vector3d(XDirection);
             Vector3d y = new Vector3d(YDirection);
-            double width = CoreType.GetWidth();
-            double depth = CoreType.GetDepth();
 
             outlinePoints.Add(pt);
             pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
@@ -1808,8 +1807,6 @@ namespace TuringAndCorbusier
             Point3d pt = new Point3d(Origin);
             Vector3d x = new Vector3d(XDirection);
             Vector3d y = new Vector3d(YDirection);
-            double width = CoreType.GetWidth();
-            double depth = CoreType.GetDepth();
 
             outlinePoints.Add(pt);
             pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
@@ -1832,15 +1829,13 @@ namespace TuringAndCorbusier
         {
             List<Point3d> outlinePoints = new List<Point3d>();
 
-
             Point3d pt = new Point3d(Origin);
             Vector3d x = new Vector3d(XDirection);
             Vector3d y = new Vector3d(YDirection);
-            double width = CoreType.GetWidth();
-            double depth = CoreType.GetDepth();
 
-            if (depth < aptWidth)
-                depth = aptWidth;
+            double depthForParking = depth;
+            if (depthForParking < aptWidth)
+                depthForParking = aptWidth;
 
             outlinePoints.Add(pt);
             pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
@@ -1863,6 +1858,8 @@ namespace TuringAndCorbusier
         public Vector3d XDirection { get { return xDirection; } set { xDirection = value; } }
         public Vector3d YDirection { get { return yDirection; } set { yDirection = value; } }
         public CoreType CoreType { get { return coreType; } set { coreType = value; } }
+        public double Width { get { return width; }set { width = value; } }
+        public double Depth { get { return depth; } set { depth = value; } }
         public double Stories { get; set; }
         public double CoreInterpenetration { get; set; }
     }

@@ -119,7 +119,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < cores.Count(); i++)
             {
                 Point3d tempCoreStart = cores[i].Origin;
-                Point3d tempCoreEnd = cores[i].Origin + cores[i].XDirection * cores[i].CoreType.GetWidth();
+                Point3d tempCoreEnd = cores[i].Origin + cores[i].XDirection * cores[i].Width;
 
                 double startDomain; double endDomain;
 

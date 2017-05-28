@@ -259,8 +259,8 @@ namespace TuringAndCorbusier
                     Point3d pt = new Point3d(agOut.Core[i][j].Origin);
                     Vector3d x = new Vector3d(agOut.Core[i][j].XDirection);
                     Vector3d y = new Vector3d(agOut.Core[i][j].YDirection);
-                    double width = agOut.Core[i][j].CoreType.GetWidth();
-                    double depth = agOut.Core[i][j].CoreType.GetDepth();
+                    double width = agOut.Core[i][j].Width;
+                    double depth = agOut.Core[i][j].Depth;
 
                     outlinePoints.Add(pt);
                     pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
@@ -332,8 +332,8 @@ namespace TuringAndCorbusier
                         Point3d pt = new Point3d(agOut.Core[i][j].Origin);
                         Vector3d x = new Vector3d(agOut.Core[i][j].XDirection);
                         Vector3d y = new Vector3d(agOut.Core[i][j].YDirection);
-                        double width = agOut.Core[i][j].CoreType.GetWidth();
-                        double depth = agOut.Core[i][j].CoreType.GetDepth();
+                        double width = agOut.Core[i][j].Width;
+                        double depth = agOut.Core[i][j].Depth;
 
                         pt.Transform(Transform.Translation(Vector3d.Multiply(x, width / 2)));
                         pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
@@ -371,8 +371,8 @@ namespace TuringAndCorbusier
                         Point3d pt = new Point3d(agOut.Core[i][0].Origin);
                         Vector3d x = new Vector3d(agOut.Core[i][0].XDirection);
                         Vector3d y = new Vector3d(agOut.Core[i][0].YDirection);
-                        double width = agOut.Core[i][0].CoreType.GetWidth();
-                        double depth = agOut.Core[i][0].CoreType.GetDepth();
+                        double width = agOut.Core[i][0].Width;
+                        double depth = agOut.Core[i][0].Depth;
 
                         pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
                         pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth / 2)));
@@ -427,8 +427,8 @@ namespace TuringAndCorbusier
 
                 output.Add(dimMaker(side, "ll"));
 
-                double width = agOut.Core[0][0].CoreType.GetWidth();
-                double depth = agOut.Core[0][0].CoreType.GetDepth();
+                double width = agOut.Core[0][0].Width;
+                double depth = agOut.Core[0][0].Depth;
 
                 Curve guide = segs[0].DuplicateCurve();
                 string newGuideStr = "lw";

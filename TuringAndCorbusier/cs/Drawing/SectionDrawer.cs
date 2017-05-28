@@ -246,7 +246,7 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < agOut.Core.Count; i++)
             {
-                temp2.AddRange(u.Select(n => n + agOut.Core[i][0].CoreType.GetDepth()).ToList());
+                temp2.AddRange(u.Select(n => n + agOut.Core[i][0].Depth).ToList());
                 strs.Add(Convert.ToInt32(Math.Round(agOut.Core[i][0].Stories + 1)));
             }
             this.y = temp2;
@@ -2535,7 +2535,7 @@ namespace TuringAndCorbusier
                     {
                         temp.Add(Vector3d.Multiply(agOut.Core[0][j].YDirection, new Vector3d(coreOri - aptClosest)));
                         widthtemp.Add(agOut.ParameterSet.Parameters[2] / 2);
-                        temp2.Add(temp.Last() + agOut.Core[0][j].CoreType.GetDepth());
+                        temp2.Add(temp.Last() + agOut.Core[0][j].Depth);
                         strs.Add(agOut.Household.Count);
                     }
                 }

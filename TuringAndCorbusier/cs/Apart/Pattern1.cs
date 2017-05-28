@@ -347,6 +347,8 @@ namespace TuringAndCorbusier
                         corep.XDirection = -tempBuildingCorridorUnits[0].XDirection;
                         corep.YDirection = tempBuildingCorridorUnits[0].YDirection;
                         corep.CoreType = randomCoreType;
+                        corep.Width = randomCoreType.GetWidth();
+                        corep.Depth = randomCoreType.GetDepth();
 
                         corep.BuildingGroupNum = j;
                         corep.Area = corearea;
@@ -376,6 +378,8 @@ namespace TuringAndCorbusier
                             corep.XDirection = -tempBuildingTowerUnits[k].XDirection;
                             corep.YDirection = tempBuildingTowerUnits[k].YDirection;
                             corep.CoreType = randomCoreType;
+                            corep.Depth = randomCoreType.GetDepth();
+                            corep.Width = randomCoreType.GetWidth();
 
                             corep.BuildingGroupNum = j;
                             corep.Area = corearea;
@@ -643,7 +647,7 @@ namespace TuringAndCorbusier
             List<Curve> obstacles = cpss[0].Select(n => n.DrawOutline(width)).ToList();
             for (int i = 0; i < obstacles.Count; i++)
             {
-                obstacles[i].Translate(cpss[0][i].YDirection * (cpss[0][i].CoreType.GetDepth() - width) / 2);
+                obstacles[i].Translate(cpss[0][i].YDirection * (cpss[0][i].Depth - width) / 2);
             }
             #endregion
 
