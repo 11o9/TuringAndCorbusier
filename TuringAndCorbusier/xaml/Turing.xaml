@@ -206,21 +206,29 @@
         </Button>
 
         <Grid Margin="17,34,19,0" Height="125" VerticalAlignment="Top">
-            <Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
 
-                <ColumnDefinition Width="4*"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
 
-            <Rectangle Fill="#ff606060" Opacity="1" Height="122" VerticalAlignment="Top" Grid.ColumnSpan="3" Margin="-1,2,1,0"/>
+            <UserControl x:Name="GISSlot" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Top" Margin="-1,2,1,0" />
 
-            <TextBlock FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" HorizontalAlignment="Right" Margin="0,13,65,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Text="프로젝트 명" FontSize="10.667" Width="64" />
-            <TextBlock  Text="주소" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,48,65,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" FontSize="10.667" HorizontalAlignment="Right" Width="64" />
-            <TextBlock Text="대지면적" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,83,65,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" FontSize="10.667" HorizontalAlignment="Right" Width="64" />
 
-            <TextBlock x:Name="ProjectName" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="-60,11,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="프로젝트1" FontSize="13.333" Height="20" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" />
-            <TextBlock x:Name="ProjectAddress" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="-60,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="용산구 이태원동 99-6, 2층" Height="20" FontSize="13.333" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"  />
-            <TextBlock x:Name="ProjectArea" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="-60,81,0,0" TextWrapping="Wrap" FontSize="13.333" Text="8000m2" Height="20"  VerticalAlignment="Top" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"  />
+            <TextBlock  Grid.Row="2"  FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" HorizontalAlignment="Right" Margin="0,0,10,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Text="프로젝트 명" FontSize="10.667" Width="64" />
+            <TextBlock  Grid.Row="3"  Text="주소" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,0,10,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" FontSize="10.667" HorizontalAlignment="Right" Width="64" />
+            <TextBlock  Grid.Row="4"  Text="대지면적" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,0,10,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" FontSize="10.667" HorizontalAlignment="Right" Width="64" />
+
+            <TextBlock  Grid.Row="2" Grid.Column="1" x:Name="ProjectName" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="새 프로젝트" FontSize="13.333" Height="20" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" />
+            <TextBlock  Grid.Row="3" Grid.Column="1" x:Name="ProjectAddress" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="" Height="20" FontSize="13.333" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"  />
+            <TextBlock  Grid.Row="4" Grid.Column="1" x:Name="ProjectArea" Foreground="#ffffffff" FontFamily="Noto Sans CJK KR Medium" Margin="0,0,0,0" TextWrapping="Wrap" FontSize="13.333" Text="0m2" Height="20"  VerticalAlignment="Top" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" />
 
 
         </Grid>
@@ -274,7 +282,7 @@
                 <Button x:Name="Btn_Load" Style="{StaticResource MyButtonStyle}" Content="불러오기"  Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Column="0" FontSize="13.333" Click="Btn_Load_Click" />
                 <Button x:Name="Btn_Save" Style="{StaticResource MyButtonStyle}" Content="저장하기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Column="1" FontSize="13.333" Click="Btn_Save_Click" />
             </Grid>
-           
+
             <Button x:Name="Btn_Export3D" Style="{StaticResource MyButtonStyle}" Content="3D모델링 내보내기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="2" FontSize="13.333" Click="Btn_Export3D_Click" />
             <Button x:Name="Btn_ExportReport" Style="{StaticResource MyButtonStyle}" Content="설계 보고서 내보내기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="4" FontSize="13.333" Click="Btn_ExportReport_Click" />
             <Button x:Name="Btn_SendToServer" Style="{StaticResource MyButtonStyle}" Content="서버에 업로드" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="6" FontSize="13.333" Click="Btn_SendToServer_Click" />
@@ -297,7 +305,7 @@
 
 
             </Grid>
-            
+
         </Grid>
         <Button x:Name="TestButton" Content="Button" HorizontalAlignment="Left" Margin="202,10,0,0" VerticalAlignment="Top" Width="75" Click="TestButton_Click" Visibility="Hidden"/>
         <Button x:Name="BirdEye" Content="BirdEye" HorizontalAlignment="Left" Margin="202,6,0,0" VerticalAlignment="Top" Width="75" Click="BirdEye_Click" Visibility="Hidden"/>

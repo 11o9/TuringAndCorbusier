@@ -6,6 +6,14 @@ using Rhino.Display;
 using System.IO;
 using Rhino;
 
+namespace TuringAndCorbusier.Document
+{
+    public class Document
+    {
+
+    }
+}
+
 namespace TuringAndCorbusier
 {
     /// Consts, 고정값들

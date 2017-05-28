@@ -55,7 +55,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GISData">
-      <HintPath>..\..\..\Documents\Visual Studio 2015\Projects\GISData\GISData\bin\Debug\GISData.dll</HintPath>
+      <HintPath>..\..\GISData\GISData\bin\Debug\GISData.dll</HintPath>
     </Reference>
     <Reference Include="Grasshopper">
       <HintPath>..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
@@ -111,6 +111,7 @@
     <Compile Include="cs\NotUsed\CalculateScore.cs" />
     <Compile Include="cs\Apart\UnitDistributor.cs" />
     <Compile Include="cs\Parkings\EddieBrock.cs" />
+    <Compile Include="cs\Server\PiljiDrawer.cs" />
     <Compile Include="cs\Server\ServerConnection.cs" />
     <Compile Include="cs\Server\ServerUI.xaml.cs">
       <DependentUpon>ServerUI.xaml</DependentUpon>

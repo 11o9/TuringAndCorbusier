@@ -19,6 +19,8 @@ namespace TuringAndCorbusier
     /// <summary>
     /// UserControl1.xaml에 대한 상호 작용 논리
     /// </summary>
+    /// 
+
     public partial class Turing : System.Windows.Controls.UserControl
     {
 
@@ -62,56 +64,60 @@ namespace TuringAndCorbusier
 
             Calculate.Click += Btn_SetInputValues;
 
-
-            try
-            {
-                this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
+            GISSlot.Content = new ServerUI();
+    //        try
+    //        {
+    //            this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
                 
-                this.ProjectAddress.Text = CommonFunc.getAddressFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList());
+    //            this.ProjectAddress.Text = CommonFunc.getAddressFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList());
 
-                this.ProjectArea.Text = Math.Round(CommonFunc.GetManualAreaFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList()),2).ToString();
-    }
-            catch (System.Exception)
-            {
-                errorMessage tempError = new errorMessage("서버와 연결할 수 없습니다.");
-            }
+    //            this.ProjectArea.Text = Math.Round(CommonFunc.GetManualAreaFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList()),2).ToString();
+    //}
+    //        catch (System.Exception)
+    //        {
+    //            errorMessage tempError = new errorMessage("서버와 연결할 수 없습니다.");
+    //        }
 
             bool is64 = System.Environment.Is64BitOperatingSystem;
-            string name = "plantype";
-            string dir = "";
-            if (is64)
-            {
-                dir = "C://Program Files (x86)//Boundless//TuringAndCorbusier//DataBase//floorPlanLibrary";
-                RhinoApp.WriteLine("fpldir64" + dir);
-            }
-            else
-            {
-                dir = "C://Program Files//Boundless//TuringAndCorbusier//DataBase//floorPlanLibrary";
-                RhinoApp.WriteLine("fpldir32" + dir);
-            }
+            //string name = "plantype";
+            //string dir = "";
+            //if (is64)
+            //{
+            //    dir = "C://Program Files (x86)//Boundless//TuringAndCorbusier//DataBase//floorPlanLibrary";
+            //    RhinoApp.WriteLine("fpldir64" + dir);
+            //}
+            //else
+            //{
+            //    dir = "C://Program Files//Boundless//TuringAndCorbusier//DataBase//floorPlanLibrary";
+            //    RhinoApp.WriteLine("fpldir32" + dir);
+            //}
 
 
-            string[] allFiles = System.IO.Directory.GetFiles(dir);
+            //string[] allFiles = System.IO.Directory.GetFiles(dir);
 
-            foreach (string file in allFiles)
-            {
-                if (file.Contains(name))
-                {
-                    try
-                    {
-                        FloorPlanLibrary tempFloorPlanLibrary = new FloorPlanLibrary(file);
-                        MainPanel_planLibraries.Add(tempFloorPlanLibrary);
-                    }
-                    catch (System.Exception ex)
-                    {
-                        //MessageBox.Show(ex.ToString());
-                        RhinoApp.WriteLine(ex.Message);
-                    }
-                }
-            }
+            //foreach (string file in allFiles)
+            //{
+            //    if (file.Contains(name))
+            //    {
+            //        try
+            //        {
+            //            FloorPlanLibrary tempFloorPlanLibrary = new FloorPlanLibrary(file);
+            //            MainPanel_planLibraries.Add(tempFloorPlanLibrary);
+            //        }
+            //        catch (System.Exception ex)
+            //        {
+            //            //MessageBox.Show(ex.ToString());
+            //            RhinoApp.WriteLine(ex.Message);
+            //        }
+            //    }
+            //}
 
             TuringAndCorbusierPlugIn.InstanceClass.turing = mainWindow;
+
+
             TuringAndCorbusierPlugIn.InstanceClass.page1Settings = new Datastructure_Settings.Settings_Page1(ProjectName.Text, ProjectAddress.Text, "제 2종 일반 주거지역", double.Parse(ProjectArea.Text.Replace("m2","")), 200, 60, 7);
+
+
             List<System.Guid> dummy = new List<System.Guid>();
             Dictionary<string, string> pathdummy = new Dictionary<string, string>();
             for (int i = 0; i < 10; i++)

@@ -415,14 +415,10 @@ namespace TuringAndCorbusier
             List<List<List<Household>>> hhps = new List<List<List<Household>>>();
             for (int i = 0; i < storiesHigh; i++)
             {
-
-         
                 double tempStoryHeight = pilotiHeight + i * Consts.FloorHeight;
                 Regulation tempStoryReg = new Regulation(storiesHigh, i);
                 Curve[] Reg = wholeRegulationHigh;
 
-                if (Reg.Length == 0)
-                { bool ohno = true; }
                 List<List<Household>> tempfloor = new List<List<Household>>();
 
                 foreach (var xx in Low)
@@ -1184,10 +1180,6 @@ namespace TuringAndCorbusier
                     if (lengthToReduce <= 0.1) //tolerance
                         break;
                 }
-
-                if (lengthToReduce >=0.1)
-                    lengthToReduce = lengthToReduce;
-                 
             }
 
 
