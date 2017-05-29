@@ -43,7 +43,8 @@ namespace TuringAndCorbusier
         {
             double height = Consts.FloorHeight;
             Curve outline = hhp.GetOutline();
-            Polyline outPoly = CurveTools.ToPolyline(outline);            
+            outline.RemoveShortSegments(0.05);
+            Polyline outPoly = CurveTools.ToPolyline(outline);
 
             Brep x = Extrusion.Create(outline, height, true).ToBrep();
 
