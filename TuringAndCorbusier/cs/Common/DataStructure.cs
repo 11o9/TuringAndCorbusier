@@ -2534,7 +2534,7 @@ namespace TuringAndCorbusier
 
         public void Init(double stories)
         {
-            if (stories > TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor) // apartment
+            if (stories >= TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor) // apartment
             {
                 this.distanceFromRoad = 3000;
                 this.distanceFromPlot = 3000;
@@ -2556,6 +2556,8 @@ namespace TuringAndCorbusier
 
             distanceLL = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation;
             distanceByLighting = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting;
+            if (stories >= TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor)
+                distanceByLighting = 0.5; //// 기본?
         }
 
         public Regulation(double stories)
@@ -3259,8 +3261,8 @@ namespace TuringAndCorbusier
         public double DistanceFromPlot { get { return distanceFromPlot; } }
         public double DistanceFromNorth { get { return distanceFromNorth * (height-fakeHeight); } }
         public double DistanceByLighting { get { return distanceByLighting * ((height-fakeHeight) - Consts.PilotiHeight); } }
-        public double DistanceLW { get { return distanceLW * ((height - fakeHeight) - Consts.PilotiHeight); } }
-        public double DistanceLL { get { return distanceLL * ((height - fakeHeight) - Consts.PilotiHeight); } }
+        public double DistanceLW { get { return distanceLW * (height - Consts.PilotiHeight); } }
+        public double DistanceLL { get { return distanceLL * (height - Consts.PilotiHeight); } }
         public double DistanceWW { get { return distanceWW; } }
         public double Lightingk { get { return distanceByLighting; } }
         public BuildingType BuildingType { get; private set; }
@@ -3636,7 +3638,7 @@ namespace TuringAndCorbusier
 
     public class CurveConduit : Rhino.Display.DisplayConduit
     {
-        public string dimension = "";
+        public List<string> dimension = new List<string>();
         public Point3d dimPoint;
         public List<Point3d> debugPoints = new List<Point3d>();
         public List<Point3d> HouseholdOrigins = new List<Point3d>();
@@ -3674,8 +3676,9 @@ namespace TuringAndCorbusier
             foreach (Curve i in CurveToDisplay)
             {
                 e.Display.DrawCurve(i, displayColor);
-                if (dimension != "")
-                    e.Display.DrawDot(i.PointAtNormalizedLength(0.5), dimension);
+                int tempIndex = CurveToDisplay.IndexOf(i);
+                if(dimension.Count > tempIndex)
+                    e.Display.DrawDot(i.PointAtNormalizedLength(0.5), dimension[tempIndex]);
             }
 
             for (int i = 0; i < debugPoints.Count;i++)
