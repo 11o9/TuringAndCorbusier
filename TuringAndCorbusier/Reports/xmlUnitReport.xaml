@@ -9,84 +9,76 @@
          >
 
     <FixedPage  Name="fixedPage" Width="1240" Height="1750">
-        <Canvas  Width="1240" Height="1750">
-            <Grid Name="myGrid">
-                <Canvas>
-                    <Rectangle Fill="White"/>
-                    <TextBlock Text="세대 타입별"  FontSize="35" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="85" Canvas.Top="80" FontFamily="Myriad Pro" FontWeight="Bold"/>
-                    <Rectangle Fill="#FF2F9947" Height="5" Canvas.Left="85" Stroke="#FF2F9947" Canvas.Top="120" Width="475" OpacityMask="#FF2F9947"/>
 
-                    <Rectangle HorizontalAlignment="Left" Fill="#ffececec" StrokeThickness="1" Width="160" Height="520" VerticalAlignment="Top" Canvas.Left="82" Canvas.Top="914"/>
-                    <Rectangle HorizontalAlignment="Left" Fill="#fff5f5f5" StrokeThickness="1" Width="160" Height="520" VerticalAlignment="Top" Canvas.Left="254" Canvas.Top="914"/>
+        <Grid Name="myGrid">
+            <Canvas x:Name="unitPlanCanvas1"  HorizontalAlignment="Left" Height="815" Margin="0,0,-1240,-815" VerticalAlignment="Top" Width="1240">
+                <Rectangle Fill="White"/>
+                <TextBlock Text="Unit type information"  FontSize="35" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="85" Canvas.Top="80" FontFamily="Myriad Pro" FontWeight="Bold"/>
+                <Rectangle Fill="#FF2F9947" Height="5" Canvas.Left="85" Stroke="#FF2F9947" Canvas.Top="120" Width="475" OpacityMask="#FF2F9947"/>
 
-                    <Path Stroke="Black" Data="F1 M 150,290 L 1090,290" StrokeThickness="0.5"  Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,330 L 1090,330" StrokeThickness="0.5"  Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,370 L 1090,370" StrokeThickness="0.5"  Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,410 L 1090,410" StrokeThickness="0.5"  Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,450 L 1090,450" StrokeThickness="0.5"  Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,490 L 1090,490" StrokeThickness="0.5" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,530 L 1090,530" StrokeThickness="0.5" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,570 L 1090,570" StrokeThickness="0.5" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,610 L 1090,610" StrokeThickness="0.5" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,650 L 1090,650" StrokeThickness="0.5" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,690 L 1090,690" StrokeThickness="0.5" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="211" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="253" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="291" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="331.667" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="371" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="409.833" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="451" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="490" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="531" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="570" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="611" Height="75" Stretch="Fill" Width="647" Canvas.Left="508"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="650" Height="75" Stretch="Fill" Width="647" Canvas.Left="505"/>
 
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="2.0" Fill="Black" Canvas.Top="173" Height="75" Stretch="Fill" Width="650" Canvas.Left="505"/>
+                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="2.0" Fill="Black" Canvas.Top="691" Height="75" Stretch="Fill" Width="650" Canvas.Left="505"/>
 
-                    <Rectangle HorizontalAlignment="Left" Fill="White" StrokeThickness="1" Width="13" Height="520" VerticalAlignment="Top" Canvas.Left="241" Canvas.Top="914"/>
-                    <Rectangle HorizontalAlignment="Left" Fill="White" StrokeThickness="1" Width="13" Height="520" VerticalAlignment="Top" Canvas.Left="414" Canvas.Top="914"/>
+                <TextBlock  Text="구분" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="593" Canvas.Top="218" FontFamily="NanumSquareOTF" />
+                <TextBlock Text="세대수" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="576" Canvas.Top="258" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="전용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="559" Canvas.Top="298" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="주거공용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="525" Canvas.Top="338" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="공급면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="559" Canvas.Top="458" FontFamily="NanumSquareOTF" />
+                <TextBlock Text="기타공용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="525" Canvas.Top="498" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="지하주차장면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="508" Canvas.Top="578" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="계약면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="559" Canvas.Top="618" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="발코니" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="576" Canvas.Top="658" FontFamily="NanumSquareOTF" />
+                <TextBlock Text="실사용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="542" Canvas.Top="698" FontFamily="NanumSquareOTF" />
 
-                    <Path Stroke="Black" Data="F1 M 150,250 L 1090,250" StrokeThickness="2" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
-                    <Path Stroke="Black" Data="F1 M 150,770 L 1090,770" StrokeThickness="2" Fill="Black" Canvas.Top="664" Canvas.Left="-68"/>
+                <TextBlock  Text="벽체공용면적" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="675" Canvas.Top="339" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="계단실" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="719" Canvas.Top="379" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="소계" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="733" Canvas.Top="419" FontFamily="NanumSquareOTF" />
+                <TextBlock  Text="(부대복리시설)" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="665" Canvas.Top="499" FontFamily="NanumSquareOTF" />
+                <TextBlock Text="기계/전기실" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="683" Canvas.Top="539" FontFamily="NanumSquareOTF" />
+                <TextBlock x:Name="AreaType"  Text="xx X형" FontSize="18.667" VerticalAlignment="Top" Canvas.Left="818" Canvas.Top="218" FontFamily="NanumSquareOTF" />
+                <TextBlock x:Name="NumberOfThisType" Text="xx세대" FontSize="18.667" VerticalAlignment="Top" Canvas.Left="818" Canvas.Top="258" FontFamily="NanumSquareOTF" />
+                <TextBlock x:Name="exclusiveArea"  Text="지역지구" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="298" />
+                <TextBlock x:Name="wallArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="338" />
+                <TextBlock x:Name="coreArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="378" />
+                <TextBlock x:Name="commonLivingArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="418" />
+                <TextBlock x:Name="providedArea"  Text="건축물용도" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="458" />
+                <TextBlock x:Name="publicFacilityArea"  Text="건축규모/구조" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="498" />
+                <TextBlock x:Name="ServiceArea"  Text="건축면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="538" />
+                <TextBlock x:Name="ParkingLotArea" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="578" />
+                <TextBlock x:Name="ContractArea"  Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="618" />
+                <TextBlock x:Name="balconyArea"  Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="658" />
+                <TextBlock x:Name="usableArea" Text="공사용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="819" Canvas.Top="698" />
 
-                    <TextBlock  Text="구분" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="187" Canvas.Top="924" FontFamily="NanumSquareOTF" />
-                    <TextBlock Text="세대수" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="170" Canvas.Top="964" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="전용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="153" Canvas.Top="1004" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="주거공용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="119" Canvas.Top="1044" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="공급면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="153" Canvas.Top="1164" FontFamily="NanumSquareOTF" />
-                    <TextBlock Text="기타공용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="119" Canvas.Top="1204" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="지하주차장면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="102" Canvas.Top="1284" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="계약면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="153" Canvas.Top="1324" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="발코니" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="170" Canvas.Top="1364" FontFamily="NanumSquareOTF" />
-                    <TextBlock Text="실사용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="136" Canvas.Top="1404" FontFamily="NanumSquareOTF" />
-
-                    <TextBlock  Text="벽체공용면적" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="310" Canvas.Top="1045" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="계단실" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="354" Canvas.Top="1085" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="소계" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="368" Canvas.Top="1125" FontFamily="NanumSquareOTF" />
-                    <TextBlock  Text="(부대복리시설)" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="300" Canvas.Top="1205" FontFamily="NanumSquareOTF" />
-                    <TextBlock Text="기계/전기실" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="318" Canvas.Top="1245" FontFamily="NanumSquareOTF" />
-                    <TextBlock x:Name="AreaType"  Text="xx X형" FontSize="18.667" VerticalAlignment="Top" Canvas.Left="453" Canvas.Top="924" FontFamily="NanumSquareOTF" />
-                    <TextBlock x:Name="NumberOfThisType" Text="xx세대" FontSize="18.667" VerticalAlignment="Top" Canvas.Left="453" Canvas.Top="964" FontFamily="NanumSquareOTF" />
-                    <TextBlock x:Name="exclusiveArea"  Text="지역지구" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1004" />
-                    <TextBlock x:Name="wallArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1044" />
-                    <TextBlock x:Name="coreArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1084" />
-                    <TextBlock x:Name="commonLivingArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1124" />
-                    <TextBlock x:Name="providedArea"  Text="건축물용도" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1164" />
-                    <TextBlock x:Name="publicFacilityArea"  Text="건축규모/구조" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1204" />
-                    <TextBlock x:Name="ServiceArea"  Text="건축면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1244" />
-                    <TextBlock x:Name="ParkingLotArea" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1284" />
-                    <TextBlock x:Name="ContractArea"  Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1324" />
-                    <TextBlock x:Name="balconyArea"  Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1364" />
-                    <TextBlock x:Name="usableArea" Text="공사용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="454" Canvas.Top="1404" />
-
-                    <TextBlock x:Name="exclusiveArea_Py" Text="지역지구" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1004" />
-                    <TextBlock x:Name="wallArea_Py"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1044" />
-                    <TextBlock x:Name="coreArea_Py"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1084" />
-                    <TextBlock x:Name="commonLivingArea_Py"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1124" />
-                    <TextBlock x:Name="providedArea_Py"  Text="건축물용도" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1164" />
-                    <TextBlock x:Name="publicFacilityArea_Py"  Text="건축규모/구조" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1204" />
-                    <TextBlock x:Name="ServiceArea_Py"  Text="건축면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1244" />
-                    <TextBlock x:Name="ParkingLotArea_Py" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1284" />
-                    <TextBlock x:Name="ContractArea_Py" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1324" />
-                    <TextBlock x:Name="balconyArea_Py" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1364" />
-                    <TextBlock x:Name="usableArea_Py" Text="공사용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="692" Canvas.Top="1404" />
-                    <Canvas x:Name="UnitPlanCanvas" Width="1065" Height="655" VerticalAlignment="Top" Canvas.Left="85" Canvas.Top="205" />
-                </Canvas>
+                <TextBlock x:Name="exclusiveArea_Py" Text="지역지구" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="298" />
+                <TextBlock x:Name="wallArea_Py"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="338" />
+                <TextBlock x:Name="coreArea_Py"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="378" />
+                <TextBlock x:Name="commonLivingArea_Py"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="418" />
+                <TextBlock x:Name="providedArea_Py"  Text="건축물용도" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="458" />
+                <TextBlock x:Name="publicFacilityArea_Py"  Text="건축규모/구조" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="498" />
+                <TextBlock x:Name="ServiceArea_Py"  Text="건축면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="538" />
+                <TextBlock x:Name="ParkingLotArea_Py" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="578" />
+                <TextBlock x:Name="ContractArea_Py" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="618" />
+                <TextBlock x:Name="balconyArea_Py" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="658" />
+                <TextBlock x:Name="usableArea_Py" Text="공사용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="698" />
+                <Canvas x:Name="UnitCanvas" Width="395" Height="514" VerticalAlignment="Top" Canvas.Left="85" Canvas.Top="211" />
+            </Canvas>
+            <Canvas x:Name="unitPlanCanvas2"  HorizontalAlignment="Left" Height="815" Margin="0,820,-1240,-1635" VerticalAlignment="Top" Width="1240">
+            </Canvas>
 
 
-            </Grid>
-
-
-        </Canvas>
+        </Grid>
     </FixedPage>
 </UserControl>

@@ -76,39 +76,39 @@ namespace Reports
             return roundedStringExclusiveArea;
         }
         //타입마다 크기색상 지정
-        private System.Windows.Media.SolidColorBrush SetAreaTypeColor(List<double> distinctRoundedExclusiveArea, double actualRoundedExclusiveArea)
-        {
-            System.Windows.Media.SolidColorBrush areaTypeColour = null;
-            //set colors
-            List<System.Windows.Media.SolidColorBrush> colorList = new List<System.Windows.Media.SolidColorBrush>();
-            colorList.Add(System.Windows.Media.Brushes.Aquamarine);
-            colorList.Add(System.Windows.Media.Brushes.Crimson);
-            colorList.Add(System.Windows.Media.Brushes.LightGreen);
-            colorList.Add(System.Windows.Media.Brushes.Snow);
-            colorList.Add(System.Windows.Media.Brushes.Plum);
-            colorList.Add(System.Windows.Media.Brushes.Gold);
-            colorList.Add(System.Windows.Media.Brushes.Tomato);
-            colorList.Add(System.Windows.Media.Brushes.Khaki);
-            colorList.Add(System.Windows.Media.Brushes.Lavender);
-            colorList.Add(System.Windows.Media.Brushes.LightSeaGreen);
+        //private System.Windows.Media.SolidColorBrush SetAreaTypeColor(List<double> distinctRoundedExclusiveArea, double actualRoundedExclusiveArea)
+        //{
+        //    System.Windows.Media.SolidColorBrush areaTypeColour = null;
+        //    //set colors
+        //    List<System.Windows.Media.SolidColorBrush> colorList = new List<System.Windows.Media.SolidColorBrush>();
+        //    colorList.Add(System.Windows.Media.Brushes.Aquamarine);
+        //    colorList.Add(System.Windows.Media.Brushes.Crimson);
+        //    colorList.Add(System.Windows.Media.Brushes.LightGreen);
+        //    colorList.Add(System.Windows.Media.Brushes.Snow);
+        //    colorList.Add(System.Windows.Media.Brushes.Plum);
+        //    colorList.Add(System.Windows.Media.Brushes.Gold);
+        //    colorList.Add(System.Windows.Media.Brushes.Tomato);
+        //    colorList.Add(System.Windows.Media.Brushes.Khaki);
+        //    colorList.Add(System.Windows.Media.Brushes.Lavender);
+        //    colorList.Add(System.Windows.Media.Brushes.LightSeaGreen);
 
-                for (int j = 0; j < distinctRoundedExclusiveArea.Count; j++)
-                {
-                    try
-                    {
-                    if(actualRoundedExclusiveArea == distinctRoundedExclusiveArea[j])
-                    {
-                        areaTypeColour = colorList[j];
-                    }
-                    }catch(Exception e){
-                    continue;
-                       // System.Windows.MessageBox.Show(e.Message);
-                    }
-                }
+        //        for (int j = 0; j < distinctRoundedExclusiveArea.Count; j++)
+        //        {
+        //            try
+        //            {
+        //            if(actualRoundedExclusiveArea == distinctRoundedExclusiveArea[j])
+        //            {
+        //                areaTypeColour = colorList[j];
+        //            }
+        //            }catch(Exception e){
+        //            continue;
+        //               // System.Windows.MessageBox.Show(e.Message);
+        //            }
+        //        }
 
-            areaTypeColour.Opacity = 50;
-            return areaTypeColour;
-        }
+        
+        //    return areaTypeColour;
+        //}
 
 
         //--------JHL
@@ -137,23 +137,27 @@ namespace Reports
 
             //세대 타입 구하기
             List<string> roundedStringExclusiveAreaList = new List<string>();
-            List<double> distinctRoundedExclusiveArea = new List<double>();
-            foreach (Household household in householdList)
-            {
-                roundedStringExclusiveAreaList.Add(ProcessExclusiveArea(household.GetExclusiveArea()));
-                distinctRoundedExclusiveArea.Add(Math.Round(household.GetExclusiveArea() / 1000000, 0));
-            }
-            List<double> testing = distinctRoundedExclusiveArea.Distinct().ToList();
+            //List<double> distinctRoundedExclusiveArea = new List<double>();
+            //foreach (Household household in householdList)
+            //{
+            //    roundedStringExclusiveAreaList.Add(ProcessExclusiveArea(household.GetExclusiveArea()));
+            //    distinctRoundedExclusiveArea.Add(Math.Round(household.GetExclusiveArea() / 1000000, 0));
+            //}
+            //List<double> testing = distinctRoundedExclusiveArea.Distinct().ToList();
 
             try
             {
 
             for(int i = 0; i < houseOutlineList.Count; i++)
                 {
-                    double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
-                    System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
+                    //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
+                    //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
                     PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-                    PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, areaTypeBackgroundColour);
+                    //PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, areaTypeBackgroundColour);
+                    PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGreen);
+
+
+
                 }
 
             foreach (Curve core in corePlanList)
@@ -194,7 +198,6 @@ namespace Reports
                     continue;
                 }
             }
-
 
 
 
