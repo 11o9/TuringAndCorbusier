@@ -415,7 +415,7 @@ namespace TuringAndCorbusier
             if(!isShortEdgeOver16)
                 coreOrigins.Add(lines[0].PointAtStart);
             else
-                coreOrigins.Add((lines[0].PointAtStart + lines[0].PointAtEnd) / 2 - courtX * coreWidth);
+                coreOrigins.Add((lines[0].PointAtStart + lines[0].PointAtEnd) / 2 - courtX * coreWidth/2);
             coreXVectors.Add(Vector3d.Multiply(courtX, 1));
             coreYVectors.Add(Vector3d.Multiply(courtY, 1));
             if (isSatisfingWW)
@@ -429,7 +429,7 @@ namespace TuringAndCorbusier
             if (!isShortEdgeOver16)
                 coreOrigins.Add(lines[2].PointAtStart);
             else
-                coreOrigins.Add((lines[2].PointAtStart + lines[0].PointAtEnd) / 2 - courtX * coreWidth);
+                coreOrigins.Add((lines[2].PointAtStart + lines[2].PointAtEnd) / 2 + courtX * coreWidth / 2);
             coreXVectors.Add(Vector3d.Multiply(courtX, -1));
             coreYVectors.Add(Vector3d.Multiply(courtY, -1));
             if (isSatisfingWW)
