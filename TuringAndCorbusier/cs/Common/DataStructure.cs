@@ -2140,6 +2140,8 @@ namespace TuringAndCorbusier
 
             Polyline outlinePolyline = new Polyline(outlinePoints);
             Curve outlineCurve = outlinePolyline.ToNurbsCurve();
+            outlineCurve.RemoveShortSegments(0.05);
+
 
             if (outlineCurve.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.CounterClockwise)
                 outlineCurve.Reverse();
@@ -2205,16 +2207,18 @@ namespace TuringAndCorbusier
                         windowIndex = j;
                 }
 
-
-                //      ----front----
-                //      |           |
-                // ---- o           |
-                // |                |     
-                // |                |side    
-                // |                |
-                // |                |
-                // |                |
-                // -------back-------
+                //       ^
+                //       |
+                //       Y            
+                //       ----front---- X->
+                //       |           |
+                //  ---- o           |
+                //  |                |     
+                //  |                |side    
+                //  |                |
+                //  |                |
+                //  |                |
+                //  -------back-------
 
 
                 Curve testLine1;
