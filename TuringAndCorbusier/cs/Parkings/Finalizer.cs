@@ -50,6 +50,9 @@ namespace TuringAndCorbusier
                 }
                 else
                 {
+                    if (apt.AGtype == "PT-4")
+                        return Reduce(apt);
+
                     //WriteLine("[{0}]GP Lack...", depth);
                     ////can make undergroundparking
                     //WriteLine("[{0}]UGP Check...", depth);
@@ -92,7 +95,7 @@ namespace TuringAndCorbusier
                             obstacles.AddRange(householdOutlines);
                             Curve ramp = ugpm.DrawRamp(apt.Plot, aptdir, obstacles);
                             if (ramp == null)
-                                return Reduce();
+                                return Reduce(apt);
 
                            
                             apt.ParkingLotUnderGround = new ParkingLotUnderGround((int)ugpm.EachFloorParkingCount * ugpm.Floors, ugpm.EachFloorArea * ugpm.Floors, ugpm.Floors);
@@ -117,7 +120,7 @@ namespace TuringAndCorbusier
                         }
                         else
                         {
-                            return Reduce();
+                            return Reduce(apt);
                         }
                         
                     }
@@ -125,7 +128,7 @@ namespace TuringAndCorbusier
                     {
                         //WriteLine("[{0}]UGP Impossible", depth);
                         //WriteLine("[{0}]return Reduced value", depth);
-                        return Reduce();
+                        return Reduce(apt);
                     }
                 }
 
@@ -135,6 +138,8 @@ namespace TuringAndCorbusier
             {
                 //WriteLine("[{0}]FAR Lack...", depth);
                 //WriteLine("[{0}]Check SetBack...", depth);
+                if (apt.AGtype == "PT-4")
+                    return Reduce(apt);
 
                 if (setBacked)
                 {
@@ -174,6 +179,7 @@ namespace TuringAndCorbusier
               
             }
 
+            Reduce(apt);
             return apt;
         }
 
@@ -306,10 +312,50 @@ namespace TuringAndCorbusier
         }
 
 
-        Apartment Reduce()
+        Apartment Reduce(Apartment aptOverFAR)
         {
-            //reduce code
-            return apt;
+            if (aptOverFAR.AGtype != "PT-4")
+                return aptOverFAR;
+
+            double currentFA = aptOverFAR.GetGrossAreaRatio() / 100.0 * aptOverFAR.Plot.GetArea();
+            double targetFA = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio / 100.0 * aptOverFAR.Plot.GetArea(); 
+
+            if (targetFA > currentFA)
+                return aptOverFAR;
+
+            double toReduceArea = targetFA - currentFA;
+
+            List<Household> topFloorHouseholds = aptOverFAR.Household.Last().First();
+            List<Core> topFloorCores = aptOverFAR.Core.Last();
+
+            int initialHouseCount = topFloorHouseholds.Count;
+            for (int i = 0; i < initialHouseCount; i++)
+            {
+                if (currentFA < targetFA)
+                    break;
+
+                int indexFromLast = initialHouseCount - 1 - i;
+                Household currentHouse = topFloorHouseholds[indexFromLast];
+                int coreIndex = indexFromLast / 2;
+
+                double reduceArea = currentHouse.GetArea();
+                topFloorHouseholds.RemoveAt(indexFromLast);
+
+                if(indexFromLast%2==0)
+                {
+                    reduceArea += topFloorCores[coreIndex].GetArea();
+                    topFloorCores.RemoveAt(coreIndex);
+                }
+
+                currentFA -= reduceArea;
+            }
+
+            if (topFloorHouseholds.Count == 0) //나중에 여러 동 만들 경우 수정해야 함
+            {
+                aptOverFAR.Household.RemoveAt(aptOverFAR.Household.Count-1);
+                aptOverFAR.Core.RemoveAt(aptOverFAR.Core.Count - 1);
+            }
+            return aptOverFAR;
         }
 
     }

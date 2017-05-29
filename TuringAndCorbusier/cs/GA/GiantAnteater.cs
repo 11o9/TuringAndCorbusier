@@ -19,19 +19,8 @@ namespace TuringAndCorbusier
             double mutationFactor = ag.GAParameterSet[6];
 
             //Initialize Minimum and Maximum value
-
-
-
-
-
             double[] tempMaxInput = ag.MaxInput.Clone() as double[];
             double[] tempMinInput = ag.MinInput.Clone() as double[];
-
-
-            tempMaxInput[0] = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors;
-            tempMinInput[0] = 3;
-            tempMaxInput[1] = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors;
-            tempMinInput[1] = 3;
 
             //create initial genes
             Random myRandom = new Random((int)DateTime.Now.Ticks);

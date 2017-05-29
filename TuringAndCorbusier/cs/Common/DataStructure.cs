@@ -1482,6 +1482,7 @@ namespace TuringAndCorbusier
 
             double tempExclusiveAreaSum = GetExclusiveAreaSum();
 
+            //add household areas
             for (int i = 0; i < Household.Count; i++)
             {
                 for (int j = 0; j < Household[i].Count; j++)
@@ -1491,22 +1492,25 @@ namespace TuringAndCorbusier
                         double tempExclusiveArea = Household[i][j][k].GetExclusiveArea();
                         double rate = tempExclusiveArea / tempExclusiveAreaSum;
 
-                        double GroundCoreAreaPerHouse = Core[0].Sum(n => n.GetArea()) * 2 * rate;
-                        double coreAreaPerHouse = GroundCoreAreaPerHouse + (GetCoreAreaSum() - Core[0].Sum(n => n.GetArea()) * 2) * rate;
-                        double sup = Household[i][j][k].GetWallArea() + Household[i][j][k].GetExclusiveArea() + coreAreaPerHouse;
+                        double householdArea = Household[i][j][k].GetWallArea() + Household[i][j][k].GetExclusiveArea();
 
-                        output += sup;
+                        output += householdArea;
                     }
                 }
 
             }
-            //double sup = Math.Round((CORE_AREA + houseHoldStatistic.GetWallArea() + houseHoldStatistic.GetExclusiveArea()) / 1000000, 2);
 
-            //전체면적 - 발코니면적 + 복도면적 합
-            //output += Household.Sum(n => n.Sum(m => m.Sum(o => o.GetWallArea() + o.GetExclusiveArea())));
-            ////전체코어 - 옥탑코어
-            //output += Core.Sum(n => n.Sum(m => m.GetArea())) - Core[0].Sum(n => n.GetArea());
+            //add core areas
+            for (int i = 0; i < Core.Count; i++)
+            {
+                for (int j = 0; j < Core[i].Count; j++)
+                {
+                    output += Core[i][j].GetArea();                    
+                }
+            }
 
+            
+            //add etc areas
             output += GetCommercialArea();
             output += GetPublicFacilityArea();
 

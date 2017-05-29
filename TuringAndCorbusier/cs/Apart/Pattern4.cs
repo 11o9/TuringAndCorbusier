@@ -203,9 +203,21 @@ namespace TuringAndCorbusier
             aptLines.Add(centerline);
 
             Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, core, household, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
+
+            //#######################################################################################################################
+            if (parameterSet.using1F || parameterSet.setback)
+            {
+
+            }
+            //#######################################################################################################################
+
+            else
+            {
+                Finalizer finalizer = new Finalizer(result);
+                result = finalizer.Finilize();
+            }
+
             return result;
-
-
         }
 
 
@@ -215,7 +227,7 @@ namespace TuringAndCorbusier
         ///////////////////////////////////////////
 
         //Parameter 최소값 ~ 최대값 {storiesHigh, storiesLow, width, angle, moveFactor}
-        private double[] minInput = { 3, 3, CoreType.Vertical.GetDepth(), 0, 0 };
+        private double[] minInput = { 6, 6, CoreType.Vertical.GetDepth(), 0, 0 };
         private double[] maxInput = { TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, CoreType.Vertical.GetDepth() + 2000, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
@@ -1035,20 +1047,39 @@ namespace TuringAndCorbusier
 
                     if (currentValue > centerLineLength)
                     {
-                        houseEndVals.RemoveAt(houseEndVals.Count - 1);
-                        houseEndVals.RemoveAt(houseEndVals.Count - 1);
-                        mappedHouseholdCount--;
-
-                        double lengthOver = currentValue - centerLineLength;
-                        double previousLength = stretchedLength[unallocated[i - 1]];
-                        double reducedLength = previousLength;
-
-                        if (previousLength - lengthOver > cornerShortEdgeLimit)
+                        if (i % 2 == 0)
                         {
-                            reducedLength -= lengthOver;
-                            houseEndVals.Add(houseEndVals.Last() + reducedLength);
-                            houseEndVals.Add(houseEndVals.Last() + coreWidth);
-                            mappedHouseholdCount++;      
+                            houseEndVals.RemoveAt(houseEndVals.Count - 1);
+                            houseEndVals.RemoveAt(houseEndVals.Count - 1);
+                            mappedHouseholdCount--;
+
+
+                            double lengthOver = currentValue - centerLineLength;
+                            double previousLength = stretchedLength[unallocated[i - 1]];
+
+                            if (previousLength - lengthOver > cornerShortEdgeLimit)
+                            {
+                                double reducedLength = previousLength - lengthOver;
+                                houseEndVals.Add(houseEndVals.Last() + reducedLength);
+                                houseEndVals.Add(houseEndVals.Last() + coreWidth);
+                                mappedHouseholdCount++;
+                            }
+                        }
+
+                        else
+                        {
+                            houseEndVals.RemoveAt(houseEndVals.Count - 1);
+                            mappedHouseholdCount--;
+
+                            double lengthOver = currentValue - centerLineLength;
+                            double currentLength = stretchedLength[unallocated[i]];
+
+                            if (currentLength - lengthOver > cornerShortEdgeLimit)
+                            {
+                                double reducedLength = currentLength - lengthOver;
+                                houseEndVals.Add(houseEndVals.Last() + reducedLength);
+                                mappedHouseholdCount++;
+                            }
                         }
 
                         break;
@@ -1235,10 +1266,11 @@ namespace TuringAndCorbusier
             }
 
             //windows
-            List<List<Line>> winBuilding = new List<List<Line>>();
+            List<List<Line>> lightingEdgesBases = new List<List<Line>>();
+            List<List<Line>> movableEdgesBases = new List<List<Line>>();
+
             for (int i = 0; i < homeShapeType.Count; i++)
             {
-                List<Line> winHouse = new List<Line>();
                 if (homeShapeType[i] == 1)
                 {
                     Point3d winPt1 = homeOri[i];
@@ -1249,8 +1281,12 @@ namespace TuringAndCorbusier
                     Point3d winPt3 = winPt2;
                     Point3d winPt4 = winPt2;
                     winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecY[i], ya[i])));
-                    winHouse.Add(new Line(winPt1, winPt2));
-                    winHouse.Add(new Line(winPt3, winPt4));
+
+                    Line lighting1 = new Line(winPt1, winPt2);
+                    Line lighting2 = new Line(winPt3, winPt4);
+
+                    lightingEdgesBases.Add(new List<Line> { lighting1, lighting2 });
+                    movableEdgesBases.Add(new List<Line> { lighting1 }); // 이거 나중에 바꿔야 함..
                 }
                 else
                 {
@@ -1263,12 +1299,13 @@ namespace TuringAndCorbusier
                     winPt3.Transform(Transform.Translation(Vector3d.Multiply(homeVecY[i], -ya[i])));
                     Point3d winPt4 = winPt3;
                     winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecX[i], -xa[i])));
-                    ////////그런데, 복도 방향도 채광창 방향이라고 할 수 있을까?
-                    winHouse.Add(new Line(winPt1, winPt2));
-                    ////////
-                    winHouse.Add(new Line(winPt3, winPt4));
+
+                    Line lighting1 = new Line(winPt1, winPt2);
+                    Line lighting2 = new Line(winPt3, winPt4);
+
+                    lightingEdgesBases.Add(new List<Line> { lighting1, lighting2 });
+                    movableEdgesBases.Add(new List<Line> { lighting1 }); // 이거 나중에 바꿔야 함..
                 }
-                winBuilding.Add(winHouse);
             }
 
             //entrance
@@ -1285,7 +1322,9 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < homeOri.Count; i++)
             {
-                hhpS.Add(new Household(homeOri[i], homeVecX[i], homeVecY[i], xa[i], xb[i], ya[i], yb[i], allocated[i], exclusiveArea[i], winBuilding[i], entBuilding[i], wallFactors[i]));
+                Household houseBase = new Household(homeOri[i], homeVecX[i], homeVecY[i], xa[i], xb[i], ya[i], yb[i], allocated[i], exclusiveArea[i], lightingEdgesBases[i], entBuilding[i], wallFactors[i]);
+                houseBase.MoveableEdge = movableEdgesBases[i];
+                hhpS.Add(houseBase);
             }
 
             for (int j = 0; j < storiesHigh; j++)
@@ -1299,16 +1338,27 @@ namespace TuringAndCorbusier
                     Point3d ent = hhp.EntrancePoint;
                     ori.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
                     ent.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                    List<Line> win = hhp.LightingEdge;
-                    List<Line> winNew = new List<Line>();
-                    for (int k = 0; k < win.Count; k++)
+                    List<Line> lightingBase = hhp.LightingEdge;
+                    List<Line> newLighting = new List<Line>();
+                    List<Line> movableBase = hhp.MoveableEdge;
+                    List<Line> newMovable = new List<Line>();
+                    for (int k = 0; k < lightingBase.Count; k++)
                     {
-                        Line winTemp = win[k];
-                        winTemp.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                        winNew.Add(winTemp);
+                        Line newWindowLine = lightingBase[k];
+                        newWindowLine.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
+                        newLighting.Add(newWindowLine);
                     }
 
-                    hhpSTemp.Add(new Household(ori, hhp.XDirection, hhp.YDirection, hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.HouseholdSizeType, hhp.GetExclusiveArea(), winNew, ent, hhp.WallFactor));
+                    for (int k = 0; k < movableBase.Count; k++)
+                    {
+                        Line newMovableLine = movableBase[k];
+                        newMovableLine.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
+                        newLighting.Add(newMovableLine);
+                    }
+
+                    Household oneHouse = new Household(ori, hhp.XDirection, hhp.YDirection, hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.HouseholdSizeType, hhp.GetExclusiveArea(), newLighting, ent, hhp.WallFactor);
+                    oneHouse.MoveableEdge = newMovable;
+                    hhpSTemp.Add(oneHouse);
                 }
                 hhpB.Add(hhpSTemp);
                 household.Add(hhpB);
