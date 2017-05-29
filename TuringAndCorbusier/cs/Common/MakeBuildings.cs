@@ -43,10 +43,10 @@ namespace TuringAndCorbusier
         {
             double height = Consts.FloorHeight;
             Curve outline = hhp.GetOutline();
-            outline.RemoveShortSegments(0.05);
             Polyline outPoly = CurveTools.ToPolyline(outline);
 
             Brep x = Extrusion.Create(outline, height, true).ToBrep();
+            x.CapPlanarHoles(0.05);
 
             double windowSide = 300;
             double windowLow = 300;
