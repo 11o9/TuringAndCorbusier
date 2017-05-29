@@ -50,10 +50,10 @@ namespace Reports
             //}
         }
 
-        private void SethouseAreaTypeColor(xmlUnitReport unitReport)
-        {
-            string AreaType = unitReport.AreaType.Text;
-        }
+        //private void SethouseAreaTypeColor(xmlUnitReport unitReport)
+        //{
+        //    string AreaType = unitReport.AreaType.Text;
+        //}
 
 
         private void AddAreaTypeToHouseOutline(System.Windows.Point newCentroid, string areaTypeInText)

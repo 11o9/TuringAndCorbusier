@@ -581,24 +581,73 @@ namespace TuringAndCorbusier
                 //double scaleFactor = PlanDrawingFunction.calculateMultipleScaleFactor(Reports.xmlUnitReport.GetCanvasRectangle(), boundingBoxes, out origins);
 
                 //JHL
-                for (int i = 0; i < uniqueHouseHoldProperties.Count(); i++)
+                
+                    List<Reports.unitPlanTemplate> multipleUnitPlanList = new List<Reports.unitPlanTemplate>();
+                for(int i = 0; i < uniqueHouseHoldProperties.Count(); i++)
                 {
-                    Household i_Copy = new Household(uniqueHouseHoldProperties[i].ToHousehold());
-
-                    i_Copy.Origin = new Point3d(i_Copy.Origin.X, i_Copy.Origin.Y, 0);
+                    Household household = new Household(uniqueHouseHoldProperties[i].ToHousehold());
+                    household.Origin = new Point3d(household.Origin.X, household.Origin.Y, 0);
 
                     double exclusiveSum = MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum();
-                    double exclusiveTemp = i_Copy.GetExclusiveArea();
-
-                    double tempCoreArea = coreAreaSum * exclusiveTemp / exclusiveSum;
-                    double tempParkingLotArea = UGParkingLotAreaSum / MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum() * i_Copy.GetExclusiveArea();
+                    double exclusiveArea = household.GetExclusiveArea();
+                    double tempCoreArea = coreAreaSum * exclusiveArea / exclusiveSum;
+                    double tempParkingLotArea = UGParkingLotAreaSum / MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum() * household.GetExclusiveArea();
                     tempCoreArea += uniqueHouseHoldProperties[i].CorridorArea;
-                    Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport(i_Copy, typeString[i], tempCoreArea, tempParkingLotArea, publicFacilityArea, serviceArea, uniqueHouseHoldProperties[i].Count);
-                    //unitReport.setUnitPlan(uniqueHouseHoldProperties[i], floorPlans[i], scaleFactor, origins[i], MainPanel_AGOutputList[tempIndex].AGtype);
 
-                    fps.Add(unitReport.fixedPage);
-                    pagename.Add("unitReport" + (i + 1).ToString());
+                    Reports.unitPlanTemplate unitPlanTemplate = new Reports.unitPlanTemplate(household, typeString[i], tempCoreArea, tempParkingLotArea, publicFacilityArea, serviceArea, uniqueHouseHoldProperties[i].Count);
+                    multipleUnitPlanList.Add(unitPlanTemplate);
                 }
+
+                //세대 타입이 1개 일 경우
+                if(multipleUnitPlanList.Count == 1)
+                {
+                    Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport();
+                    unitReport.SetFirstUnitTypePlan(multipleUnitPlanList[0]);
+                    fps.Add(unitReport.fixedPage);
+                    pagename.Add("newUnitReport" + 1.ToString());
+
+                }
+                else
+                {
+                for(int i = 0; i < multipleUnitPlanList.Count; i += 2)
+                {
+                        if (i == multipleUnitPlanList.Count && multipleUnitPlanList.Count%2!=0)
+                        {
+                            Reports.xmlUnitReport unitReport1 = new Reports.xmlUnitReport();
+                            unitReport1.SetFirstUnitTypePlan(multipleUnitPlanList[i]);
+                            fps.Add(unitReport1.fixedPage);
+                            pagename.Add("newUnitReport" + (i + 1).ToString());
+                        }
+                        if (i < multipleUnitPlanList.Count - 2)
+                        {
+                        Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport();
+                        unitReport.SetUnitTypePlan(multipleUnitPlanList[i],multipleUnitPlanList[i+1]);
+                        fps.Add(unitReport.fixedPage);
+                        pagename.Add("newUnitReport" + (i + 1).ToString());
+                        }
+                }
+                }
+
+             
+                //이전코드
+                //for (int i = 0; i < uniqueHouseHoldProperties.Count(); i++)
+                //{
+                //    Household i_Copy = new Household(uniqueHouseHoldProperties[i].ToHousehold());
+
+                //    i_Copy.Origin = new Point3d(i_Copy.Origin.X, i_Copy.Origin.Y, 0);
+
+                //    double exclusiveSum = MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum();
+                //    double exclusiveTemp = i_Copy.GetExclusiveArea();
+
+                //    double tempCoreArea = coreAreaSum * exclusiveTemp / exclusiveSum;
+                //    double tempParkingLotArea = UGParkingLotAreaSum / MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum() * i_Copy.GetExclusiveArea();
+                //    tempCoreArea += uniqueHouseHoldProperties[i].CorridorArea;
+                //    Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport(i_Copy, typeString[i], tempCoreArea, tempParkingLotArea, publicFacilityArea, serviceArea, uniqueHouseHoldProperties[i].Count);
+                //    //unitReport.setUnitPlan(uniqueHouseHoldProperties[i], floorPlans[i], scaleFactor, origins[i], MainPanel_AGOutputList[tempIndex].AGtype);
+
+                //    fps.Add(unitReport.fixedPage);
+                //    pagename.Add("unitReport" + (i + 1).ToString());
+                //}
 
                 //JHL
                 for (int i = 0; i < MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2; i++)

@@ -132,6 +132,9 @@
     <Compile Include="Reports\typicalPlan.xaml.cs">
       <DependentUpon>typicalPlan.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Reports\unitPlanTemplate.xaml.cs">
+      <DependentUpon>unitPlanTemplate.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Reports\xmlBuildingReport.xaml.cs">
       <DependentUpon>xmlBuildingReport.xaml</DependentUpon>
     </Compile>
@@ -242,6 +245,10 @@
     <Page Include="Reports\typicalPlan.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Reports\unitPlanTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Reports\xmlBuildingReport.xaml">
       <Generator>MSBuild:Compile</Generator>
