@@ -241,7 +241,7 @@ namespace TuringAndCorbusier
 
         Apartment Add1F(Apartment apt)
         {
-            bool canAdd1F = apt.Household.Count < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1;
+            bool canAdd1F = apt.Household.Count != TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor - 1;
             if (!canAdd1F)
                 return apt;
 
