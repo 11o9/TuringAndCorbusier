@@ -9,7 +9,6 @@
          >
 
     <FixedPage  Name="fixedPage" Width="1240" Height="1750">
-
         <Grid Name="myGrid">
             <Canvas x:Name="unitPlanCanvas1"  HorizontalAlignment="Left" Height="815" Margin="0,0,-1240,-815" VerticalAlignment="Top" Width="1240">
                 <Rectangle Fill="White"/>
@@ -75,8 +74,8 @@
                 <TextBlock x:Name="usableArea_Py" Text="공사용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="995" Canvas.Top="698" />
                 <Canvas x:Name="UnitCanvas" Width="395" Height="514" VerticalAlignment="Top" Canvas.Left="85" Canvas.Top="211" />
             </Canvas>
-            <Canvas x:Name="unitPlanCanvas2"  HorizontalAlignment="Left" Height="815" Margin="0,820,-1240,-1635" VerticalAlignment="Top" Width="1240">
-            </Canvas>
+            <ContentControl x:Name="unitPlanCanvas2"  HorizontalAlignment="Left" Height="815" Margin="0,820,-1240,-1635" VerticalAlignment="Top" Width="1240">
+            </ContentControl>
 
 
         </Grid>

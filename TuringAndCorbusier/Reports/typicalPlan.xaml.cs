@@ -138,11 +138,11 @@ namespace Reports
             //세대 타입 구하기
             List<string> roundedStringExclusiveAreaList = new List<string>();
             //List<double> distinctRoundedExclusiveArea = new List<double>();
-            //foreach (Household household in householdList)
-            //{
-            //    roundedStringExclusiveAreaList.Add(ProcessExclusiveArea(household.GetExclusiveArea()));
+           foreach (Household household in householdList)
+            {
+                roundedStringExclusiveAreaList.Add(ProcessExclusiveArea(household.GetExclusiveArea()));
             //    distinctRoundedExclusiveArea.Add(Math.Round(household.GetExclusiveArea() / 1000000, 0));
-            //}
+            }
             //List<double> testing = distinctRoundedExclusiveArea.Distinct().ToList();
 
             try

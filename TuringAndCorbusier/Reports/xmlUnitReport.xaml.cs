@@ -19,6 +19,8 @@ namespace Reports
         public xmlUnitReport()
         {
             InitializeComponent();
+            unitPlanCanvas2.Content = new unitPlanTemplate();
+            
         }
 
         public xmlUnitReport(Household houseHoldProperty, string typeString, double coreArea, double parkingLotArea, double publicFacilityArea, double serviceArea, int numOfThisType)
