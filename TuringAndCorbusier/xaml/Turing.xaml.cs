@@ -192,7 +192,7 @@ namespace TuringAndCorbusier
             MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count, false);
             MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count, tempoutput);
             MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count);
-            string widthlog;
+            List<string> widthlog;
             MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.ApartDistance(MainPanel_AGOutputList[tempIndex],out widthlog);
             MainPanel_LawPreview_ApartDistance.dimension = widthlog;
             //MainPanel_LawPreview_ApartDistance.dimPoint = MainPanel_LawPreview_ApartDistance.CurveToDisplay[0].

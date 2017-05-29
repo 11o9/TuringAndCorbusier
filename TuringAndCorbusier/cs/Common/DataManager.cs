@@ -95,7 +95,7 @@ namespace TuringAndCorbusier
         public SerializablePlot(Plot toCopy, KDGinfo kdg)
         {
             plotType = (int)toCopy.PlotType;
-            boundary = toCopy.Boundary?.DuplicateSegments().Select(n=>n.PointAtStart).ToList();
+            boundary = toCopy.Boundary?.DuplicateSegments().Select(n => n.PointAtStart).ToList();
             surroundings = toCopy.Surroundings;
             outrect = kdg.outrect?.DuplicateSegments().Select(n => n.PointAtStart).ToList();
             simplifiedSurroundings = toCopy.SimplifiedSurroundings;
@@ -125,8 +125,8 @@ namespace TuringAndCorbusier
             plot.layout = layout.Select(n => new PolylineCurve(n) as Curve).ToList();
 
             plot.OriginalBoundary = new Polyline(Closed(originalBoundary)).ToNurbsCurve();
-            if(originalSurroundings!=null)
-            plot.OriginalRoadwidths = originalSurroundings.ToList();
+            if (originalSurroundings != null)
+                plot.OriginalRoadwidths = originalSurroundings.ToList();
             return plot;
         }
 
@@ -155,7 +155,7 @@ namespace TuringAndCorbusier
 
             List<Point3d> closed = new List<Point3d>(p);
             closed.Add(p[0]);
-            return closed;  
+            return closed;
         }
 
 
