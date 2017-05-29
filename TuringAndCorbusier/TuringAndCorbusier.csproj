@@ -54,8 +54,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GISData">
-      <HintPath>..\..\GISData\GISData\bin\Debug\GISData.dll</HintPath>
+    <Reference Include="GISData, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\GISData.dll</HintPath>
     </Reference>
     <Reference Include="Grasshopper">
       <HintPath>..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
@@ -112,10 +113,12 @@
     <Compile Include="cs\Apart\UnitDistributor.cs" />
     <Compile Include="cs\Parkings\EddieBrock.cs" />
     <Compile Include="cs\Server\PiljiDrawer.cs" />
+    <Compile Include="cs\Server\PlotPreviewer.cs" />
     <Compile Include="cs\Server\ServerConnection.cs" />
     <Compile Include="cs\Server\ServerUI.xaml.cs">
       <DependentUpon>ServerUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="cs\Server\SiteParser.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

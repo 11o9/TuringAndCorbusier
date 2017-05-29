@@ -1445,8 +1445,12 @@ namespace TuringAndCorbusier
             Rhino.RhinoApp.WriteLine(pd.projectName + "로드됨");
 
             if (pd.setting1 != null)
+            { 
                 TuringAndCorbusierPlugIn.InstanceClass.page1Settings = pd.setting1;
-
+                TuringAndCorbusierPlugIn.InstanceClass.turing.ProjectAddress.Text = pd.setting1.Address;
+                TuringAndCorbusierPlugIn.InstanceClass.turing.ProjectName.Text = pd.setting1.ProjectName;
+                TuringAndCorbusierPlugIn.InstanceClass.turing.ProjectArea.Text = Math.Round(pd.setting1.PlotArea,2).ToString();
+            } 
             if (pd.regsetting != null)
                 TuringAndCorbusierPlugIn.InstanceClass.regSettings = pd.regsetting;
 

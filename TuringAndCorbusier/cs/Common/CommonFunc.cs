@@ -8,7 +8,7 @@ using Microsoft.Win32;
 using System.IO.Ports;
 using Oracle.ManagedDataAccess.Client;
 using Rhino.Collections;
-
+using GISData.DataStruct;
 
 
 namespace TuringAndCorbusier
@@ -16,6 +16,8 @@ namespace TuringAndCorbusier
 
     class CommonFunc
     {
+        
+
         public static List<Curve> NewJoin(IEnumerable<Curve> spl)
         {
             Queue<Curve> q = new Queue<Curve>(spl);
@@ -3648,7 +3650,8 @@ namespace TuringAndCorbusier
                 {
                     return System.Drawing.Color.Gray;
                 }
-
+                if (i > 19)
+                    i = 19;
                 int myInt1 = (i <= 10) ? 25 * i : 255;
                 int myInt2 = (i >= 10) ? 25 * (20 - i) : 255;
                 System.Drawing.Color tempColor = System.Drawing.Color.FromArgb(myInt2, myInt1, 0);
