@@ -9,13 +9,13 @@
          >
 
     <FixedPage  Name="fixedPage" Width="1240" Height="1750">
-        <Rectangle Fill="#FF2F9947" Height="5" Canvas.Left="120" Stroke="#FF2F9947" Canvas.Top="120" Width="475" OpacityMask="#FF2F9947" Margin="160,150,-160,-105"/>
-        <TextBlock Text="UNITS"  FontSize="35" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Myriad Pro" FontWeight="Bold" Margin="160,135,-30,-135"/>
+        <Rectangle Fill="#FF2F9947" Height="5" Canvas.Left="120" Stroke="#FF2F9947" Canvas.Top="120" Width="475" OpacityMask="#FF2F9947" Margin="89,80,-89,-35"/>
+        <TextBlock Text="UNITS"  FontSize="35" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Myriad Pro" FontWeight="Bold" Margin="89,65,40.52,-65"/>
 
-        
-        <ContentControl x:Name="unitPlanCanvasControl1" Content="ContentControl" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-980"/>
 
-        <ContentControl x:Name="unitPlanCanvasControl2" Content="ContentControl" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-1740"/>
+        <ContentControl x:Name="unitPlanCanvasControl1" Content="" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-910"/>
+
+        <ContentControl x:Name="unitPlanCanvasControl2" Content="" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-1670"/>
 
     </FixedPage>
 </UserControl>

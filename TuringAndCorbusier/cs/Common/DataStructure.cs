@@ -2192,6 +2192,45 @@ namespace TuringAndCorbusier
 
             if (outlineCurve.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.CounterClockwise)
                 outlineCurve.Reverse();
+            return outlineCurve;
+        }
+        //JHL
+        public Curve GetDefaultXYOutline()
+        {
+            List<Point3d> outlinePoints = new List<Point3d>();
+            Point3d pt = new Point3d(this.Origin);
+            Vector3d x = new Vector3d(Plane.WorldXY.XAxis);
+            Vector3d y = new Vector3d(Plane.WorldXY.YAxis);
+            //방 총 x 축 길이
+            double xa = this.XLengthA;
+            //방 x 축 길이
+            double xb = this.XLengthB;
+
+            double ya = this.YLengthA;
+            double yb = this.YLengthB;
+
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, yb)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, xa - xb)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, -ya)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, -xa)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, ya - yb)));
+            outlinePoints.Add(pt);
+
+            Point3d.CullDuplicates(outlinePoints, 0);
+
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, xb)));
+            outlinePoints.Add(pt);
+
+            Polyline outlinePolyline = new Polyline(outlinePoints);
+            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
+
+            if (outlineCurve.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.CounterClockwise)
+                outlineCurve.Reverse();
 
             return outlineCurve;
 

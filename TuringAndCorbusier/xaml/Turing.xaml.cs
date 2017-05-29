@@ -574,11 +574,12 @@ namespace TuringAndCorbusier
                 //                              select new FloorPlan(PlanDrawingFunction.alignHousholdProperties(i.ToHousehold()), MainPanel_planLibraries, MainPanel_AGOutputList[tempIndex].AGtype)).ToList();
 
                 //List<Rectangle3d> boundingBoxes = (from i in floorPlans
-                //                                   select new Rectangle3d(Plane.WorldXY, i.GetBoundingBox().Min, i.GetBoundingBox().Max)).ToList();
+                //                                  select new Rectangle3d(Plane.WorldXY, i.GetBoundingBox().Min, i.GetBoundingBox().Max)).ToList();
 
                 //List<System.Windows.Point> origins = new List<System.Windows.Point>();
+                //double scaleFactor = PlanDrawingFunction.calculateMultipleScaleFactor(Reports.unitPlanTemplate.GetUnitPlanRectangle(), boundingBoxes, out origins);
 
-                //double scaleFactor = PlanDrawingFunction.calculateMultipleScaleFactor(Reports.xmlUnitReport.GetCanvasRectangle(), boundingBoxes, out origins);
+
 
                 //JHL
                 
@@ -587,6 +588,10 @@ namespace TuringAndCorbusier
                 {
                     Household household = new Household(uniqueHouseHoldProperties[i].ToHousehold());
                     household.Origin = new Point3d(household.Origin.X, household.Origin.Y, 0);
+                    Curve householdOutline = household.GetDefaultXYOutline();
+                    Rectangle3d householdOutlineBoundingBox = new Rectangle3d(Plane.WorldXY, householdOutline.GetBoundingBox(true).Min,householdOutline.GetBoundingBox(true).Max);
+                    System.Windows.Point origin = new System.Windows.Point();
+                    double scaleFactor = PlanDrawingFunction.scaleToFitFactor(Reports.unitPlanTemplate.GetUnitPlanRectangle(),householdOutlineBoundingBox,out origin);
 
                     double exclusiveSum = MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum();
                     double exclusiveArea = household.GetExclusiveArea();
@@ -595,6 +600,7 @@ namespace TuringAndCorbusier
                     tempCoreArea += uniqueHouseHoldProperties[i].CorridorArea;
 
                     Reports.unitPlanTemplate unitPlanTemplate = new Reports.unitPlanTemplate(household, typeString[i], tempCoreArea, tempParkingLotArea, publicFacilityArea, serviceArea, uniqueHouseHoldProperties[i].Count);
+                    unitPlanTemplate.SetUnitPlan(householdOutline, uniqueHouseHoldProperties[i], scaleFactor, origin, MainPanel_AGOutputList[tempIndex].AGtype);
                     multipleUnitPlanList.Add(unitPlanTemplate);
                 }
 

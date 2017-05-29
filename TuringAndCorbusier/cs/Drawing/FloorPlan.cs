@@ -1276,8 +1276,6 @@ namespace TuringAndCorbusier
         public class Dimension
         {
             //Constructor
-           
-
 
             public Dimension(List<Point3d> endPoints, Point3d side, double length)
             {

@@ -81,6 +81,31 @@ namespace TuringAndCorbusier
 
             UnitPlanCanvas.Children.Add(polygonToDraw);
         }
+        public static void drawUnitBackGround(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush fillBrush)
+        {
+            List<System.Windows.Point> pointSet = new List<System.Windows.Point>();
+            Curve duplicatedCurve = curveToDraw.DuplicateCurve();
+            duplicatedCurve.MakeClosed(0);
+            Curve[] segments = duplicatedCurve.DuplicateSegments();
+
+            for (int i = 0; i <= segments.Length; i++)
+            {
+                int tempIndex = i % segments.Length;
+
+                System.Windows.Point tempTransformedPoint = pointConverter(tempBoundingBox, segments[tempIndex].PointAt(segments[tempIndex].Domain.T0), tempScaleFactor, tempOrigin);
+                pointSet.Add(tempTransformedPoint);
+            }
+
+            Polygon polygonToDraw = new Polygon();
+            polygonToDraw.Points = new PointCollection(pointSet);
+            polygonToDraw.Fill = fillBrush;
+
+            UnitPlanCanvas.Children.Add(polygonToDraw);
+            double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+            double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
+            Canvas.SetLeft(polygonToDraw, -width);
+            Canvas.SetTop(polygonToDraw, -height);
+        }
 
         public static void drawPlan(Rectangle3d tempBoundingBox, List<List<Curve>> curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
         {
@@ -306,11 +331,139 @@ namespace TuringAndCorbusier
             }
         }
 
-        //JHL
-        public static void simpleDrawPlan()
+        //JHL unitplan drawing
+        public static void drawUnitPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
         {
+            Curve[] shatteredCurves = curveToDraw.DuplicateSegments();
+            //List<System.Windows.Shapes.Line> householdLineList = new List<System.Windows.Shapes.Line>();
+            //List<TextBlock> dimensionList = GetDimensionList(lineLengthList);
+            //List<System.Windows.Point> pointList = new List<System.Windows.Point>();
+            //foreach(Point3d point in dimensionLocationPointList)
+            //{
+            //    pointList.Add(pointConverter(tempBoundingBox, point, tempScaleFactor, tempOrigin));
+            //}
 
+            double width, height;
+            if (shatteredCurves.Length > 1)
+            {
+                foreach (Curve j in shatteredCurves)
+                {
+                    System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
+                    System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
+
+                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                    line.Stroke = strokeBrush;
+
+                    line.X1 = Math.Abs(Start.X);
+                    line.X2 = Math.Abs(End.X);
+                    line.Y1 = Math.Abs(Start.Y);
+                    line.Y2 = Math.Abs(End.Y);
+
+                    line.StrokeThickness = strokeThickness;
+
+                    UnitPlanCanvas.Children.Add(line);
+                    width = ((tempBoundingBox.Width/2) * tempScaleFactor);
+                    height = ((tempBoundingBox.Height/2) * tempScaleFactor);
+                    Canvas.SetLeft(line,-width);
+                    Canvas.SetTop(line, -height);
+                }
+            }
+            else
+            {
+
+                if (curveToDraw.PointAt(curveToDraw.Domain.Mid) != (curveToDraw.PointAtStart + curveToDraw.PointAtEnd) / 2)
+                {
+                    List<Curve> shatteredArc = shatterArc(curveToDraw);
+
+                    foreach (Curve j in shatteredArc)
+                    {
+                        System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
+                        System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
+
+                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                        line.Stroke = strokeBrush;
+
+                        line.X1 = Math.Abs(Start.X);
+                        line.X2 = Math.Abs(End.X);
+                        line.Y1 = Math.Abs(Start.Y);
+                        line.Y2 = Math.Abs(End.Y);
+
+                        line.StrokeThickness = strokeThickness;
+
+                        UnitPlanCanvas.Children.Add(line);
+                        //aligned the drawing to center
+                        width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+                        height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
+                        Canvas.SetLeft(line, -width);
+                        Canvas.SetTop(line, -height);
+   
+
+                    }
+                }
+                else
+                {
+                    System.Windows.Point Start = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T0), tempScaleFactor, tempOrigin);
+                    System.Windows.Point End = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T1), tempScaleFactor, tempOrigin);
+
+                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                    line.Stroke = strokeBrush;
+
+                    line.X1 = Math.Abs(Start.X);
+                    line.X2 = Math.Abs(End.X);
+                    line.Y1 = Math.Abs(Start.Y);
+                    line.Y2 = Math.Abs(End.Y);
+
+                    line.StrokeThickness = strokeThickness;
+
+                    UnitPlanCanvas.Children.Add(line);
+                    width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+                    height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
+                    Canvas.SetLeft(line, -width);
+                    Canvas.SetTop(line, -height);
+
+                }
+            }
         }
+        public static void DrawUnitPlanDimension( List<Point3d> dimensionLocationPointList, List<double> houseOutlineLength, Rectangle3d tempBoundingBox,double scaleFactor,System.Windows.Point origin, ref Canvas unitPlanCanvas)
+        {
+            List<TextBlock> dimensionTextBlockList = GetDimensionList(houseOutlineLength);
+            List<System.Windows.Point> convertedPointList = new List<System.Windows.Point>();
+            foreach(Point3d point in dimensionLocationPointList)
+            {
+                convertedPointList.Add(pointConverter(tempBoundingBox,point,scaleFactor,origin));
+            }
+            DrawDimension(dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor);
+        }
+
+        private static List<TextBlock> GetDimensionList(List<double> lineLengthList)
+        {
+            List<TextBlock> dimensionList = new List<TextBlock>();
+            foreach (double lineLength in lineLengthList)
+            {
+                string formattedLength = lineLength.ToString("N0");
+                TextBlock dimension = new TextBlock();
+                dimension.Text = formattedLength;
+                dimension.FontSize = 8;
+                dimensionList.Add(dimension);
+            }
+            return dimensionList;
+        }
+
+
+        private static void DrawDimension(List<TextBlock> dimensionList, List<System.Windows.Point> pointList,Canvas UnitPlanCanvas,Rectangle3d tempBoundingBox, double tempScaleFactor)
+        {
+            for (int i = 0; i < dimensionList.Count; i++)
+            {
+
+                UnitPlanCanvas.Children.Add(dimensionList[i]);
+            double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+            double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
+                Canvas.SetTop(dimensionList[i], (pointList[i].Y - height));
+                Canvas.SetLeft(dimensionList[i], (pointList[i].X - width));
+
+            }
+        }
+
 
         private static double getAngle(Vector3d baseVec, Vector3d targetVec)
         {

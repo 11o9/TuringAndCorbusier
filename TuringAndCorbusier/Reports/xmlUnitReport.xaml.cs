@@ -33,7 +33,6 @@ namespace Reports
             unitPlanCanvasControl2.Content = planForCanvas2;
         }
 
-
         public static System.Windows.Shapes.Rectangle GetCanvasRectangle()
         {
             System.Windows.Shapes.Rectangle tempRectangle = new System.Windows.Shapes.Rectangle();
