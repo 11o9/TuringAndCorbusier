@@ -85,7 +85,7 @@ namespace TuringAndCorbusier
         public List<Point3d> outrect;
         public List<Point3d> simplifiedBoundary;
         public int[] simplifiedSurroundings;
-        public List<List<Point3d>> layout;
+        public List<List<Point3d>> layout = new List<List<Point3d>>();
         public List<Point3d> originalBoundary;
         public double[] originalSurroundings;
 
@@ -95,14 +95,16 @@ namespace TuringAndCorbusier
         public SerializablePlot(Plot toCopy, KDGinfo kdg)
         {
             plotType = (int)toCopy.PlotType;
-            boundary = toCopy.Boundary?.DuplicateSegments().Select(n=>n.PointAtStart).ToList();
+            boundary = toCopy.Boundary?.DuplicateSegments().Select(n => n.PointAtStart).ToList();
             surroundings = toCopy.Surroundings;
             outrect = kdg.outrect?.DuplicateSegments().Select(n => n.PointAtStart).ToList();
             simplifiedSurroundings = toCopy.SimplifiedSurroundings;
             simplifiedBoundary = toCopy.SimplifiedBoundary?.DuplicateSegments().Select(n => n.PointAtStart).ToList();
             ignoreNorth = toCopy.ignoreNorth;
             isSpecialCase = toCopy.isSpecialCase;
-            layout = kdg.surrbuildings?.Select(n => new List<Point3d>() { n.PointAtStart, n.PointAtEnd }).ToList();
+            var x = kdg.surrbuildings[0];
+            kdg.surrbuildings?.ForEach(n => layout.Add(OpenCurveToPoint(n)));
+
         }
 
         public Plot ToPlot()
@@ -120,12 +122,27 @@ namespace TuringAndCorbusier
             plot.outrect = new Polyline(Closed(outrect)).ToNurbsCurve();
             plot.SimplifiedBoundary = new Polyline(Closed(simplifiedBoundary)).ToNurbsCurve();
             plot.SimplifiedSurroundings = simplifiedSurroundings;
-            plot.layout = layout.Select(n => new LineCurve(n[0], n[1]) as Curve).ToList();
+            plot.layout = layout.Select(n => new PolylineCurve(n) as Curve).ToList();
 
             plot.OriginalBoundary = new Polyline(Closed(originalBoundary)).ToNurbsCurve();
-            if(originalSurroundings!=null)
-            plot.OriginalRoadwidths = originalSurroundings.ToList();
+            if (originalSurroundings != null)
+                plot.OriginalRoadwidths = originalSurroundings.ToList();
             return plot;
+        }
+
+        public List<Point3d> OpenCurveToPoint(Curve c)
+        {
+
+            List<Point3d> r = c.DuplicateSegments().Select(n => n.PointAtStart).ToList();
+            r.Add(c.PointAtEnd);
+
+            if (r.Count < 2)
+            {
+                r.Clear();
+                r.Add(c.PointAtStart);
+                r.Add(c.PointAtEnd);
+            }
+            return r;
         }
 
         public List<Point3d> Closed(List<Point3d> p)
@@ -138,8 +155,10 @@ namespace TuringAndCorbusier
 
             List<Point3d> closed = new List<Point3d>(p);
             closed.Add(p[0]);
-            return closed;  
+            return closed;
         }
+
+
     }
 
 
