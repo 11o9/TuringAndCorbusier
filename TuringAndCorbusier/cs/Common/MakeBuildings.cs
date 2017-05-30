@@ -46,7 +46,7 @@ namespace TuringAndCorbusier
             Polyline outPoly = CurveTools.ToPolyline(outline);
 
             Brep x = Extrusion.Create(outline, height, true).ToBrep();
-            x.CapPlanarHoles(0.05);
+            x.CapPlanarHoles(1);
 
             double windowSide = 300;
             double windowLow = 300;

@@ -28,6 +28,7 @@ namespace TuringAndCorbusier
         public static double minimumArea { get { return 20 * 1000 * 1000; } }
         public static double corridorWidth { get { return 1300; } }
         public static double corridorWallHeight { get { return 1200; } }
+        public static double escapeCoreCriteria { get { return 30000; } }
         public static string connectionString
         {
             get
@@ -1704,7 +1705,7 @@ namespace TuringAndCorbusier
             else if (this.coreType == CoreType.Vertical_AG1.ToString())
                 return 7920;
             else if (this.coreType == CoreType.CourtShortEdge.ToString())
-                return 4200;
+                return 2700;
             else
                 return 0;
         }

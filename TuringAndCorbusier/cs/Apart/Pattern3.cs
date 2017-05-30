@@ -10,6 +10,7 @@ namespace TuringAndCorbusier
 {
     class AG3 : ApartmentGeneratorBase
     {
+        //main
         public override Apartment generator(Plot plot, ParameterSet parameterSet, Target target)
         {
             randomCoreType = GetRandomCoreType();
@@ -154,14 +155,13 @@ namespace TuringAndCorbusier
             ///////////////////////////////
 
             //set right coreType
-            bool isSatisfingWW = regulationHigh.DistanceLL + 2 * randomCoreType.GetWidth() + width < Math.Min(lines[0].GetLength(), lines[1].GetLength());
             bool isSquareCoreAvailable = width*2 +regulationHigh.DistanceLW + CoreType.Folded.GetDepth() < Math.Min(lines[0].GetLength(), lines[1].GetLength());
             if (!isSquareCoreAvailable)
                 parameterSet.fixedCoreType = randomCoreType = CoreType.CourtShortEdge;
             else
                 parameterSet.fixedCoreType = randomCoreType = CoreType.Folded;
             //Draw cores and households
-            List<List<Core>> cores = MakeCores(parameterSet, inlineCurve, isSatisfingWW);
+            List<List<Core>> cores = MakeCores(parameterSet, inlineCurve);
             List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, centerLinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
            
             //복도면적..?
@@ -348,29 +348,34 @@ namespace TuringAndCorbusier
             }
 
             return result;
-
-
         }
 
         #region New Apartment Generating Methods
-        private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve, bool isSatisfingWW)
+        private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve)
         {
-            //wwregbool 잠시 비활성화
-            isSatisfingWW = false;
+            bool isShortCore = false;
             double pilotiHeight = Consts.PilotiHeight;
             
-            //#######################################################################################################################
-            if (parameterSet.using1F)
+            if (parameterSet.using1F) //1층 사용
             {
                 randomCoreType = parameterSet.fixedCoreType;
                 pilotiHeight = 0;
             }
-            //#######################################################################################################################
             
             //initial settings
             Polyline inlinePolyline;
             inlineCurve.TryGetPolyline(out inlinePolyline);
             Curve[] lines = inlineCurve.DuplicateSegments();
+            Curve minEdge = lines[0];
+            Curve maxEdge = lines[1];
+
+            double[] parameters = parameterSet.Parameters;
+            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
+            double width = parameters[2];
+            double coreWidth = randomCoreType.GetWidth();
+            double coreDepth = randomCoreType.GetDepth();
+            double escapeCoreWidth = CoreType.CourtShortEdge.GetWidth();
+            double escapeCoreDepth = CoreType.CourtShortEdge.GetDepth();
 
             //reverse Curve orientation & set index0 shortEdge
             if (lines[0].GetLength() > lines[1].GetLength())
@@ -382,25 +387,19 @@ namespace TuringAndCorbusier
                 }
             }
 
-            Curve minEdge = lines[0];
-            double[] parameters = parameterSet.Parameters;
-            double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
-            double width = parameters[2];
-            double coreWidth = randomCoreType.GetWidth();
-            double coreDepth = randomCoreType.GetDepth();
-            bool isShortEdgeOver16 = false;
+            //
             if (randomCoreType == CoreType.CourtShortEdge)
             {
+                isShortCore = true;
                 coreWidth = minEdge.GetLength();
-                isSatisfingWW = false;
                 if (minEdge.GetLength() > 16000)
-                {
-                    isShortEdgeOver16 = true;
                     coreWidth = CoreType.CourtShortEdge.GetWidth();
-                }
             }
 
-
+            bool hasToPlaceEscapeCore = maxEdge.GetLength() > Consts.escapeCoreCriteria;
+            double escapeCoreEdgeLength = maxEdge.GetLength() - (coreDepth+Consts.corridorWidth) * 2;
+            int escapeCoreCountPerEdge = (int)(escapeCoreEdgeLength / Consts.escapeCoreCriteria)-1;
+            
             Vector3d courtX = new Vector3d(lines[0].PointAtEnd - lines[0].PointAtStart);
             Vector3d courtY = new Vector3d(lines[3].PointAtStart - lines[3].PointAtEnd);
             courtX.Unitize();
@@ -409,39 +408,73 @@ namespace TuringAndCorbusier
             List<Point3d> coreOrigins = new List<Point3d>();
             List<Vector3d> coreXVectors = new List<Vector3d>();
             List<Vector3d> coreYVectors = new List<Vector3d>();
+            List<double> coreWidths = new List<double>();
+            List<double> coreDepths = new List<double>();
+
 
             //Draw groundFloor cores
             //1
-            if(!isShortEdgeOver16)
+            if (isShortCore)
+                coreOrigins.Add(lines[0].PointAtStart + (courtX + courtY) * Consts.corridorWidth);
+            else
                 coreOrigins.Add(lines[0].PointAtStart);
-            else
-                coreOrigins.Add((lines[0].PointAtStart + lines[0].PointAtEnd) / 2 - courtX * coreWidth/2);
-            coreXVectors.Add(Vector3d.Multiply(courtX, 1));
-            coreYVectors.Add(Vector3d.Multiply(courtY, 1));
-            if (isSatisfingWW)
+            coreXVectors.Add(courtX);
+            coreYVectors.Add(courtY);
+            coreWidths.Add(coreWidth);
+            coreDepths.Add(coreDepth);
+
+            //2(escapeCore)
+            if (hasToPlaceEscapeCore && escapeCoreCountPerEdge >0)
             {
-                //2
-                coreOrigins.Add(lines[1].PointAtStart);
-                coreXVectors.Add(Vector3d.Multiply(courtX, -1));
-                coreYVectors.Add(Vector3d.Multiply(courtY, 1));
-            }
-            //3
-            if (!isShortEdgeOver16)
-                coreOrigins.Add(lines[2].PointAtStart);
-            else
-                coreOrigins.Add((lines[2].PointAtStart + lines[2].PointAtEnd) / 2 + courtX * coreWidth / 2);
-            coreXVectors.Add(Vector3d.Multiply(courtX, -1));
-            coreYVectors.Add(Vector3d.Multiply(courtY, -1));
-            if (isSatisfingWW)
-            {
-                //4
-                coreOrigins.Add(lines[3].PointAtStart);
-                coreXVectors.Add(Vector3d.Multiply(courtX, 1));
-                coreYVectors.Add(Vector3d.Multiply(courtY, -1));
+                Vector3d coreXDirec = courtY;
+                Vector3d coreYDirec = -courtX;
+                Point3d coreOriginBase = lines[1].PointAtStart + coreXDirec * escapeCoreDepth + (coreXDirec+coreYDirec)*Consts.corridorWidth;
+                double devidedLength = escapeCoreEdgeLength / (escapeCoreCountPerEdge+1);
+               
+                for (int i = 0; i < escapeCoreCountPerEdge; i++)
+                {
+                    Point3d coreOrigin = coreOriginBase + coreXDirec * devidedLength* (i + 1) - coreXDirec * escapeCoreWidth / 2;
+
+                    coreOrigins.Add(coreOrigin);
+                    coreXVectors.Add(coreXDirec);
+                    coreYVectors.Add(coreYDirec);
+                    coreWidths.Add(escapeCoreWidth);
+                    coreDepths.Add(escapeCoreDepth);
+                }
             }
 
-                //stack
-                List<List<Core>> outputCores = new List<List<Core>>();
+            //3      
+            if (isShortCore)
+                coreOrigins.Add(lines[2].PointAtStart - (courtX + courtY) * Consts.corridorWidth);
+            else
+                coreOrigins.Add(lines[2].PointAtStart);
+            coreXVectors.Add(-courtX);
+            coreYVectors.Add(-courtY);
+            coreWidths.Add(coreWidth);
+            coreDepths.Add(coreDepth);
+
+            //4(escapeCore)
+            if (hasToPlaceEscapeCore && escapeCoreCountPerEdge > 0)
+            {
+                Vector3d coreXDirec = -courtY;
+                Vector3d coreYDirec = courtX;
+                Point3d coreOriginBase = lines[3].PointAtStart + coreXDirec * escapeCoreDepth+(coreXDirec + coreYDirec) * Consts.corridorWidth;
+                double devidedLength = escapeCoreEdgeLength / (escapeCoreCountPerEdge + 1);
+
+                for (int i = 0; i < escapeCoreCountPerEdge; i++)
+                {
+                    Point3d coreOrigin = coreOriginBase + coreXDirec * devidedLength * (i+1) - coreXDirec * escapeCoreWidth / 2;
+
+                    coreOrigins.Add(coreOrigin);
+                    coreXVectors.Add(coreXDirec);
+                    coreYVectors.Add(coreYDirec);
+                    coreWidths.Add(escapeCoreWidth);
+                    coreDepths.Add(escapeCoreDepth);
+                }
+            }
+
+            //stack
+            List<List<Core>> outputCores = new List<List<Core>>();
 
             for (int i = 0; i < storiesHigh + 2; i++)
             {
@@ -457,8 +490,8 @@ namespace TuringAndCorbusier
                     Core oneCore = new Core(coreOrigins[j], coreXVectors[j], coreYVectors[j], randomCoreType, storiesHigh, coreDepth);
                     oneCore.Origin = oneCore.Origin + Vector3d.ZAxis * tempStoryHeight;
                     oneCore.Stories = i;
-                    oneCore.Width = coreWidth;
-                    oneCore.Depth = coreDepth;
+                    oneCore.Width = coreWidths[j];
+                    oneCore.Depth = coreDepths[j];
 
                     //임시 면적
                     oneCore.Area = coreWidth * coreDepth;
@@ -490,11 +523,6 @@ namespace TuringAndCorbusier
             double coreWidth = randomCoreType.GetWidth();
             double coreDepth = randomCoreType.GetDepth();
             bool isCorner = false;
-
-            bool isShortEdgeCore = randomCoreType == CoreType.CourtShortEdge;
-            bool isOnShortEdge = false;
-            if (lines[0].GetLength() < lines[1].GetLength())
-                isOnShortEdge = true;
 
             List<double> minCornerCheck = new List<double>();
             int entranceLength = 2000;
@@ -559,7 +587,6 @@ namespace TuringAndCorbusier
                     Point3d winPt4 = winPt3;
                     winPt4.Transform(Transform.Translation(Vector3d.Multiply(homeVecXH, -xaH)));
                     ////////그런데, 복도 방향도 채광창 방향이라고 할 수 있을까?
-                    if(isShortEdgeCore && !isOnShortEdge)
                     windowsH.Add(new Line(winPt1, winPt2));
                     ////////
                     windowsH.Add(new Line(winPt3, winPt4));
@@ -577,11 +604,6 @@ namespace TuringAndCorbusier
                 }
                 else //if is corner
                 {
-                    if (isOnShortEdge)
-                        isOnShortEdge = false;
-                    else
-                        isOnShortEdge = true;
-
                     Point3d checkP = lines[(int)(mappedVals[i] - 0.01)].PointAtEnd;
                     Point3d sOri = centerLine.PointAt(mappedVals[i]);
                     Point3d eOri = centerLine.PointAt(mappedVals[(mappedVals.Count + i + 1) % mappedVals.Count]);
@@ -969,24 +991,35 @@ namespace TuringAndCorbusier
                     {
                         double minSearchWidth = Math.Sqrt(bestArea * ratios[k]);
                         double maxSearchWidth = Math.Min(maxWidth, maxHeight * ratios[k]);
-                        if (minSearchWidth < maxSearchWidth)
+
+                        if (minSearchWidth >= maxSearchWidth)
+                            continue;
+
+                        double widthTemp = widthFinder(boundaryClone, bestArea, ratios[k], points[j], minSearchWidth, maxSearchWidth, binaryIterNum);
+
+                        double maxEdgeLength = Math.Max(widthTemp, widthTemp / ratios[k]);
+                        double minEdgeLength = Math.Min(widthTemp, widthTemp / ratios[k]);
+
+                        bool isSatisfyingLL = aptWidth * 2 + Math.Max(CoreType.CourtShortEdge.GetWidth()+Consts.corridorWidth, regulationHigh.DistanceLL) < minEdgeLength;
+                        bool isEscapeCoreAvailable = minEdgeLength > (CoreType.CourtShortEdge.GetDepth() + Consts.corridorWidth) * 2 + aptWidth * 2 + regulationHigh.DistanceWW;
+                        bool hasToPlaceEscapeCore = maxEdgeLength - aptWidth * 2 > Consts.escapeCoreCriteria;
+
+                        if (hasToPlaceEscapeCore && !isEscapeCoreAvailable)
+                            continue;
+
+                        if (bestArea < widthTemp * widthTemp / ratios[k] && isSatisfyingLL)
                         {
-                            double widthTemp = widthFinder(boundaryClone, bestArea, ratios[k], points[j], minSearchWidth, maxSearchWidth, binaryIterNum);
-
-                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + Math.Max(CoreType.CourtShortEdge.GetWidth(),regulationHigh.DistanceLL)< Math.Min(widthTemp, widthTemp / ratios[k]))
+                            double t = aptWidth + Consts.corridorWidth;
+                            double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
+                            if (area / CommonFunc.getArea(plot.Boundary) < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage / 100)
                             {
-                                double t = aptWidth + Consts.corridorWidth;
-                                double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
-                                if (area / CommonFunc.getArea(plot.Boundary) < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage / 100)
-                                {
 
-                                    bestArea = widthTemp * widthTemp / ratios[k];
-                                    solWidth = widthTemp;
-                                    solAngle = angles[i];
-                                    solPoint = points[j];
-                                    solPoint.Transform(Transform.Rotation(-angles[i], Point3d.Origin));
-                                    solRatio = ratios[k];
-                                }
+                                bestArea = widthTemp * widthTemp / ratios[k];
+                                solWidth = widthTemp;
+                                solAngle = angles[i];
+                                solPoint = points[j];
+                                solPoint.Transform(Transform.Rotation(-angles[i], Point3d.Origin));
+                                solRatio = ratios[k];
                             }
                         }
                     }
@@ -1022,25 +1055,34 @@ namespace TuringAndCorbusier
                     {
                         double minSearchWidth = Math.Sqrt(bestArea * ratios[k]);
                         double maxSearchWidth = Math.Min(maxWidth, maxHeight * ratios[k]);
-                        if (minSearchWidth < maxSearchWidth)
-                        {
-                            double widthTemp = widthFinder(boundaryClone, bestArea, ratios[k], points[j], minSearchWidth, maxSearchWidth, binaryIterNum);
-                            //Rhino.RhinoDoc.ActiveDoc.Objectrs.AddCurve(rectMaker(angles[i], points[j], ratios[k], widthTemp).ToNurbsCurve());
-                            if (bestArea < widthTemp * widthTemp / ratios[k] && aptWidth * 2 + Math.Max(CoreType.CourtShortEdge.GetWidth(), regulationHigh.DistanceLL) < Math.Min(widthTemp, widthTemp / ratios[k]))
-                            //if(true)
-                            {
-                                double t = aptWidth + Consts.corridorWidth;
-                                double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
-                                if (area / CommonFunc.getArea(plot.Boundary) < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage / 100)
-                                {
-                                    bestArea = widthTemp * widthTemp / ratios[k];
-                                    solWidth = widthTemp;
-                                    solAngle = angles[i];
-                                    solPoint = points[j];
-                                    solPoint.Transform(Transform.Rotation(-angles[i], Point3d.Origin));
-                                    solRatio = ratios[k];
-                                }
 
+                        if (minSearchWidth >= maxSearchWidth)
+                            continue;
+
+                        double widthTemp = widthFinder(boundaryClone, bestArea, ratios[k], points[j], minSearchWidth, maxSearchWidth, binaryIterNum);
+
+                        double maxEdgeLength = Math.Max(widthTemp, widthTemp / ratios[k]);
+                        double minEdgeLength = Math.Min(widthTemp, widthTemp / ratios[k]);
+
+                        bool isSatisfyingLL = aptWidth * 2 + Math.Max(CoreType.CourtShortEdge.GetWidth() + Consts.corridorWidth, regulationHigh.DistanceLL) < minEdgeLength;
+                        bool isEscapeCoreAvailable = minEdgeLength > (CoreType.CourtShortEdge.GetDepth() + Consts.corridorWidth) * 2 + aptWidth * 2 + regulationHigh.DistanceWW;
+                        bool hasToPlaceEscapeCore = maxEdgeLength - aptWidth * 2 > Consts.escapeCoreCriteria;
+
+                        if (hasToPlaceEscapeCore && !isEscapeCoreAvailable)
+                            continue;
+
+                        if (bestArea < widthTemp * widthTemp / ratios[k] && isSatisfyingLL)
+                        {
+                            double t = aptWidth + Consts.corridorWidth;
+                            double area = 2 * t * (widthTemp + widthTemp / ratios[k] - 2 * t) + 4 * (core.GetWidth() - Consts.corridorWidth) * (core.GetDepth() - Consts.corridorWidth);
+                            if (area / CommonFunc.getArea(plot.Boundary) < TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage / 100)
+                            {
+                                bestArea = widthTemp * widthTemp / ratios[k];
+                                solWidth = widthTemp;
+                                solAngle = angles[i];
+                                solPoint = points[j];
+                                solPoint.Transform(Transform.Rotation(-angles[i], Point3d.Origin));
+                                solRatio = ratios[k];
                             }
 
                         }
