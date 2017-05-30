@@ -157,9 +157,9 @@ namespace TuringAndCorbusier
             bool isSatisfingWW = regulationHigh.DistanceLL + 2 * randomCoreType.GetWidth() + width < Math.Min(lines[0].GetLength(), lines[1].GetLength());
             bool isSquareCoreAvailable = width*2 +regulationHigh.DistanceLW + CoreType.Folded.GetDepth() < Math.Min(lines[0].GetLength(), lines[1].GetLength());
             if (!isSquareCoreAvailable)
-                randomCoreType = CoreType.CourtShortEdge;
-
-   
+                parameterSet.fixedCoreType = randomCoreType = CoreType.CourtShortEdge;
+            else
+                parameterSet.fixedCoreType = randomCoreType = CoreType.Folded;
             //Draw cores and households
             List<List<Core>> cores = MakeCores(parameterSet, inlineCurve, isSatisfingWW);
             List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, centerLinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
