@@ -75,10 +75,11 @@ namespace TuringAndCorbusier
                 {
                     if (/*i % 2 == 0 &&*/ j == 3 && ag.GetType() == typeof(AG1))
                     {
-                        //double parameterForGene = ((goodAngle + Math.PI / 2 * (i % 4) / 2) % (Math.PI * 2) + Math.PI * ((int)(i / 4) % 2) % (Math.PI * 2));
+                        double parameterForGene = ((goodAngle + Math.PI / 2 * (i % 4) / 2) % (Math.PI * 2) + Math.PI * ((int)(i / 4) % 2) % (Math.PI * 2));
                         //oneGene[j] = parameterForGene;
-                        double mainAngle = Math.PI * i / otherAngles;
-                        oneGene[j] = mainAngle;
+                        //double mainAngle = Math.PI * i / otherAngles;
+                        //oneGene[j] = mainAngle;
+                        oneGene[j] = parameterForGene;
                     }
                     else
                     {
