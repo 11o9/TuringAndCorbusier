@@ -15,34 +15,41 @@ namespace Reports
     /// </summary>
     public partial class floorPlanDrawingPage
     {
-        public floorPlanDrawingPage(Interval floorInterval)
+        public floorPlanDrawingPage(Interval floorInterval,bool isUsing1F)
         {
             InitializeComponent();
+            if (isUsing1F == true)
+            {
+                this.SetTitle2(floorInterval);
+            }else
+            {
             this.SetTitle(floorInterval);
+
+            }
         }
         public floorPlanDrawingPage(int number)
         {
             InitializeComponent();
-            this.planPageTitle.Text = "1st Floor plan";
+            this.planPageTitle.Text = "PLAN 1F";
+        }
+        public floorPlanDrawingPage(int number,string lastFloor)
+        {
+            InitializeComponent();
+            this.planPageTitle.Text = "PLAN "+number.ToString()+"F";
         }
 
         private void SetTitle(Interval floorInterval)
         {
-            if (floorInterval.Min == floorInterval.Max)
-            {
-                if (floorInterval.Min == 1)
-                {
-                    this.planPageTitle.Text = (floorInterval.Min + 1).ToString() + "nd Floor plan";
-                }
-                else if (floorInterval.Min == 2)
-                {
-                    this.planPageTitle.Text = (floorInterval.Min + 1).ToString() + "rd Floor plan";
-                }
-                else
-                {
-                    this.planPageTitle.Text = (floorInterval.Min + 1).ToString() + "th Floor plan";
-                }
-            }
+            this.planPageTitle.Text = "PLAN " + (floorInterval.Min+1).ToString() + "-" + floorInterval.Max.ToString() + "F";
+
+            //else
+            //{
+            //    this.planPageTitle.Text = "4." + floorInterval.Min.ToString() + "~" + floorInterval.Max.ToString() + "th Floor plan";
+            //}
+        }
+        private void SetTitle2(Interval floorInterval)
+        {
+            this.planPageTitle.Text = "PLAN " + floorInterval.Min.ToString() + "-" + floorInterval.Max.ToString() + "F";
 
             //else
             //{
@@ -131,9 +138,8 @@ namespace Reports
             double scaleFactor = PlanDrawingFunction_90degree.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
 
 
-            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray, 0.2);
-            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 2);
-            PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
+            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+            PlanDrawingFunction_90degree.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 5);
 
             //세대 타입 구하기
             List<string> roundedStringExclusiveAreaList = new List<string>();
@@ -152,17 +158,14 @@ namespace Reports
                 {
                     //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
                     //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
-                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
                     //PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, areaTypeBackgroundColour);
                     PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGreen);
-
-
-
                 }
 
             foreach (Curve core in corePlanList)
             {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
                 PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
             }
             foreach (Curve detail in coreDetailList)
@@ -171,7 +174,7 @@ namespace Reports
             }
             foreach (FloorPlan floorPlan in floorPlanList)
             {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
             }
 
             }catch(Exception e)
@@ -223,33 +226,33 @@ namespace Reports
             System.Windows.Point initialOriginPoint = new System.Windows.Point();
             double scaleFactor = PlanDrawingFunction_90degree.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
 
-            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray, 0.2);
-            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 2);
-            PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
+            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+            PlanDrawingFunction_90degree.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 5);
+           
 
 
             //draw the core
+            //foreach (Curve detail in coreDetailList)
+            //{
+            //    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, detail, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+            //}
             foreach (Curve core in corePlanList)
             {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
                 PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
             }
-            foreach (Curve detail in coreDetailList)
-            {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, detail, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
-            }
-            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 3);
+            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
             //draw houseoutline with dashlines
             foreach (Curve house in houseOutline)
             {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, house, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray, 0.025);
+                PlanDrawingFunction_90degree.drawDashedPlan(rectangleToFit, house, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
             }
             foreach (Curve parkingLine in parkinglineList)
             {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, parkingLine, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, parkingLine, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
             }
 
-            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 3);
+            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
         }
     }
 }

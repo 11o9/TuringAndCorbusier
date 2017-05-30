@@ -22,25 +22,25 @@ namespace Reports
             this.address.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.Address;
             this.plotType.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotType;
             this.plotArea_Manual.Text = Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea, 2).ToString() + "m\xB2";
-            this.plotArea_Manual_Py.Text = Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea / 3.3, 2).ToString() + "평";
+            //this.plotArea_Manual_Py.Text = Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea / 3.3, 2).ToString() + "평";
             this.plotArea_Unusable.Text = (0).ToString() + "m\xB2";
-            this.plotArea_Unusable_Py.Text = (0 / 3.3).ToString() + "평";
+            //this.plotArea_Unusable_Py.Text = (0 / 3.3).ToString() + "평";
             this.plotArea_Usable.Text = Math.Round(AGoutput.Plot.GetArea() / 1000000, 2).ToString() + "m\xB2";
-            this.plotArea_Usable_Py.Text = Math.Round(AGoutput.Plot.GetArea() / 1000000 / 3.3, 2).ToString() + "평";
+            //this.plotArea_Usable_Py.Text = Math.Round(AGoutput.Plot.GetArea() / 1000000 / 3.3, 2).ToString() + "평";
             this.buildingType.Text = "공동주택(" + CommonFunc.GetApartmentType(AGoutput) + ")";
             this.buildingScale.Text = buildingScaleForReport(AGoutput);
             this.buildingArea.Text = Math.Round(AGoutput.GetBuildingArea() / 1000000, 2).ToString() + "m\xB2";
-            this.buildingArea_Py.Text = Math.Round(AGoutput.GetBuildingArea() / 1000000 / 3.3, 2).ToString() + "평";
+            //this.buildingArea_Py.Text = Math.Round(AGoutput.GetBuildingArea() / 1000000 / 3.3, 2).ToString() + "평";
             this.grossArea_UnderGround.Text = Math.Round(AGoutput.ParkingLotUnderGround.ParkingArea / 1000000, 2).ToString() + "m\xB2"; //////////////////////////////////////////////////////////////
-            this.grossArea_UnderGround_Py.Text = Math.Round(AGoutput.ParkingLotUnderGround.ParkingArea / 1000000 / 3.3, 2).ToString() + "평"; //////////////////////////////////////////////////////////////
+            //this.grossArea_UnderGround_Py.Text = Math.Round(AGoutput.ParkingLotUnderGround.ParkingArea / 1000000 / 3.3, 2).ToString() + "평"; //////////////////////////////////////////////////////////////
             this.grossArea_OverGround.Text = Math.Round(AGoutput.GetGrossArea() / 1000000, 2).ToString() + "m\xB2";
-            this.grossArea_OverGround_Py.Text = Math.Round(AGoutput.GetGrossArea() / 1000000 / 3.3, 2).ToString() + "평";
+            //this.grossArea_OverGround_Py.Text = Math.Round(AGoutput.GetGrossArea() / 1000000 / 3.3, 2).ToString() + "평";
             this.grossArea.Text = Math.Round((AGoutput.GetGrossArea() + 1) / 1000000, 2).ToString() + "m\xB2";//////////////////////////////////////////////////////////////
-            this.grossArea_Py.Text = Math.Round((AGoutput.GetGrossArea() + 1) / 1000000 / 3.3, 2).ToString() + "평";//////////////////////////////////////////////////////////////
+            //this.grossArea_Py.Text = Math.Round((AGoutput.GetGrossArea() + 1) / 1000000 / 3.3, 2).ToString() + "평";//////////////////////////////////////////////////////////////
             this.BPR.Text = Math.Round((AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000, 2).ToString() + "m\xB2";
-            this.BPR_Py.Text = Math.Round((AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
-            this.ConstructionArea.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000, 2).ToString() + "m\xB2";
-            this.ConstructionArea_Py.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
+            //this.BPR_Py.Text = Math.Round((AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
+            //this.ConstructionArea.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000, 2).ToString() + "m\xB2";
+            //this.ConstructionArea_Py.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
             this.legalParking.Text = AGoutput.GetLegalParkingLotofHousing().ToString();
             //test
             double grossarea = AGoutput.GetGreenArea();
@@ -105,7 +105,7 @@ namespace Reports
 
             foreach (FloorPlan floorPlan in floorPlanList)
             {
-                PlanDrawingFunction.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+                PlanDrawingFunction.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
             }
 
             PlanDrawingFunction.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
