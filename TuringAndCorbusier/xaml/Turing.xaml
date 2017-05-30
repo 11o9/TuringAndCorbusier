@@ -234,6 +234,7 @@
         </Grid>
 
         <Button x:Name="Calculate" Style="{StaticResource MyButtonStyle3}" Content="대지 입력" FontSize="17" Margin="17,169,19,0" FontFamily="Noto Sans CJK KR Regular" Background="#FF353535" Foreground="White" Height="34" VerticalAlignment="Top" />
+        <Button x:Name="Information" Style="{StaticResource MyButtonStyle3}" Content="프로그램 정보" FontSize="10" Margin="160,10,10,0" FontFamily="Noto Sans CJK KR Regular" Background="#FF353535" Foreground="White" Height="19" VerticalAlignment="Top" Click="Information_Click"/>
 
         <Rectangle Fill="#FF2B2B2B" Margin="17,218,34,163">
 

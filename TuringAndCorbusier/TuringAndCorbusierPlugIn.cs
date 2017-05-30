@@ -81,7 +81,7 @@ namespace TuringAndCorbusier
             System.Type panel_type = typeof(TuringHost);
 
 
-            Rhino.UI.Panels.RegisterPanel(this, panel_type, "SH_ApartmentGenerator", TuringAndCorbusier.Properties.Resources.Icon1);
+            Rhino.UI.Panels.RegisterPanel(this, panel_type, "SPACEWALK_ApartmentGenerator", TuringAndCorbusier.Properties.Resources.Icon1);
 
 
             //Rhino.RhinoApp.Idle += idleEvent;

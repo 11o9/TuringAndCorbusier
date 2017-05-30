@@ -153,6 +153,7 @@ namespace TuringAndCorbusier
 
         private void DrawPilji(object sender, RoutedEventArgs e)
         {
+            RhinoApp.RunScript("Show", false);
             drawer.Draw(Piljis);
             if (Bonbun == "")
             {

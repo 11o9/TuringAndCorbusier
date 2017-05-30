@@ -119,6 +119,7 @@
       <DependentUpon>ServerUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="cs\Server\SiteParser.cs" />
+    <Compile Include="ProgramInformation.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -169,6 +170,7 @@
     <Compile Include="Utility\PointTools.cs" />
     <Compile Include="Utility\PolylineTools.cs" />
     <Compile Include="Utility\RectangleTools.cs" />
+    <Compile Include="Utility\TimeCheck.cs" />
     <Compile Include="Utility\VectorSet.cs" />
     <Compile Include="Utility\VectorTools.cs" />
     <Compile Include="xaml\Corbusier.xaml.cs">

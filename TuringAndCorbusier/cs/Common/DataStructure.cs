@@ -5,7 +5,7 @@ using System.Linq;
 using Rhino.Display;
 using System.IO;
 using Rhino;
-
+using TuringAndCorbusier.Utility;
 namespace TuringAndCorbusier.Document
 {
     public class Document
@@ -2196,6 +2196,7 @@ namespace TuringAndCorbusier
 
             Point3d origin = Origin;
 
+
             
             //each side
             for (int i = 0; i < MoveableEdge.Count; i++)
@@ -2314,7 +2315,12 @@ namespace TuringAndCorbusier
                 }
 
             }
-            return true;
+            var diff = Curve.CreateBooleanDifference(GetOutline(), testCurve);
+
+            if (diff.Length == 0)
+                return true;
+            else
+                return false;
         }
 
         private double CalculateSetBackDistance(Curve testCurve, Curve testline)

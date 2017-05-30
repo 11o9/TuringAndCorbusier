@@ -44,14 +44,12 @@ namespace TuringAndCorbusier
                                    select layer).ToList<Rhino.DocObjects.Layer>();
 
             Rhino.DocObjects.Layer layer_to_change = null;
-            if (matching_layers.Count == 0)
-            {
-                RhinoApp.WriteLine("Layer" + layercolor.ToKnownColor() + "does not exist.");
 
-            }
-
-
-            else if (matching_layers.Count > 0)
+            //if (matching_layers.Count == 0)
+            //{
+            //    RhinoApp.WriteLine("Layer" + layercolor.ToKnownColor() + "does not exist.");
+            //}
+            if (matching_layers.Count > 0)
             {
 
                 
@@ -252,19 +250,7 @@ namespace TuringAndCorbusier
             Guid currentPanel = TuringHost.PanelId;
 
 
-            
-            
 
-            
-            
-            
-
-            RhinoApp.WriteLine("PROJECT BOUNDLESS-X");
-            RhinoApp.WriteLine("BY BOUNDLESS");
-            RhinoApp.WriteLine("Ver 2.10 For SH");
-            RhinoApp.WriteLine("Load Complete");
-
-            //
             //레이어 검정색 -> 하얀색
             LayerColorChange(doc, Color.Black);
 
