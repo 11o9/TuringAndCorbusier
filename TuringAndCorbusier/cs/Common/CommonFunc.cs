@@ -77,9 +77,11 @@ namespace TuringAndCorbusier
                     break;
 
                 case "PT-3":
+                    crvs.AddRange(AG3AptDistance(output, ref dim));
                     break;
 
                 case "PT-4":
+                    crvs.AddRange(AG4AptDistance(output, ref dim));
                     break;
 
                 default:
@@ -96,6 +98,8 @@ namespace TuringAndCorbusier
             List<Curve> result = new List<Curve>();
             foreach (var aptline in output.AptLines)
             {
+                if (output.AptLines.IndexOf(aptline) == 0)
+                    continue;
                 Curve front = aptline.DuplicateCurve();
                 Curve back = front.DuplicateCurve();
                 var v = aptline.TangentAtStart;
@@ -109,7 +113,8 @@ namespace TuringAndCorbusier
                 Curve back2 = back.DuplicateCurve();
 
                 //height(total)
-                var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight;
+                double pilotiHeight = output.ParameterSet.using1F ? 0 : Consts.PilotiHeight;
+                var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight - pilotiHeight;
                 //height(except pil)
 
                 var d3 = d2 * TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation;
@@ -131,6 +136,152 @@ namespace TuringAndCorbusier
 
             return result;
         }
+        private static List<Curve> AG3AptDistance(Apartment output, ref List<string> dim)
+        {
+            List<Curve> result = new List<Curve>();
+            if (output.AptLines == null || output.AptLines.Count == 0)
+                return new List<Curve>();
+
+            Curve rect = output.AptLines[0];
+            double width = output.ParameterSet.Parameters[2];
+            var offset = rect.Offset(Plane.WorldXY, width / 2, 0, CurveOffsetCornerStyle.Sharp);
+
+            if (offset == null || offset.Length == 0)
+                return new List<Curve>();
+
+            Curve innerRect = offset[0];
+            Curve[] segments = innerRect.DuplicateSegments();
+
+            if (segments.Length == 0)
+                segments = offset;
+            double minDistance = segments.Min(n => n.GetLength());
+            double maxDistance = segments.Max(n => n.GetLength());
+
+            Vector3d maxDir = segments.Where(n => n.GetLength() == maxDistance).ToList()[0].TangentAtStart; //장변벡터
+            Vector3d minDir = -(segments.Where(n => n.GetLength() == minDistance).ToList()[0].TangentAtStart); //단변벡터
+
+            Point3d maxStart = segments.Where(n => n.GetLength() == minDistance).ToList()[0].PointAtNormalizedLength(0.55); //단변중심
+            Point3d minStart = segments.Where(n => n.GetLength() == maxDistance).ToList()[0].PointAtNormalizedLength(0.55); //장변중심
+            maxStart.Z = output.Household.Last().ToList().Last().ToList().Last().Origin.Z;
+            minStart.Z = output.Household.Last().ToList().Last().ToList().Last().Origin.Z;
+
+            if (output.ParameterSet.fixedCoreType == CoreType.Folded)
+            {
+   
+                var Cores = output.Core[output.Core.Count - 2];
+                Point3d xStart = Cores[0].Origin + Cores[0].XDirection * Cores[0].Width + Cores[0].YDirection * Cores[0].Depth / 2;
+                Point3d yStart = Cores[0].Origin + Cores[0].XDirection * Cores[0].Width / 2 + Cores[0].YDirection * Cores[0].Depth;
+
+                //Point3d xEnd = Cores[1].Origin + Cores[1].XDirection * Cores[1].Width + Cores[1].YDirection * Cores[1].Depth / 2;
+                //Point3d yEnd = Cores[1].Origin + Cores[1].XDirection * Cores[1].Width / 2 + Cores[1].YDirection * Cores[1].Depth;
+                //maxdir쪽이면
+
+                //Vector3d xdiff = xEnd - xStart;
+                //Vector3d ydiff = yEnd - yStart;
+
+                //double xLength = xdiff.X + Cores[0].Width;
+                //double yLength = ydiff.Y + Cores[0].Depth;
+
+                //LineCurve x = new LineCurve(xStart,xStart + Cores[0].XDirection * xLength);
+                //dim.Add(Math.Round(xLength).ToString());
+                //result.Add(x);
+                //LineCurve y = new LineCurve(yStart, yStart + Cores[0].YDirection * yLength);
+                //dim.Add(Math.Round(yLength).ToString());
+                //result.Add(y);
+
+                Point3d start = Cores[0].Origin;
+                Point3d end = Cores[1].Origin;
+
+                Line fromStart = new Line(xStart, Cores[0].XDirection);
+                Line fromEnd = new Line(end, Cores[0].YDirection);
+                double paramA, paramB;
+                Rhino.Geometry.Intersect.Intersection.LineLine(fromStart, fromEnd, out paramA, out paramB);
+
+                Line xLine = new Line(xStart, fromStart.PointAt(paramA));
+
+
+                fromStart = new Line(yStart, Cores[0].YDirection);
+                fromEnd = new Line(end, Cores[0].XDirection);
+                double paramC, paramD;
+                Rhino.Geometry.Intersect.Intersection.LineLine(fromStart, fromEnd, out paramC, out paramD);
+
+                Line yLine = new Line(yStart, fromStart.PointAt(paramC));
+
+                result.Add(new LineCurve(xLine));
+                dim.Add(Math.Round(xLine.Length).ToString());
+
+                result.Add(new LineCurve(yLine));
+                dim.Add(Math.Round(yLine.Length).ToString());
+
+
+                return result;
+
+            }
+            
+            else if (output.ParameterSet.fixedCoreType == CoreType.CourtShortEdge)
+            {
+                var Cores = output.Core[output.Core.Count - 2];
+
+                double distanceExceptCoreDepth = maxDistance - Cores[0].Depth * 2;
+                LineCurve coreTocore = new LineCurve(maxStart + maxDir * Cores[0].Depth, maxStart + maxDir * Cores[0].Depth + maxDir * distanceExceptCoreDepth);
+                result.Add(coreTocore);
+                string log = Math.Round(distanceExceptCoreDepth).ToString();
+                dim.Add(log);
+                LineCurve winTowin = new LineCurve(minStart, minStart + minDir * minDistance);
+                result.Add(winTowin);
+                log = Math.Round(minDistance).ToString();
+                dim.Add(log);
+
+                return result;
+            }
+            else
+            {
+                return new List<Curve>();
+            }
+        }
+        private static List<Curve> AG4AptDistance(Apartment output, ref List<string> dim)
+        {
+            List<Curve> result = new List<Curve>();
+            if (output.AptLines.Count == 0)
+                return new List<Curve>();
+            Curve[] segments = output.AptLines[0].DuplicateSegments();
+            if (segments.Length != 3)
+                return new List<Curve>();
+
+            Vector3d seg1v = segments[0].TangentAtStart;
+            Vector3d seg2v = segments[2].TangentAtStart;
+
+            double width = output.ParameterSet.Parameters[2];
+
+            if (Vector3d.VectorAngle(seg1v, seg2v) < 0.1)
+                return new List<Curve>();
+
+            else
+            {
+                Line a = new Line(segments[0].PointAtStart,segments[2].PointAtStart);
+                Line b = new Line(segments[2].PointAtEnd, segments[0].PointAtEnd);
+                
+                double length = segments[1].GetLength() - width;
+                double paramA, paramB;
+                Rhino.Geometry.Intersect.Intersection.LineLine(a, b, out paramA, out paramB);
+                Point3d cross = a.PointAt(paramA);
+                double onSegments0;
+                segments[0].ClosestPoint(cross,out onSegments0);
+                Point3d onSeg0 = segments[0].PointAt(onSegments0);
+                Vector3d dir = cross - onSeg0;
+                dir.Unitize();
+                onSeg0 += dir * width / 2;
+                onSeg0.Z = output.Household.Last().First().First().Origin.Z;
+
+                LineCurve line = new LineCurve(onSeg0, onSeg0 + dir * length);
+                result.Add(line);
+                dim.Add(Math.Round(length).ToString());
+            }
+
+            return result;
+
+        }
+
 
         public static List<Curve> JoinRegulation(Plot plot, double stories, Apartment output)
         {
