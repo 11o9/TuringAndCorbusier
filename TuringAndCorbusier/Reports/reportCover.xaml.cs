@@ -22,6 +22,7 @@ namespace Reports
     public partial class ReportCover : UserControl,IDisposable
     {
         string imageDirectory = "";
+
         public ReportCover()
         {
             //이전에 저장한 이미지 가져오기 위해 이미지 저장되어있는 경로 만들기
@@ -107,6 +108,12 @@ namespace Reports
         public void Dispose()
         {
             image.Source = null;
+        }
+
+        private void SetFontFamily()
+        {
+            FontFamily fontFamily = new FontFamily("Din Alternate");
+            
         }
     }//class
 }//namespace

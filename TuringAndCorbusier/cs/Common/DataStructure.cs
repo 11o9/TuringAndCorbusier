@@ -614,7 +614,7 @@ namespace TuringAndCorbusier
         }
 
         //Field, 필드
-
+        //JHL 1층 활성화
         double[] thisParameters;
         double height;
         public bool using1F = false;

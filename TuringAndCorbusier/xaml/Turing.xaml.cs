@@ -135,7 +135,7 @@ namespace TuringAndCorbusier
                 UIManager.getInstance().ShowWindow(TuringAndCorbusierPlugIn.InstanceClass.theOnlyMenuWindow, UIManager.WindowType.Menu);
         }
 
-        //JHL
+        //JHL 초감도
         private void MainPaenl_StackButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -145,7 +145,7 @@ namespace TuringAndCorbusier
             this.previousClickedButtonIndex = stackPanel.Children.IndexOf(sender as Button);
             this.previousClickedButtonBrush = (sender as Button).Background;
 
-            (sender as Button).Background = new SolidColorBrush(Color.FromArgb(255, 255, 204, 0));
+            (sender as Button).Background = new SolidColorBrush(Color.FromArgb(255, 255, 255, 0));
 
 
 
@@ -488,7 +488,7 @@ namespace TuringAndCorbusier
                 List<System.Windows.Documents.FixedPage> FixedPageList = new List<System.Windows.Documents.FixedPage>();
 
                 FixedDocument currentDoc = new FixedDocument();
-                currentDoc.DocumentPaginator.PageSize = new Size(1240, 1753);
+                currentDoc.DocumentPaginator.PageSize = new Size(1240, 1750);
 
                 List<Page> pagesToVIew = new List<Page>();
 
@@ -516,6 +516,9 @@ namespace TuringAndCorbusier
                 var hasImage = reportCover.setImage("test1.jpeg");
                 reportCover.SetTitle(projectNameStr);
                 reportCover.SetPublishDate();
+                //1층 활성화되는지 가져오기
+                bool isUsing1F = MainPanel_AGOutputList[tempIndex].ParameterSet.using1F;
+
                 //표지에 넣을 정보 값 리스트에 넣기
                 Reports.xmlBuildingReport xmlBuildingInfo = new Reports.xmlBuildingReport(MainPanel_AGOutputList[tempIndex]);
 
@@ -1299,8 +1302,9 @@ namespace TuringAndCorbusier
                 RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
 
                 RhinoApp.Wait();
+
                 //-----------JHL 조감도 ---------------//
-                var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(940, 665), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
+                var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038, 812), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
                 string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
                 bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
                 string key = "BIRDEYE" + (i + 1).ToString();
@@ -1352,7 +1356,7 @@ namespace TuringAndCorbusier
 
                 RhinoApp.Wait();
                 string path = "";
-                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1035, 1081), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038, 812), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
                 {
                     
                     path = dirinfo.FullName + "test" + i.ToString() + ".jpeg";

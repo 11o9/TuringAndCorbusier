@@ -85,27 +85,30 @@ namespace Reports
             System.Windows.Point initialOriginPoint = new System.Windows.Point();
             double scaleFactor = PlanDrawingFunction.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
 
-            PlanDrawingFunction.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray, 0.2);
-            PlanDrawingFunction.drawPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 2);
+
+
+            PlanDrawingFunction.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.2);
+            PlanDrawingFunction.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 5);
+            //PlanDrawingFunction.drawBackGround(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
 
             foreach (Curve house in houseOutline)
             {
-                PlanDrawingFunction.drawPlan(rectangleToFit, house, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
-                PlanDrawingFunction.drawBackGround(rectangleToFit, house, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightSeaGreen);
+                PlanDrawingFunction.drawPlan(rectangleToFit, house, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+
             }
 
             foreach(Curve core in corePlanList)
             {
-                PlanDrawingFunction.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
-                PlanDrawingFunction.drawBackGround(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
+                PlanDrawingFunction.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+                
             }
 
             foreach (FloorPlan floorPlan in floorPlanList)
             {
-                PlanDrawingFunction.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+                PlanDrawingFunction.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
             }
 
-            PlanDrawingFunction.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 3);
+            PlanDrawingFunction.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
         }
 
 

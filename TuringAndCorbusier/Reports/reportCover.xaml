@@ -9,49 +9,56 @@
          >
 
     <FixedPage Name="fixedPage" Width="1240" Height="1750">
+        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="89,83,-680,-38"/>
+        <TextBlock Text="PROJECT OVERVIEW" FontSize="30" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="150" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="Bold" Margin="88,70,42,-70"/>
+
         <Canvas  Width="1240" Height="1750">
-            <TextBlock Text="PROJECT OVERVIEW"  FontSize="35" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="85" Canvas.Top="80" FontFamily="Myriad Pro" FontWeight="Bold"/>
-            <Rectangle Fill="#FF2F9947" Height="5" Canvas.Left="85" Stroke="#FF2F9947" Canvas.Top="120" Width="475" OpacityMask="#FF2F9947"/>
+            <Image x:Name="image" Height="812" Width="1038" Canvas.Left="97" Canvas.Top="656"/>
 
-            <Canvas x:Name="canvas1" Height="1100" Width="1055" Canvas.Left="85" Canvas.Top="350" Background="#FF2F9947">
-                <Image x:Name="image" Height="1081" Width="1035" Canvas.Left="10" Canvas.Top="9"/>
-                <Rectangle Height="266" Canvas.Left="500" Canvas.Top="799" Width="520" StrokeThickness="2">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="White" Opacity="0.8"/>
-                    </Rectangle.Fill>
-                </Rectangle>
-                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Left="500" Canvas.Top="799" Height="75" Stretch="Fill" Width="520"/>
-                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Left="500" Canvas.Top="838" Height="75" Stretch="Fill" Width="520"/>
-                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Left="500" Canvas.Top="875" Height="75" Stretch="Fill" Width="520"/>
-                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Left="500" Canvas.Top="913" Height="75" Stretch="Fill" Width="520"/>
-                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Left="500" Canvas.Top="951" Height="75" Stretch="Fill" Width="520"/>
-                <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Left="500" Canvas.Top="990" Height="75" Stretch="Fill" Width="520"/>
-                <TextBlock  Text="프로젝트 명" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="515" Canvas.Top="809" FontFamily="NanumSquareOTF" FontWeight="Bold" />
-                <TextBlock  Text="대지 위치" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="515" Canvas.Top="846" FontFamily="NanumSquareOTF"  FontWeight="Bold" />
-                <TextBlock  Text="지역지구" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="515" Canvas.Top="884" FontFamily="NanumSquareOTF"  FontWeight="Bold" />
-                <TextBlock  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="515" Canvas.Top="922" FontFamily="NanumSquareOTF"  FontWeight="Bold" />
-                <TextBlock  Text="용적률" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="515" Canvas.Top="960" FontFamily="NanumSquareOTF"  FontWeight="Bold" />
-                <TextBlock  Text="건폐율" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="515" Canvas.Top="1000" FontFamily="NanumSquareOTF"  FontWeight="Bold" />
-                <TextBlock  Text="세대구성" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="515" Canvas.Top="1035" FontFamily="NanumSquareOTF"  FontWeight="Bold" />
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3" Fill="Black" Canvas.Left="95" Canvas.Top="356" Height="75" Stretch="Fill" Width="145"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3" Fill="Black" Canvas.Left="95" Canvas.Top="391.6" Height="75" Stretch="Fill" Width="145"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3" Fill="Black" Canvas.Left="95" Canvas.Top="430.6" Height="75" Stretch="Fill" Width="145"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3" Fill="Black" Canvas.Left="95" Canvas.Top="467.6" Height="75" Stretch="Fill" Width="145"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3" Fill="Black" Canvas.Left="95" Canvas.Top="505.6" Height="75" Stretch="Fill" Width="145"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3" Fill="Black" Canvas.Left="95" Canvas.Top="543.6" Height="75" Stretch="Fill" Width="145"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3" Fill="Black" Canvas.Left="95" Canvas.Top="582.6" Height="75" Stretch="Fill" Width="145"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3" Fill="Black" Canvas.Left="95" Canvas.Top="619" Height="75" Stretch="Fill" Width="145"/>
 
-                <!-- -->
-                <TextBlock  x:Name="projectName" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="809" FontFamily="NanumSquareOTF" />
-                <TextBlock  x:Name="address" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="846" FontFamily="NanumSquareOTF" />
-                <TextBlock  x:Name="plotType" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="884" FontFamily="NanumSquareOTF" />
-                <TextBlock  x:Name="plotArea_Usable" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="922" FontFamily="NanumSquareOTF" />
-                <TextBlock  x:Name="buildingCoverage" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="1000" FontFamily="NanumSquareOTF" />
-                <TextBlock  x:Name="floorAreaRatio" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="960" FontFamily="NanumSquareOTF" />
-                <TextBlock  x:Name="numOfHouseHolds" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="715" Canvas.Top="1035" FontFamily="NanumSquareOTF" />
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1" Fill="Black" Canvas.Left="237.333" Canvas.Top="356" Height="75" Stretch="Fill" Width="898"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1" Fill="Black" Canvas.Left="237.333" Canvas.Top="391.6" Height="75" Stretch="Fill" Width="898"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1" Fill="Black" Canvas.Left="237.333" Canvas.Top="430.6" Height="75" Stretch="Fill" Width="898"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1" Fill="Black" Canvas.Left="237.333" Canvas.Top="467.6" Height="75" Stretch="Fill" Width="898"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1" Fill="Black" Canvas.Left="237.333" Canvas.Top="505.6" Height="75" Stretch="Fill" Width="898"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1" Fill="Black" Canvas.Left="237.333" Canvas.Top="543.6" Height="75" Stretch="Fill" Width="898"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1" Fill="Black" Canvas.Left="237.333" Canvas.Top="582.6" Height="75" Stretch="Fill" Width="898"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1" Fill="Black" Canvas.Left="237.333" Canvas.Top="619" Height="75" Stretch="Fill" Width="898"/>
 
 
+            <TextBlock  Text="프로젝트 명" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="110" Canvas.Top="402" FontFamily="NanumSquareOTF"  />
+            <TextBlock  Text="대지 위치" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="110" Canvas.Top="439" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="지역지구" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="110" Canvas.Top="477" FontFamily="NanumSquareOTF"  />
+            <TextBlock  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="110" Canvas.Top="515" FontFamily="NanumSquareOTF"  />
+            <TextBlock  Text="용적률" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="110" Canvas.Top="553" FontFamily="NanumSquareOTF"   />
+            <TextBlock  Text="건폐율" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="110" Canvas.Top="593" FontFamily="NanumSquareOTF"  />
+            <TextBlock  Text="세대구성" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="110" Canvas.Top="628" FontFamily="NanumSquareOTF" />
+
+            <!-- -->
+            <TextBlock  x:Name="projectName" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="270" Canvas.Top="402" FontFamily="NanumSquareOTF" />
+            <TextBlock  x:Name="address" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="270" Canvas.Top="439" FontFamily="NanumSquareOTF" />
+            <TextBlock  x:Name="plotType" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="270" Canvas.Top="477" FontFamily="NanumSquareOTF" />
+            <TextBlock  x:Name="plotArea_Usable" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="270" Canvas.Top="515" FontFamily="NanumSquareOTF" />
+            <TextBlock  x:Name="buildingCoverage" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="270" Canvas.Top="593" FontFamily="NanumSquareOTF" />
+            <TextBlock  x:Name="floorAreaRatio" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="270" Canvas.Top="553" FontFamily="NanumSquareOTF" />
+            <TextBlock  x:Name="numOfHouseHolds" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="270" Canvas.Top="628" FontFamily="NanumSquareOTF" />
 
 
+            <TextBlock x:Name="title" Canvas.Left="91" Text="Title" TextWrapping="Wrap" Canvas.Top="240" FontSize="36" FontFamily="NanumSquareOTF" />
+            <TextBlock x:Name="publishDate" Text="Date" Canvas.Left="91" TextWrapping="Wrap" Canvas.Top="285" FontSize="30" FontFamily="NanumSquareOTF" />
 
-
-            </Canvas>
-            <TextBlock x:Name="title" Canvas.Left="85" TextWrapping="Wrap" Canvas.Top="135" FontSize="36"/>
-            <TextBlock x:Name="publishDate" Canvas.Left="85" TextWrapping="Wrap" Canvas.Top="180" FontSize="30"/>
+            <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="NanumSquareOTF" FontWeight="Bold" />
+            <Rectangle Height="812" Canvas.Left="97" Stroke="Black" Canvas.Top="656" Width="1038"/>
         </Canvas>
+
     </FixedPage>
 
 </UserControl>

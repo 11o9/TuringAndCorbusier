@@ -9,15 +9,12 @@
          >
 
     <FixedPage Name="fixedPage" Width="1240" Height="1750">
+        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="89,83,-680,-38"/>
+        <TextBlock Text="OUTLINE" FontSize="30" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="Bold" Margin="88,70,42,-70"/>
+
+
         <Canvas Grid.ColumnSpan="3" Grid.RowSpan="4">
-            <Rectangle Height="760" StrokeThickness="0.5" Canvas.Top="150" Width="200" Canvas.Left="85">
-                <Rectangle.Fill>
-                    <SolidColorBrush Color="#FF86E29A"/>
-                </Rectangle.Fill>
-            </Rectangle>
             <Rectangle Fill="White"/>
-            <TextBlock Text="OUTLINE"  FontSize="35" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="85" Canvas.Top="80" FontFamily="Myriad Pro" FontWeight="Bold"/>
-            <Rectangle Fill="#FF2F9947" Height="5" Canvas.Left="85" Stroke="#FF2F9947" Canvas.Top="120" Width="475" OpacityMask="#FF2F9947"/>
 
             <TextBlock Text="공사명" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Right" FontFamily="NanumSquareOTF" Canvas.Left="130" Canvas.Top="161" FontWeight="Bold" />
             <TextBlock Text="대지위치" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Right" FontFamily="NanumSquareOTF" Canvas.Left="130" Canvas.Top="198" FontWeight="Bold"  />
@@ -100,8 +97,9 @@
             <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="0.5" Fill="Black" Canvas.Top="833.667" Height="75" Stretch="Fill" Width="1070" Canvas.Left="85"/>
             <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="2.0" Fill="Black" Canvas.Top="873" Height="75" Stretch="Fill" Width="1070" Canvas.Left="85"/>
 
-            <Canvas x:Name="typicalPlanCanvas" Canvas.Left="85" Canvas.Top="960" Width="1070" Height="705">
+            <Canvas x:Name="typicalPlanCanvas" Canvas.Left="85" Canvas.Top="914" Width="1070" Height="641">
             </Canvas>
+            <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="Din Alternate" FontWeight="Bold" />
         </Canvas>
 
     </FixedPage>

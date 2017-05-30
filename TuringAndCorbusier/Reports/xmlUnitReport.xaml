@@ -9,9 +9,8 @@
          >
 
     <FixedPage  Name="fixedPage" Width="1240" Height="1750">
-        <Rectangle Fill="#FF2F9947" Height="5" Canvas.Left="120" Stroke="#FF2F9947" Canvas.Top="120" Width="475" OpacityMask="#FF2F9947" Margin="89,80,-89,-35"/>
-        <TextBlock Text="UNITS"  FontSize="35" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Myriad Pro" FontWeight="Bold" Margin="89,65,40.52,-65"/>
-
+        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="89,83,-680,-38"/>
+        <TextBlock Text="UNITS" FontSize="30" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="Bold" Margin="88,70,42,-70"/>
 
         <ContentControl x:Name="unitPlanCanvasControl1" Content="" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-910"/>
 
