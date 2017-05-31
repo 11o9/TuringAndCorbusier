@@ -182,15 +182,15 @@ namespace TuringAndCorbusier
 
             RhinoApp.WriteLine("tempoutputplottype = " + tempoutput.Plot.PlotType.ToString());
 
-            bool using1F = tempoutput.ParameterSet.using1F;
-            int stories = tempoutput.Household.Count();
             Plot tempPlot = tempoutput.Plot;
+            bool using1f = tempoutput.ParameterSet.using1F;
+            int tempStories = tempoutput.Household.Count;
 
             MainPanel_building2DPreview.CurveToDisplay = tempCurves;
-            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLineDrawer.North(tempPlot, stories, using1F);
-            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot(tempPlot, stories, using1F);
-            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLineDrawer.Lighting(tempPlot, stories, tempoutput, using1F);
-            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLineDrawer.Boundary(tempPlot, stories, using1F);
+            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLineDrawer.North(tempPlot, tempStories, using1f);
+            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot(tempPlot, tempStories, using1f);
+            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLineDrawer.Lighting(tempPlot, tempStories, tempoutput, using1f);
+            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLineDrawer.Boundary(tempPlot, tempStories, using1f);
       
             List<string> widthlog;
             MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.LawLineDrawer.ApartDistance(tempoutput, out widthlog);
@@ -720,7 +720,7 @@ namespace TuringAndCorbusier
                 for (int i = 0; i < houseOutline.Count; i++)
                 {
                     int top = houseOutline.Count/(int)(MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2);
-                    if (i%top==0)
+                    if (i!=0&&i%top==0)
                         area.Add(AreaMassProperties.Compute(houseOutline[i]).Area);
     
                 }

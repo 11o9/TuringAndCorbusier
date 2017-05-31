@@ -50,7 +50,7 @@ namespace Reports
             //this.BPR_Py.Text = Math.Round((AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
             //this.ConstructionArea.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000, 2).ToString() + "m\xB2";
             //this.ConstructionArea_Py.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
-            this.legalParking.Text = AGoutput.GetLegalParkingLotofHousing().ToString();
+            //this.legalParking.Text = AGoutput.GetLegalParkingLotofHousing().ToString();
             //test
             double grossarea = AGoutput.GetGreenArea();
             double balcony = AGoutput.GetBalconyArea();
