@@ -1747,7 +1747,7 @@ namespace TuringAndCorbusier
             this.width = coreType.GetWidth();
             this.depth = coreType.GetDepth();
             this.Stories = stories;
-
+            this.Area = width * depth;
         }
 
         //Field, 필드
@@ -2188,7 +2188,7 @@ namespace TuringAndCorbusier
 
         public double GetBalconyArea()
         {
-            return GetArea() - GetExclusiveArea() - CorridorArea - GetWallArea(); ;
+            return GetArea() - GetExclusiveArea() - /*CorridorArea -*/ GetWallArea(); ;
         }
 
         public double GetExclusiveArea()

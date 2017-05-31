@@ -41,6 +41,14 @@ namespace Reports
             this.BPR_Py.Text = Math.Round((AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
             this.ConstructionArea.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000, 2).ToString() + "m\xB2";
             this.ConstructionArea_Py.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
+            this.legalParking.Text = AGoutput.GetLegalParkingLotofHousing().ToString();
+            //test
+            double grossarea = AGoutput.GetGreenArea();
+            double balcony = AGoutput.GetBalconyArea();
+            double parking = AGoutput.ParkingLotUnderGround.ParkingArea;
+            double core1f = AGoutput.GetCoreAreaOnEarthSum();
+
+
             this.buildingCoverage.Text = Math.Round(AGoutput.GetBuildingCoverage(), 2).ToString() + "%";
             this.buildingCoverage_legal.Text = "(법정 : " + Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage) + "%)";
             this.floorAreaRatio.Text = Math.Round(AGoutput.GetGrossAreaRatio(), 2).ToString() + "%";

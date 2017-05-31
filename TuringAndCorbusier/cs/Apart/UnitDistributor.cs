@@ -15,8 +15,8 @@ namespace TuringAndCorbusier
 
         public UnitDistributor(List<double> aptLineLengths, List<Unit> units)
         {
-            aptLines = aptLineLengths.Select(n => new ApartLine(n)).ToList();
             this.units = units;
+            aptLines = aptLineLengths.Select(n => new ApartLine(n)).ToList();
             //added = units.Select(n => 0.0).ToArray();
         }
 
@@ -290,11 +290,13 @@ namespace TuringAndCorbusier
     {
         Corridor = 0,
         Tower,
+        CorridorCore,
         Clearance
     }
 
     class UnitCollection
     {
+        public CoreType coreType { get; set; }
         public List<Unit> Units { get; set; }
         public double Length { get { return GetLengthSum(); } }
         bool sorted = false;
@@ -372,6 +374,7 @@ namespace TuringAndCorbusier
                 return;
 
             sorted = true;
+
 
             Units.Sort((Unit a, Unit b) => ((int)a.Type).CompareTo((int)b.Type));
 
@@ -460,7 +463,50 @@ namespace TuringAndCorbusier
             }
 
 
+            //다끝나고 복도형 사이에 복도형 코어 넣기
 
+            int[] domain = GetStartEnd(UnitType.Corridor);
+            int count = Units.Where(n => n.Type == UnitType.Corridor).Count();
+            int coreCount = Units.Where(n => n.Type == UnitType.CorridorCore).Count();
+
+            double eachCell = (double)count / (coreCount * 2);
+            int minCount = (int)Math.Floor(eachCell);
+            int toFill = count - (minCount * coreCount * 2);
+
+            List<int> rooms = new List<int>(coreCount * 2);
+            for (int i = 0; i < coreCount * 2; i++)
+                rooms.Add(minCount);
+
+            List<int> indexes = new List<int>();
+            for (int i = 0; i < coreCount * 2; i++)
+                indexes.Add(i);
+
+            Queue<int> indexOrdered = new Queue<int>();
+            for (int i = 0; i < coreCount * 2; i++)
+            {
+                indexOrdered.Enqueue(indexes.First());
+                indexes.RemoveAt(0);
+                indexes.Reverse();
+            }
+
+            for (int i = 0; i < toFill; i++)
+                rooms[indexOrdered.Dequeue()]++;
+
+            int stack = 0;
+            Queue<int> coreIndex = new Queue<int>();
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                stack+=rooms[i];
+                if (i % 2 == 0)
+                    coreIndex.Enqueue(domain[0] + stack);
+            }
+
+
+            while (coreIndex.Count > 0)
+            {
+                Units.RemoveAt(Units.Count - 1);
+                Units.Insert(coreIndex.Dequeue(), new Unit(UnitType.CorridorCore));
+            }
         }
 
         int[] GetStartEnd(UnitType type)
@@ -515,6 +561,40 @@ namespace TuringAndCorbusier
             if (LeftLength >= unit.Length)
             {
                 Container.Add(unit);
+
+                //복도형
+                if (unit.Type == UnitType.Corridor)
+                {
+                    int corridorCount = Container.Units.Where(n => n.Type == UnitType.Corridor).Count();
+                    int corridorCoreCount = Container.Units.Where(n => n.Type == UnitType.CorridorCore).Count();
+                    //첫 복도형
+                    if (corridorCount == 1)
+                    {
+                        //복도형 + 코어 길이 합 보다 크면
+                        if (LeftLength >= unit.Length + 2500)
+                        {
+                            Container.Add(new Unit(UnitType.CorridorCore));
+                        }
+                        else
+                        {
+                            Container.Remove(unit);
+                            return false;
+                        }
+                    }
+                    else if (corridorCount > corridorCoreCount * 8) // 8 = 코어당 붙일수있는 세대수 
+                    {
+                        //복도형 + 코어 길이 합 보다 크면
+                        if (LeftLength >= unit.Length + 2500)
+                        {
+                            Container.Add(new Unit(UnitType.CorridorCore));
+                        }
+                        else
+                        {
+                            Container.Remove(unit);
+                            return false;
+                        }
+                    }
+                }
 
                 if (ClearancePredict() != tempClearancePredict && unit.Type != UnitType.Clearance)
                 {
@@ -634,11 +714,23 @@ namespace TuringAndCorbusier
 
         public Unit(UnitType type)
         {
-            Length = 5000;
-            Area = 0;
-            Type = type;
-            AreaFixed = true;
+            if (type == UnitType.Clearance)
+            {
+                Length = 5000;
+                Area = 0;
+                Type = type;
+                AreaFixed = true;
+            }
+            else
+            if (type == UnitType.CorridorCore)
+            {
+                Length = CoreType.Parallel.GetWidth();
+                Area = CoreType.Parallel.GetWidth() * CoreType.Parallel.GetDepth();
+                AreaFixed = true;
+                Type = type;
+            }
         }
+
 
         public Unit()
         {
