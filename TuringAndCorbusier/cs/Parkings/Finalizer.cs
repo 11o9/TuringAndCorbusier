@@ -123,6 +123,9 @@ namespace TuringAndCorbusier
 
             if (farStatus == FARstatus.Over)
             {
+                if (apt.AGtype == "PT-1")
+                    return apt;
+
                 Apartment reduced = Reduce(apt);
                 Finalizer finalizer = new Finalizer(reduced, depth);
                 finalizer.subtracted = true;
