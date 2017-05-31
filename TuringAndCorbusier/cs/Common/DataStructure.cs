@@ -836,6 +836,14 @@ namespace TuringAndCorbusier
         }
 
         //method
+        public int GetStroy()
+        {
+            if (ParameterSet.using1F)
+                return Household.Count;
+
+            return Household.Count + 1;
+        }
+
         public double GetParkingScore()
         {
             if (ParkingLotUnderGround.Count + ParkingLotOnEarth.GetCount() == 0)
@@ -1407,8 +1415,6 @@ namespace TuringAndCorbusier
 
         public double GetBuildingArea()
         {
-            double[] buildingAreaPerApartment = this.GetBuildingAreaPerApartment();
-
             double output = 0;
 
 
@@ -2681,12 +2687,38 @@ namespace TuringAndCorbusier
 
     public class Regulation
     {
+        //Field, 필드
+        public double totalheight;
+        public double height;
+        private double distanceFromRoad; //건축선으로부터 건축물까지 띄어야 하는 거리, 완화
+        private double distanceFromPlot; //인접대지 경계선부터 띄어야 하는 거리, 완화
+        private double distanceFromNorth = 0.5; //일조에 의한 높이제한(정북방향)
+        private double distanceByLighting = 0.25; //인접대지경계선(채광창), 완화
+        private double distanceLW = 0.5; //채광창의 각 부분높이의 0.5배
+        private double distanceLL = 0.8; //채광창과 채광창이 마주볼경우
+        private double distanceWW = 4000; //측벽과 측벽
 
-        bool high = false;
+        bool using1f = false;
         double fakeHeight = 0;
-        //Constructor, 생성자
 
-        public void Init(double stories)
+
+        //Constructor, 생성자
+        public Regulation(double stories)
+        {
+            this.height = Consts.PilotiHeight + Consts.FloorHeight * stories;
+            Init(stories);
+            totalheight = stories;
+        }
+
+        public Regulation(double stories, bool using1F)
+        {
+                this.using1f = using1F;
+                this.height = using1F? Consts.FloorHeight * stories: Consts.PilotiHeight + Consts.FloorHeight * stories;
+                Init(stories);
+                totalheight = stories;
+        }
+
+        private void Init(double stories)
         {
             if (stories >= TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor) // apartment
             {
@@ -2714,38 +2746,8 @@ namespace TuringAndCorbusier
                 distanceByLighting = 0.5; //// 기본?
         }
 
-        public Regulation(double stories)
-        {
-            this.height = Consts.PilotiHeight + Consts.FloorHeight * stories;
-            high = true;
-            Init(stories);
-            totalheight = stories;
-        }
 
-        //stories = max tempheight = tempstory?
-        public Regulation(double storiesHigh,double storiesLow)
-        {
-            this.height = Consts.PilotiHeight + Consts.FloorHeight * (storiesLow);
-            Init(storiesHigh);
-            totalheight = storiesHigh;
-        }
-
-        public Regulation(double stories, bool using1F)
-        {
-            this.height = using1F ? 0 : Consts.PilotiHeight + Consts.FloorHeight * stories;
-            high = true;
-            Init(stories);
-            totalheight = stories;
-        }
-
-        //stories = max tempheight = tempstory?
-        public Regulation(double storiesHigh, double storiesLow, bool using1F)
-        {
-            this.height = using1F?0:Consts.PilotiHeight + Consts.FloorHeight * (storiesLow);
-            Init(storiesHigh);
-            totalheight = storiesHigh;
-        }
-
+        //Options
         //층수,동간거리 : 최상층 기준, 동간거리를 제외한 법규 : 최상층-1 기준 
         public void Fake()
         {
@@ -2757,20 +2759,7 @@ namespace TuringAndCorbusier
             fakeHeight = 0;
         }
 
-
-        //Field, 필드
-        public double totalheight;
-        public double height;
-        private double distanceFromRoad; //건축선으로부터 건축물까지 띄어야 하는 거리, 완화
-        private double distanceFromPlot; //인접대지 경계선부터 띄어야 하는 거리, 완화
-        private double distanceFromNorth = 0.5; //일조에 의한 높이제한(정북방향)
-        private double distanceByLighting = 0.25; //인접대지경계선(채광창), 완화
-        private double distanceLW = 0.5; //채광창의 각 부분높이의 0.5배
-        private double distanceLL = 0.8; //채광창과 채광창이 마주볼경우
-        private double distanceWW = 4000; //측벽과 측벽
-
-        //Method, 메소드
-
+        //Main Method
         public Curve RoadCenterLines(Plot plot)
         {
             //plot 의 boundary 와 roads 를 사용.
@@ -3114,85 +3103,7 @@ namespace TuringAndCorbusier
             //return copy.Select(n => n[0]).ToArray();
             //plot의 boundary, maxfloor, roadwidths, plottype 사용 , 도로중심선
         }
-       
-        //not used
-        public Curve[] fromNorthCurve2(Plot plot)
-        {
-            Curve roadCenter = RoadCenterLines(plot);
-            Curve[] plotArr = roadCenter.DuplicateSegments();
-            //상업 or 법규무시 체크시
-            double newdistancefromnorth = DistanceFromNorth;
-            if (plot.PlotType == PlotType.상업지역 || plot.ignoreNorth)
-            { 
-                newdistancefromnorth = 0;
-            }
-
-            double[] distanceFromNorth = new double[plotArr.Length];
-            for (int i = 0; i < plotArr.Length; i++)
-            {
-                Vector3d tempVector = new Vector3d(plotArr[i].PointAt(plotArr[i].Domain.T1) - plotArr[i].PointAt(plotArr[i].Domain.T0));
-                tempVector = tempVector / tempVector.Length;
-
-                int h = (i + plotArr.Length - 1) % plotArr.Length;
-                int j = (i + 1) % plotArr.Length;
-                double moveDistance = 0;
-
-                if (plot.SimplifiedSurroundings[j] >= 20000 || plot.SimplifiedSurroundings[i] >= 20000 || plot.SimplifiedSurroundings[h] >= 20000 || plot.SimplifiedSurroundings[i]==21000)
-                { }
-                else if (tempVector.X > 0 && plot.SimplifiedSurroundings[i] >= 0)
-                {
-
-                    double tempSineFactor = System.Math.Abs(tempVector.X);
-
-                    double tempDistanceByRoad = (plot.SimplifiedSurroundings[i] / 2) * (tempVector.Length / System.Math.Abs(tempVector.X));
-                    if (tempDistanceByRoad < newdistancefromnorth)
-                        moveDistance = newdistancefromnorth - tempDistanceByRoad;
-                }
-
-                distanceFromNorth[i] = moveDistance;
-            }
-
-            List<Point3d> distanceFromNorthPts = new List<Point3d>();
-
-            for (int i = 0; i < plotArr.Length; i++)
-            {
-                int h = (i - 1 + plotArr.Length) % plotArr.Length;
-                int j = (i + 1 + plotArr.Length) % plotArr.Length;
-
-                double distH = distanceFromNorth[h];
-                double distI = distanceFromNorth[i];
-                double distJ = distanceFromNorth[j];
-
-                if (distI == 0)
-                {
-                    distanceFromNorthPts.Add(plotArr[i].PointAt(plotArr[i].Domain.T0));
-                    distanceFromNorthPts.Add(plotArr[i].PointAt(plotArr[i].Domain.T1));
-                }
-                else
-                {
-                    Curve tempCurve = new LineCurve(plotArr[i].PointAt(plotArr[i].Domain.T0), plotArr[i].PointAt(plotArr[i].Domain.T1));
-                    tempCurve.Transform(Transform.Translation(new Vector3d(0, -distI, 0)));
-
-                    var tempIntersect1 = Rhino.Geometry.Intersect.Intersection.CurveCurve(tempCurve, plotArr[h], 0, 0);
-                    var tempIntersect2 = Rhino.Geometry.Intersect.Intersection.CurveCurve(tempCurve, plotArr[j], 0, 0);
-
-                    if (tempIntersect1.Count > 0)
-                        distanceFromNorthPts.Add(tempIntersect1[0].PointA);
-                    else if (tempIntersect1.Count <= 0)
-                        distanceFromNorthPts.Add(tempCurve.PointAt(tempCurve.Domain.T0));
-
-                    if (tempIntersect2.Count > 0)
-                        distanceFromNorthPts.Add(tempIntersect2[0].PointA);
-                    else if (tempIntersect2.Count <= 0)
-                        distanceFromNorthPts.Add(tempCurve.PointAt(tempCurve.Domain.T1));
-                }
-            }
-
-            distanceFromNorthPts.Add(distanceFromNorthPts[0]);
-
-            Curve fromNorthCurve = (new Polyline(distanceFromNorthPts)).ToNurbsCurve();
-            return new Curve[] { fromNorthCurve };
-        }
+ 
        
         //채광방향 사선 규칙입니다.
         public Curve[] byLightingCurve(Plot plot, double angle)
@@ -3409,18 +3320,38 @@ namespace TuringAndCorbusier
             return k;
         }
 
+        private double GetDistanceByLighting(LightingType lType)
+        {
+            if (lType == LightingType.WW)
+                return distanceWW;
+
+            double offsetCoefficient = distanceByLighting;
+
+            if (lType == LightingType.LW)
+                offsetCoefficient = distanceLW;
+            if (lType == LightingType.LL)
+                offsetCoefficient = distanceLL;
+
+            if(using1f)
+                return offsetCoefficient * (height - fakeHeight);
+
+            return offsetCoefficient * ((height - fakeHeight) - Consts.PilotiHeight);
+        }
         //Property, 속성
 
         public double DistanceFromRoad { get { return distanceFromRoad; } }
         public double DistanceFromPlot { get { return distanceFromPlot; } }
         public double DistanceFromNorth { get { return distanceFromNorth * (height-fakeHeight); } }
-        public double DistanceByLighting { get { return distanceByLighting * ((height-fakeHeight) - Consts.PilotiHeight); } }
-        public double DistanceLW { get { return distanceLW * (height - Consts.PilotiHeight); } }
-        public double DistanceLL { get { return distanceLL * (height - Consts.PilotiHeight); } }
-        public double DistanceWW { get { return distanceWW; } }
+        public double DistanceByLighting { get { return GetDistanceByLighting(LightingType.Default); } }
+        public double DistanceLW { get { return GetDistanceByLighting(LightingType.LW); } }
+        public double DistanceLL { get { return GetDistanceByLighting(LightingType.LL); } }
+        public double DistanceWW { get { return GetDistanceByLighting(LightingType.WW); } }
         public double Lightingk { get { return distanceByLighting; } }
         public BuildingType BuildingType { get; private set; }
 
+
+        //data structure & enum
+        private enum LightingType { LW, LL, WW, Default}
         private class TypeParam
         {
             public double Parameter = 0;
