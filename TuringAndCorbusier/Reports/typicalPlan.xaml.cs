@@ -119,7 +119,7 @@ namespace Reports
 
 
         //--------JHL
-        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> coreDetail, List<Curve> houseOutline, TypicalPlan typicalPlan,List<Household> householdList,Interval floor)
+        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan,List<Household> householdList,Interval floor)
         {
 
             Curve boundary = typicalPlan.Boundary;
@@ -127,7 +127,7 @@ namespace Reports
             List<FloorPlan> housePlanList = typicalPlan.UnitPlans;
             List<Curve> corePlanList = coreOutline;
             List<FloorPlan> floorPlanList = typicalPlan.UnitPlans;
-            List<Curve> coreDetailList = coreDetail;
+
             List<Curve> houseOutlineList = houseOutline;
             List<Point3d> houseOutlinesCentroid = new List<Point3d>();
             Rectangle3d rectangleToFit = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
@@ -160,7 +160,7 @@ namespace Reports
                     //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
                     PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
                     //PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, areaTypeBackgroundColour);
-                    PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGreen);
+                    PlanDrawingFunction_90degree.drawHouseBackGroundPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGreen,0);
                 }
 
             foreach (Curve core in corePlanList)
@@ -168,10 +168,7 @@ namespace Reports
                 PlanDrawingFunction_90degree.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
                 PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
             }
-            foreach (Curve detail in coreDetailList)
-            {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, detail, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
-            }
+           
             foreach (FloorPlan floorPlan in floorPlanList)
             {
                 PlanDrawingFunction_90degree.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
@@ -204,10 +201,10 @@ namespace Reports
 
 
 
-            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 3);
+            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
         }
 
-        public void SetCoreOutline(List<Curve> coreOutline, List<Curve> coreDetail, List<Curve> houseOutline, TypicalPlan typicalPlan, Interval floor)
+        public void SetCoreOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, Interval floor)
         {
 
             Curve boundary = typicalPlan.Boundary;
@@ -216,7 +213,6 @@ namespace Reports
             List<FloorPlan> housePlanList = typicalPlan.UnitPlans;
             List<Curve> corePlanList = coreOutline;
             List<FloorPlan> floorPlanList = typicalPlan.UnitPlans;
-            List<Curve> coreDetailList = coreDetail;
             List<Curve> houseOutlineList = houseOutline;
             Rectangle3d rectangleToFit = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
 
@@ -236,21 +232,21 @@ namespace Reports
             //{
             //    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, detail, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
             //}
+            //draw houseoutline with dashlines
+            foreach (Curve house in houseOutline)
+            {
+                PlanDrawingFunction_90degree.drawDashedPlan(rectangleToFit, house, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray, 0.075);
+            }
+            foreach (Curve parkingLine in parkinglineList)
+            {
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, parkingLine, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+            }
             foreach (Curve core in corePlanList)
             {
                 PlanDrawingFunction_90degree.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
                 PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
             }
-            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-            //draw houseoutline with dashlines
-            foreach (Curve house in houseOutline)
-            {
-                PlanDrawingFunction_90degree.drawDashedPlan(rectangleToFit, house, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
-            }
-            foreach (Curve parkingLine in parkinglineList)
-            {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, parkingLine, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
-            }
+
 
             PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
         }

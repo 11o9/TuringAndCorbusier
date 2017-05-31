@@ -462,6 +462,7 @@ namespace TuringAndCorbusier
             this.ProjectArea.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea.ToString() + "m\xB2";
         }
 
+        //JHL
         private void Btn_ExportReport_Click(object sender, RoutedEventArgs e)
         {
 
@@ -481,6 +482,7 @@ namespace TuringAndCorbusier
                 List<FixedPage> fps = new List<FixedPage>();
                 if (tempIndex == -1)
                 {
+
                     errorMessage tempError = new errorMessage("설계안을 먼저 선택하세요.");
                     return;
                 }
@@ -547,23 +549,31 @@ namespace TuringAndCorbusier
 
                 //page2 건축개요
                 // 배치도 테스트
+                List<HouseholdStatistics> uniqueHouseHoldProperties = MainPanel_AGOutputList[tempIndex].HouseholdStatistics.ToList();
                 BoundingBox tempBBox = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect.GetBoundingBox(true);
                 Rectangle3d tempRectangle = new Rectangle3d(Plane.WorldXY, tempBBox.Min, tempBBox.Max);
                 TypicalPlan tempTypicalPlan_FL0 = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
+               
                 List<Curve> coreOutline = MainPanel_AGOutputList[tempIndex].drawEachCore();
+                int NumberOfCores = MainPanel_AGOutputList[tempIndex].Core[0].Count;
                 List<Curve> houseOutline = MainPanel_AGOutputList[tempIndex].drawEachHouse();
-                List<Curve> coreDetailOutline = MainPanel_AGOutputList[tempIndex].drawEachCoreDetail();
-                xmlBuildingInfo.SetHouseOutline(coreOutline,coreDetailOutline,houseOutline, tempTypicalPlan_FL0);
+                int NumberOfHouses = MainPanel_AGOutputList[tempIndex].Household[0][0].Count;
+                List<List<Core>> coreDoubleList = MainPanel_AGOutputList[tempIndex].Core;
+                List<Core> newCoreList = new List<Core>();
+                foreach (List<Core> coreList in coreDoubleList)
+                {
+                    foreach(Core core in coreList)
+                    {
+                        newCoreList.Add(core);
+                    }
+                }
+                xmlBuildingInfo.SetHouseOutline(coreOutline,houseOutline, tempTypicalPlan_FL0,newCoreList,NumberOfCores,NumberOfHouses,uniqueHouseHoldProperties);
 
                 fps.Add(xmlBuildingInfo.fixedPage);
                 pagename.Add("buildingReport");
-                
-
-
-
+     
                 //page3~ 세대타입별 개요
 
-                List<HouseholdStatistics> uniqueHouseHoldProperties = MainPanel_AGOutputList[tempIndex].HouseholdStatistics.ToList();
 
                 List<string> typeString = MainPanel_AGOutputList[tempIndex].AreaTypeString();
                 double coreAreaSum = MainPanel_AGOutputList[tempIndex].GetCoreAreaSum();
@@ -583,7 +593,6 @@ namespace TuringAndCorbusier
 
 
                 //JHL
-                
                 List<Reports.unitPlanTemplate> multipleUnitPlanList = new List<Reports.unitPlanTemplate>();
                 for(int i = 0; i < uniqueHouseHoldProperties.Count(); i++)
                 {
@@ -680,24 +689,33 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i+1);
                             Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(1);
-                            floorPlanDrawing1.SetCoreOutline(coreOutline, coreDetailOutline, houseOutline, typicalCorePlan, new Interval(1, 1));
+                            floorPlanDrawing1.SetCoreOutline(coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1));
                             fps.Add(floorPlanDrawing1.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + i.ToString());
-                        }else if(i == MainPanel_AGOutputList[tempIndex].ParameterSet.Stories+2)
+                        }
+
+                        if (i == MainPanel_AGOutputList[tempIndex].ParameterSet.Stories+2)
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries,i);
                             Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(i,"LastFloor");
-                            floorPlanDrawing1.SetHouseOutline(coreOutline, coreDetailOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i));
+                            floorPlanDrawing1.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i));
                             fps.Add(floorPlanDrawing1.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + 5168456.ToString());
                             break;
                         }
                 }
+                //최고층 면적 계산
+                bool isTopFloorDifferent = false;
+                double area = 0.0;
+                for (int i = 0; i < houseOutline.Count; i++)
+                {
+                    area += AreaMassProperties.Compute(houseOutline[i]).Area;
+                }
 
                         List<HouseholdStatistics> householeStatisticsList = MainPanel_AGOutputList[tempIndex].HouseholdStatistics;
                         Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1), isUsing1F);
                         TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
-                        floorPlanDrawing.SetHouseOutline(coreOutline, coreDetailOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1));
+                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1));
                         fps.Add(floorPlanDrawing.fixedPage);
                         pagename.Add("floorPlanDrawingPage" + (12312+1).ToString());
 
@@ -1354,9 +1372,12 @@ namespace TuringAndCorbusier
 
                 RhinoApp.Wait();
                 string path = "";
+                //screenshot
                 using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038, 812), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
                 {
-                    
+                    TypicalPlan typicalPlan = new TypicalPlan();
+                    Rectangle3d rec = new Rectangle3d(Plane.WorldXY,typicalPlan.GetBoundingBox().Min,typicalPlan.GetBoundingBox().Max);
+                
                     path = dirinfo.FullName + "test" + i.ToString() + ".jpeg";
                     //var files = dirinfo.GetFiles("test*.jpeg");
                     //foreach (var f in files)

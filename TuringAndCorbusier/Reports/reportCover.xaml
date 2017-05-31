@@ -9,7 +9,7 @@
          >
 
     <FixedPage Name="fixedPage" Width="1240" Height="1750">
-        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="90,87,-680,-38" VerticalAlignment="Top"/>
+        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="90,100,-680,-38" VerticalAlignment="Top"/>
         <TextBlock Text="PROJECT OVERVIEW" FontSize="28" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="150" Canvas.Top="80" FontFamily="DIN Alternate" FontWeight="ExtraBlack" Margin="88,70,42,-70"/>
 
         <Canvas  Width="1240" Height="1750">

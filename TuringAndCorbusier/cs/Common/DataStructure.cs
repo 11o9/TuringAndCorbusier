@@ -1249,29 +1249,7 @@ namespace TuringAndCorbusier
 
             return coreOutlines;
         }
-        //JHL 코어 디테일
-        public List<Curve> drawEachCoreDetail()
-        {
-            List<Curve> coreDetailOutlines = new List<Curve>();
 
-            try
-            {
-                for (int i = 0; i < this.Core.Count; i++)
-                {
-                    for (int j = 0; j < this.Core[i].Count; j++)
-                    {
-                        coreDetailOutlines.Add(Core[i][j].DrawCoreDetail());
-
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return coreDetailOutlines;
-            }
-
-            return coreDetailOutlines;
-        }
 
         public List<Curve> drawEachHouse()
         {
@@ -1302,6 +1280,7 @@ namespace TuringAndCorbusier
             List<Curve> houseBalconyOutlines = new List<Curve>();
 
             try
+
             {
                 for (int i = 0; i < this.Household.Count; i++)
                 {
@@ -1761,12 +1740,12 @@ namespace TuringAndCorbusier
 
         //Field, 필드
 
-        private Point3d origin;
-        private Vector3d xDirection;
-        private Vector3d yDirection;
-        private CoreType coreType;
-        private double width;
-        private double depth;
+        public Point3d origin;
+        public Vector3d xDirection;
+        public Vector3d yDirection;
+        public CoreType coreType;
+        public double width;
+        public double depth;
 
         //Method, 메소드
 
@@ -1787,7 +1766,6 @@ namespace TuringAndCorbusier
 
             return Area;
         }
-
         
         public Curve DrawOutline()
         {
@@ -1811,29 +1789,7 @@ namespace TuringAndCorbusier
             Curve outlineCurve = outlinePolyline.ToNurbsCurve();
             return outlineCurve;
         }
-        //JHL
-        public Curve DrawCoreDetail()
-        {
-            List<Point3d> outlinePoints = new List<Point3d>();
 
-            Point3d pt = new Point3d(Origin);
-            Vector3d x = new Vector3d(XDirection);
-            Vector3d y = new Vector3d(YDirection);
-
-            outlinePoints.Add(pt);
-            pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
-            pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
-            outlinePoints.Add(pt);
-            pt.Transform(Transform.Translation(Vector3d.Multiply(x, -width)));
-            outlinePoints.Add(pt);
-            pt.Transform(Transform.Translation(Vector3d.Multiply(y, -depth)));
-            pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
-            outlinePoints.Add(pt);
-
-            Polyline outlinePolyline = new Polyline(outlinePoints);
-            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
-            return outlineCurve;
-        }
         //--------------------------------------------------------------------------//
 
         //주차배치용 확장

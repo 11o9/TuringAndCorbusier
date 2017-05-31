@@ -9,7 +9,7 @@
          >
 
     <FixedPage Name="fixedPage" Width="1240" Height="1750">
-        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="89,90,-680,-38"/>
+        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="90,100,-680,-38"/>
         <TextBlock x:Name="planPageTitle"  Text="TITLE" FontSize="30" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="ExtraBlack" Margin="88,70,42,-70"/>
 
 

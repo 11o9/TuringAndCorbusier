@@ -9,12 +9,12 @@
          >
 
     <FixedPage  Name="fixedPage" Width="1240" Height="1750">
-        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="89,90,-680,-38"/>
+        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="90,100,-680,-38"/>
         <TextBlock Text="UNITS" FontSize="30" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="Bold" Margin="88,70,42,-70"/>
 
         <ContentControl x:Name="unitPlanCanvasControl1" Content="" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-910"/>
 
         <ContentControl x:Name="unitPlanCanvasControl2" Content="" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-1670"/>
-
+        <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="Din Alternate" FontWeight="Bold" Margin="980,1595,-980.35,-1595.89" />
     </FixedPage>
 </UserControl>

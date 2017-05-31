@@ -98,7 +98,9 @@ namespace TuringAndCorbusier
 
             Polygon polygonToDraw = new Polygon();
             polygonToDraw.Points = new PointCollection(pointSet);
-            polygonToDraw.Fill = fillBrush;
+            SolidColorBrush LHGreen = new SolidColorBrush();
+            LHGreen.Color = Color.FromRgb(196,215,0);
+            polygonToDraw.Fill = LHGreen;
 
             UnitPlanCanvas.Children.Add(polygonToDraw);
             double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
@@ -422,7 +424,6 @@ namespace TuringAndCorbusier
                 }
             }
         }
-
         //JHL unitplan drawing
         public static void drawUnitPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
         {
@@ -714,7 +715,5 @@ namespace TuringAndCorbusier
 
             return point;
         }
-        
     }
-
 }
