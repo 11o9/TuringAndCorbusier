@@ -57,13 +57,6 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < hhp.LightingEdge.Count; i++)
             {
-                //Rhino.RhinoDoc.ActiveDoc.Objects.Add(hhp.LightingEdge[i].ToNurbsCurve());
-                //var c = hhp.LightingEdge[i].ToNurbsCurve().Trim(CurveEnd.Both, 300);
-                //var p1 = c.PointAtStart + Vector3d.ZAxis * 300;
-                //var p2 = c.PointAtStart + Vector3d.ZAxis * 2400;
-                //var p3 = c.PointAtEnd + Vector3d.ZAxis * 2400;
-                //var p4 = c.PointAtEnd + Vector3d.ZAxis * 300;
-                //Brep[] open = Brep.CreatePlanarBreps(new PolylineCurve(new Point3d[] { p1, p2, p3, p4, p1 }));
                 Line tempLine = hhp.LightingEdge[i];
 
                 Point3d midPoint = tempLine.PointAt(0.5);

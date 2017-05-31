@@ -1286,7 +1286,7 @@ namespace TuringAndCorbusier
                     Line lighting2 = new Line(winPt3, winPt4);
 
                     lightingEdgesBases.Add(new List<Line> { lighting1, lighting2 });
-                    movableEdgesBases.Add(new List<Line> { lighting1 }); // 이거 나중에 바꿔야 함..
+                    movableEdgesBases.Add(new List<Line> { lighting1, lighting2 }); // 이거 나중에 바꿔야 함..
                 }
                 else
                 {
@@ -1304,7 +1304,7 @@ namespace TuringAndCorbusier
                     Line lighting2 = new Line(winPt3, winPt4);
 
                     lightingEdgesBases.Add(new List<Line> { lighting1, lighting2 });
-                    movableEdgesBases.Add(new List<Line> { lighting1 }); // 이거 나중에 바꿔야 함..
+                    movableEdgesBases.Add(new List<Line> { lighting1, lighting2 }); // 이거 나중에 바꿔야 함..
                 }
             }
 
@@ -1323,7 +1323,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < homeOri.Count; i++)
             {
                 Household houseBase = new Household(homeOri[i], homeVecX[i], homeVecY[i], xa[i], xb[i], ya[i], yb[i], allocated[i], exclusiveArea[i], lightingEdgesBases[i], entBuilding[i], wallFactors[i]);
-                houseBase.MoveableEdge = movableEdgesBases[i];
+                houseBase.MovableEdge = movableEdgesBases[i];
                 hhpS.Add(houseBase);
             }
 
@@ -1340,7 +1340,7 @@ namespace TuringAndCorbusier
                     ent.Transform(Transform.Translation(Vector3d.Multiply(Consts.PilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
                     List<Line> lightingBase = hhp.LightingEdge;
                     List<Line> newLighting = new List<Line>();
-                    List<Line> movableBase = hhp.MoveableEdge;
+                    List<Line> movableBase = hhp.MovableEdge;
                     List<Line> newMovable = new List<Line>();
                     for (int k = 0; k < lightingBase.Count; k++)
                     {
@@ -1357,7 +1357,7 @@ namespace TuringAndCorbusier
                     }
 
                     Household oneHouse = new Household(ori, hhp.XDirection, hhp.YDirection, hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.HouseholdSizeType, hhp.GetExclusiveArea(), newLighting, ent, hhp.WallFactor);
-                    oneHouse.MoveableEdge = newMovable;
+                    oneHouse.MovableEdge = newMovable;
                     hhpSTemp.Add(oneHouse);
                 }
                 hhpB.Add(hhpSTemp);

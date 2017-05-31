@@ -805,7 +805,7 @@ namespace TuringAndCorbusier
                     Point3d pt13 = pt12 + temp.YDirection * -temp.YLengthA;
                     Point3d pt14 = pt13 - temp.XDirection * temp.XLengthA;
                     temp.LightingEdge = new Line[] { new Line(pt11, pt12), new Line(pt13, pt14) }.ToList();
-                    temp.MoveableEdge = new Line[] { new Line(pt11, pt12), new Line(pt13, pt14) }.ToList();
+                    temp.MovableEdge = new Line[] { new Line(pt11, pt12), new Line(pt13, pt14) }.ToList();
                     break;
                 case UnitType.Tower:
                     temp.isCorridorType = false;
@@ -830,7 +830,7 @@ namespace TuringAndCorbusier
                     Point3d pt23 = pt22 + temp.YDirection * -temp.YLengthA;
                     Point3d pt24 = pt23 - temp.XDirection * temp.XLengthA;
                     temp.LightingEdge = new Line[] { new Line(pt21, pt22), new Line(pt23, pt24) }.ToList();
-                    temp.MoveableEdge = new Line[] { new Line(pt21, pt22), new Line(pt23, pt24) }.ToList();
+                    temp.MovableEdge = new Line[] { new Line(pt21, pt22), new Line(pt23, pt24) }.ToList();
                     break;
 
                 default:

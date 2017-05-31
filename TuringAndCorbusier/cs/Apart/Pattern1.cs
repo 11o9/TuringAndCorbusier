@@ -434,7 +434,7 @@ namespace TuringAndCorbusier
                         {
                             var newhhp = new Household(x);
                             newhhp.Origin = x.Origin + Vector3d.ZAxis * tempStoryHeight;
-                            newhhp.MoveLightingAndMoveAble();
+                            newhhp.MoveLightingAndMovable();
                             Curve outline = newhhp.GetOutline();
                             //법규체크?
                             var intersect = Rhino.Geometry.Intersect.Intersection.CurveCurve(r, outline, 0, 0);
@@ -552,7 +552,7 @@ namespace TuringAndCorbusier
                             List<int> removeIndex = new List<int>();
                             foreach (var h in hh)
                             {
-                                var contractResult = h.Contract(wholeRegulationHigh[0]);
+                                bool contractResult = h.Contract(wholeRegulationHigh[0]);
                                 if (!contractResult)
                                     removeIndex.Add(hh.IndexOf(h));
                             }
