@@ -138,10 +138,7 @@ namespace TuringAndCorbusier
             tempGrid.Children.Add(buildingCoverageTextBlock);
             Grid.SetColumn(buildingCoverageTextBlock, 3);
 
-
-            //parameter 를 그대로 층수로 사용 했었으나, 지역 최적화에서 층수를 낮추는 과정에서 실제 층수와 맞지 않을수 있어 수정
-            //TextBlock storiesTextBlock = createTextBlock(((int)agOutput.ParameterSet.Stories + 1).ToString() + "층");
-            TextBlock storiesTextBlock = createTextBlock(((int)agOutput.Household.Count+1).ToString() + "층");
+            TextBlock storiesTextBlock = createTextBlock(((int)agOutput.GetStroy()).ToString() + "층");
             tempGrid.Children.Add(storiesTextBlock);
             Grid.SetColumn(storiesTextBlock, 4);
 

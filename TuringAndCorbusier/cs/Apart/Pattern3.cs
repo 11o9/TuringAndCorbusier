@@ -55,9 +55,7 @@ namespace TuringAndCorbusier
             if (parameterSet.using1F && !parameterSet.setback)
             {
                 if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
-                {
                     return null;
-                }
 
                 regulationHigh = new Regulation(storiesHigh, true);
                 //regulationLow = new Regulation(storiesHigh, storiesLow, true);
@@ -65,9 +63,8 @@ namespace TuringAndCorbusier
             else if (parameterSet.setback && !parameterSet.using1F)
             {
                 if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
-                {
                     return null;
-                }
+
                 //최상층 법규선 - 동간거리 사용
                 regulationHigh = new Regulation(storiesHigh);
 

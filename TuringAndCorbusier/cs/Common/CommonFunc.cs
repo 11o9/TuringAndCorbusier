@@ -287,157 +287,130 @@ namespace TuringAndCorbusier
             var result = JoinRegulations(reg.byLightingCurve(plot,output.ParameterSet.Parameters[3]), reg.fromNorthCurve(plot), reg.fromSurroundingsCurve(plot));
             return result.ToList();
         }
-        public static List<Curve> LawLines(Plot plot, double stories)
+
+        public static class LawLineDrawer
         {
-            //if (plot.PlotType == PlotType.상업지역)
-            //    return new List<Curve>();
-
-            List<Curve> result = new List<Curve>();
-            for (int i = 0; i <= stories; i++)
+            public static List<Curve> Boundary(Plot plot, double stories, bool using1F)
             {
-                double storyheight = Consts.PilotiHeight + Consts.FloorHeight * i;
-                Curve crv = plot.Boundary.DuplicateCurve();   //angle radian
-                crv.Translate(Vector3d.ZAxis * storyheight);
-                result.Add(crv);
-            }
+                List<Curve> result = new List<Curve>();
 
-            return result;
-        }
-        //fortest
-        public static List<Curve> LawbyLighting(Plot plot, double stories)
-        {
-            double angle = 0;
-            List<Curve> result = new List<Curve>();
-            for (int i = 0; i <= stories; i++)
-            {
-                Regulation reg2 = new Regulation(stories, i);
-                Curve[] crv = reg2.byLightingCurve(plot, angle);  //angle radian
-                foreach (var c in crv)
-                    c.Translate(Vector3d.ZAxis * reg2.height);
-                result.AddRange(crv);
-            }
-            return result;
-        }
-        public static List<Curve> LawLines(Plot plot, double stories, Apartment output)
-        {
-            #region regacy                                              
-            //Regulation tempreg = new Regulation(stories);
-            //double eyelevel = 1500;
-            //foreach (var hhp2 in output.Household)
-            //{
-            //    foreach (var hhp1 in hhp2)
-            //    {
-            //        foreach (var hhp in hhp1)
-            //        {
-            //            var outline = hhp.GetOutline();
-            //            for (int i = 0; i < hhp.LightingEdge.Count; i++)
-            //            {
-            //                var start = hhp.LightingEdge[i].PointAt(0.5);
-            //                var dir1 = hhp.LightingEdge[i].UnitTangent;
-            //                dir1.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                double heightBase = Consts.PilotiHeight;
 
-            //                var testpoint = start + dir1;
-            //                if (outline.Contains(testpoint) == PointContainment.Inside)
-            //                    dir1.Reverse();
+                if (using1F)
+                    heightBase = 0;
 
-            //                var dir2 = -Vector3d.ZAxis;
-            //                var length2 = hhp.Origin.Z + eyelevel;
-            //                var length1 = length2 * tempreg.Lightingk;
-
-
-            //                LineCurve newline = new LineCurve(new Line(start + Vector3d.ZAxis * eyelevel, (dir1 * length1 + dir2 * length2)));
-            //                result.Add(newline);
-            //            }
-            //        }
-            //    }
-            //}
-            //#endregion
-
-            //return result;
-
-            #endregion
-            double height = output.Household.Count * Consts.FloorHeight;
-            double posz = height + Consts.PilotiHeight;
-            double k = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting;
-            k = output.Household.Count > TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor ? 0.5 : k;  //0.5 = 기본, 변수화해야.
-            double distance = height * k;
-
-            List<Curve> result = new List<Curve>();
-
-            for (int i = 0; i < output.Household.Last().Count; i++)
-            {
-                for (int j = 0; j < output.Household.Last()[i].Count; j++)
+                for (int i = 0; i <= stories; i++)
                 {
-                    var outline = output.Household.Last()[i][j].GetOutline();
-                    for (int l = 0; l < output.Household.Last()[i][j].LightingEdge.Count; l++)
+                    double storyheight = heightBase + Consts.FloorHeight * i;
+                    Curve crv = plot.Boundary.DuplicateCurve();   //angle radian
+                    crv.Translate(Vector3d.ZAxis * storyheight);
+                    result.Add(crv);
+                }
+
+                return result;
+            }
+
+            public static List<Curve> Lighting(Plot plot, double stories, Apartment output, bool using1f)
+            {
+                double height = output.Household.Count * Consts.FloorHeight;
+                double posz = height + Consts.PilotiHeight;
+                if (using1f)
+                    posz = height;
+
+                double k = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting;
+                k = output.Household.Count > TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor ? 0.5 : k;  //0.5 = 기본, 변수화해야.
+                double distance = height * k;
+
+                List<Curve> result = new List<Curve>();
+                List<List<Household>> baseFloorHouses = output.Household[1];
+
+                for (int i = 0; i < baseFloorHouses.Count; i++)
+                {
+                    for (int j = 0; j < baseFloorHouses[i].Count; j++)
                     {
-                        Line tempLighting = output.Household.Last()[i][j].LightingEdge[l];
-                        result.Add(LightingBox(tempLighting, outline, distance));
+                        var outline = baseFloorHouses[i][j].GetOutline();
+                        for (int l = 0; l < baseFloorHouses[i][j].LightingEdge.Count; l++)
+                        {
+                            Line tempLighting = baseFloorHouses[i][j].LightingEdge[l];
+                            result.Add(LightingBox(tempLighting, outline, distance));
+                        }
                     }
                 }
+
+                Regulation reg = new Regulation(0);
+                Curve roadcenter = reg.RoadCenterLines(plot);
+                result.Add(roadcenter);
+
+                return result;
             }
 
-            Regulation reg = new Regulation(0);
-            Curve roadcenter = reg.RoadCenterLines(plot);
-            result.Add(roadcenter);
 
-            return result;
-
-        }
-        private static Curve LightingBox(Line lighting, Curve outline, double distance)
-        {
-            Point3d tempLightingCenter = lighting.From + lighting.Direction / 2;
-            Vector3d dir = lighting.UnitTangent;
-            for (int i = 0; i < 4; i++)
+            public static List<Curve> North(Plot plot, double stories, bool using1f)
             {
-                //do
-                Point3d testPoint = tempLightingCenter + dir;
+                var boundary = plot.SimplifiedBoundary;
+                var surr = plot.SimplifiedSurroundings;
 
-                if (outline.Contains(testPoint) == PointContainment.Inside)
+                List<Curve> result = new List<Curve>();
+
+                for (int i = 0; i <= stories; i++)
                 {
-                    Vector3d v = -dir;
-                    Line edge = lighting;
-                    Line edge2 = new Line(edge.From + v * distance, edge.To + v * distance);
-                    var result = new PolylineCurve(new Point3d[] { edge.From, edge.To, edge2.To, edge2.From, edge.From });
-                    return result;
+                    Regulation reg = new Regulation(i,using1f);
+
+                        var tempfloornorth = reg.fromNorthCurve(plot);
+                        foreach (var n in tempfloornorth)
+                            n.Transform(Transform.Translation(Vector3d.ZAxis * reg.height));
+                        result.AddRange(tempfloornorth);
                 }
-                //finish
-                else
-                    dir.Rotate(Math.PI / 2,Vector3d.ZAxis);
+                return result;
             }
-           
-            return new PolylineCurve();
-        }
 
-
-
-        public static List<Curve> LawLines(Plot plot,double stories,bool north)
-        {
-            var boundary = plot.SimplifiedBoundary;
-            var surr = plot.SimplifiedSurroundings;
-
-            List<Curve> result = new List<Curve>();
-
-            for (int i = 0; i <= stories; i++)
+            public static List<Curve> NearPlot(Plot plot, double stories, bool using1f)
             {
-                Regulation reg = new Regulation(stories, i);
-                if(north)
+                var boundary = plot.SimplifiedBoundary;
+                var surr = plot.SimplifiedSurroundings;
+
+                List<Curve> result = new List<Curve>();
+
+                for (int i = 0; i <= stories; i++)
                 {
-                    var tempfloornorth = reg.fromNorthCurve(plot);
-                    foreach(var n in tempfloornorth)
-                        n.Transform(Transform.Translation(Vector3d.ZAxis * reg.height));
-                    result.AddRange(tempfloornorth);
+                    Regulation reg = new Regulation(i,using1f);
+       
+                        var tempfloorsurr = reg.fromSurroundingsCurve(plot);
+                        foreach (var n in tempfloorsurr)
+                            n.Transform(Transform.Translation(Vector3d.ZAxis * reg.height));
+                        result.AddRange(tempfloorsurr);
+   
                 }
-                else
-                {
-                    var tempfloorsurr = reg.fromSurroundingsCurve(plot);
-                    foreach (var n in tempfloorsurr)
-                        n.Transform(Transform.Translation(Vector3d.ZAxis * reg.height));
-                    result.AddRange(tempfloorsurr);
-                }
+                return result;
             }
-            return result;
-        }
+
+            //sub
+            private static Curve LightingBox(Line lightingEdge, Curve outline, double distance)
+            {
+                Point3d tempLightingCenter = lightingEdge.From + lightingEdge.Direction / 2;
+                Vector3d dir = lightingEdge.UnitTangent;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    //do
+                    Point3d testPoint = tempLightingCenter + dir;
+
+                    if (outline.Contains(testPoint) == PointContainment.Inside)
+                    {
+                        Vector3d v = -dir;
+                        Line edge = lightingEdge;
+                        Line edge2 = new Line(edge.From + v * distance, edge.To + v * distance);
+                        var result = new PolylineCurve(new Point3d[] { edge.From, edge.To, edge2.To, edge2.From, edge.From });
+                        return result;
+                    }
+                    //finish
+                    else
+                        dir.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                }
+
+                return new PolylineCurve();
+            }
+        }       
 
         class myFunc
         {

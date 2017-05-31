@@ -121,15 +121,17 @@ namespace TuringAndCorbusier
                 {
                     endCondition = false;
 
-                    apartments.Sort((a, b) => 
-                    -fitnessValues[apartments.IndexOf(a)].CompareTo(fitnessValues[apartments.IndexOf(b)]));
+                    RhinoList<Apartment> apartRList = new RhinoList<Apartment>(apartments);
+                    apartRList.Sort(fitnessValues.ToArray());
+                    apartRList.Reverse();
 
-                    offspringGenes.Sort((a, b) =>
-                   -fitnessValues[offspringGenes.IndexOf(a)].CompareTo(fitnessValues[offspringGenes.IndexOf(b)]));
+                    RhinoList<ParameterSet> paramRList = new RhinoList<ParameterSet>(offspringGenes);
+                    paramRList.Sort(fitnessValues.ToArray());
+                    paramRList.Reverse();
 
-                    List<ParameterSet> distinctGenes = offspringGenes.Distinct().ToList();
+                    List<ParameterSet> distinctGenes = paramRList.Distinct().ToList();
                     ApartComaperer comparer = new ApartComaperer();
-                    List<Apartment> distinctApartment = apartments.Distinct(comparer).ToList();
+                    List<Apartment> distinctApartment = apartRList.Distinct(comparer).ToList();
                     bestGenes.AddRange(distinctGenes.Take(2));
                     bestOutputs.AddRange(distinctApartment.Take(2));
 
@@ -350,8 +352,8 @@ namespace TuringAndCorbusier
 
                 //firstfloor test
                 double firstfloorBonus = 0;
-                //if (gene[j].using1F)
-                //    firstfloorBonus = 1000;
+                if (gene[j].using1F)
+                    firstfloorBonus = 1000;
                 //setback test
                 double setbackBonus = 0;
                 //if (gene[j].setback)

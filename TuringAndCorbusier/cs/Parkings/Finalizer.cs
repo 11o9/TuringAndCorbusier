@@ -232,6 +232,12 @@ namespace TuringAndCorbusier
             //temp.Parameters[0]++;
             temp.Parameters[1]++;
 
+            if (temp.Parameters[1] > TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1)
+            {
+                temp.Parameters[1]--;
+                return apt;
+            }
+
             //가능하면 agtype enum으로 만들면 ..
             switch (apt.AGtype)
             {
@@ -247,6 +253,7 @@ namespace TuringAndCorbusier
                 //    AG1 ag4 = new AG1();
                 //    Apartment a4 = ag4.generator(apt.Plot, temp, apt.Target);
                 //    return a4 == null ? apt : a4;
+
                 default:
                     return apt;
             }
