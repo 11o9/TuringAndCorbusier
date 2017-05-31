@@ -123,8 +123,8 @@
     <Compile Include="Reports\reportCover.xaml.cs">
       <DependentUpon>reportCover.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Reports\section.xaml.cs">
-      <DependentUpon>section.xaml</DependentUpon>
+    <Compile Include="Reports\Perspective.xaml.cs">
+      <DependentUpon>Perspective.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reports\showme.xaml.cs">
       <DependentUpon>showme.xaml</DependentUpon>
@@ -134,9 +134,6 @@
     </Compile>
     <Compile Include="Reports\unitPlanTemplate.xaml.cs">
       <DependentUpon>unitPlanTemplate.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Reports\UserControl1.xaml.cs">
-      <DependentUpon>UserControl1.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reports\xmlBuildingReport.xaml.cs">
       <DependentUpon>xmlBuildingReport.xaml</DependentUpon>
@@ -237,7 +234,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Reports\section.xaml">
+    <Page Include="Reports\Perspective.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -250,10 +247,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Reports\unitPlanTemplate.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Reports\UserControl1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

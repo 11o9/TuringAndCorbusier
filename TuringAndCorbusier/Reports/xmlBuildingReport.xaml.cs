@@ -243,18 +243,33 @@ namespace Reports
                 if(coreType[i] == CoreType.Horizontal)
                 {
 
-                Vector3d v1 = coreList[i].XDirection;
+                Vector3d v1 = coreList[i].YDirection;
                 Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
-                double radian = Vector3d.VectorAngle(v2,v1);
+                double radian = Vector3d.VectorAngle(v2,v1,Plane.WorldXY);
 
                 for(int j = 0; j < coreDetail[i].Count; j++)
                 {
-                    coreDetail[i][j].PointAtStart.Transform(Rhino.Geometry.Transform.Rotation(radian,coreList[i].Origin));
-                    coreDetail[i][j].PointAtEnd.Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
-                    Rhino.RhinoDoc.ActiveDoc.Objects.Add(coreDetail[i][j]);
+                    coreDetail[i][j].PointAtStart.Transform(Rhino.Geometry.Transform.Rotation(-radian,coreList[i].Origin));
+                    coreDetail[i][j].PointAtEnd.Transform(Rhino.Geometry.Transform.Rotation(-radian, coreList[i].Origin));
+                   // Rhino.RhinoDoc.ActiveDoc.Objects.Add(coreDetail[i][j]);
                 }
             }
+                if(coreType[i] == CoreType.Parallel)
+                {
+
+                    Vector3d v1 = coreList[i].YDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
+                    Vector3d v3 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
+                    double radian = Vector3d.VectorAngle(v2, v3, Plane.WorldXY);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        coreDetail[i][j].PointAtStart.Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                        coreDetail[i][j].PointAtEnd.Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                       // Rhino.RhinoDoc.ActiveDoc.Objects.Add(coreDetail[i][j]);
+                    }
                 }
+            }
 
             return coreDetail;
         }
@@ -348,7 +363,6 @@ namespace Reports
                 buildingCanvas.Children.Add(textBlock);
                 Canvas.SetTop(textBlock, previousTop);
                 Canvas.SetLeft(textBlock, previousLeft);
-                textBlock.Name = i.ToString() + "AreaType";
                 count++;
                 if (count > i)
                 {

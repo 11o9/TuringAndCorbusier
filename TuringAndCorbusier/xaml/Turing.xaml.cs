@@ -515,9 +515,10 @@ namespace TuringAndCorbusier
 
                 //JHL:2017.5.30:17.11 리포트 커버 페이지
                 Reports.ReportCover reportCover = new Reports.ReportCover();
-                var hasImage = reportCover.setImage("test1.jpeg");
+                var hasImage = reportCover.setImage("test0.jpeg");
                 reportCover.SetTitle(projectNameStr);
                 reportCover.SetPublishDate();
+
 
                 //표지에 넣을 정보 값 리스트에 넣기
                 Reports.xmlBuildingReport xmlBuildingInfo = new Reports.xmlBuildingReport(MainPanel_AGOutputList[tempIndex]);
@@ -546,6 +547,15 @@ namespace TuringAndCorbusier
                     fps.Add(reportCover.fixedPage);
                     pagename.Add("mainCover");
                 }
+                //조감도
+                Reports.Perspective persPage = new Reports.Perspective();
+                var persImage1 = persPage.setImage1("test2.jpeg");
+                var persImage2 = persPage.setImage2("test3.jpeg");
+                if (persImage1 && persImage2)
+                {
+                    fps.Add(persPage.fixedPage);
+                    pagename.Add("perspective");
+                } 
 
                 //page2 건축개요
                 // 배치도 테스트
@@ -557,7 +567,7 @@ namespace TuringAndCorbusier
                 List<Curve> coreOutline = MainPanel_AGOutputList[tempIndex].drawEachCore();
                 int NumberOfCores = MainPanel_AGOutputList[tempIndex].Core[0].Count;
                 List<Curve> houseOutline = MainPanel_AGOutputList[tempIndex].drawEachHouse();
-                int NumberOfHouses = MainPanel_AGOutputList[tempIndex].Household[0][0].Count;
+                int NumberOfHouses = houseOutline.Count/MainPanel_AGOutputList[tempIndex].Household.Count;
                 List<List<Core>> coreDoubleList = MainPanel_AGOutputList[tempIndex].Core;
                 List<Core> newCoreList = new List<Core>();
                 foreach (List<Core> coreList in coreDoubleList)
@@ -706,10 +716,13 @@ namespace TuringAndCorbusier
                 }
                 //최고층 면적 계산
                 bool isTopFloorDifferent = false;
-                double area = 0.0;
+                List<double> area = new List<double>();
                 for (int i = 0; i < houseOutline.Count; i++)
                 {
-                    area += AreaMassProperties.Compute(houseOutline[i]).Area;
+                    int top = houseOutline.Count/(int)(MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2);
+                    if (i%top==0)
+                        area.Add(AreaMassProperties.Compute(houseOutline[i]).Area);
+    
                 }
 
                         List<HouseholdStatistics> householeStatisticsList = MainPanel_AGOutputList[tempIndex].HouseholdStatistics;
@@ -1355,7 +1368,7 @@ namespace TuringAndCorbusier
             Vector3d backupDir = RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.CameraDirection;
             MainPanel_building2DPreview.Enabled = false;
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 Point3d center = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.center;
                 Point3d tempcampos = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.campos[i] + Vector3d.ZAxis * new Vector3d(center - TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.campos[i]).Length;

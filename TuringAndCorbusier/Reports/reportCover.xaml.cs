@@ -86,7 +86,7 @@ namespace Reports
         public void SetTitle(string projectNameStr)
         {
             string tempTitle = projectNameStr;
-            title.Text = tempTitle+" 가로주택정비사업 기획설계";
+            title.Text = tempTitle+"\n가로주택정비사업 기획설계";
         }
         //보고서 출력 날짜 넣기
         public void SetPublishDate() {

@@ -52,7 +52,7 @@
             <TextBlock  x:Name="numOfHouseHolds" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="270" Canvas.Top="628" FontFamily="NanumSquareOTF" />
 
 
-            <TextBlock x:Name="title" Canvas.Left="95" Text="Title" TextWrapping="Wrap" Canvas.Top="240" FontSize="36" FontFamily="NanumSquareOTF" />
+            <TextBlock x:Name="title" Canvas.Left="95" Text="Title" TextWrapping="Wrap" Canvas.Top="199" FontSize="36" FontFamily="NanumSquareOTF" />
             <TextBlock x:Name="publishDate" Text="Date" Canvas.Left="95" TextWrapping="Wrap" Canvas.Top="285" FontSize="30" FontFamily="NanumSquareOTF" />
 
             <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="NanumSquareOTF" FontWeight="Bold" />
