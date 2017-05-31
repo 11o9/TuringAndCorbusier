@@ -21,6 +21,7 @@ namespace TuringAndCorbusier
         public static double corridorWidth { get { return 1300; } }
         public static double corridorWallHeight { get { return 1200; } }
         public static double escapeCoreCriteria { get { return 30000; } }
+        public static double twoCoreAreaCriteria { get { return 300 * 1000 * 1000; } }
         public static string connectionString
         {
             get

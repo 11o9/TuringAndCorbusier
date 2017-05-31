@@ -116,7 +116,7 @@ namespace TuringAndCorbusier
                 List<double> fitnessValues = evaluateFitness(plot, ag, target, offspringGenes, fitnessFactor, previewOn, out apartments);
 
                 //check is maxGeneration
-                genCount += 1;
+               
                 if (genCount == maxGen)
                 {
                     endCondition = false;
@@ -133,6 +133,8 @@ namespace TuringAndCorbusier
                     GC.Collect();
                     break;
                 }
+
+                genCount += 1;
 
                 //sort genes and fitness values
                 RhinoList<ParameterSet> myRhinoList = new RhinoList<ParameterSet>(offspringGenes);
@@ -168,13 +170,8 @@ namespace TuringAndCorbusier
 
           
 
-                //GC.Collect();
+     
                 //Rhino.RhinoApp.Wait();
-
-                //finalize before end
-               
-
-                Rhino.RhinoApp.Wait();
             }
 
             //best 1
