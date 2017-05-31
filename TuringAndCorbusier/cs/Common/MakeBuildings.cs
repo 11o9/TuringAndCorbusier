@@ -44,7 +44,8 @@ namespace TuringAndCorbusier
             double height = Consts.FloorHeight;
             Curve outline = hhp.GetOutline();
             Polyline outPoly = CurveTools.ToPolyline(outline);
-
+            if (outline == null)
+                return new List<Brep>();
             Brep x = Extrusion.Create(outline, height, true).ToBrep();
             x.CapPlanarHoles(1);
 
@@ -57,13 +58,6 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < hhp.LightingEdge.Count; i++)
             {
-                //Rhino.RhinoDoc.ActiveDoc.Objects.Add(hhp.LightingEdge[i].ToNurbsCurve());
-                //var c = hhp.LightingEdge[i].ToNurbsCurve().Trim(CurveEnd.Both, 300);
-                //var p1 = c.PointAtStart + Vector3d.ZAxis * 300;
-                //var p2 = c.PointAtStart + Vector3d.ZAxis * 2400;
-                //var p3 = c.PointAtEnd + Vector3d.ZAxis * 2400;
-                //var p4 = c.PointAtEnd + Vector3d.ZAxis * 300;
-                //Brep[] open = Brep.CreatePlanarBreps(new PolylineCurve(new Point3d[] { p1, p2, p3, p4, p1 }));
                 Line tempLine = hhp.LightingEdge[i];
 
                 Point3d midPoint = tempLine.PointAt(0.5);
@@ -160,9 +154,56 @@ namespace TuringAndCorbusier
         public static List<Brep> DrawCorridor(Apartment apartment)
         {
             List<Brep> output = new List<Brep>();
+            #region P1Corridor
+            if (apartment.AGtype == "PT-1")
+            {
+                List<Brep> courtCorridorBrep = new List<Brep>();
+                List<Curve> corridorLines = new List<Curve>();
 
+                foreach (var hh in apartment.Household)
+                {
+                    foreach (var h in hh)
+                    {
+                        foreach (var household in h)
+                        {
+                            if (household.isCorridorType)
+                            {
+                                Curve corridorLine = new LineCurve(household.Origin, household.Origin + household.XDirection * household.XLengthA);
+                                corridorLines.Add(corridorLine);
+                            }
+                        }
+                    }
+                }
+
+                corridorLines = Curve.JoinCurves(corridorLines).ToList();
+
+
+                for(int i = 0; i < corridorLines.Count;i++)
+                {
+                    Curve offset = corridorLines[i].DuplicateCurve();
+                    Vector3d dir = offset.TangentAtStart;
+                    dir.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                    offset.Transform(Transform.Translation(dir * Consts.corridorWidth));
+
+                    PolylineCurve floor = new PolylineCurve(new Point3d[] { corridorLines[i].PointAtStart, offset.PointAtStart, offset.PointAtEnd, corridorLines[i].PointAtEnd, corridorLines[i].PointAtStart });
+
+                    Brep corridorFloorBrep = Brep.CreatePlanarBreps(new List<Curve> { floor }).First();
+
+                    PolylineCurve corridorWall = new PolylineCurve(new Point3d[] { corridorLines[i].PointAtStart, offset.PointAtStart, offset.PointAtEnd, corridorLines[i].PointAtEnd });
+
+                    Surface corridorWallSurface = Surface.CreateExtrusion(corridorWall, Vector3d.Multiply(Vector3d.ZAxis, Consts.corridorWallHeight));
+
+                    Brep corridorWallBrep = corridorWallSurface.ToBrep();
+
+
+                    courtCorridorBrep.Add(corridorFloorBrep);
+                    courtCorridorBrep.Add(corridorWallBrep);
+                }
+                output = courtCorridorBrep;
+            }
+            #endregion
             #region P3Corridor
-            if (apartment.AGtype == "PT-3")
+            else if (apartment.AGtype == "PT-3")
             {
                 List<Brep> courtCorridorBrep = new List<Brep>();
                 List<Curve> centerLine = apartment.AptLines;
@@ -189,6 +230,7 @@ namespace TuringAndCorbusier
                 }
                 output = courtCorridorBrep;
             }
+        
             #endregion P3Corridor
 
             return output;

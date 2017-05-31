@@ -596,6 +596,7 @@ namespace TuringAndCorbusier
                 return false;
 
             InnerIsoDrawer noConcave = new InnerIsoDrawer(poly,2000,0);
+            noConcave.MaxAspectRatio = 4;
             Isothetic iso1 = noConcave.Draw();
 
             InnerIsoDrawer oneConcave = new InnerIsoDrawer(poly, 2000, 1);

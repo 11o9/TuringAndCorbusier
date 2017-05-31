@@ -256,7 +256,7 @@ namespace TuringAndCorbusier
                         List<int> removeIndex = new List<int>();
                         foreach (var h in hh)
                         {
-                            var contractResult = h.Contract(wholeRegulationHigh[0]);
+                            bool contractResult = h.Contract(wholeRegulationHigh[0]);
                             if (!contractResult)
                                 removeIndex.Add(hh.IndexOf(h));
                         }
@@ -344,7 +344,7 @@ namespace TuringAndCorbusier
             else
             {
                 Finalizer finalizer = new Finalizer(result);
-                result = finalizer.Finilize();
+                result = finalizer.Finalize();
             }
 
             return result;
@@ -391,7 +391,7 @@ namespace TuringAndCorbusier
             if (randomCoreType == CoreType.CourtShortEdge)
             {
                 isShortCore = true;
-                coreWidth = minEdge.GetLength();
+                coreWidth = minEdge.GetLength()-2* Consts.corridorWidth;
                 if (minEdge.GetLength() > 16000)
                     coreWidth = CoreType.CourtShortEdge.GetWidth();
             }
@@ -541,7 +541,7 @@ namespace TuringAndCorbusier
                 double yaH;
                 double ybH;
                 List<Line> windowsH = new List<Line>();
-                List<Line> moveableH = new List<Line>();
+                List<Line> movableH = new List<Line>();
                 Point3d ent = new Point3d();
                 List<double> wallFactor;
                 //int targetAreaTypeH = new List<int>();
@@ -590,7 +590,7 @@ namespace TuringAndCorbusier
                     windowsH.Add(new Line(winPt1, winPt2));
                     ////////
                     windowsH.Add(new Line(winPt3, winPt4));
-                    moveableH.Add(new Line(winPt3, winPt4));
+                    movableH.Add(new Line(winPt3, winPt4));
 
                     //entrance points
                     ent = new Point3d(homeOriH);
@@ -651,8 +651,8 @@ namespace TuringAndCorbusier
                     windowsH.Add(new Line(winPt1, winPt2));
                     windowsH.Add(new Line(winPt3, winPt4));
 
-                    //moveables == windows
-                    moveableH = new List<Line>(windowsH);
+                    //movables == windows
+                    movableH = new List<Line>(windowsH);
 
                     //entrance points
                     ent = new Point3d(homeOriH);
@@ -673,14 +673,14 @@ namespace TuringAndCorbusier
                     if (isCorner)
                     {
                         Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Corner(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
-                        tempHP.MoveableEdge = new List<Line>(moveableH);
+                        tempHP.MovableEdge = new List<Line>(movableH);
                         outputS.Add(tempHP);
                         //cornerProperties[targetAreaType[i]].Add(tempHP);
                     }
                     else
                     {
                         Household tempHP = new Household(homeOriH, homeVecXH, homeVecYH, xaH, xbH, yaH, ybH, targetAreaType[i], exclusiveAreaCalculatorAG3Edge(xaH, xbH, yaH, ybH, targetAreaType[i], Consts.balconyDepth), windowsH, ent, wallFactor);
-                        tempHP.MoveableEdge = new List<Line>(moveableH);
+                        tempHP.MovableEdge = new List<Line>(movableH);
                         outputS.Add(tempHP);
                         //edgeProperties[targetAreaType[i]].Add(tempHP);
                     }
@@ -701,10 +701,10 @@ namespace TuringAndCorbusier
                     List<Line> win = new List<Line>(hp.LightingEdge); 
 
                     Household newTemp = new Household(ori, hp.XDirection, hp.YDirection, hp.XLengthA, hp.XLengthB, hp.YLengthA, hp.YLengthB, hp.HouseholdSizeType, hp.GetExclusiveArea() + hp.GetWallArea(), win, ent, hp.WallFactor);
-                    newTemp.MoveableEdge = new List<Line>(hp.MoveableEdge);
+                    newTemp.MovableEdge = new List<Line>(hp.MovableEdge);
 
                     //라이팅 등 위치 재조정
-                    newTemp.MoveLightingAndMoveAble();
+                    newTemp.MoveLightingAndMovable();
 
                     outputSTemp.Add(newTemp);
                 }

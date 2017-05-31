@@ -75,7 +75,7 @@
             <TextBlock x:Name="ConstructionArea_Py" Text="건폐율" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="830" Canvas.Top="694" />
             <TextBlock x:Name="buildingCoverage_legal" Text="용적률" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="830" Canvas.Top="730" />
             <TextBlock x:Name="floorAreaRatio_legal" Text="세대수" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="830" Canvas.Top="769" />
-            <TextBlock Text="주차대수" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="830" Canvas.Top="806" />
+            <TextBlock x:Name="legalParking" Text="주차대수" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="830" Canvas.Top="806" />
             <TextBlock x:Name="ParkingLotArea" Text="주차대수" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="830" Canvas.Top="844" />
 
             <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="2.0" Fill="Black" Canvas.Top="113" Height="75" Stretch="Fill" Width="1070" Canvas.Left="85"/>

@@ -225,7 +225,7 @@ namespace TuringAndCorbusier
 
             #region GetLow
             List<List<Household>> Low = new List<List<Household>>();
-
+            List<Core> corridorCores = new List<Core>();
             //buildingnumber..
             int buildingnum = -1;
 
@@ -273,7 +273,7 @@ namespace TuringAndCorbusier
                     //temp.XLengthA = shattered[j].GetLength();
                     //temp.HouseholdSizeType = 0;
                     #endregion
-                    if (isclearance[i][j] != UnitType.Clearance)
+                    if (isclearance[i][j] != UnitType.Clearance && isclearance[i][j] != UnitType.CorridorCore)
                     {
                         //복도형
                         if (isclearance[i][j] == UnitType.Corridor)
@@ -299,6 +299,20 @@ namespace TuringAndCorbusier
                             houseindex++;
                         }
                     }
+                    else if (isclearance[i][j] == UnitType.CorridorCore)
+                    {
+                        Household corridor = hhg.Generate(UnitType.Corridor, buildingnum, houseindex);
+                        Core c = new Core();
+                        c.Origin = corridor.Origin + corridor.YDirection * Consts.corridorWidth;
+                        c.XDirection = -corridor.XDirection;
+                        c.YDirection = corridor.YDirection;
+                        c.CoreType = CoreType.Parallel;
+                        c.Depth = CoreType.Parallel.GetDepth();
+                        c.Width = CoreType.Parallel.GetWidth();
+                        c.Origin += c.XDirection * - c.Width;
+                        c.Origin += c.YDirection * - c.Depth;
+                        corridorCores.Add(c);
+                    }
                     //clearance
                     else
                     {
@@ -317,6 +331,10 @@ namespace TuringAndCorbusier
             #region core
             List<Core> cps = new List<Core>();
             List<List<Core>> cpss = new List<List<Core>>();
+
+            cps.AddRange(corridorCores);
+           
+
             for (int i = 0; i < Low.Count; i++)
             {
                 if (Low[i].Count == 0)
@@ -330,37 +348,38 @@ namespace TuringAndCorbusier
                 {
                     var tempBuildingCorridorUnits = Low[i].Where(n => n.indexer[0] == j && n.isCorridorType).ToList();
 
-                    if (tempBuildingCorridorUnits.Count != 0)
-                    {
-                        double wholeLength = tempBuildingCorridorUnits[0].XLengthA * tempBuildingCorridorUnits.Count;
+                    //if (tempBuildingCorridorUnits.Count != 0)
+                    //{
+                    //    double wholeLength = tempBuildingCorridorUnits[0].XLengthA * tempBuildingCorridorUnits.Count;
 
-                        Core corep = new Core();
-
-                        var op = new Point3d(tempBuildingCorridorUnits.Last().Origin);
-                        op += tempBuildingCorridorUnits[0].XDirection * (wholeLength / 2 + coreWidth / 2);
-
-                        //코어 안튀어나가게 하기위한 임시방편
-                        op += tempBuildingCorridorUnits[0].YDirection * (-coreDepth + Consts.corridorWidth);
-
-                        corep.Origin = op;
-                        corep.Stories = 0;
-                        corep.XDirection = -tempBuildingCorridorUnits[0].XDirection;
-                        corep.YDirection = tempBuildingCorridorUnits[0].YDirection;
-                        corep.CoreType = randomCoreType;
-                        corep.Width = randomCoreType.GetWidth();
-                        corep.Depth = randomCoreType.GetDepth();
-
-                        corep.BuildingGroupNum = j;
-                        corep.Area = corearea;
+                    //    Core corep = new Core();
 
 
-                        cps.Add(corep);
+                    //    var op = new Point3d(tempBuildingCorridorUnits.Last().Origin);
+                    //    op += tempBuildingCorridorUnits[0].XDirection * (wholeLength / 2 + coreWidth / 2);
 
-                        //이거뭐지....왜.. // getArea가 이상했음
-                        double aaarea = corep.GetArea();
+                    //    //코어 안튀어나가게 하기위한 임시방편
+                    //    op += tempBuildingCorridorUnits[0].YDirection * (-coreDepth + Consts.corridorWidth);
+
+                    //    corep.Origin = op;
+                    //    corep.Stories = 0;
+                    //    corep.XDirection = -tempBuildingCorridorUnits[0].XDirection;
+                    //    corep.YDirection = tempBuildingCorridorUnits[0].YDirection;
+                    //    corep.CoreType = randomCoreType;
+                    //    corep.Width = randomCoreType.GetWidth();
+                    //    corep.Depth = randomCoreType.GetDepth();
+
+                    //    corep.BuildingGroupNum = j;
+                    //    corep.Area = corearea;
 
 
-                    }
+                    //    cps.Add(corep);
+
+                    //    //이거뭐지....왜.. // getArea가 이상했음
+                    //    double aaarea = corep.GetArea();
+
+
+                    //}
 
                     var tempBuildingTowerUnits = Low[i].Where(n => n.indexer[0] == j && !n.isCorridorType).ToList();
 
@@ -430,7 +449,7 @@ namespace TuringAndCorbusier
                         {
                             var newhhp = new Household(x);
                             newhhp.Origin = x.Origin + Vector3d.ZAxis * tempStoryHeight;
-                            newhhp.MoveLightingAndMoveAble();
+                            newhhp.MoveLightingAndMovable();
                             Curve outline = newhhp.GetOutline();
                             //법규체크?
                             var intersect = Rhino.Geometry.Intersect.Intersection.CurveCurve(r, outline, 0, 0);
@@ -490,7 +509,7 @@ namespace TuringAndCorbusier
                     regulationHigh.UnFake();
                     Curve[] topNorth = regulationHigh.fromNorthCurve(plot);
 
-                    //일조사선 걸리는 코어들 제거, 연결된 house 제거
+                    //일조사선 걸리는 코어들 제거, 연결된 house 제거... 복도형의경우???
                     List<Curve> topCoreOutlines = topCores.Select(n => n.DrawOutline()).ToList();
                     topCoreOutlines.ForEach(n => n.Translate(Vector3d.ZAxis * -n.PointAtStart.Z));
                     List<bool> remove = new List<bool>();
@@ -516,16 +535,33 @@ namespace TuringAndCorbusier
                             foreach (var hh in hhps.Last())
                             {
                                 List<int> toRemove = new List<int>();
+                                
                                 foreach (var h in hh)
                                 {
                                     Curve outline = h.GetOutline();
                                     Curve coreoutline = cpss[cpss.Count - 2][i].DrawOutline();
                                     var col = Curve.PlanarCurveCollision(outline, coreoutline, Plane.WorldXY, 0);
+
                                     if (col)
                                     {
-                                        toRemove.Add(hh.IndexOf(h));
+                                        //복도형 - 탐색 해야함
+                                        if (cpss.Last()[i].CoreType == CoreType.Vertical)
+                                        {
+                                            List<int> linkedIndex = new List<int>();
+                                            linkedIndex.Add(hh.IndexOf(h));
+                                            var hascontacts = FindContacts(hh, topCores, h, ref linkedIndex);
+                                            if (hascontacts)
+                                                toRemove.AddRange(linkedIndex);
+                                        }
+                                        //일반 - 바로 지우면 됨
+                                        else
+                                        {
+                                            toRemove.Add(hh.IndexOf(h));
+                                        }
                                     }
                                 }
+
+                                toRemove = toRemove.OrderBy(n=>n).ToList();
 
                                 for (int j = toRemove.Count - 1; j >= 0; j--)
                                 {
@@ -548,7 +584,7 @@ namespace TuringAndCorbusier
                             List<int> removeIndex = new List<int>();
                             foreach (var h in hh)
                             {
-                                var contractResult = h.Contract(wholeRegulationHigh[0]);
+                                bool contractResult = h.Contract(wholeRegulationHigh[0]);
                                 if (!contractResult)
                                     removeIndex.Add(hh.IndexOf(h));
                             }
@@ -684,7 +720,7 @@ namespace TuringAndCorbusier
             else
             {
                 Finalizer finalizer = new Finalizer(result);
-                result = finalizer.Finilize();
+                result = finalizer.Finalize();
             }
             
             //ParkingDistributor.Distribute(ref result);
@@ -768,6 +804,56 @@ namespace TuringAndCorbusier
             }
         }
         #endregion GASetting
+
+
+        //recursive
+        private bool FindContacts(List<Household> hh, List<Core> cores, Household h, ref List<int> indexes)
+        {
+            //hh 중 h에 접하는것들 찾음.
+            int nextIndex = -1;
+            for (int k = 0; k < hh.Count; k++)
+            {
+                if (k == hh.IndexOf(h) || !hh[k].isCorridorType || indexes.Contains(k))
+                    continue;
+
+                var colK = Curve.PlanarCurveCollision(h.GetOutline(), hh[k].GetOutline(), Plane.WorldXY, 0);
+                if(colK)
+                {
+                    nextIndex = k;
+                    indexes.Add(nextIndex);
+                    break;
+                }
+            }
+
+            //마지막. 코어와 접하나?
+            if (nextIndex == -1)
+            {
+                for (int i = 0; i < cores.Count; i++)
+                {
+                    Curve kProjected = h.GetOutline();
+                    Curve coreProjected = cores[i].DrawOutline();
+                    kProjected = Curve.ProjectToPlane(kProjected, Plane.WorldXY);
+                    coreProjected = Curve.ProjectToPlane(coreProjected, Plane.WorldXY);
+                    var colI = Curve.PlanarCurveCollision(kProjected, coreProjected, Plane.WorldXY, 0);
+                    if (colI)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            else
+            {
+                bool result = FindContacts(hh, cores, hh[nextIndex], ref indexes);
+                                 
+                return result;
+            }
+
+
+        }
+
 
         //////////////////////////////////
         //////////  apt baseline  //////////
