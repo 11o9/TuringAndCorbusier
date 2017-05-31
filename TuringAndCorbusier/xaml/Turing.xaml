@@ -18,11 +18,11 @@
     <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="192*"/>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="32*"/>
-            <RowDefinition Height="233*"/>
-            <RowDefinition Height="192*"/>
+            <RowDefinition Height="200*"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="250*"/>
+            <RowDefinition Height="170*"/>
         </Grid.RowDefinitions>
         <TextBlock Style="{StaticResource TitleBoxStyle}" Text="대지 탐색" FontSize="15" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="0" Margin="0,0,0,0" Height="Auto" Width="Auto"/>
         <Rectangle x:Name="backGround" Margin="-2,0,2,0" Grid.Row="1"  Loaded="backGround_Loaded" />
@@ -111,7 +111,7 @@
             <TextBlock Text="건폐율" FontFamily="Noto Sans CJK KR Regular" Foreground="#ffffffff" TextAlignment="Center" Padding="3" Grid.Column="2" FontSize="9.333"/>
         </Grid>
 
-        <Grid Margin="17,0,17,0" Height="140" VerticalAlignment="Stretch" Grid.Row="5">
+        <Grid Margin="17,0,17,5" Height="Auto" VerticalAlignment="Stretch" Grid.Row="5">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition Height="5"/>
@@ -139,8 +139,8 @@
             <Button x:Name="Btn_Export3D" Style="{StaticResource MyButtonStyle}" Content="3D모델링" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="2" FontSize="13.333" Click="Btn_Export3D_Click" />
             <Button x:Name="Btn_ExportReport" Style="{StaticResource MyButtonStyle}" Content="설계 보고서" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="4" FontSize="13.333" Click="Btn_ExportReport_Click" />
             <Button x:Name="Btn_SendToServer" Visibility="Hidden" Style="{StaticResource MyButtonStyle}" Content="서버에 업로드" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="6" FontSize="13.333" Click="Btn_SendToServer_Click" />
-            <Button x:Name="Btn_Lawline" Style="{StaticResource MyButtonStyle}" Content="전체 법규선 보기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="6" FontSize="13.333" Click="Btn_Lawline_Click" />
-            <Button x:Name="Information" Style="{StaticResource MyButtonStyle2}" Grid.Row="10" Content="프로그램 정보" FontSize="10"  HorizontalAlignment="Stretch" FontFamily="Noto Sans CJK KR Regular" Background="#FF353535" Foreground="White"  VerticalAlignment="Top" Click="Information_Click" Margin="0"/>
+            <Button x:Name="Btn_Lawline" Style="{StaticResource MyButtonStyle}" Content="전체 법규선 보기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="6" FontSize="13.333" Click="Btn_Lawline_Click" Height="Auto" />
+            <Button x:Name="Information" Style="{StaticResource MyButtonStyle2}" Grid.Row="10" Content="프로그램 정보" FontSize="13.333"  HorizontalAlignment="Stretch" FontFamily="Noto Sans CJK KR Regular" Background="#FF353535" Foreground="White"  VerticalAlignment="Stretch" Click="Information_Click" Margin="0"/>
 
             <Grid Grid.Row="8">
                 <Grid.ColumnDefinitions>
@@ -151,12 +151,12 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button x:Name="Btn_LawBoundary" Style="{StaticResource MyButtonStyle}" Content="대지" Margin="0,0,2.5,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="0" FontSize="10" Click="Btn_LawBoundary_Click"  Height="15"/>
-                <Button x:Name="Btn_LawNorth" Style="{StaticResource MyButtonStyle}" Content="정북" Margin="2.5,0,2.5,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="1" FontSize="10" Click="Btn_LawNorth_Click"  Height="15"/>
-                <Button x:Name="Btn_LawNear" Style="{StaticResource MyButtonStyle}" Content="공지" Margin="2.5,0,2.5,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="2" FontSize="10" Click="Btn_LawNear_Click"  Height="15"/>
+                <Button x:Name="Btn_LawBoundary" Style="{StaticResource MyButtonStyle}" Content="대지" Margin="0,0,2.5,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="0" FontSize="13" Click="Btn_LawBoundary_Click"  Height="Auto"/>
+                <Button x:Name="Btn_LawNorth" Style="{StaticResource MyButtonStyle}" Content="정북" Margin="2.5,0,2.5,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="1" FontSize="13" Click="Btn_LawNorth_Click"  Height="Auto"/>
+                <Button x:Name="Btn_LawNear" Style="{StaticResource MyButtonStyle}" Content="공지" Margin="2.5,0,2.5,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="2" FontSize="13" Click="Btn_LawNear_Click"  Height="Auto"/>
 
-                <Button x:Name="Btn_LawLighting" Style="{StaticResource MyButtonStyle}" Content="채광" Margin="2.5,0,2.5,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="3" FontSize="10" Click="Btn_LawLighting_Click"  Height="15"/>
-                <Button x:Name="Btn_LawApart" Style="{StaticResource MyButtonStyle}" Content="인동" Margin="2.5,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="4"  FontSize="10" Click="Btn_LawApart_Click"  Height="15"/>
+                <Button x:Name="Btn_LawLighting" Style="{StaticResource MyButtonStyle}" Content="채광" Margin="2.5,0,2.5,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="3" FontSize="13" Click="Btn_LawLighting_Click"  Height="Auto"/>
+                <Button x:Name="Btn_LawApart" Style="{StaticResource MyButtonStyle}" Content="인동" Margin="2.5,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff"  Background="#FF404040" Grid.Column="4"  FontSize="13" Click="Btn_LawApart_Click"  Height="Auto"/>
 
 
             </Grid>
