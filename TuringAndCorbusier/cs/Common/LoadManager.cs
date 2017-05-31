@@ -382,8 +382,12 @@ namespace TuringAndCorbusier
 
             foreach (var item in Rhino.RhinoDoc.ActiveDoc.Layers)
             {
-                item.Color = System.Drawing.Color.White;
-                item.CommitChanges();
+                if (item.Name == "Default")
+                {
+                    item.Color = System.Drawing.Color.Black;
+                    item.CommitChanges();
+                    break;
+                }
             }
 
             Rhino.DocObjects.Layer[] newLayers = { modelLayer, etcLayer, guideLayer };

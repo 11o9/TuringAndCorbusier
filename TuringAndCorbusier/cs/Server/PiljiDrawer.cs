@@ -74,7 +74,7 @@ namespace TuringAndCorbusier
 
         public void Draw()
         {
-            ObjectAttributes att = new ObjectAttributes() { ColorSource = ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.White, Mode = ObjectMode.Locked };
+            ObjectAttributes att = new ObjectAttributes() { ColorSource = ObjectColorSource.ColorFromObject, ObjectColor = System.Drawing.Color.Black, Mode = ObjectMode.Locked };
 
             if (piljiData.Jimok == "도")
                 att.ObjectColor = System.Drawing.Color.Red;

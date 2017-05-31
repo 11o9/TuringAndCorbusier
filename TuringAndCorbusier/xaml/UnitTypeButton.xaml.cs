@@ -41,7 +41,7 @@ namespace TuringAndCorbusier.xaml
 
             Input.Text = "1";
 
-            X.Source = BitmapTools.CreateBitmapSourceFromGdiBitmap(Properties.Resources.Transparent_X);
+            X.Source = XamlTools.CreateBitmapSourceFromGdiBitmap(Properties.Resources.Transparent_X);
 
         }
 

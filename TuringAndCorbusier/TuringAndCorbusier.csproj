@@ -156,7 +156,7 @@
     <Compile Include="Reports\xmlUnitReport.xaml.cs">
       <DependentUpon>xmlUnitReport.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utility\BitmapTools.cs" />
+    <Compile Include="Utility\XamlTools.cs" />
     <Compile Include="Utility\CCXTools.cs" />
     <Compile Include="Utility\CurveTools.cs" />
     <Compile Include="Utility\DoubleTools.cs" />

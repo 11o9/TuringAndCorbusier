@@ -74,7 +74,7 @@
         <Button x:Name="Btn_Calculate" Content="계산" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="20,0,0,10" Background="#ff676868" HorizontalAlignment="Left" Width="75" Click="Btn_Calculate_Click" Height="24" VerticalAlignment="Bottom" Grid.Row="6" />
         <Button x:Name="Btn_CheckReg" Content="법규선체크" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="0,0,275,10" Background="#ff676868" HorizontalAlignment="Right" Width="75" Click="Btn_CheckReg_Click"  Height="24" VerticalAlignment="Bottom" Grid.Row="6" Visibility="Hidden" />
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Background="Black">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="80"/>
@@ -99,28 +99,28 @@
 
 
             <TextBlock Style="{StaticResource TitleBoxStyle}" Text="건축 개요" Grid.ColumnSpan="8" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="1" Grid.Column="1" Text="건축물 용도" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingType" Grid.Row="1" Grid.Column="2" Text="건축물 용도" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="2" Grid.Column="1" Text="건축규모" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingScale" Grid.Row="2" Grid.Column="2" Text="건축규모" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="3" Grid.Column="1" Text="건축면적" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingArea" Grid.Row="3" Grid.Column="2" Text="건축면적" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingArea_Py" Grid.Row="3" Grid.Column="3" Text="건축면적 평" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="3" Grid.Column="4" Text="건폐율" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingCoverage" Grid.Row="3" Grid.Column="5" Text="건폐율" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="LegalBuildingCoverage" Grid.Row="3" Grid.Column="6" Text="법정건폐율" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="4" Grid.Column="1" Text="연면적" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="GrossArea" Grid.Row="4" Grid.Column="2" Text="연면적" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="GrossArea_Py" Grid.Row="4" Grid.Column="3" Text="연면적 평" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="4" Grid.Column="4" Text="용적률" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="FloorAreaRatio" Grid.Row="4" Grid.Column="5" Text="용적률" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="LegalFloorAreaRatio" Grid.Row="4" Grid.Column="6" Text="법정용적률" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="5" Grid.Column="1" Text="총 세대수" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="NumOfHousing" Grid.Row="5" Grid.Column="2" Text="총 세대수" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="5" Grid.Column="4" Text="유닛타입" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="6" Grid.Column="1" Text="주차대수" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="NumOfParking" Grid.Row="6" Grid.Column="2" Text="주차대수" />
-            <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="6" Grid.Column="4" Text="유닛수" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="1" Grid.Column="1" Text="건축물 용도" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingType" Grid.Row="1" Grid.Column="2"  Grid.ColumnSpan="2" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="2" Grid.Column="1" Text="건축규모" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingScale" Grid.Row="2" Grid.Column="2"  Grid.ColumnSpan="2" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="3" Grid.Column="1" Text="건축면적" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingArea" Grid.Row="3" Grid.Column="2" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingArea_Py" Grid.Row="3" Grid.Column="3" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="3" Grid.Column="4" Text="건폐율" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="BuildingCoverage" Grid.Row="3" Grid.Column="5" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="LegalBuildingCoverage" Grid.Row="3" Grid.Column="6" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="4" Grid.Column="1" Text="연면적" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="GrossArea" Grid.Row="4" Grid.Column="2" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="GrossArea_Py" Grid.Row="4" Grid.Column="3" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="4" Grid.Column="4" Text="용적률" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="FloorAreaRatio" Grid.Row="4" Grid.Column="5" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="LegalFloorAreaRatio" Grid.Row="4" Grid.Column="6" Text="" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="5" Grid.Column="1" Text="총 세대수" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="NumOfHousing" Grid.Row="5" Grid.Column="2" Text=""  Grid.ColumnSpan="2" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="5" Grid.Column="4" Text="유닛타입" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="6" Grid.Column="1" Text="주차대수" />
+            <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="NumOfParking" Grid.Row="6" Grid.Column="2" Text=""  Grid.ColumnSpan="2" />
+            <TextBlock Style="{StaticResource TextBlockStyleCenter}" Grid.Row="6" Grid.Column="4" Text="유닛수" />
 
             <Border Grid.Column="5" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="200">
                 <Grid Grid.Row="1" RenderTransformOrigin="0.0,-0.5">
@@ -276,7 +276,7 @@
             </Rectangle>
 
             <TextBlock Name="CurrentCondition" Text="계산 준비중..." Style="{StaticResource TextBlockStyle}" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="2" FontSize="8" Margin="5,6,0,7"/>
-            <TextBlock Name="CurrentPercentage" Text="0%" TextAlignment="Right" Style="{StaticResource TextBlockStyle}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="1" FontSize="8" Height="Auto"/>
+            <TextBlock Name="CurrentPercentage" Text="0%" TextAlignment="Right" Style="{StaticResource TextBlockStyle}" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2" FontSize="8" Height="Auto"/>
 
         </Grid>
         <Button x:Name="button" Content="Sectiontest" HorizontalAlignment="Left" Margin="100,16,0,0" Grid.Row="6" VerticalAlignment="Top" Width="75" Click="button_Click" Visibility="Hidden" />

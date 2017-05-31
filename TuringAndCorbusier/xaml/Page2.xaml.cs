@@ -87,7 +87,7 @@ namespace TuringAndCorbusier
         }
         private void Btn_ToNext_Click(object sender, RoutedEventArgs e)
         {
-            bool[] whichAgToUse = { !Toggle_AG1.IsChecked.Value, !Toggle_AG3.IsChecked.Value, !Toggle_AG4.IsChecked.Value };
+            bool[] whichAgToUse = selected;
 
             List<double> areas = new List<double>();
             List<double> ratios = new List<double>();
@@ -195,7 +195,7 @@ namespace TuringAndCorbusier
 
             selected[index] = !selected[index];
             int alpha = selected[index] ? 1 : 0;
-            diagrams[index].Source = BitmapTools.CreateBitmapSourceFromGdiBitmap(icons[index * 2 + alpha]);
+            diagrams[index].Source = XamlTools.CreateBitmapSourceFromGdiBitmap(icons[index * 2 + alpha]);
 
             titles[index].Foreground = selected[index] ? Brushes.Lime : Brushes.White;
 

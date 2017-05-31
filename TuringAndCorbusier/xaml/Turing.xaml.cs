@@ -150,7 +150,7 @@ namespace TuringAndCorbusier
             this.previousClickedButtonIndex = stackPanel.Children.IndexOf(sender as Button);
             this.previousClickedButtonBrush = (sender as Button).Background;
 
-            (sender as Button).Background = new SolidColorBrush(Color.FromArgb(255, 255, 204, 0));
+            (sender as Button).Background = Brushes.Lime;
 
 
 

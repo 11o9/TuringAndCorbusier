@@ -165,7 +165,8 @@ namespace TuringAndCorbusier
 
             string[] stackPannelButtonStyle = { "stackPannelButtonStyle1", "stackPannelButtonStyle2" };
             string tempStyle = stackPannelButtonStyle[stackPanel.Children.Count % 2];
-            System.Windows.Style style = Application.Current.FindResource(tempStyle) as Style;
+            ResourceDictionary tempDictionary = this.Resources.MergedDictionaries[0];
+            System.Windows.Style style = tempDictionary[tempStyle] as Style;
             btn.Style = style;
             btn.Content = tempGrid;
             btn.Height = 21;
@@ -205,7 +206,7 @@ namespace TuringAndCorbusier
             this.previousClickedButtonIndex = stackPanel.Children.IndexOf(sender as Button);
             this.previousClickedButtonBrush = (sender as Button).Background;
 
-            (sender as Button).Background = new SolidColorBrush(Color.FromArgb(255, 255, 204, 0));
+            (sender as Button).Background = Brushes.Lime;
             this.preview(tempOutput[stackPanel.Children.IndexOf(sender as Button)]);
 
             UpdateSummary(tempOutput[stackPanel.Children.IndexOf(sender as Button)]);
@@ -261,6 +262,7 @@ namespace TuringAndCorbusier
             BuildingArea_Py.Text = "(" + Math.Round(agOutput.GetBuildingArea() / 1000000 / 3.3, 2).ToString() + " 평)";
             BuildingCoverage.Text = ((int)agOutput.GetBuildingCoverage()).ToString() + " %";
             LegalBuildingCoverage.Text = "(법정 : " + TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage.ToString() + " %)";
+            LegalFloorAreaRatio.Text = "(법정 : " + TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio.ToString() + " %)";
 
             GrossArea.Text = Math.Round(agOutput.GetGrossArea() / 1000000, 2).ToString() + " m\xB2";
             GrossArea_Py.Text = "(" + Math.Round(agOutput.GetGrossArea() / 1000000 / 3.3, 2).ToString() + " 평)";

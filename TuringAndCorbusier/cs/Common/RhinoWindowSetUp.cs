@@ -154,7 +154,7 @@ namespace TuringAndCorbusier
                     vp.ParentView.Maximized = false;
                     vp.ConstructionGridVisible = true;
                     Rhino.Display.DisplayModeDescription dm = vp.DisplayMode;
-                    if (dm.EnglishName != "Shaded")
+                    if (dm.EnglishName != "Render")
                     {
                         Rhino.Display.DisplayModeDescription[] dms = Rhino.Display.DisplayModeDescription.GetDisplayModes();
 
@@ -167,7 +167,7 @@ namespace TuringAndCorbusier
                             english_name = english_name.Replace(",", "");
                             english_name = english_name.Replace(".", "");
 
-                            if (english_name == "Shaded")
+                            if (english_name == "Render")
                                 vp.DisplayMode = Rhino.Display.DisplayModeDescription.FindByName(dms[j].EnglishName);
 
 
