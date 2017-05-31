@@ -62,7 +62,7 @@ namespace TuringAndCorbusier
         {
             InitializeComponent();
 
-            Calculate.Click += Btn_SetInputValues;
+            //Calculate.Click += Btn_SetInputValues;
 
             GISSlot.Content = new ServerUI();
     //        try
@@ -187,15 +187,11 @@ namespace TuringAndCorbusier
 
             RhinoApp.WriteLine("tempoutputplottype = " + tempoutput.Plot.PlotType.ToString());
 
-            bool using1F = tempoutput.ParameterSet.using1F;
-            int stories = tempoutput.Household.Count();
-            Plot tempPlot = tempoutput.Plot;
-
-            MainPanel_building2DPreview.CurveToDisplay = tempCurves;
-            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLineDrawer.North(tempPlot, stories, using1F);
-            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot(tempPlot, stories, using1F);
-            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLineDrawer.Lighting(tempPlot, stories, tempoutput, using1F);
-            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLineDrawer.Boundary(tempPlot, stories, using1F);
+            MainPanel_building2DPreview.CurveToDisplay = tempCurves; 
+            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLineDrawer.North(tempoutput.Plot, tempoutput.Household.Count,true);
+            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot(tempoutput.Plot, tempoutput.Household.Count, false);
+            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLineDrawer.Lighting(tempoutput.Plot, tempoutput.Household.Count, tempoutput, tempoutput.ParameterSet.using1F);
+            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLineDrawer.Boundary(tempoutput.Plot, tempoutput.Household.Count, tempoutput.ParameterSet.using1F);
             List<string> widthlog;
             MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.LawLineDrawer.ApartDistance(tempoutput, out widthlog);
             MainPanel_LawPreview_ApartDistance.dimension = widthlog;
@@ -442,18 +438,18 @@ namespace TuringAndCorbusier
 
            // var makekdg = MessageBox.Show("건물이 있으면 안되는 블럭의 내부에 점을 찍으세요. 선택이 끝나면 esc", "도로 선택 완료", MessageBoxButton.YesNoCancel);
             //깍두기 최초 생성
-            if (stackPanel.Children.Count == 1)
-            {
-                var wantset = MessageBox.Show("주변 대지모형을 생성","주변 대지 모형",MessageBoxButton.YesNo);
-                if (wantset == MessageBoxResult.No)
-                    return;
+            //if (stackPanel.Children.Count == 1)
+            //{
+            //    var wantset = MessageBox.Show("주변 대지모형을 생성","주변 대지 모형",MessageBoxButton.YesNo);
+            //    if (wantset == MessageBoxResult.No)
+            //        return;
 
-                var makekdg = MessageBox.Show("주변 건물을 생성합니다. 건물이 있으면 안되는 블럭(도로/공지)의 내부에 점을 찍으세요."
-                    + System.Environment.NewLine + "선택이 끝나면 esc 후 완료버튼을, 잘못 입력했으면 esc 후 이전 취소를 눌러주세요.", "도로 선택 시작");
+            //    var makekdg = MessageBox.Show("주변 건물을 생성합니다. 건물이 있으면 안되는 블럭(도로/공지)의 내부에 점을 찍으세요."
+            //        + System.Environment.NewLine + "선택이 끝나면 esc 후 완료버튼을, 잘못 입력했으면 esc 후 이전 취소를 눌러주세요.", "도로 선택 시작");
 
-                SetKDG();
+            //    SetKDG();
 
-            }
+            //}
         }
 
 
@@ -688,11 +684,15 @@ namespace TuringAndCorbusier
             try
             {
                 List<Brep>tempBreps = TuringAndCorbusier.MakeBuildings.makeBuildings(MainPanel_AGOutputList[index]);
+                
                 List<Guid> tempGuid = new List<Guid>();
                 foreach (Brep i in tempBreps)
                 {
                     tempGuid.Add(LoadManager.getInstance().DrawObjectWithSpecificLayer(i, LoadManager.NamedLayer.Model));
                 }
+
+                tempGuid.AddRange(MakeBuildings.DrawFoundation(MainPanel_AGOutputList[index]));
+
                 MainPanel_building3DPreview.Insert(index, tempGuid);
                 RhinoDoc.ActiveDoc.Views.Redraw();
             }
@@ -1488,9 +1488,9 @@ namespace TuringAndCorbusier
             RhinoDoc.ActiveDoc.Views.Redraw();
 
 
-            Calculate.Content = "설계 시작";
-            Calculate.Click -= Btn_SetInputValues;
-            Calculate.Click += Calculate_Click;
+            //Calculate.Content = "설계 시작";
+            //Calculate.Click -= Btn_SetInputValues;
+            //Calculate.Click += Calculate_Click;
 
             ProjectName.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName;
             ProjectAddress.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.Address;

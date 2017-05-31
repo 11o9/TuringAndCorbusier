@@ -35,7 +35,6 @@ namespace TuringAndCorbusier
             }
 
             output.AddRange(DrawCorridor(agOut));
-
             return output;
         }
 
@@ -235,7 +234,64 @@ namespace TuringAndCorbusier
 
             return output;
         }
+        public static List<Guid> DrawFoundation(Apartment apartment)
+        {
+            List<Guid> result = new List<Guid>();
+            Plot plot = apartment.Plot;
+            var LHGreen = System.Drawing.Color.FromArgb(127, 255, 0);
 
+            Brep[] green = Brep.CreatePlanarBreps(plot.Boundary);
+            Brep[] white = Brep.CreatePlanarBreps(plot.outrect);
+
+            for (int i = 0; i < green.Length; i++)
+            {
+                var att = new Rhino.DocObjects.ObjectAttributes() { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromMaterial, MaterialSource = Rhino.DocObjects.ObjectMaterialSource.MaterialFromObject };
+
+                int index = Rhino.RhinoDoc.ActiveDoc.Materials.Find("LHGreen", true);
+                if (index == -1)
+                {
+                    Rhino.DocObjects.Material matt = new Rhino.DocObjects.Material();
+                    matt.DiffuseColor = LHGreen;
+                    matt.Name = "LHGreen";
+                    matt.CommitChanges();
+
+                    Rhino.RhinoDoc.ActiveDoc.Materials.Add(matt);
+                    att.MaterialIndex = Rhino.RhinoDoc.ActiveDoc.Materials.Find("LHGreen", true);
+                }
+                else
+                {
+                    att.MaterialIndex = index;
+                }
+
+                Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(green[i], att);
+            }
+
+            for (int i = 0; i < white.Length; i++)
+            {
+                var att = new Rhino.DocObjects.ObjectAttributes() { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromMaterial, MaterialSource = Rhino.DocObjects.ObjectMaterialSource.MaterialFromObject };
+
+                int index = Rhino.RhinoDoc.ActiveDoc.Materials.Find("LHWhite", true);
+                if (index == -1)
+                {
+                    Rhino.DocObjects.Material matt = new Rhino.DocObjects.Material();
+                    matt.DiffuseColor = System.Drawing.Color.White;
+                    matt.Name = "LHWhite";
+                    matt.CommitChanges();
+
+                    Rhino.RhinoDoc.ActiveDoc.Materials.Add(matt);
+                    att.MaterialIndex = Rhino.RhinoDoc.ActiveDoc.Materials.Find("LHWhite", true);
+                }
+                else
+                {
+                    att.MaterialIndex = index;
+                }
+
+                Rhino.RhinoDoc.ActiveDoc.Objects.Add(white[i], att);
+            }
+
+            return result;
+
+        }
         private static List<Brep> DrawWindowAll(Curve baseCurve, double height, bool drawComplexModeling)
         {
             Curve tempCurve = new LineCurve(baseCurve.PointAt(baseCurve.Domain.T0), baseCurve.PointAt(baseCurve.Domain.T1));

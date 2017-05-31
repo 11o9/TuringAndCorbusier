@@ -35,8 +35,7 @@ namespace TuringAndCorbusier
             Color defaultcolor = Color.Gold;
             Color tempcolor = Color.Black;
             if (layercolor == Color.Black)
-            
-                tempcolor = Color.White;
+                tempcolor = Color.Black;
            
 
             var matching_layers = (from layer in doc.Layers
@@ -94,7 +93,7 @@ namespace TuringAndCorbusier
 
             
 
-            LayerColorChange(doc,Color.White);
+            //LayerColorChange(doc,Color.White);
             //Rhino.Render.RenderContent[] rendercontents = Rhino.Render.UI.UserInterfaceSection.FromWindow(RhinoApp.MainWindow()).GetContentList();
             //for (int i = 0; i < rendercontents.Length; i++)
             //{

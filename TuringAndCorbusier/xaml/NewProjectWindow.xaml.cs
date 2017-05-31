@@ -76,7 +76,7 @@ namespace TuringAndCorbusier
             resetPlotTypeButton();
             LastClickedPlotType = 1;
 
-            (sender as Button).Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 204, 17));
+            (sender as Button).Background = System.Windows.Media.Brushes.Lime;
             (sender as Button).Foreground = System.Windows.Media.Brushes.Black;
             this.plotType = "제 1종 일반 주거지역";
             plotType2 = PlotType.제1종일반주거지역;
@@ -91,7 +91,7 @@ namespace TuringAndCorbusier
             resetPlotTypeButton();
             LastClickedPlotType = 2;
 
-            (sender as Button).Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 204, 17));
+            (sender as Button).Background = System.Windows.Media.Brushes.Lime;
             (sender as Button).Foreground = System.Windows.Media.Brushes.Black;
             this.plotType = "제 2종 일반 주거지역";
             plotType2 = PlotType.제2종일반주거지역;
@@ -106,7 +106,7 @@ namespace TuringAndCorbusier
             resetPlotTypeButton();
             LastClickedPlotType = 3;
 
-            (sender as Button).Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 204, 17));
+            (sender as Button).Background = System.Windows.Media.Brushes.Lime;
             (sender as Button).Foreground = System.Windows.Media.Brushes.Black;
             this.plotType = "제 3종 일반 주거지역";
             plotType2 = PlotType.제3종일반주거지역;
@@ -121,7 +121,7 @@ namespace TuringAndCorbusier
             resetPlotTypeButton();
             LastClickedPlotType = 4;
 
-            (sender as Button).Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 204, 17));
+            (sender as Button).Background = System.Windows.Media.Brushes.Lime;
             (sender as Button).Foreground = System.Windows.Media.Brushes.Black;
             this.plotType = "상업지역";
             plotType2 = PlotType.상업지역;

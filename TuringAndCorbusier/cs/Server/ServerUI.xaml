@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TuringAndCorbusier"
              mc:Ignorable="d" 
-             d:DesignWidth="300" Height="60">
+             d:DesignWidth="300">
+
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -13,24 +15,28 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="2*"/>
-            <RowDefinition Height="0*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
         <!--
         <Canvas Width="Auto" Height="Auto" Background="Gray"  Grid.ColumnSpan="3"></Canvas>
         -->
-        <ComboBox x:Name="si" Grid.Row="0" Grid.Column="0" Margin="5,2,2,5" Height="Auto" SelectionChanged="SiChanged">
+        <TextBlock Text="법정 경계" Grid.Row="0" Foreground="White" Margin="5,2,2,5" FontSize="10"/>
+        <ComboBox x:Name="si" Grid.Row="1" Grid.Column="0" Margin="5,2,2,5" Height="Auto" SelectionChanged="SiChanged"  >
 
         </ComboBox>
-        <ComboBox x:Name="gu" Grid.Row="0" Grid.Column="1" Margin="5,2,2,5" Height="Auto" SelectionChanged="GuChanged"></ComboBox>
-        <ComboBox x:Name="dong" Grid.Row="0" Grid.Column="2" Margin="5,2,2,5" Height="Auto" SelectionChanged="DongChanged"></ComboBox>
+        
+        <ComboBox x:Name="gu" Grid.Row="1" Grid.Column="1" Margin="5,2,2,5" Height="Auto" SelectionChanged="GuChanged"></ComboBox>
+        <ComboBox x:Name="dong" Grid.Row="1" Grid.Column="2" Margin="5,2,2,5" Height="Auto" SelectionChanged="DongChanged"></ComboBox>
 
-        <TextBox x:Name="bonbun" Grid.Row="1" Grid.Column="0" Margin="5,2,2,5" Height="Auto" TextChanged="BonbunChanged" MaxLength="4"></TextBox>
-        <TextBox x:Name="bubun" Grid.Row="1" Grid.Column="1" Margin="5,2,2,5" Height="Auto" TextChanged="BubunChanged" MaxLength="4" ></TextBox>
-
-        <Button x:Name="search" Grid.Row="1" Grid.Column="2" Margin="5,2,2,5" FontSize="12" Click="DrawPilji" >검색</Button>
+        <TextBlock Text="지번" Grid.Row="2" Foreground="White" Margin="5,2,2,5" FontSize="10"/>
+        <TextBox x:Name="bonbun" Grid.Row="3" Grid.Column="0" Margin="5,2,2,5" Height="Auto" TextChanged="BonbunChanged" MaxLength="4"></TextBox>
+        <TextBox x:Name="bubun" Grid.Row="3" Grid.Column="1" Margin="5,2,2,5" Height="Auto" TextChanged="BubunChanged" MaxLength="4" ></TextBox>
+        <Button x:Name="search" Grid.Row="3" Grid.Column="2" Margin="5,2,2,5" FontSize="12" Click="DrawPilji" >지적 검색</Button>
 
         <!--<TextBox x:Name="codeTest" Grid.Row="2" Grid.ColumnSpan="3"/>-->
 
