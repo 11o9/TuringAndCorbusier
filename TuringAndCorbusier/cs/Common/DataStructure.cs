@@ -2449,7 +2449,7 @@ namespace TuringAndCorbusier
 
             }
            
-            var diff = Curve.CreateBooleanDifference(GetOutline(), testCurve);
+            var diff = Curve.CreateBooleanDifference(GetOutline(), regulationLine);
 
             if (diff.Length == 0)
                 return true;
