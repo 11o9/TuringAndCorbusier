@@ -308,13 +308,12 @@ namespace TuringAndCorbusier
 
 
                 //initial setting
-                double toReduceArea = targetFA - currentFA;
+                double toReduceArea = currentFA - targetFA;
                 double aptWidth = aptOverFAR.ParameterSet.Parameters[2];
 
                 List<Core> topFloorCore = aptOverFAR.Core.Last();
                 List<Household> topFloorHouseholds = aptOverFAR.Household.Last().First();
                 int initialHouseCount = topFloorHouseholds.Count;
-                int initialCoreCount = topFloorCore.Count;
                 double currentFloorZ = topFloorHouseholds.First().Origin.Z;
                 double currentCoreZ = topFloorCore.First().Origin.Z;
 
@@ -358,8 +357,6 @@ namespace TuringAndCorbusier
                 courtInnerLine.Translate(Vector3d.ZAxis * (currentFloorZ - currentCoreZ));
 
                 //Subtract
-                int currentCoreCount = initialCoreCount;
-
                 for (int i = 0; i < initialHouseCount; i++)
                 {
                     //subtract household
@@ -376,6 +373,11 @@ namespace TuringAndCorbusier
                     toReduceArea -= reduceArea;
 
                     //subtract core
+                    if (topFloorCore.Count == 0)
+                        continue;
+
+                    int currentCoreCount = topFloorCore.Count;
+
                     if (toReduceArea > 0 && topFloorCore.First().Area * currentCoreCount> toReduceArea)
                     {
                         if (topFloorHouseholds.Count == 0)
@@ -399,14 +401,15 @@ namespace TuringAndCorbusier
                         courtInnerLine.ClosestPoint(houseEnd, out houseEndParam);
 
                         Interval houseInterval = new Interval(houseStartParam, houseEndParam);
+                 
 
-                        for (int j = 0; j < topFloorCore.Count; j++)
+                        for (int j = 0; j < currentCoreCount; j++)
                         {
-                            int indexFromLastCore = initialCoreCount - 1- j;
+                            int indexFromLastCore = currentCoreCount - 1- j;
                             Core currentCore = topFloorCore[indexFromLastCore];
                             Interval currentInterval = entranceIntervals[indexFromLastCore];
 
-                            bool CanUseEntrance = currentInterval.Max > houseInterval.Min;
+                            bool CanUseEntrance = currentInterval.Min < houseInterval.Max;
                             if (CanUseEntrance)
                                 continue;
 
@@ -437,7 +440,7 @@ namespace TuringAndCorbusier
                 if (targetFA > currentFA)
                     return aptOverFAR;
 
-                double toReduceArea = targetFA - currentFA;
+                double toReduceArea = currentFA - targetFA;
 
                 List<Household> topFloorHouseholds = aptOverFAR.Household.Last().First();
                 List<Core> topFloorCores = aptOverFAR.Core.Last();
