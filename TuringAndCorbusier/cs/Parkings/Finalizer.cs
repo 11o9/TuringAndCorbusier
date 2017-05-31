@@ -110,14 +110,7 @@ namespace TuringAndCorbusier
                         //re finalize
                     }
                     else
-                    {
-                        double currentFAR = apt.GetGrossAreaRatio();
-                        if (currentFAR > 200)
-                        {
-
-                        }
                         return apt;//with new ugp
-                    }
                 }
             }
 
@@ -165,14 +158,7 @@ namespace TuringAndCorbusier
                     fnz.using1f = true;
 
                     //use1f and Recurse
-                    Apartment temp =  fnz.Finalize();
-                    double currentFAR = temp.GetGrossAreaRatio();
-                    if (currentFAR > 200)
-                    {
-
-                    }
-
-                    return temp;
+                    return fnz.Finalize();
                 }
             }
 

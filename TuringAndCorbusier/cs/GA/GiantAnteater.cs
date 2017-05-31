@@ -127,8 +127,10 @@ namespace TuringAndCorbusier
                     offspringGenes.Sort((a, b) =>
                    -fitnessValues[offspringGenes.IndexOf(a)].CompareTo(fitnessValues[offspringGenes.IndexOf(b)]));
 
-                    bestGenes.AddRange(offspringGenes.Take(2));
-                    bestOutputs.AddRange(apartments.Take(2));
+                    List<ParameterSet> distinctGenes = offspringGenes.Distinct().ToList();
+                    List<Apartment> distinctApartment = apartments.Distinct().ToList();
+                    bestGenes.AddRange(distinctGenes.Take(2));
+                    bestOutputs.AddRange(distinctApartment.Take(2));
 
                     GC.Collect();
                     break;
@@ -167,9 +169,6 @@ namespace TuringAndCorbusier
                     tempGenes.Add(newOffspring);
                 }
                 offspringGenes = tempGenes;
-
-          
-
      
                 //Rhino.RhinoApp.Wait();
             }
