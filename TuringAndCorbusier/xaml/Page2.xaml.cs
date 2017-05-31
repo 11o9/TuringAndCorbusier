@@ -135,8 +135,6 @@ namespace TuringAndCorbusier
 
             TuringAndCorbusierPlugIn.InstanceClass.page2Settings = new Settings_Page2(whichAgToUse.ToList(), target, new Interval(directionList[0], directionList[1]), new Interval(storiesList[0], storiesList[1]), !UndergroundParking_Button.IsChecked.Value);
 
-            GC.Collect();
-
             NavigationService.Navigate(TuringAndCorbusierPlugIn.InstanceClass.page3);
         }
 

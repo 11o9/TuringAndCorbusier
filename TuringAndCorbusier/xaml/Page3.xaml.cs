@@ -346,8 +346,6 @@ namespace TuringAndCorbusier
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
             RhinoApp.Wait();
 
-            GC.Collect();
-
             List<ApartmentGeneratorBase> agSet = new List<ApartmentGeneratorBase>();
 
             agSet.Add(new AG1());
@@ -435,15 +433,6 @@ namespace TuringAndCorbusier
                             }
 
                         }
-
-
-                        Rhino.RhinoApp.Wait();
-                        GC.Collect();
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    RhinoApp.WriteLine(ex.Message);
-                    //}
                 }
             }
         }
@@ -469,10 +458,6 @@ namespace TuringAndCorbusier
             DisableConduit();
             this.tempOutput.Clear();
             this.stackPanel.Children.Clear();
-
-            GC.Collect();
-
-
 
             NavigationService.Navigate(TuringAndCorbusierPlugIn.InstanceClass.page2);
         }
@@ -585,8 +570,8 @@ namespace TuringAndCorbusier
 
             foreach (ApartmentGeneratorBase i in agList)
             {
-                //population * initialboost * generation
-                output += i.GAParameterSet[4] * i.GAParameterSet[2] * i.GAParameterSet[3];
+                //population * (initialboost + generation)
+                output += (i.GAParameterSet[4] + i.GAParameterSet[2]) * i.GAParameterSet[3];
             }
 
             this.currentWorkQuantity = output;

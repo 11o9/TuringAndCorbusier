@@ -29,6 +29,7 @@ namespace TuringAndCorbusier
         public static double corridorWidth { get { return 1300; } }
         public static double corridorWallHeight { get { return 1200; } }
         public static double escapeCoreCriteria { get { return 30000; } }
+        public static double twoCoreAreaCriteria { get { return 300 * 1000 * 1000; } }
         public static string connectionString
         {
             get
@@ -769,6 +770,7 @@ namespace TuringAndCorbusier
     {
         //visible regulation
         public Curve[] topReg { get; set; }
+
         //Constructor, 생성자
         public Apartment(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<Core>> core, List<List<List<Household>>> household, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<List<Curve>> buildingOutline, List<Curve> aptLines)
         {
@@ -833,6 +835,33 @@ namespace TuringAndCorbusier
             this.AptLines = other.AptLines;
         }
 
+        //operator
+        public static bool operator ==(Apartment first, Apartment second)
+        {
+            bool status = true;
+            for (int i = 0; i < first.ParameterSet.Parameters.Count(); i++)
+            {
+                if (first.ParameterSet.Parameters[i] != first.ParameterSet.Parameters[i])
+                    status = false;               
+            }
+
+            return status;
+        }
+
+        public static bool operator !=(Apartment first, Apartment second)
+        {
+            bool status = false;
+            for (int i = 0; i < first.ParameterSet.Parameters.Count(); i++)
+            {
+                if (first.ParameterSet.Parameters[i] != first.ParameterSet.Parameters[i])
+                    status = true;
+            }
+
+            return status;
+        }
+
+
+        //method
         public double GetParkingScore()
         {
             if (ParkingLotUnderGround.Count + ParkingLotOnEarth.GetCount() == 0)

@@ -376,13 +376,8 @@ namespace TuringAndCorbusier
             }
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
 
-            GC.Collect();
-
             temp = result;
             return result;
-
-
-
         }
 
         public Curve GetBound(Curve c, Point3d origin)

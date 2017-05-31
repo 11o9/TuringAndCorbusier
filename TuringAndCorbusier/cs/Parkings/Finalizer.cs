@@ -110,19 +110,15 @@ namespace TuringAndCorbusier
                         //re finalize
                     }
                     else
-                    {
-                        double currentFAR = apt.GetGrossAreaRatio();
-                        if (currentFAR > 200)
-                        {
-
-                        }
                         return apt;//with new ugp
-                    }
                 }
             }
 
             if (farStatus == FARstatus.Over)
             {
+                if (apt.AGtype == "PT-1")
+                    return apt;
+
                 Apartment reduced = Reduce(apt);
                 Finalizer finalizer = new Finalizer(reduced, depth);
                 finalizer.subtracted = true;
@@ -162,14 +158,7 @@ namespace TuringAndCorbusier
                     fnz.using1f = true;
 
                     //use1f and Recurse
-                    Apartment temp =  fnz.Finalize();
-                    double currentFAR = temp.GetGrossAreaRatio();
-                    if (currentFAR > 200)
-                    {
-
-                    }
-
-                    return temp;
+                    return fnz.Finalize();
                 }
             }
 
@@ -310,13 +299,60 @@ namespace TuringAndCorbusier
                 if (targetFA > currentFA)
                     return aptOverFAR;
 
+
+                //initial setting
                 double toReduceArea = targetFA - currentFA;
+                double aptWidth = aptOverFAR.ParameterSet.Parameters[2];
 
+                List<Core> topFloorCore = aptOverFAR.Core.Last();
                 List<Household> topFloorHouseholds = aptOverFAR.Household.Last().First();
-
                 int initialHouseCount = topFloorHouseholds.Count;
+                int initialCoreCount = topFloorCore.Count;
+                double currentFloorZ = topFloorHouseholds.First().Origin.Z;
+
+
+                //Core lengthParam setting
+                Curve courtCenterLine = aptOverFAR.AptLines[0];
+                Curve courtInnerLine = courtCenterLine.Offset(Plane.WorldXY, aptWidth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+                courtInnerLine.Translate(Vector3d.ZAxis * (currentFloorZ - courtInnerLine.PointAtStart.Z));
+
+                List <Interval> entranceIntervals = new List<Interval>();
+
+                for (int i = 0; i < topFloorCore.Count; i++)
+                {
+                    Core tempCore = topFloorCore[i];
+
+                    if (tempCore.CoreType == CoreType.CourtShortEdge)
+                    {
+                        Point3d CoreStart = tempCore.Origin;
+                        Point3d CoreEnd = tempCore.Origin + tempCore.XDirection * tempCore.Width;
+
+                        double startParam, endParam;
+                        courtInnerLine.ClosestPoint(CoreStart, out startParam);
+                        courtInnerLine.ClosestPoint(CoreEnd, out endParam);
+
+                        entranceIntervals.Add(new Interval(startParam, endParam));
+                    }
+
+                    else
+                    {
+                        Point3d CoreStart = tempCore.Origin + tempCore.YDirection * tempCore.Depth;
+                        Point3d CoreEnd = tempCore.Origin + tempCore.XDirection * tempCore.Width;
+
+                        double startParam, endParam;
+                        courtInnerLine.ClosestPoint(CoreStart, out startParam);
+                        courtInnerLine.ClosestPoint(CoreEnd, out endParam);
+
+                        entranceIntervals.Add(new Interval(startParam, endParam));
+                    }
+                }
+
+                //Subtract
+                int currentCoreCount = initialCoreCount;
+
                 for (int i = 0; i < initialHouseCount; i++)
                 {
+                    //subtract household
                     if (currentFA < targetFA)
                         break;
 
@@ -327,6 +363,51 @@ namespace TuringAndCorbusier
                     topFloorHouseholds.RemoveAt(indexFromLast);
 
                     currentFA -= reduceArea;
+                    toReduceArea -= reduceArea;
+
+                    //subtract core
+                    if (toReduceArea > 0 && topFloorCore.First().Area * currentCoreCount> toReduceArea)
+                    {
+                        if (topFloorHouseholds.Count == 0)
+                            break;
+
+                        Household firstHouse = topFloorHouseholds.First();
+                        Household endHouse = topFloorHouseholds.Last();
+
+
+                        Point3d houseStart = firstHouse.Origin + firstHouse.XDirection * firstHouse.XLengthA;
+                        if (Math.Abs(firstHouse.YLengthB) > 0.5)
+                            houseStart = firstHouse.Origin + firstHouse.YDirection * firstHouse.YLengthB;
+
+                        Point3d houseEnd = endHouse.Origin;
+                        if (Math.Abs(firstHouse.YLengthB) > 0.5)
+                            houseEnd = endHouse.Origin - endHouse.XDirection * endHouse.XLengthB;
+
+                        
+                        double houseStartParam, houseEndParam;
+                        courtInnerLine.ClosestPoint(houseStart, out houseStartParam);
+                        courtInnerLine.ClosestPoint(houseEnd, out houseEndParam);
+
+                        Interval houseInterval = new Interval(houseStartParam, houseEndParam);
+
+                        for (int j = 0; j < topFloorCore.Count; j++)
+                        {
+                            int indexFromLastCore = initialCoreCount - 1- j;
+                            Core currentCore = topFloorCore[indexFromLastCore];
+                            Interval currentInterval = entranceIntervals[indexFromLastCore];
+
+                            bool CanUseEntrance = currentInterval.Max > houseInterval.Min;
+                            if (CanUseEntrance)
+                                continue;
+
+                            double reduceAreaCore = currentCore.Area;
+                            topFloorCore.RemoveAt(indexFromLastCore);
+                            entranceIntervals.RemoveAt(indexFromLastCore);
+
+                            currentFA -= reduceAreaCore;
+                            toReduceArea -= reduceAreaCore;
+                        }
+                    }
                 }
 
                 if (topFloorHouseholds.Count == 0) //나중에 여러 동 만들 경우 수정해야 함

@@ -42,8 +42,6 @@ namespace TuringAndCorbusier
 
         public static void saveFIxedPageAsPdf(string basicFilePath, FixedPage currentPageToContain, int i)
         {
-            System.GC.Collect();
-
             FixedDocument currentDoc = new FixedDocument();
             currentDoc.DocumentPaginator.PageSize = new Size(1240, 1753);
 
