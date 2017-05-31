@@ -128,7 +128,8 @@ namespace TuringAndCorbusier
                    -fitnessValues[offspringGenes.IndexOf(a)].CompareTo(fitnessValues[offspringGenes.IndexOf(b)]));
 
                     List<ParameterSet> distinctGenes = offspringGenes.Distinct().ToList();
-                    List<Apartment> distinctApartment = apartments.Distinct().ToList();
+                    ApartComaperer comparer = new ApartComaperer();
+                    List<Apartment> distinctApartment = apartments.Distinct(comparer).ToList();
                     bestGenes.AddRange(distinctGenes.Take(2));
                     bestOutputs.AddRange(distinctApartment.Take(2));
 
@@ -177,6 +178,23 @@ namespace TuringAndCorbusier
             return bestOutputs;
         }
 
+
+        //sub
+        private class ApartComaperer : IEqualityComparer<Apartment>
+        {
+            public bool Equals(Apartment a, Apartment b)
+            {
+                double aFA = a.GetGrossArea();
+                double bFA = a.GetGrossArea();
+
+                return aFA == bFA;
+            }
+
+            public int GetHashCode(Apartment a)
+            {
+                return a.GetHashCode();
+            }
+        }
         public static List<List<List<Household>>> CloneHhp(List<List<List<Household>>> cloneBase)
         {
             List<List<List<Household>>> output = new List<List<List<Household>>>();

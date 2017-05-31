@@ -309,12 +309,13 @@ namespace TuringAndCorbusier
                 int initialHouseCount = topFloorHouseholds.Count;
                 int initialCoreCount = topFloorCore.Count;
                 double currentFloorZ = topFloorHouseholds.First().Origin.Z;
+                double currentCoreZ = topFloorCore.First().Origin.Z;
 
 
                 //Core lengthParam setting
                 Curve courtCenterLine = aptOverFAR.AptLines[0];
                 Curve courtInnerLine = courtCenterLine.Offset(Plane.WorldXY, aptWidth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
-                courtInnerLine.Translate(Vector3d.ZAxis * (currentFloorZ - courtInnerLine.PointAtStart.Z));
+                courtInnerLine.Translate(Vector3d.ZAxis * (currentCoreZ - courtInnerLine.PointAtStart.Z));
 
                 List <Interval> entranceIntervals = new List<Interval>();
 
@@ -346,6 +347,8 @@ namespace TuringAndCorbusier
                         entranceIntervals.Add(new Interval(startParam, endParam));
                     }
                 }
+
+                courtInnerLine.Translate(Vector3d.ZAxis * (currentFloorZ - currentCoreZ));
 
                 //Subtract
                 int currentCoreCount = initialCoreCount;

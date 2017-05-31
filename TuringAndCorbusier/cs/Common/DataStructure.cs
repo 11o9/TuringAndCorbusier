@@ -835,32 +835,6 @@ namespace TuringAndCorbusier
             this.AptLines = other.AptLines;
         }
 
-        //operator
-        public static bool operator ==(Apartment first, Apartment second)
-        {
-            bool status = true;
-            for (int i = 0; i < first.ParameterSet.Parameters.Count(); i++)
-            {
-                if (first.ParameterSet.Parameters[i] != first.ParameterSet.Parameters[i])
-                    status = false;               
-            }
-
-            return status;
-        }
-
-        public static bool operator !=(Apartment first, Apartment second)
-        {
-            bool status = false;
-            for (int i = 0; i < first.ParameterSet.Parameters.Count(); i++)
-            {
-                if (first.ParameterSet.Parameters[i] != first.ParameterSet.Parameters[i])
-                    status = true;
-            }
-
-            return status;
-        }
-
-
         //method
         public double GetParkingScore()
         {
