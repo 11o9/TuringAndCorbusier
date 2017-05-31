@@ -222,6 +222,8 @@ namespace TuringAndCorbusier.Utility
                     return;
                 if (tempUpBound < minLength) //start seive: initial width < minLength
                     return;
+                if (boundCrv.Contains(BasePt) == PointContainment.Outside) //start seive: base outside
+                    return;
 
                 double loopBreaker = 0;
 
@@ -284,7 +286,7 @@ namespace TuringAndCorbusier.Utility
                 nextInit.SubAxis = new Line(nextBase, HeightLine.To);
                 Line subCandidate = nextInit.SubAxis;
 
-                if (subCandidate.Length !=0 && subCandidate.UnitTangent == -heightVec)
+                if (subCandidate.Length <0.5 || subCandidate.Length >0.5 && subCandidate.UnitTangent == -heightVec)
                     nextInit.SubAxis = new Line(nextBase, nextBase);
 
                 return nextInit;

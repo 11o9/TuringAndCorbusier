@@ -105,13 +105,34 @@ namespace TuringAndCorbusier
 
             //start genetic algorithm
             int genCount = 0;
-            ParameterSet bestGene = offspringGenes[0];
+            List<ParameterSet> bestGenes = new List<ParameterSet>();
+            List<Apartment> bestOutputs = new List<Apartment>();
+           
 
             while (endCondition)
             {
-                //evaluate fitness`
-                List<List<double>> evaluation = new List<List<double>>(evaluateFitness(plot, ag, target, offspringGenes, fitnessFactor, previewOn));
-                List<double> fitnessValues = new List<double>(evaluation[0]);
+                //evaluate fitness
+                List<Apartment> apartments = new List<Apartment>();
+                List<double> fitnessValues = evaluateFitness(plot, ag, target, offspringGenes, fitnessFactor, previewOn, out apartments);
+
+                //check is maxGeneration
+                genCount += 1;
+                if (genCount == maxGen)
+                {
+                    endCondition = false;
+
+                    apartments.Sort((a, b) => 
+                    -fitnessValues[apartments.IndexOf(a)].CompareTo(fitnessValues[apartments.IndexOf(b)]));
+
+                    offspringGenes.Sort((a, b) =>
+                   -fitnessValues[offspringGenes.IndexOf(a)].CompareTo(fitnessValues[offspringGenes.IndexOf(b)]));
+
+                    bestGenes.AddRange(offspringGenes.Take(2));
+                    bestOutputs.AddRange(apartments.Take(2));
+
+                    GC.Collect();
+                    break;
+                }
 
                 //sort genes and fitness values
                 RhinoList<ParameterSet> myRhinoList = new RhinoList<ParameterSet>(offspringGenes);
@@ -122,18 +143,6 @@ namespace TuringAndCorbusier
                 offspringGenes = myRhinoList.ToList();
 
                 var radcheck = offspringGenes.Select(n => n.Parameters[3]);
-                /*
-                //write
-                Rhino.RhinoApp.WriteLine(genCount.ToString());
-                Rhino.RhinoApp.WriteLine(evaluation[1][0].ToString());
-                Rhino.RhinoApp.WriteLine(evaluation[1][offspringGenes.Count-1].ToString());
-                ParameterSet geneToShow = offspringGenes[0];
-
-                for (int i = 0; i < geneToShow.Parameters.Length; i++)
-                {
-                    Rhino.RhinoApp.WriteLine(geneToShow.Parameters[i].ToString());
-                }
-                */
 
                 //create new generation
                 List<ParameterSet> tempGenes = new List<ParameterSet>();
@@ -157,118 +166,19 @@ namespace TuringAndCorbusier
                 }
                 offspringGenes = tempGenes;
 
-                genCount += 1;
-                if (genCount == maxGen)
-                {
-                    endCondition = false;
-                }
+          
 
-                GC.Collect();
+                //GC.Collect();
                 //Rhino.RhinoApp.Wait();
 
                 //finalize before end
-                if (endCondition == false)
-                {
-                    //evaluate fitness
-                    evaluation = new List<List<double>>(evaluateFitness(plot, ag, target, offspringGenes, fitnessFactor, previewOn));
-                    fitnessValues = new List<double>(evaluation[0]);
-
-                    //sort genes and fitness values
-                    myRhinoList = new RhinoList<ParameterSet>(offspringGenes);
-                    myRhinoList.Sort(fitnessValues.ToArray());
-                    myRhinoList.Reverse();
-                    fitnessValues.Sort();
-                    fitnessValues.Reverse();
-                    offspringGenes = myRhinoList.ToList();
-
-
-
-                    bestGene = offspringGenes[0];
-                }
+               
 
                 Rhino.RhinoApp.Wait();
             }
 
             //best 1
-            Apartment bestOutput = ag.generator(plot, bestGene, target);
-            return new Apartment[] { bestOutput }.ToList();
-
-            //best 5
-            //var uniqueGenes = offspringGenes.Distinct();
-            //Apartment[] bestOutputs = offspringGenes.Take(5).Select(n => ag.generator(plot, n, target)).ToArray();
-            //return bestOutputs.ToList();
-
-
-            //best 10
-            //var uniqueGenes = offspringGenes.Distinct();
-            //Apartment[] bestOutputs = offspringGenes.Take(10).Select(n=>ag.generator(plot, n, target)).ToArray();
-            //return new Apartment[] { bestOutput }.ToList();
-            //return bestOutputs.ToList();
-
-            //all
-            Apartment[] bestOutputs = offspringGenes.Select(n => ag.generator(plot, n, target)).ToArray();
-            return bestOutputs.ToList();
-
-            if (bestOutput.ParameterSet == null)
-                return FinalizeApartment.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
-
-            if (bestOutput.ParameterSet.Parameters != null)
-            {
-                List<Apartment> output = FinalizeApartment.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
-
-                bool IsSatisfyingLegalParking = false;
-
-                List<Apartment> satisFyingLegalParkingOutput = new List<Apartment>();
-
-                foreach (Apartment i in output)
-                {
-                    if (i.GetLegalParkingLotOfCommercial() + i.GetLegalParkingLotofHousing() < i.ParkingLotOnEarth.GetCount() + i.ParkingLotUnderGround.Count)
-                    {
-                        satisFyingLegalParkingOutput.Add(i);
-                        IsSatisfyingLegalParking = true;
-                    }
-                }
-
-                if (IsSatisfyingLegalParking == false)
-                {
-                    targetError tempErrorMessage = new targetError();
-                    List<Apartment> tempNewOutput = tempErrorMessage.showDialogAndReturnValue(ag, plot, bestGene, target, output);
-
-                    bool tempSatisfyingLegalParking = false;
-
-                    List<Apartment> tempSatisFyingLegalParkingOutput = new List<Apartment>();
-
-                    foreach (Apartment i in tempNewOutput)
-                    {
-                        if (i.GetLegalParkingLotOfCommercial() + i.GetLegalParkingLotofHousing() < i.ParkingLotOnEarth.GetCount() + i.ParkingLotUnderGround.Count)
-                        {
-                            tempSatisfyingLegalParking = true;
-                            tempSatisFyingLegalParkingOutput.Add(i);
-                        }
-                    }
-
-                    if (tempSatisfyingLegalParking == false)
-                    {
-                        System.Windows.MessageBox.Show("선택한 설계로 법정 주차대수를 만족하기 어려운 대지입니다.");
-
-                        return output;
-                    }
-                    else
-                    {
-                        return tempSatisFyingLegalParkingOutput;
-                    }
-                }
-                else
-                {
-                    return output;
-                }
-            }
-            else
-            {
-                System.Windows.MessageBox.Show(CommonFunc.GetApartmentType(ag.GetAGType) + " 타입 설계에 적합하지 않은 대지입니다.");
-            }
-
-            return FinalizeApartment.finalizeAGoutput(bestOutput, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, false);
+            return bestOutputs;
         }
 
         public static List<List<List<Household>>> CloneHhp(List<List<List<Household>>> cloneBase)
@@ -324,9 +234,11 @@ namespace TuringAndCorbusier
                 return newStory;
         }
 
-        private static List<List<double>> evaluateFitness(Plot plot, ApartmentGeneratorBase ag, Target target, List<ParameterSet> gene, double fitnessFactor, bool previewOn)
+        private static List<double> evaluateFitness(Plot plot, ApartmentGeneratorBase ag, Target target, List<ParameterSet> gene, double fitnessFactor, bool previewOn, out List<Apartment> refinedOutput)
         {
-            List<List<double>> result = new List<List<double>>();
+            List<double> fitness = new List<double>();
+            List<Apartment> apartments = new List<Apartment>();
+
             List<double> grossAreaRatio = new List<double>();
             List<double> parkinglotRatio = new List<double>();
             List<double> targetAccuracy = new List<double>();
@@ -347,6 +259,7 @@ namespace TuringAndCorbusier
             {
                 Apartment tempOutput = ag.generator(plot, gene[i], target);
 
+                apartments.Add(tempOutput);
                 grossAreaRatio.Add(tempOutput.GetGrossAreaRatio());
                 //targetAccuracy.Add(tempOutput.GetTargetAccuracy());
                 parkinglotRatio.Add(tempOutput.GetParkingScore());
@@ -396,17 +309,10 @@ namespace TuringAndCorbusier
             List<double> tempGAR = new List<double>(grossAreaRatio);
             RhinoList<double> FARList = new RhinoList<double>(tempGAR);
 
-            //FARList.Sort(points.ToArray());
-            //points.Sort();
 
             double Cworst = FARList.First;
             double Cbest = FARList.Last;
             double k = fitnessFactor;
-            List<double> fitness = new List<double>();
-            //double Cworst = tempGAR[0];
-            //double Cbest = tempGAR[gene.Count - 1];
-            //double k = fitnessFactor;
-            //List<double> fitness = new List<double>();
 
             double parkingWeight = 0.3;
             double CworstR = parkinglotRatio.Min();
@@ -414,25 +320,10 @@ namespace TuringAndCorbusier
 
 
             double targetWeight = 0.4;
-            //double CworstT = targetAccuracy.Min();
-            //double CbestT = targetAccuracy.Max();
-
+    
             //fitnessvalue rate
             //연면적 1 : 주차율(?) 0.3 : 유닛정확도 : 0.4
 
-
-            //for test 
-            //string url = @"C://Users//user//Desktop//test";
-            //System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(url);
-
-
-            //string filename = "//garojutacklogV2" + (dinfo.GetFiles().Length + 1).ToString() + ".csv";
-            //System.IO.FileStream fs = new System.IO.FileStream(url + filename, System.IO.FileMode.CreateNew);
-            //fs.Close();
-            //fs.Dispose();
-            //System.IO.StreamWriter w = new System.IO.StreamWriter(fs.Name);
-            //string column = "FAR" + "," + "Floors" + "," + "FARPoint" + "," + "ParkingPoint" + "," + "AxisPoint" + "," + "Sum" + "," + "Use1F" + ",UseSetback";
-            //w.WriteLine(column);
             for (int j = 0; j < gene.Count; j++)
             {
                 double farfitnessVal = points[j]*10;
@@ -452,32 +343,12 @@ namespace TuringAndCorbusier
                 //if (gene[j].setback)
                 //    setbackBonus = 1000;
                 fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus + firstfloorBonus);
-                //for test
-
-                //string format = grossAreaRatio[j].ToString() + "," + gene[j].Stories + "," + farfitnessVal + "," + parkkingfitnessVal + "," + axisfitnessVal + "," + (farfitnessVal + parkkingfitnessVal + axisfitnessVal).ToString() + "," + gene[j].using1F.ToString() + "," + gene[j].setback.ToString();
-
-                //w.WriteLine(format);
             }
-            //for test
-            //w.Close();
-            //w.Dispose();
-
-
-            //tempGAR.Reverse();
-
-            //fitness.Reverse();
-            //FARList.Reverse();
-
-            result.Add(fitness);
-            result.Add(FARList.Select(n=>n).ToList());
-
-            double maxfar = FARList.Max();
-            double maxfitness = fitness.Max();
 
             TuringAndCorbusierPlugIn.InstanceClass.page3.updateProGressBar(TuringAndCorbusierPlugIn.InstanceClass.page3.currentProgressFactor.ToString() + "/" + TuringAndCorbusierPlugIn.InstanceClass.page3.currentWorkQuantity.ToString() + " 완료");
 
-
-            return result;
+            refinedOutput = apartments;
+            return fitness;
 
             //or, return nested list, containing gross area ratio.
         }

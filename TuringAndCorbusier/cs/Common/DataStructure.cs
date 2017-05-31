@@ -1471,8 +1471,6 @@ namespace TuringAndCorbusier
         {
             double output = 0;
 
-
-
             //공급면적 * 세대
 
             //공급면적 = 코어 + 벽 + 전용

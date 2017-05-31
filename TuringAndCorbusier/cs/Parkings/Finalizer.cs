@@ -12,12 +12,19 @@ namespace TuringAndCorbusier
         Random random = new Random();
         int depth = 0;
 
+        //field
         Apartment apt;
-        public bool setBacked = false;
-        public bool using1f = false;
+        private bool setBacked = false;
+        private bool using1f = false;
+        private bool subtracted = false;
+        private FARstatus farStatus = FARstatus.Undefined;
 
-        double ugpRequired = 0;
+        private double ugpRequired = 0;
 
+        //enum
+        private enum FARstatus { Lack, Suit ,Over, Undefined } 
+
+        //constructor
         public Finalizer(Apartment apt)
         {
             this.apt = apt;
@@ -28,182 +35,173 @@ namespace TuringAndCorbusier
             this.apt = apt;
             this.depth = depth + 1;
         }
-        public Apartment Finilize()
+
+        //main
+        public Apartment Finalize()
         {
-            //WriteLine("[{0}]Start Finalize",depth);
-            ////far check
-            //WriteLine("[{0}]FAR Check...", depth);
-            if (IsSuitable())
+            if (apt.AptLines.Count == 0) //seive: null
+                return apt;
+
+            double farCaculated;
+            CheckFARStatus(out farCaculated);
+
+            //finalize
+            if (farStatus == FARstatus.Suit)
             {
-                //WriteLine("[{0}]FAR Enough...", depth);
-
-                //WriteLine("[{0}]GP Check...", depth);
-                //suit
-                //ground parking enough
-                //generate ground parking
-
                 if (ParkingsEnough())
-                {
-                    //WriteLine("[{0}]GP Enough...", depth);
-                    //WriteLine("[{0}]return value", depth);
                     return apt;
-                }
-                else
+
+                //make undergroundParking
+                UnderGroundParkingModule ugpm = new UnderGroundParkingModule(apt.Plot.Boundary, (int)ugpRequired);
+                bool canUGP = ugpm.CheckPrecondition();
+
+                if (!canUGP) //seive: cannot make underground parking
+                    return apt;
+
+                bool isCaculateduccessfully = ugpm.Calculate(); //seive: cannot calculate
+                if (!isCaculateduccessfully)
+                    return apt;
+
+                //if passed all seives
+                Vector3d aptdir = Vector3d.Unset;
+                if (apt.AptLines.Count > 0)
                 {
-                    if (apt.AGtype == "PT-4")
-                        return Reduce(apt);
-
-                    //WriteLine("[{0}]GP Lack...", depth);
-                    ////can make undergroundparking
-                    //WriteLine("[{0}]UGP Check...", depth);
-                    UnderGroundParkingModule ugpm = new UnderGroundParkingModule(apt.Plot.Boundary, (int)ugpRequired);
-                    bool canUGP = ugpm.CheckPrecondition();
-                    bool isNull = (apt.AptLines.Count == 0) ? true : false; 
-                    if (canUGP && !isNull)
+                    for (int i = 0; i < apt.AptLines.Count; i++)
                     {
-                        //UnderGroundParkingModule ...
-                        //WriteLine("[{0}]UGP Creating", depth);
-                        //WriteLine("[{0}]return value", depth);
-                        bool ugpResult = ugpm.Calculate();
-                        if (ugpResult)
-                        {
-                            Vector3d aptdir = Vector3d.Unset;
-                            if (apt.AptLines.Count > 0)
-                            {
-                                for (int i = 0; i < apt.AptLines.Count; i++)
-                                {
-                                    aptdir = apt.AptLines[0].TangentAtStart;
-                                    if (aptdir != Vector3d.Zero)
-                                        break;
-                                }
-                            }                              
-                            if (aptdir == Vector3d.Zero)
-                                aptdir = Vector3d.Unset;
+                        aptdir = apt.AptLines[0].TangentAtStart;
+                        if (aptdir != Vector3d.Zero)
+                            break;
+                    }
+                }
 
-                            List<Curve> obstacles = new List<Curve>();
-                            obstacles.AddRange(apt.Core[0].Select(n => n.DrawOutline()));
-                            List<Curve> householdOutlines = new List<Curve>();
-                            for (int i = 0; i < apt.Household[0].Count; i++)
-                            {
-                                for (int j = 0; j < apt.Household[0][i].Count; j++)
-                                {
-                                    Curve tempOutline = apt.Household[0][i][j].GetOutline();
-                                    tempOutline.Translate(-Vector3d.ZAxis * tempOutline.PointAtStart.Z);
-                                    householdOutlines.Add(tempOutline);
-                                }
-                            }
-                            obstacles.AddRange(householdOutlines);
-                            Curve ramp = ugpm.DrawRamp(apt.Plot, aptdir, obstacles);
-                            if (ramp == null)
-                                return Reduce(apt);
+                if (aptdir == Vector3d.Zero)
+                    aptdir = Vector3d.Unset;
 
-                           
-                            apt.ParkingLotUnderGround = new ParkingLotUnderGround((int)ugpm.EachFloorParkingCount * ugpm.Floors, ugpm.EachFloorArea * ugpm.Floors, ugpm.Floors);
-                            apt.ParkingLotUnderGround.Ramp = ramp;
+                List<Curve> obstacles = new List<Curve>();
+                obstacles.AddRange(apt.Core[0].Select(n => n.DrawOutline()));
+                List<Curve> householdOutlines = new List<Curve>();
+                for (int i = 0; i < apt.Household[0].Count; i++)
+                {
+                    for (int j = 0; j < apt.Household[0][i].Count; j++)
+                    {
+                        Curve tempOutline = apt.Household[0][i][j].GetOutline();
+                        tempOutline.Translate(-Vector3d.ZAxis * tempOutline.PointAtStart.Z);
+                        householdOutlines.Add(tempOutline);
+                    }
+                }
 
-                            //overlap check & replace parkings (ref)
-                            while (true)
-                            {
-                                bool overlapResult = ugpm.OverlapCheck(ref apt);
-                                if (overlapResult)
-                                {
-                                    ramp = ugpm.DrawRamp(apt.Plot, aptdir, obstacles);
-                                    apt.ParkingLotUnderGround.Ramp = ramp;
-                                    //something changed
-                                    //re finalize
-                                }
-                                else
-                                {
-                                    return apt;//with new ugp
-                                }
-                            }
-                        }
-                        else
-                        {
-                            return Reduce(apt);
-                        }
-                        
+                obstacles.AddRange(householdOutlines);
+                Curve ramp = ugpm.DrawRamp(apt.Plot, aptdir, obstacles);
+                if (ramp == null)
+                    return apt;
+
+                apt.ParkingLotUnderGround = new ParkingLotUnderGround((int)ugpm.EachFloorParkingCount * ugpm.Floors, ugpm.EachFloorArea * ugpm.Floors, ugpm.Floors);
+                apt.ParkingLotUnderGround.Ramp = ramp;
+
+                //overlap check & replace parkings (ref)
+                while (true)
+                {
+                    bool overlapResult = ugpm.OverlapCheck(ref apt);
+                    if (overlapResult)
+                    {
+                        ramp = ugpm.DrawRamp(apt.Plot, aptdir, obstacles);
+                        apt.ParkingLotUnderGround.Ramp = ramp;
+                        //something changed
+                        //re finalize
                     }
                     else
                     {
-                        //WriteLine("[{0}]UGP Impossible", depth);
-                        //WriteLine("[{0}]return Reduced value", depth);
-                        return Reduce(apt);
+                        double currentFAR = apt.GetGrossAreaRatio();
+                        if (currentFAR > 200)
+                        {
+
+                        }
+                        return apt;//with new ugp
                     }
                 }
-
-                
             }
-            else
-            {
-                //WriteLine("[{0}]FAR Lack...", depth);
-                //WriteLine("[{0}]Check SetBack...", depth);
-                if (apt.AGtype == "PT-4")
-                    return Reduce(apt);
 
-                if (setBacked)
+            if (farStatus == FARstatus.Over)
+            {
+                Apartment reduced = Reduce(apt);
+                Finalizer finalizer = new Finalizer(reduced, depth);
+                finalizer.subtracted = true;
+
+                return finalizer.Finalize();
+            }
+                        
+
+            if (farStatus == FARstatus.Lack)
+            {
+                if (setBacked || using1f || subtracted)
                 {
-                    //WriteLine("[{0}]Can Set Back...", depth);
-                    //WriteLine("[{0}]Set Back...", depth);
+                    Finalizer fnz = new Finalizer(apt, depth);
+                    fnz.farStatus = FARstatus.Suit;
+                    return fnz.Finalize();
+                }
+
+                //처리방법 선택: 지금은 랜덤
+                Random rand = new Random();
+                double d = rand.NextDouble();
+
+                if (d < 0.5) //한 층 더 올리고 최상층 후퇴
+                {
                     Apartment setBacked = SetBack(apt);
                     Finalizer fnz = new Finalizer(setBacked, depth);
                     fnz.setBacked = true;
-                    //set back and Recursive
-                    //WriteLine("[{0}]return SetBack...", depth);
-                    return fnz.Finilize();
+                    //set back and Recurse
+
+                    return fnz.Finalize();
                 }
 
-                //if (!setBacked && !using1f)
-                else if(using1f)
+                else //1층 사용
                 {
-                    ////WriteLine("[{0}]Can't Set Back...", depth);
-                    ////WriteLine("[{0}]Check Using1F...", depth);
-                    //if (!using1f)
-                    //{
-                        //WriteLine("[{0}]Can Using1F...", depth);
-                        //WriteLine("[{0}]Using 1F...", depth);
-                        //지상주차 계산도 다시 해야함.
+                    //지상주차 계산도 다시 해야함.
                     Apartment using1f = Add1F(apt);
-                    Finalizer fnz = new Finalizer(using1f,depth);
+                    Finalizer fnz = new Finalizer(using1f, depth);
                     fnz.using1f = true;
-                    //use1f and Recursive
-                    //WriteLine("[{0}]return Using 1F...", depth);
-                    return fnz.Finilize();
-                    //}
-                    //else
-                    //{
-                    //    //WriteLine("[{0}]can't do anything , return basic value", depth);
-                    //    return apt;
-                    //}
+
+                    //use1f and Recurse
+                    Apartment temp =  fnz.Finalize();
+                    double currentFAR = temp.GetGrossAreaRatio();
+                    if (currentFAR > 200)
+                    {
+
+                    }
+
+                    return temp;
                 }
-              
             }
 
-            Reduce(apt);
             return apt;
         }
 
-        bool IsSuitable()
+
+        //sub
+        private void CheckFARStatus(out double farCaculated)
         {
-            //이미 한번 후처리 됨, 주차만들고 땡
-            if (setBacked || using1f)
-                return true;
+            double currentFAR = apt.GetGrossAreaRatio();
+            double targetFAR = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio;
+            farCaculated = currentFAR;
 
-            //지금은 랜덤
-            Random rand = new Random();
-            double d = rand.NextDouble();
-            if (d < 0.5)
-                using1f = true;
-            else
-                setBacked = true;
+            if (farStatus != FARstatus.Undefined)
+                return;
 
-            double tempFAR = apt.GetGrossAreaRatio();
-            double FARlimit = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio;
-            
-            if (tempFAR >= FARlimit*0.9 && tempFAR< FARlimit)
-                return true;
+
+            if (currentFAR < targetFAR * 0.9)
+            {
+                farStatus = FARstatus.Lack;
+                return;
+            }
+
+            if (currentFAR > targetFAR)
+            {
+                farStatus = FARstatus.Over;
+                return;
+            }
+
             else
-                return false;
+                farStatus = FARstatus.Suit;
         }
 
         bool ParkingsEnough()
@@ -229,15 +227,6 @@ namespace TuringAndCorbusier
             }
         }
 
-        //내부변수로대체
-        //bool CanUGP()
-        //{
-        //    double d = random.NextDouble();
-        //    if (d > 0.5)
-        //        return true;
-        //    else
-        //        return false;
-        //}
 
         Apartment Add1F(Apartment apt)
         {
@@ -251,7 +240,7 @@ namespace TuringAndCorbusier
             ParameterSet temp = apt.ParameterSet;
             temp.using1F = true;
             temp.fixedCoreType = apt.Core[0][0].CoreType;
-            temp.Parameters[0]++;
+            //temp.Parameters[0]++;
             temp.Parameters[1]++;
 
             //가능하면 agtype enum으로 만들면 ..
@@ -311,52 +300,88 @@ namespace TuringAndCorbusier
 
         }
 
-
         Apartment Reduce(Apartment aptOverFAR)
         {
-            if (aptOverFAR.AGtype != "PT-4")
-                return aptOverFAR;
-
-            double currentFA = aptOverFAR.GetGrossAreaRatio() / 100.0 * aptOverFAR.Plot.GetArea();
-            double targetFA = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio / 100.0 * aptOverFAR.Plot.GetArea(); 
-
-            if (targetFA > currentFA)
-                return aptOverFAR;
-
-            double toReduceArea = targetFA - currentFA;
-
-            List<Household> topFloorHouseholds = aptOverFAR.Household.Last().First();
-            List<Core> topFloorCores = aptOverFAR.Core.Last();
-
-            int initialHouseCount = topFloorHouseholds.Count;
-            for (int i = 0; i < initialHouseCount; i++)
+            if (aptOverFAR.AGtype == "PT-3")
             {
-                if (currentFA < targetFA)
-                    break;
+                double currentFA = aptOverFAR.GetGrossAreaRatio() / 100.0 * aptOverFAR.Plot.GetArea();
+                double targetFA = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio / 100.0 * aptOverFAR.Plot.GetArea();
 
-                int indexFromLast = initialHouseCount - 1 - i;
-                Household currentHouse = topFloorHouseholds[indexFromLast];
-                int coreIndex = indexFromLast / 2;
+                if (targetFA > currentFA)
+                    return aptOverFAR;
 
-                double reduceArea = currentHouse.GetArea();
-                topFloorHouseholds.RemoveAt(indexFromLast);
+                double toReduceArea = targetFA - currentFA;
 
-                if(indexFromLast%2==0)
+                List<Household> topFloorHouseholds = aptOverFAR.Household.Last().First();
+
+                int initialHouseCount = topFloorHouseholds.Count;
+                for (int i = 0; i < initialHouseCount; i++)
                 {
-                    reduceArea += topFloorCores[coreIndex].GetArea();
-                    topFloorCores.RemoveAt(coreIndex);
+                    if (currentFA < targetFA)
+                        break;
+
+                    int indexFromLast = initialHouseCount - 1 - i;
+                    Household currentHouse = topFloorHouseholds[indexFromLast];
+
+                    double reduceArea = currentHouse.GetArea();
+                    topFloorHouseholds.RemoveAt(indexFromLast);
+
+                    currentFA -= reduceArea;
                 }
 
-                currentFA -= reduceArea;
+                if (topFloorHouseholds.Count == 0) //나중에 여러 동 만들 경우 수정해야 함
+                {
+                    aptOverFAR.Household.RemoveAt(aptOverFAR.Household.Count - 1);
+                    aptOverFAR.Core.RemoveAt(aptOverFAR.Core.Count - 1);
+                }
+                return aptOverFAR;
             }
 
-            if (topFloorHouseholds.Count == 0) //나중에 여러 동 만들 경우 수정해야 함
+
+            if (aptOverFAR.AGtype == "PT-4")
             {
-                aptOverFAR.Household.RemoveAt(aptOverFAR.Household.Count-1);
-                aptOverFAR.Core.RemoveAt(aptOverFAR.Core.Count - 1);
+                double currentFA = aptOverFAR.GetGrossAreaRatio() / 100.0 * aptOverFAR.Plot.GetArea();
+                double targetFA = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio / 100.0 * aptOverFAR.Plot.GetArea();
+
+                if (targetFA > currentFA)
+                    return aptOverFAR;
+
+                double toReduceArea = targetFA - currentFA;
+
+                List<Household> topFloorHouseholds = aptOverFAR.Household.Last().First();
+                List<Core> topFloorCores = aptOverFAR.Core.Last();
+
+                int initialHouseCount = topFloorHouseholds.Count;
+                for (int i = 0; i < initialHouseCount; i++)
+                {
+                    if (currentFA < targetFA)
+                        break;
+
+                    int indexFromLast = initialHouseCount - 1 - i;
+                    Household currentHouse = topFloorHouseholds[indexFromLast];
+                    int coreIndex = indexFromLast / 2;
+
+                    double reduceArea = currentHouse.GetArea();
+                    topFloorHouseholds.RemoveAt(indexFromLast);
+
+                    if (indexFromLast % 2 == 0)
+                    {
+                        reduceArea += topFloorCores[coreIndex].GetArea();
+                        topFloorCores.RemoveAt(coreIndex);
+                    }
+
+                    currentFA -= reduceArea;
+                }
+
+                if (topFloorHouseholds.Count == 0) //나중에 여러 동 만들 경우 수정해야 함
+                {
+                    aptOverFAR.Household.RemoveAt(aptOverFAR.Household.Count - 1);
+                    aptOverFAR.Core.RemoveAt(aptOverFAR.Core.Count - 1);
+                }
+                return aptOverFAR;
             }
+
             return aptOverFAR;
         }
-
     }
 }

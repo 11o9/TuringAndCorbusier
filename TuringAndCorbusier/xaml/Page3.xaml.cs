@@ -585,7 +585,8 @@ namespace TuringAndCorbusier
 
             foreach (ApartmentGeneratorBase i in agList)
             {
-                output += (i.GAParameterSet[2] + i.GAParameterSet[4]) * i.GAParameterSet[3];
+                //population * initialboost * generation
+                output += i.GAParameterSet[4] * i.GAParameterSet[2] * i.GAParameterSet[3];
             }
 
             this.currentWorkQuantity = output;

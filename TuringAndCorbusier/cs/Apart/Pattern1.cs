@@ -688,7 +688,7 @@ namespace TuringAndCorbusier
             else
             {
                 Finalizer finalizer = new Finalizer(result);
-                result = finalizer.Finilize();
+                result = finalizer.Finalize();
             }
             
             //ParkingDistributor.Distribute(ref result);
