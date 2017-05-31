@@ -41,7 +41,7 @@ namespace TuringAndCorbusier
             double angleRadian = parameters[3];
             double moveFactor = parameters[4];
             Regulation regulationHigh = new Regulation(storiesHigh);
-            Regulation regulationLow = new Regulation(storiesHigh, storiesLow);
+            Regulation regulationLow = new Regulation(storiesLow);
             //List<double> ratio = target.Ratio;
             //List<double> area = target.Area.Select(n => n / 0.91 * 1000 * 1000).ToList();
             //double areaLimit = Consts.AreaLimit;
@@ -85,14 +85,12 @@ namespace TuringAndCorbusier
             {
                
                 if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
-           
                 {
-                 
                     return null;
                 }
 
                 regulationHigh = new Regulation(storiesHigh, true);
-                regulationLow = new Regulation(storiesHigh, storiesLow, true);
+                regulationLow = new Regulation(storiesLow, true);
             }
             else if (parameterSet.setback && !parameterSet.using1F)
             {
@@ -121,7 +119,7 @@ namespace TuringAndCorbusier
                         if (storiesHigh <= storiesLow)
                             break;
                         regulationHigh = new Regulation(storiesHigh);
-                        regulationLow = new Regulation(storiesHigh, storiesLow);
+                        regulationLow = new Regulation(storiesLow);
                     }
                     else
                         break;
@@ -435,7 +433,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < storiesHigh; i++)
             {
                 double tempStoryHeight = pilotiHeight + i * Consts.FloorHeight;
-                Regulation tempStoryReg = new Regulation(storiesHigh, i);
+                Regulation tempStoryReg = new Regulation(i);
                 Curve[] Reg = wholeRegulationHigh;
 
                 List<List<Household>> tempfloor = new List<List<Household>>();
@@ -473,7 +471,7 @@ namespace TuringAndCorbusier
                 if (parameterSet.using1F && i == 0)
                     continue;
                 double tempStoryHeight = (i == 0) ? 0 : pilotiHeight + Consts.FloorHeight * (i - 1);
-                Regulation tempStoryReg = new Regulation(storiesHigh, i);
+                Regulation tempStoryReg = new Regulation(i);
                 Curve[] Reg = tempStoryReg.JoinRegulations(plot, angleRadian);
                 List<Core> tempfloor = new List<Core>();
 

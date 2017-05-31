@@ -187,11 +187,15 @@ namespace TuringAndCorbusier
 
             RhinoApp.WriteLine("tempoutputplottype = " + tempoutput.Plot.PlotType.ToString());
 
+            bool using1F = tempoutput.ParameterSet.using1F;
+            int stories = tempoutput.Household.Count();
+            Plot tempPlot = tempoutput.Plot;
+
             MainPanel_building2DPreview.CurveToDisplay = tempCurves;
-            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count,true);
-            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count, false);
-            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count, tempoutput);
-            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLines(tempoutput.Plot, tempoutput.Household.Count);
+            MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLineDrawer.North(tempPlot, stories, using1F);
+            MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot(tempPlot, stories, using1F);
+            MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLineDrawer.Lighting(tempPlot, stories, tempoutput, using1F);
+            MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLineDrawer.Boundary(tempPlot, stories, using1F);
             List<string> widthlog;
             MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.ApartDistance(MainPanel_AGOutputList[tempIndex],out widthlog);
             MainPanel_LawPreview_ApartDistance.dimension = widthlog;
