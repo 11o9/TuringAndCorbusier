@@ -156,6 +156,7 @@
     <Compile Include="Reports\xmlUnitReport.xaml.cs">
       <DependentUpon>xmlUnitReport.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utility\BitmapTools.cs" />
     <Compile Include="Utility\CCXTools.cs" />
     <Compile Include="Utility\CurveTools.cs" />
     <Compile Include="Utility\DoubleTools.cs" />
@@ -344,6 +345,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="xaml\XamlSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -398,12 +403,33 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="xaml\ViewModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PT4on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PT1on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PT3off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PT3on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PT4off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PT1off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Transparent_X.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

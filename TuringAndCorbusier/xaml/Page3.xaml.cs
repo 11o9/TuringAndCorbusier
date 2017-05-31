@@ -165,8 +165,7 @@ namespace TuringAndCorbusier
 
             string[] stackPannelButtonStyle = { "stackPannelButtonStyle1", "stackPannelButtonStyle2" };
             string tempStyle = stackPannelButtonStyle[stackPanel.Children.Count % 2];
-            System.Windows.Style style = this.FindResource(tempStyle) as System.Windows.Style;
-
+            System.Windows.Style style = Application.Current.FindResource(tempStyle) as Style;
             btn.Style = style;
             btn.Content = tempGrid;
             btn.Height = 21;
@@ -340,6 +339,9 @@ namespace TuringAndCorbusier
 
         private void Btn_Calculate_Click(object sender, RoutedEventArgs e)
         {
+
+            
+
             currentProgressFactor = 0;
 
             //building3DPreview.BrepToDisplay = new List<Brep>();
@@ -559,7 +561,7 @@ namespace TuringAndCorbusier
             double percentage = progressBarFactor / workQuantity * 100;
 
             CurrentPercentage.Text = Math.Round(percentage, 0).ToString() + "%";
-            CurrentProgressBar.Width = ProgressBarBase.Width * percentage / 100;
+            CurrentProgressBar.Width = ProgressBarBase.ActualWidth * percentage / 100;
 
             CurrentCondition.Text = currentConditionString;
         }

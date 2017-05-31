@@ -1507,7 +1507,7 @@ namespace TuringAndCorbusier
             //parkingLotPreview.CurveToDisplay = tempParkingLotArr.ToList();
             //parkingLotPreview.Enabled = true;
             RhinoDoc.ActiveDoc.Views.Redraw();
-
+            
             //RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(Rhino.RhinoDoc.ActiveDoc.Layers.Find("Default", true), true);
 
         }

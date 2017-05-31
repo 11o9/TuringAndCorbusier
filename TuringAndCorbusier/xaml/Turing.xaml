@@ -24,7 +24,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#ffcccccc"/>
+                                <Setter TargetName="border" Property="Background" Value="#FF727171"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#ff999999"/>
@@ -171,10 +171,15 @@
             <Setter Property="FontFamily" Value="Noto Sans CJK KR Regular regular"/>
         </Style>
 
+        <Style x:Key="RectangleStyle" TargetType="{x:Type Rectangle}">
+            <Setter Property="Fill" Value="#FF202020"></Setter>
+        </Style>
+               
+        
     </UserControl.Resources>
 
     <Grid>
-        <Rectangle x:Name="backGround" Fill="#FF202020" Margin="-2,0,2,0" Grid.RowSpan="2" Loaded="backGround_Loaded" />
+        <Rectangle x:Name="backGround" Style="{StaticResource RectangleStyle}" Margin="-2,0,2,0" Grid.RowSpan="2" Loaded="backGround_Loaded" />
 
         <Button x:Name="button"  Click="Menu_Click" Style="{StaticResource MyButtonStyle}" Margin="17,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="20" Width="56" RenderTransformOrigin="0.8,0.68" MouseEnter="button_MouseEnter" >
 
@@ -234,7 +239,7 @@
         </Grid>
 
         <Button x:Name="Calculate" Style="{StaticResource MyButtonStyle3}" Content="대지 입력" FontSize="17" Margin="17,169,19,0" FontFamily="Noto Sans CJK KR Regular" Background="#FF353535" Foreground="White" Height="34" VerticalAlignment="Top" />
-        <Button x:Name="Information" Style="{StaticResource MyButtonStyle3}" Content="프로그램 정보" FontSize="10" Margin="160,10,10,0" FontFamily="Noto Sans CJK KR Regular" Background="#FF353535" Foreground="White" Height="19" VerticalAlignment="Top" Click="Information_Click"/>
+        <Button x:Name="Information" Style="{StaticResource MyButtonStyle3}" Content="프로그램 정보" FontSize="10" Margin="0,10,19,0" Width="100" HorizontalAlignment="Right" FontFamily="Noto Sans CJK KR Regular" Background="#FF353535" Foreground="White" Height="19" VerticalAlignment="Top" Click="Information_Click"/>
 
         <Rectangle Fill="#FF2B2B2B" Margin="17,218,34,163">
 
@@ -271,8 +276,7 @@
                 <RowDefinition/>
                 <RowDefinition Height="5"/>
                 <RowDefinition/>
-                <RowDefinition Height="5"/>
-                <RowDefinition/>
+
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
@@ -284,11 +288,11 @@
                 <Button x:Name="Btn_Save" Style="{StaticResource MyButtonStyle}" Content="저장하기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Column="1" FontSize="13.333" Click="Btn_Save_Click" />
             </Grid>
 
-            <Button x:Name="Btn_Export3D" Style="{StaticResource MyButtonStyle}" Content="3D모델링 내보내기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="2" FontSize="13.333" Click="Btn_Export3D_Click" />
-            <Button x:Name="Btn_ExportReport" Style="{StaticResource MyButtonStyle}" Content="설계 보고서 내보내기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="4" FontSize="13.333" Click="Btn_ExportReport_Click" />
-            <Button x:Name="Btn_SendToServer" Style="{StaticResource MyButtonStyle}" Content="서버에 업로드" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="6" FontSize="13.333" Click="Btn_SendToServer_Click" />
-            <Button x:Name="Btn_Lawline" Style="{StaticResource MyButtonStyle}" Content="전체 법규선 보기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="8" FontSize="13.333" Click="Btn_Lawline_Click" />
-            <Grid Grid.Row="10">
+            <Button x:Name="Btn_Export3D" Style="{StaticResource MyButtonStyle}" Content="3D모델링" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="2" FontSize="13.333" Click="Btn_Export3D_Click" />
+            <Button x:Name="Btn_ExportReport" Style="{StaticResource MyButtonStyle}" Content="설계 보고서" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="4" FontSize="13.333" Click="Btn_ExportReport_Click" />
+            <Button x:Name="Btn_SendToServer" Visibility="Hidden" Style="{StaticResource MyButtonStyle}" Content="서버에 업로드" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium Medium" Foreground="#ffffffff" Background="#404040" Grid.Row="6" FontSize="13.333" Click="Btn_SendToServer_Click" />
+            <Button x:Name="Btn_Lawline" Style="{StaticResource MyButtonStyle}" Content="전체 법규선 보기" Margin="0,0,0,0" FontFamily="Noto Sans CJK KR Medium" Foreground="#ffffffff" Background="#FF404040" Grid.Row="6" FontSize="13.333" Click="Btn_Lawline_Click" />
+            <Grid Grid.Row="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
