@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="Reports.unitPlanTemplate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Reports"
+             mc:Ignorable="d" Height="759" Width="1240" 
+             >
+    <Grid>
+        <Canvas x:Name="unitPlanTemplateCanvas" Background="White" Height="759" Margin="0,0,0,56" Width="1240">
+            <Rectangle Fill="White"/>
+            <Canvas x:Name="UnitCanvas" Width="913" Height="298" VerticalAlignment="Top" Canvas.Left="157" />
+            <!-- 3.0-->
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="261" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="299" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="339" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="379" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="499" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="539" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="579" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="619" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="659" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
+            <!--1.0-->
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="299" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="339" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="379" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="419" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="459" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="499" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="539" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="579" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="619" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="1.0" Fill="Black" Canvas.Top="659" Height="75" Stretch="Fill" Width="224" Canvas.Left="367"/>
+
+            <!--dashedLine-->
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="299" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="339" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="379" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="419" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="459" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="499" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="539" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="579" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="619" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+            <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeDashArray="2,4" StrokeThickness="1.0" Fill="Black" Canvas.Top="659" Height="75" Stretch="Fill" Width="480" Canvas.Left="590"/>
+
+
+            <TextBlock  Text="구분" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="178" Canvas.Top="307" FontFamily="NanumSquareOTF" />
+            <TextBlock Text="세대수" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="178" Canvas.Top="347" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="전용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="178" Canvas.Top="387" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="주거공용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="178" Canvas.Top="465" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="공급면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="178" Canvas.Top="547" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="비주거공용면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="178" Canvas.Top="585" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="계약면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="178" Canvas.Top="627" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="서비스면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="178" Canvas.Top="667" FontFamily="NanumSquareOTF" />
+
+
+            <TextBlock  Text="벽체공용면적" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="388" Canvas.Top="427" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="계단실" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="388" Canvas.Top="467" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="소계" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="388" Canvas.Top="507" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="지하주차장" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="388" Canvas.Top="587" FontFamily="NanumSquareOTF" />
+            <TextBlock  Text="발코니" FontSize="16" VerticalAlignment="Top" TextAlignment="Right" Canvas.Left="388" Canvas.Top="667" FontFamily="NanumSquareOTF" />
+
+            <TextBlock x:Name="AreaType"  Text="xx X형" FontSize="18.667" VerticalAlignment="Top" Canvas.Left="619" Canvas.Top="307" FontFamily="NanumSquareOTF" />
+            <TextBlock x:Name="NumberOfThisType" Text="xx세대" FontSize="18.667" VerticalAlignment="Top" Canvas.Left="619" Canvas.Top="347" FontFamily="NanumSquareOTF" />
+            <TextBlock x:Name="exclusiveArea"  Text="지역지구" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="620" Canvas.Top="387" />
+            <TextBlock x:Name="wallArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="620" Canvas.Top="427" />
+            <TextBlock x:Name="coreArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="620" Canvas.Top="467" />
+            <TextBlock x:Name="commonLivingArea"  Text="대지면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="620" Canvas.Top="507" />
+            <TextBlock x:Name="providedArea"  Text="건축물용도" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="620" Canvas.Top="547" />
+            <TextBlock x:Name="ParkingLotArea" Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="620" Canvas.Top="587" />
+            <TextBlock x:Name="ContractArea"  Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="620" Canvas.Top="627" />
+            <TextBlock x:Name="balconyArea"  Text="연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="620" Canvas.Top="667" />
+            <Rectangle Height="299" Canvas.Left="157" Width="913" Stroke="Black"/>
+
+
+        </Canvas>
+    </Grid>
+</UserControl>

@@ -622,7 +622,7 @@ namespace TuringAndCorbusier
         }
 
         //Field, 필드
-
+        //JHL 1층 활성화
         double[] thisParameters;
         double height;
         public bool using1F = false;
@@ -1257,34 +1257,11 @@ namespace TuringAndCorbusier
 
             return coreOutlines;
         }
-        //JHL 코어 디테일
-        public List<Curve> drawEachCoreDetail()
-        {
-            List<Curve> coreDetailOutlines = new List<Curve>();
 
-            try
-            {
-                for (int i = 0; i < this.Core.Count; i++)
-                {
-                    for (int j = 0; j < this.Core[i].Count; j++)
-                    {
-                        coreDetailOutlines.Add(Core[i][j].DrawCoreDetail());
-
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return coreDetailOutlines;
-            }
-
-            return coreDetailOutlines;
-        }
 
         public List<Curve> drawEachHouse()
         {
             List<Curve> houseOutlines = new List<Curve>();
-
             try
             {
                 for (int i = 0; i < this.Household.Count; i++)
@@ -1295,7 +1272,6 @@ namespace TuringAndCorbusier
                         {
                             houseOutlines.Add(this.Household[i][j][k].GetOutline());
                         }
-
                     }
                 }
             }
@@ -1312,6 +1288,7 @@ namespace TuringAndCorbusier
             List<Curve> houseBalconyOutlines = new List<Curve>();
 
             try
+
             {
                 for (int i = 0; i < this.Household.Count; i++)
                 {
@@ -1415,6 +1392,7 @@ namespace TuringAndCorbusier
 
         public double GetBuildingArea()
         {
+
             double output = 0;
 
 
@@ -1487,7 +1465,6 @@ namespace TuringAndCorbusier
         public double GetGrossArea()
         {
             double output = 0;
-
 
 
             //공급면적 * 세대
@@ -1771,12 +1748,12 @@ namespace TuringAndCorbusier
 
         //Field, 필드
 
-        private Point3d origin;
-        private Vector3d xDirection;
-        private Vector3d yDirection;
-        private CoreType coreType;
-        private double width;
-        private double depth;
+        public Point3d origin;
+        public Vector3d xDirection;
+        public Vector3d yDirection;
+        public CoreType coreType;
+        public double width;
+        public double depth;
 
         //Method, 메소드
 
@@ -1797,7 +1774,6 @@ namespace TuringAndCorbusier
 
             return Area;
         }
-
         
         public Curve DrawOutline()
         {
@@ -1821,29 +1797,7 @@ namespace TuringAndCorbusier
             Curve outlineCurve = outlinePolyline.ToNurbsCurve();
             return outlineCurve;
         }
-        //JHL
-        public Curve DrawCoreDetail()
-        {
-            List<Point3d> outlinePoints = new List<Point3d>();
 
-            Point3d pt = new Point3d(Origin);
-            Vector3d x = new Vector3d(XDirection);
-            Vector3d y = new Vector3d(YDirection);
-
-            outlinePoints.Add(pt);
-            pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
-            pt.Transform(Transform.Translation(Vector3d.Multiply(y, depth)));
-            outlinePoints.Add(pt);
-            pt.Transform(Transform.Translation(Vector3d.Multiply(x, -width)));
-            outlinePoints.Add(pt);
-            pt.Transform(Transform.Translation(Vector3d.Multiply(y, -depth)));
-            pt.Transform(Transform.Translation(Vector3d.Multiply(x, width)));
-            outlinePoints.Add(pt);
-
-            Polyline outlinePolyline = new Polyline(outlinePoints);
-            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
-            return outlineCurve;
-        }
         //--------------------------------------------------------------------------//
 
         //주차배치용 확장
@@ -1965,6 +1919,7 @@ namespace TuringAndCorbusier
         {
             Household output = new Household(this.origin, this.xDirection, this.yDirection, this.XLengthA, this.XLengthB, this.YLengthA, this.YLengthB, this.HouseholdSizeType, this.ExclusiveArea, this.LightingEdge, this.EntrancePoint, this.WallFactor);
             output.isCorridorType = isCorridorType;
+
             output.MovableEdge = new List<Line>();
             return output;
         }
@@ -2065,6 +2020,7 @@ namespace TuringAndCorbusier
             this.CorridorArea = household.CorridorArea;
             this.isCorridorType = household.isCorridorType;
             this.LightingEdge = new List<Line>(household.LightingEdge);
+
             this.MovableEdge = new List<Line>(household.MovableEdge);
             this.edgeOrientations = household.edgeOrientations;
         }
@@ -2087,9 +2043,11 @@ namespace TuringAndCorbusier
             this.CorridorArea = household.CorridorArea;
 
             this.LightingEdge = new List<Line>(household.LightingEdge);
+
             this.MovableEdge = new List<Line>(household.MovableEdge);
 
             LightingEdge.ForEach(n => n.Transform(Transform.Translation(-Vector3d.ZAxis * downheight)));
+
             MovableEdge.ForEach(n => n.Transform(Transform.Translation(-Vector3d.ZAxis * downheight)));
         }
         public override int GetHashCode()
@@ -2124,6 +2082,7 @@ namespace TuringAndCorbusier
             //  |                |
             //  -------back-------
 
+
             for (int i = 0; i < MovableEdge.Count; i++)
             {
                 Curve movableCurve = MovableEdge[i].ToNurbsCurve();
@@ -2154,7 +2113,7 @@ namespace TuringAndCorbusier
                         windowIndex = j;
                 }
 
-     
+
                 edgeLightingIndex.Add(windowIndex);
             }
         }
@@ -2197,6 +2156,45 @@ namespace TuringAndCorbusier
 
             if (outlineCurve.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.CounterClockwise)
                 outlineCurve.Reverse();
+            return outlineCurve;
+        }
+        //JHL
+        public Curve GetDefaultXYOutline()
+        {
+            List<Point3d> outlinePoints = new List<Point3d>();
+            Point3d pt = new Point3d(this.Origin);
+            Vector3d x = new Vector3d(Plane.WorldXY.XAxis);
+            Vector3d y = new Vector3d(Plane.WorldXY.YAxis);
+            //방 총 x 축 길이
+            double xa = this.XLengthA;
+            //방 x 축 길이
+            double xb = this.XLengthB;
+
+            double ya = this.YLengthA;
+            double yb = this.YLengthB;
+
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, yb)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, xa - xb)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, -ya)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, -xa)));
+            outlinePoints.Add(pt);
+            pt.Transform(Transform.Translation(Vector3d.Multiply(y, ya - yb)));
+            outlinePoints.Add(pt);
+
+            Point3d.CullDuplicates(outlinePoints, 0);
+
+            pt.Transform(Transform.Translation(Vector3d.Multiply(x, xb)));
+            outlinePoints.Add(pt);
+
+            Polyline outlinePolyline = new Polyline(outlinePoints);
+            Curve outlineCurve = outlinePolyline.ToNurbsCurve();
+
+            if (outlineCurve.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.CounterClockwise)
+                outlineCurve.Reverse();
 
             return outlineCurve;
 
@@ -2234,13 +2232,13 @@ namespace TuringAndCorbusier
             if (regulationLine.PointAtStart.Z != Origin.Z)
                 regulationLine.Translate(Vector3d.ZAxis * (Origin.Z - regulationLine.PointAtStart.Z));
             
-
+ 
             if (regulationLine.Contains(Origin) == PointContainment.Outside)
                 return false;
 
             Curve tempOutline = GetOutline();
 
-
+      
             var intersection = Curve.CreateBooleanIntersection(tempOutline, regulationLine);
 
             if (intersection.Length != 1)
@@ -2258,18 +2256,18 @@ namespace TuringAndCorbusier
             MatchMovableWithLighting();
 
             //each side
-
+ 
             for (int i = 0; i < MovableEdge.Count; i++)
             {
-
+            
                 if (edgeLightingIndex[i] == -1)
                     continue;
 
-             
+          
                 Curve testLine1;
                 Curve testLine2;
                 List<Curve> testLines;
-              
+     
 
                 if (edgeOrientations[i] == EdgeOrientation.Front)
                 {
@@ -2292,7 +2290,7 @@ namespace TuringAndCorbusier
                     testLines = new List<Curve> { testLine1, testLine2 };
                 }
 
-              
+  
                 else if (edgeOrientations[i] == EdgeOrientation.Back)
                 {
                     Point3d p1 = origin + XDirection * (XLengthA - XLengthB);
@@ -2322,7 +2320,7 @@ namespace TuringAndCorbusier
                 double minDistance = double.MaxValue;
                 for (int j = 0; j < testLines.Count; j++)
                 {
-                
+              
                     double d = CalculateSetBackDistance(regulationLine, testLines[j]);
                     if (d < minDistance)
                         minDistance = d;
@@ -2331,7 +2329,7 @@ namespace TuringAndCorbusier
                 if (minDistance == double.MaxValue)
                     continue;
 
-              
+   
 
 
                 //setback
@@ -2343,11 +2341,11 @@ namespace TuringAndCorbusier
                 //front (reversed 에서는 front가 깎이지 않는다고 가정)
                 if (edgeOrientations[i] == EdgeOrientation.Front)
                 {
-                  
+          
                     Vector3d v = -YDirection * (preYb - minDistance);
                     for (int j = 0; j < MovableEdge.Count; j++)
                     {
-                      
+              
                         Line l = LightingEdge[edgeLightingIndex[j]];
 
                         if (edgeOrientations[j] == EdgeOrientation.Front)
@@ -2370,14 +2368,14 @@ namespace TuringAndCorbusier
                         else
                             continue;
                     }
-                  
+               
                 }
 
                 //side                                                                                              
-           
+    
                 else if (edgeOrientations[i] == EdgeOrientation.Side)
                 {
-                 
+             
                     Vector3d v = -XDirection * (preXa - preXb - minDistance);
 
                     for (int j = 0; j < MovableEdge.Count; j++)
@@ -2411,21 +2409,21 @@ namespace TuringAndCorbusier
                         else
                             continue;
                     }
-                 
+            
                 }
 
                 //back
-            
+         
                 else if (edgeOrientations[i] == EdgeOrientation.Back)
                 {
-               
+          
                     Vector3d v = YDirection * (preYa - preYb - minDistance);
                     if (isReversed)
                         v = YDirection * (preYa - minDistance);
 
                     for (int j = 0; j < MovableEdge.Count; j++)
                     {
-                      
+              
                         Line l = LightingEdge[edgeLightingIndex[j]];
 
                         if (edgeOrientations[j] == EdgeOrientation.Front)
@@ -2450,7 +2448,7 @@ namespace TuringAndCorbusier
                         else
                             continue;
                     }
-                  
+      
                 }
 
             }
@@ -2470,7 +2468,7 @@ namespace TuringAndCorbusier
 
             foreach (var e in inter)
             {
-           
+
                 Point3d p = e.PointB;
                 DebugPoints.Add(p);
                 double distance = p.DistanceTo(testline.PointAtStart);
@@ -2481,13 +2479,13 @@ namespace TuringAndCorbusier
             return minDistanceBack;
         }
 
-        
+
         public void MoveLightingAndMovable()
         {
-          
+
             for ( int i = 0; i < MovableEdge.Count; i++)
             {
-               
+             
                 double height = Origin.Z - MovableEdge[i].From.Z;
                 Line temp = new Line(MovableEdge[i].From + Vector3d.ZAxis * height, MovableEdge[i].To + Vector3d.ZAxis * height);
                 MovableEdge[i] = temp;
@@ -2515,7 +2513,7 @@ namespace TuringAndCorbusier
         public double ExclusiveArea { get { return GetExclusiveArea(); }}
         //public List<int> ConnectedCoreIndex { get { return connectedCoreIndex; } }
         public List<Line> LightingEdge { get; set; }
-       
+
         public List<Line> MovableEdge { get; set; }
         public List<double> WallFactor { get; set; }
         public Point3d EntrancePoint { get; set; }
@@ -2698,6 +2696,7 @@ namespace TuringAndCorbusier
         private double distanceLL = 0.8; //채광창과 채광창이 마주볼경우
         private double distanceWW = 4000; //측벽과 측벽
 
+
         bool using1f = false;
         double fakeHeight = 0;
 
@@ -2709,6 +2708,7 @@ namespace TuringAndCorbusier
             Init(stories);
             totalheight = stories;
         }
+
 
         public Regulation(double stories, bool using1F)
         {
@@ -2746,7 +2746,7 @@ namespace TuringAndCorbusier
                 distanceByLighting = 0.5; //// 기본?
         }
 
-
+ 
         //Options
         //층수,동간거리 : 최상층 기준, 동간거리를 제외한 법규 : 최상층-1 기준 
         public void Fake()
@@ -2758,6 +2758,7 @@ namespace TuringAndCorbusier
         {
             fakeHeight = 0;
         }
+
 
         //Main Method
         public Curve RoadCenterLines(Plot plot)
@@ -3105,6 +3106,7 @@ namespace TuringAndCorbusier
         }
  
        
+       
         //채광방향 사선 규칙입니다.
         public Curve[] byLightingCurve(Plot plot, double angle)
         {
@@ -3342,6 +3344,7 @@ namespace TuringAndCorbusier
         public double DistanceFromRoad { get { return distanceFromRoad; } }
         public double DistanceFromPlot { get { return distanceFromPlot; } }
         public double DistanceFromNorth { get { return distanceFromNorth * (height-fakeHeight); } }
+    
         public double DistanceByLighting { get { return GetDistanceByLighting(LightingType.Default); } }
         public double DistanceLW { get { return GetDistanceByLighting(LightingType.LW); } }
         public double DistanceLL { get { return GetDistanceByLighting(LightingType.LL); } }

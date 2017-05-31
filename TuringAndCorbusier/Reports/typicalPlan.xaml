@@ -9,16 +9,16 @@
          >
 
     <FixedPage Name="fixedPage" Width="1240" Height="1750">
-        <Canvas  Width="1240" Height="1750">
+        <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="90,100,-680,-38"/>
+        <TextBlock x:Name="planPageTitle"  Text="TITLE" FontSize="30" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="ExtraBlack" Margin="88,70,42,-70"/>
+
+
+        <Canvas  Width="1240" Height="1750" Margin="0,10,0,-10">
             <Rectangle Fill="White"/>
-            <TextBlock x:Name="planPageTitle" Text="titie"  FontSize="35" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="85" Canvas.Top="80" FontFamily="Myriad Pro" FontWeight="Bold"/>
-            <Rectangle Fill="#FF2F9947" Height="5" Canvas.Left="85" Stroke="#FF2F9947" Canvas.Top="120" Width="475" OpacityMask="#FF2F9947"/>
 
-            <Canvas x:Name="typicalPlanCanvas" VerticalAlignment="Bottom" Canvas.Left="85" Canvas.Top="185" Width="1075" Height="1410"  >
+            <Canvas  x:Name="typicalPlanCanvas"  VerticalAlignment="Bottom" Canvas.Left="85" Canvas.Top="150" Width="1075" Height="1400"  />
 
-            </Canvas>
-
-
+            <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="Din Alternate" FontWeight="Bold" />
         </Canvas>
     </FixedPage>
 </UserControl>

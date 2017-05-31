@@ -89,10 +89,10 @@ namespace TuringAndCorbusier
             this.normals = new List<Curve>(tempNormals);
             this.others = new List<Curve>(tempOthers);
             this.groundFloor = new List<Curve>(tempGroundFloor);
+
         }
 
         //메소드
-
         private string GetCoreString(CoreType coreType)
         {
             if (coreType == CoreType.Horizontal)

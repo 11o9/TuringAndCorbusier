@@ -75,6 +75,7 @@ namespace TuringAndCorbusier
                 {
                     if (j.Stories + 2 > targetFloor)
                         tempCorePlans.Add(new CorePlan(j));
+
                 }
             }
             for (int i = 0; i < agOutput.Household[targetFloor - 1].Count(); i++)
@@ -139,6 +140,7 @@ namespace TuringAndCorbusier
             }
         }
 
+      
         private static List<Text3d> GetRoadWidthFromPlot(Plot plot)
         {
             Curve[] segments = plot.Boundary.DuplicateSegments();

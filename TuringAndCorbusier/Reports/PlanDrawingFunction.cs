@@ -81,6 +81,33 @@ namespace TuringAndCorbusier
 
             UnitPlanCanvas.Children.Add(polygonToDraw);
         }
+        public static void drawUnitBackGround(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush fillBrush)
+        {
+            List<System.Windows.Point> pointSet = new List<System.Windows.Point>();
+            Curve duplicatedCurve = curveToDraw.DuplicateCurve();
+            duplicatedCurve.MakeClosed(0);
+            Curve[] segments = duplicatedCurve.DuplicateSegments();
+
+            for (int i = 0; i <= segments.Length; i++)
+            {
+                int tempIndex = i % segments.Length;
+
+                System.Windows.Point tempTransformedPoint = pointConverter(tempBoundingBox, segments[tempIndex].PointAt(segments[tempIndex].Domain.T0), tempScaleFactor, tempOrigin);
+                pointSet.Add(tempTransformedPoint);
+            }
+
+            Polygon polygonToDraw = new Polygon();
+            polygonToDraw.Points = new PointCollection(pointSet);
+            SolidColorBrush LHGreen = new SolidColorBrush();
+            LHGreen.Color = Color.FromRgb(196,215,0);
+            polygonToDraw.Fill = LHGreen;
+
+            UnitPlanCanvas.Children.Add(polygonToDraw);
+            double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+            double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
+            Canvas.SetLeft(polygonToDraw, -width);
+            Canvas.SetTop(polygonToDraw, -height);
+        }
 
         public static void drawPlan(Rectangle3d tempBoundingBox, List<List<Curve>> curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
         {
@@ -160,6 +187,98 @@ namespace TuringAndCorbusier
                 }
             }
         }
+        //JHL
+        public static void drawBoundaryPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
+        {
+            Curve[] shatteredCurves = curveToDraw.DuplicateSegments();
+            List<System.Windows.Point> polygonPointList = new List<System.Windows.Point>();
+            System.Windows.Point point = new System.Windows.Point();
+            if (shatteredCurves.Length > 1)
+            {
+                for(int i = 0 ; i < shatteredCurves.Length;i++)
+                {
+                    System.Windows.Point Start = pointConverter(tempBoundingBox, shatteredCurves[i].PointAt(shatteredCurves[i].Domain.T0), tempScaleFactor, tempOrigin);
+                    System.Windows.Point End = pointConverter(tempBoundingBox, shatteredCurves[i].PointAt(shatteredCurves[i].Domain.T1), tempScaleFactor, tempOrigin);
+
+                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                    line.Stroke = strokeBrush;
+
+                    line.X1 = Math.Abs(Start.X);
+                    line.X2 = Math.Abs(End.X);
+                    line.Y1 = Math.Abs(Start.Y);
+                    line.Y2 = Math.Abs(End.Y);
+
+                    //line.Stroke = new SolidColorBrush(Color.FromRgb(196, 215, 0));
+                    // line.StrokeThickness = strokeThickness;
+                    if (i == 0)
+                        {
+                            point= new System.Windows.Point(line.X1,line.Y1);
+                        }
+                    polygonPointList.Add(new System.Windows.Point(line.X2, line.Y2));
+                }
+
+                polygonPointList.Add(point);
+                Polygon polygon = new Polygon();
+                polygon.Stroke = new SolidColorBrush(Color.FromRgb(196, 215, 0));
+                polygon.StrokeThickness = strokeThickness;
+                PointCollection pointCollection = new PointCollection();
+                for(int i = 0; i < polygonPointList.Count; i++)
+                {
+                    pointCollection.Add(polygonPointList[i]);
+                }
+                polygon.Points = pointCollection;
+                SolidColorBrush fillColor = new SolidColorBrush();
+                fillColor.Color = Colors.LightGray;
+                polygon.Fill = fillColor;
+                UnitPlanCanvas.Children.Add(polygon);
+            }
+            else
+            {
+
+                if (curveToDraw.PointAt(curveToDraw.Domain.Mid) != (curveToDraw.PointAtStart + curveToDraw.PointAtEnd) / 2)
+                {
+                    List<Curve> shatteredArc = shatterArc(curveToDraw);
+
+                    foreach (Curve j in shatteredArc)
+                    {
+                        System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
+                        System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
+
+                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                        line.Stroke = strokeBrush;
+
+                        line.X1 = Math.Abs(Start.X);
+                        line.X2 = Math.Abs(End.X);
+                        line.Y1 = Math.Abs(Start.Y);
+                        line.Y2 = Math.Abs(End.Y);
+
+                        line.StrokeThickness = strokeThickness;
+
+                        UnitPlanCanvas.Children.Add(line);
+
+                    }
+                }
+                else
+                {
+                    System.Windows.Point Start = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T0), tempScaleFactor, tempOrigin);
+                    System.Windows.Point End = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T1), tempScaleFactor, tempOrigin);
+
+                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                    line.Stroke = strokeBrush;
+
+                    line.X1 = Math.Abs(Start.X);
+                    line.X2 = Math.Abs(End.X);
+                    line.Y1 = Math.Abs(Start.Y);
+                    line.Y2 = Math.Abs(End.Y);
+
+                    line.StrokeThickness = strokeThickness;
+
+                    UnitPlanCanvas.Children.Add(line);
+
+                }
+            }
+        }
+
 
         public static void drawPlan(Rectangle3d tempBoundingBox, List<Curve> curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
         {
@@ -305,10 +424,188 @@ namespace TuringAndCorbusier
                 }
             }
         }
-
-        //JHL
-        public static void simpleDrawPlan()
+        //JHL unitplan drawing
+        public static void drawUnitPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
         {
+            Curve[] shatteredCurves = curveToDraw.DuplicateSegments();
+            //List<System.Windows.Shapes.Line> householdLineList = new List<System.Windows.Shapes.Line>();
+            //List<TextBlock> dimensionList = GetDimensionList(lineLengthList);
+            //List<System.Windows.Point> pointList = new List<System.Windows.Point>();
+            //foreach(Point3d point in dimensionLocationPointList)
+            //{
+            //    pointList.Add(pointConverter(tempBoundingBox, point, tempScaleFactor, tempOrigin));
+            //}
+            List<System.Windows.Shapes.Line> WPFLineList = new List<System.Windows.Shapes.Line>();
+            double width, height;
+            if (shatteredCurves.Length > 1)
+            {
+                foreach (Curve j in shatteredCurves)
+                {
+                    System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
+                    System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
+
+                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                    line.Stroke = strokeBrush;
+
+                    line.X1 = Math.Abs(Start.X);
+                    line.X2 = Math.Abs(End.X);
+                    line.Y1 = Math.Abs(Start.Y);
+                    line.Y2 = Math.Abs(End.Y);
+
+                    line.StrokeThickness = strokeThickness;
+                    WPFLineList.Add(line);
+                    UnitPlanCanvas.Children.Add(line);
+                    width = ((tempBoundingBox.Width/2) * tempScaleFactor);
+                    height = ((tempBoundingBox.Height/2) * tempScaleFactor);
+                    Canvas.SetLeft(line,-width);
+                    Canvas.SetTop(line, -height);
+                }
+            }
+            else
+            {
+
+                if (curveToDraw.PointAt(curveToDraw.Domain.Mid) != (curveToDraw.PointAtStart + curveToDraw.PointAtEnd) / 2)
+                {
+                    List<Curve> shatteredArc = shatterArc(curveToDraw);
+
+                    foreach (Curve j in shatteredArc)
+                    {
+                        System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
+                        System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
+
+                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                        line.Stroke = strokeBrush;
+
+                        line.X1 = Math.Abs(Start.X);
+                        line.X2 = Math.Abs(End.X);
+                        line.Y1 = Math.Abs(Start.Y);
+                        line.Y2 = Math.Abs(End.Y);
+
+                        line.StrokeThickness = strokeThickness;
+                        WPFLineList.Add(line);
+                        UnitPlanCanvas.Children.Add(line);
+                        //aligned the drawing to center
+                        width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+                        height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
+                        Canvas.SetLeft(line, -width);
+                        Canvas.SetTop(line, -height);
+   
+
+                    }
+                }
+                else
+                {
+                    System.Windows.Point Start = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T0), tempScaleFactor, tempOrigin);
+                    System.Windows.Point End = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T1), tempScaleFactor, tempOrigin);
+
+                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                    line.Stroke = strokeBrush;
+                    WPFLineList.Add(line);
+                    line.X1 = Math.Abs(Start.X);
+                    line.X2 = Math.Abs(End.X);
+                    line.Y1 = Math.Abs(Start.Y);
+                    line.Y2 = Math.Abs(End.Y);
+
+                    line.StrokeThickness = strokeThickness;
+
+                    UnitPlanCanvas.Children.Add(line);
+                    width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+                    height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
+                    Canvas.SetLeft(line, -width);
+                    Canvas.SetTop(line, -height);
+
+                }
+            }
+        }
+        public static void DrawUnitPlanDimension(Curve householdOutline,List<Point3d> dimensionLocationPointList, List<double> houseOutlineLength, Rectangle3d tempBoundingBox,double scaleFactor,System.Windows.Point origin, ref Canvas unitPlanCanvas)
+        {
+            List<TextBlock> dimensionTextBlockList = GetDimensionList(houseOutlineLength);
+            List<System.Windows.Point> convertedPointList = new List<System.Windows.Point>();
+            foreach(Point3d point in dimensionLocationPointList)
+            {
+                convertedPointList.Add(pointConverter(tempBoundingBox,point,scaleFactor,origin));
+            }
+           // List<System.Windows.Vector> vectorList = GetVector3d(householdOutline);
+           // List<System.Windows.Point> newPointList = GetNewPointList(vectorList,convertedPointList);
+
+            DrawDimension(dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor);
+        }
+
+        //private static List<System.Windows.Vector> GetVector3d(Curve householdOutlineList)
+        //{
+        //    List<Vector3d> householdVectorList = new List<Vector3d>();
+        //    double angle = Rhino.RhinoMath.ToRadians(-90);
+        //    Curve[] segmentArray = householdOutlineList.DuplicateSegments();
+        //    foreach (Curve segment in segmentArray)
+        //    {
+        //        Vector3d vector = segment.TangentAtStart;
+        //        vector.Transform(Rhino.Geometry.Transform.Rotation(angle, segment.PointAtStart));
+        //        householdVectorList.Add(vector);
+        //    }
+        //    List<System.Windows.Vector> WPFVectorList = VectorConverter(householdVectorList);
+        //    return WPFVectorList;
+        //}
+
+        //private static List<System.Windows.Vector> VectorConverter(List<Vector3d> vectorList)
+        //{
+        //    List<System.Windows.Vector> WPFVectorList = new List<System.Windows.Vector>();
+        //    foreach(Vector3d vector in vectorList)
+        //    {
+        //        System.Windows.Vector WPFVector = new System.Windows.Vector(vector.X, -vector.Y);
+        //        WPFVectorList.Add(WPFVector);
+        //    }
+        //    return WPFVectorList;
+        //}
+
+        private static List<TextBlock> GetDimensionList(List<double> lineLengthList)
+        {
+            List<TextBlock> dimensionList = new List<TextBlock>();
+
+            foreach (double lineLength in lineLengthList)
+            {
+                string formattedLength = lineLength.ToString("N0");
+                TextBlock dimension = new TextBlock();
+                dimension.Text = formattedLength;
+                dimension.FontSize = 12;
+                dimensionList.Add(dimension);
+            }
+            return dimensionList;
+        }
+
+        //private static List<System.Windows.Point> GetNewPointList(List<System.Windows.Vector> vectorList,List<System.Windows.Point> oldPointList)
+        //{
+        //    for (int i = 0; i < vectorList.Count; i++)
+        //    {
+        //        vectorList[i] = Vector.Multiply(vectorList[i], 30);
+        //    }
+
+
+        //    List<System.Windows.Point> newPointList = new List<System.Windows.Point>();
+
+        //    for (int i = 0; i < oldPointList.Count; i++)
+        //    {
+        //        System.Windows.Point point = oldPointList[i];
+        //        point = Vector.Add(vectorList[i], oldPointList[i]);
+        //        newPointList.Add(point);
+        //    }
+        //    return newPointList;
+        //}
+
+
+        private static void DrawDimension(List<TextBlock> dimensionList, List<System.Windows.Point> pointList, Canvas UnitPlanCanvas, Rectangle3d tempBoundingBox, double tempScaleFactor)
+        {
+
+            for (int i = 0; i < dimensionList.Count; i++)
+            {
+
+                UnitPlanCanvas.Children.Add(dimensionList[i]);
+
+                double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+                double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
+
+                Canvas.SetLeft(dimensionList[i], pointList[i].X-width);
+                Canvas.SetTop(dimensionList[i], pointList[i].Y-height);
+            }
 
         }
 
@@ -418,7 +715,5 @@ namespace TuringAndCorbusier
 
             return point;
         }
-
     }
-
 }
