@@ -47,7 +47,7 @@ namespace TuringAndCorbusier
             if (outline == null)
                 return new List<Brep>();
             Brep x = Extrusion.Create(outline, height, true).ToBrep();
-            x.CapPlanarHoles(1);
+            x.CapPlanarHoles(10);
 
             double windowSide = 300;
             double windowLow = 300;

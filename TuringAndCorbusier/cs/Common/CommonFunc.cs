@@ -283,7 +283,7 @@ namespace TuringAndCorbusier
 
                 Curve rect = output.AptLines[0];
                 double width = output.ParameterSet.Parameters[2];
-                var offset = rect.Offset(Plane.WorldXY, width / 2, 0, CurveOffsetCornerStyle.Sharp);
+                var offset = rect.Offset(Plane.WorldXY, width / 2, 1, CurveOffsetCornerStyle.Sharp);
 
                 if (offset == null || offset.Length == 0) //seive: cannot offset
                     return new List<Curve>();
@@ -312,15 +312,35 @@ namespace TuringAndCorbusier
                     {
                         //add short
                         Line dimLine1 = PCXTools.PCXByEquation(dimOrigin1, innerRectPoly, dimBaseCore.XDirection);
+                        Line dimLine1sub = PCXTools.PCXByEquation(dimOrigin1, innerRectPoly, -dimBaseCore.XDirection);
 
-                        dim.Add(dimLine1.Length.ToString());
-                        result.Add(dimLine1.ToNurbsCurve());
+                        if (dimLine1.Length > 0.5)
+                        {
+                            dim.Add(dimLine1.Length.ToString());
+                            result.Add(dimLine1.ToNurbsCurve());
+                        }
+
+                        else
+                        {
+                            dim.Add(dimLine1sub.Length.ToString());
+                            result.Add(dimLine1sub.ToNurbsCurve());
+                        }
 
                         //add long
                         Line dimLine2 = PCXTools.PCXByEquation(dimOrigin2, innerRectPoly, dimBaseCore.YDirection);
+                        Line dimLine2sub = PCXTools.PCXByEquation(dimOrigin2, innerRectPoly, -dimBaseCore.YDirection);
 
-                        dim.Add(dimLine2.Length.ToString());
-                        result.Add(dimLine2.ToNurbsCurve());
+                        if (dimLine2.Length > 0.5)
+                        {
+                            dim.Add(dimLine2.Length.ToString());
+                            result.Add(dimLine2.ToNurbsCurve());
+                        }
+
+                        else
+                        {
+                            dim.Add(dimLine2sub.Length.ToString());
+                            result.Add(dimLine2sub.ToNurbsCurve());
+                        }
 
                         return result;
                     }
@@ -329,9 +349,20 @@ namespace TuringAndCorbusier
                     {
                         //add LW
                         Line dimLine1 = PCXTools.PCXByEquation(dimOrigin1, innerRectPoly, dimBaseCore.XDirection);
-                        dim.Add(dimLine1.Length.ToString());
-                        result.Add(dimLine1.ToNurbsCurve());
-                        
+                        Line dimLine1sub = PCXTools.PCXByEquation(dimOrigin1, innerRectPoly, -dimBaseCore.XDirection);
+
+                        if (dimLine1.Length > 0.5)
+                        {
+                            dim.Add(dimLine1.Length.ToString());
+                            result.Add(dimLine1.ToNurbsCurve());
+                        }
+
+                        else
+                        {
+                            dim.Add(dimLine1sub.Length.ToString());
+                            result.Add(dimLine1sub.ToNurbsCurve());
+                        }
+
                         //add LL
                         Core firstEscapeCore = baseFloorCore[1];
                         Point3d escOrigin1 = firstEscapeCore.Origin +
@@ -354,9 +385,17 @@ namespace TuringAndCorbusier
                         Point3d onRectOrigin = dimBaseCore.Origin + dimBaseCore.YDirection * dimBaseToLastMid / 2;
 
                         Line dimLine3 = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, dimBaseCore.XDirection);
-
-                        dim.Add(dimLine3.Length.ToString());
-                        result.Add(dimLine3.ToNurbsCurve());
+                        Line dimLine3sub = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, -dimBaseCore.XDirection);
+                        if (dimLine3.Length > 0.5)
+                        {
+                            dim.Add(dimLine3.Length.ToString());
+                            result.Add(dimLine3.ToNurbsCurve());
+                        }
+                        else
+                        {
+                            dim.Add(dimLine3sub.Length.ToString());
+                            result.Add(dimLine3sub.ToNurbsCurve());
+                        }
 
                         return result;
                     }
@@ -403,11 +442,20 @@ namespace TuringAndCorbusier
                         dim.Add(dimLine2.Length.ToString());
                         result.Add(dimLine2.ToNurbsCurve());
 
-                        //LL
+                        //WW
                         Point3d onRectOrigin = innerRectPoly.SegmentAt(1).PointAt(0.5);
                         Line dimLine3 = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, -innerRectPoly.SegmentAt(0).UnitTangent);
-                        dim.Add(dimLine3.Length.ToString());
-                        result.Add(dimLine3.ToNurbsCurve());
+                        Line dimLine3sub = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, innerRectPoly.SegmentAt(0).UnitTangent);
+                        if (dimLine3.Length >0.5)
+                        {
+                            dim.Add(dimLine3.Length.ToString());
+                            result.Add(dimLine3.ToNurbsCurve());
+                        }
+                        else
+                        {
+                            dim.Add(dimLine3sub.Length.ToString());
+                            result.Add(dimLine3sub.ToNurbsCurve());
+                        }
                         return result;
                     }
 
