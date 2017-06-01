@@ -707,7 +707,7 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries,i);
                             Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(i,"LastFloor");
-                            floorPlanDrawing1.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i));
+                            floorPlanDrawing1.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i),NumberOfHouses);
                             fps.Add(floorPlanDrawing1.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + 5168456.ToString());
                             break;
@@ -727,7 +727,7 @@ namespace TuringAndCorbusier
                         List<HouseholdStatistics> householeStatisticsList = MainPanel_AGOutputList[tempIndex].HouseholdStatistics;
                         Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1), isUsing1F);
                         TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
-                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1));
+                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1),NumberOfHouses);
                         fps.Add(floorPlanDrawing.fixedPage);
                         pagename.Add("floorPlanDrawingPage" + (12312+1).ToString());
 
@@ -1336,12 +1336,22 @@ namespace TuringAndCorbusier
                 RhinoApp.Wait();
 
                 //-----------JHL 조감도 ---------------//
+                if(i ==0)
+                {
                 var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038, 812), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
                 string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
                 bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
                 string key = "BIRDEYE" + (i + 1).ToString();
                 MainPanel_reportspaths[tempIndex].Add(key, path);
-                
+                }
+                if (i > 0)
+                {
+                    var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1075, 695), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
+                    string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
+                    bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    string key = "BIRDEYE" + (i + 1).ToString();
+                    MainPanel_reportspaths[tempIndex].Add(key, path);
+                }
             }
             MainPanel_building2DPreview.Enabled = true;
             RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(backupPoint, false);

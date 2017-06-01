@@ -144,7 +144,7 @@ namespace Reports
                 if (i <= numberOfCores)
                 {
                     PlanDrawingFunction.drawPlan(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-                    PlanDrawingFunction.drawPlan(rectangleToFit, RotatedCoreDetail[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+                    //PlanDrawingFunction.drawPlan(rectangleToFit, RotatedCoreDetail[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
                 }
             }
 
