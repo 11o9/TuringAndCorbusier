@@ -127,7 +127,7 @@ namespace TuringAndCorbusier.xaml
         private void OnPropertyChanged(string info)
         {
             //scrollvalue = 1;
-            Rhino.RhinoApp.WriteLine(info + "has been changed");
+            //Rhino.RhinoApp.WriteLine(info + "has been changed");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
 

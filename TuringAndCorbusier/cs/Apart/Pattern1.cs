@@ -13,7 +13,7 @@ namespace TuringAndCorbusier
     {
         CurveConduit regulationDebug = new CurveConduit(System.Drawing.Color.Red);
         
-
+        
 
         public override Apartment generator(Plot plot, ParameterSet parameterSet, Target target)
         {

@@ -179,7 +179,7 @@ namespace TuringAndCorbusier
 
             var tempoutput = MainPanel_AGOutputList[stackPanel.Children.IndexOf(sender as Button)];
 
-            RhinoApp.WriteLine("tempoutputplottype = " + tempoutput.Plot.PlotType.ToString());
+            //RhinoApp.WriteLine("tempoutputplottype = " + tempoutput.Plot.PlotType.ToString());
 
             Plot tempPlot = tempoutput.Plot;
             bool using1f = tempoutput.ParameterSet.using1F;
@@ -929,7 +929,7 @@ namespace TuringAndCorbusier
                         else
                         {
                             temphhs.Add(new HouseholdStatistics(tomerge));
-                            RhinoApp.WriteLine(tomerge.Count.ToString() + " 개의 householdstatistics 가 병합됨.");
+                            //RhinoApp.WriteLine(tomerge.Count.ToString() + " 개의 householdstatistics 가 병합됨.");
                             tomerge.Clear();
                             tomerge.Add(hhsStack.Pop());
                         }
@@ -1005,7 +1005,7 @@ namespace TuringAndCorbusier
                 }
 
 
-                RhinoApp.WriteLine("설계 보고서 업로드 시작");
+                //RhinoApp.WriteLine("설계 보고서 업로드 시작");
                 CommonFunc.AddTdDesignReport(CurrentDataIdName.ToList(), CurrentDataId.ToList(), MainPanel_reportspaths[tempIndex], temp_REGI_PRE_DESIGN_NO);
 
 
@@ -1039,12 +1039,12 @@ namespace TuringAndCorbusier
 
 
 
-                RhinoApp.WriteLine("업로드 끝");
+                //RhinoApp.WriteLine("업로드 끝");
 
             }
             catch(Exception x)
             {
-                RhinoApp.WriteLine("업로드 실패");
+                //RhinoApp.WriteLine("업로드 실패");
             }
         }
 

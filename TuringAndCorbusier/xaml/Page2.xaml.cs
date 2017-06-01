@@ -27,6 +27,8 @@ namespace TuringAndCorbusier
         //double s3bak = 0;
         //double s4bak = 0;
         //double s5bak = 0;
+        List<int> mult = new List<int>() { 1, 1, 1 };
+        int multMax = 2;
         public bool isAG34Valid = true;
         UnitTypeSetting targetsetting = new UnitTypeSetting();
         public string Format(double x)
@@ -139,7 +141,7 @@ namespace TuringAndCorbusier
             storiesList.Sort();
 
             TuringAndCorbusierPlugIn.InstanceClass.page2Settings = new Settings_Page2(whichAgToUse.ToList(), target, new Interval(directionList[0], directionList[1]), new Interval(storiesList[0], storiesList[1]), !UndergroundParking_Button.IsChecked.Value);
-
+            TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Multiply = mult;
             NavigationService.Navigate(TuringAndCorbusierPlugIn.InstanceClass.page3);
         }
 
@@ -180,7 +182,7 @@ namespace TuringAndCorbusier
         /// <param name="e"></param>
 
 
-        bool[] selected = { true, true, true };
+        bool[] selected = { false, false, false };
         System.Drawing.Bitmap[] icons = {
             Properties.Resources.PT1off, Properties.Resources.PT1on,
             Properties.Resources.PT3off, Properties.Resources.PT3on,
@@ -432,6 +434,33 @@ namespace TuringAndCorbusier
         private void TextBlock_PreviewStylusSystemGesture(object sender, StylusSystemGestureEventArgs e)
         {
 
+        }
+
+        private void MultiplyAG1_Click(object sender, RoutedEventArgs e)
+        {
+            if (mult[0] > multMax)
+                mult[0] = 1;
+            else
+                mult[0]++;
+            MultiplyAG1.Content = "X" + mult[0].ToString();
+        }
+
+        private void MultiplyAG3_Click(object sender, RoutedEventArgs e)
+        {
+            if (mult[1] > multMax)
+                mult[1] = 1;
+            else
+                mult[1]++;
+            MultiplyAG3.Content = "X" + mult[1].ToString();
+        }
+
+        private void MultiplyAG4_Click(object sender, RoutedEventArgs e)
+        {
+            if (mult[2] > multMax)
+                mult[2] = 1;
+            else
+                mult[2]++;
+            MultiplyAG4.Content = "X" + mult[2].ToString();
         }
     }
 }

@@ -46,11 +46,13 @@ namespace TuringAndCorbusier
                 this.Direction = direction;
                 this.TargetFloor = targetFloor;
                 this.MakeUnderGroundParking = makeUndergroundParking;
+                this.Multiply = new List<int>() { 1, 1, 1 };
             }
 
             //Properties. 속성
 
             public List<bool> WhichAGToUse { get; private set; }
+            public List<int> Multiply { get; set; }
             public Target Target { get; private set; }
             public Interval Direction { get; private set; }
             public Interval TargetFloor { get; private set; }

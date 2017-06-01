@@ -83,7 +83,7 @@ namespace TuringAndCorbusier
             this.maxFloorAreaRatio.Text = "150";
             this.maxBuildingCoverage.Text = "60";
             this.maxFloors.Text = "4";
-            Rhino.RhinoApp.WriteLine(plotType2.ToString());
+            //Rhino.RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
         private void PlotType_2_Click(object sender, RoutedEventArgs e)
@@ -98,7 +98,7 @@ namespace TuringAndCorbusier
             this.maxFloorAreaRatio.Text = "200";
             this.maxBuildingCoverage.Text = "60";
             this.maxFloors.Text = "7";
-            RhinoApp.WriteLine(plotType2.ToString());
+            //RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
         private void PlotType_3_Click(object sender, RoutedEventArgs e)
@@ -113,7 +113,7 @@ namespace TuringAndCorbusier
             this.maxFloorAreaRatio.Text = "250";
             this.maxBuildingCoverage.Text = "50";
             this.maxFloors.Text = "10";
-            RhinoApp.WriteLine(plotType2.ToString());
+            //RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
         private void Commercial_Click(object sender, RoutedEventArgs e)
@@ -128,7 +128,7 @@ namespace TuringAndCorbusier
             this.maxFloorAreaRatio.Text = "1300";
             this.maxBuildingCoverage.Text = "80";
             this.maxFloors.Text = "30";
-            RhinoApp.WriteLine(plotType2.ToString());
+            //RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
         private void EasterEgg_Click(object sender, RoutedEventArgs e)
@@ -250,20 +250,20 @@ namespace TuringAndCorbusier
             }
 
 
-            if (points.Count == 0)
-            {
-                var result = MessageBox.Show("대지의 경사 정보가 설정되지 않았습니다. 평평한 대지로 계속 하시겠습니까?", "경사 정보 없음", MessageBoxButton.YesNo);
+            //if (points.Count == 0)
+            //{
+            //    var result = MessageBox.Show("대지의 경사 정보가 설정되지 않았습니다. 평평한 대지로 계속 하시겠습니까?", "경사 정보 없음", MessageBoxButton.YesNo);
 
-                if (result == MessageBoxResult.No)
-                    return false;
-            }
-            else
-            {
-                var result = MessageBox.Show("정보 입력을 마치고 설계를 시작합니다.", "창 닫기", MessageBoxButton.YesNo);
+            //    if (result == MessageBoxResult.No)
+            //        return false;
+            //}
+            //else
+            //{
+            //    var result = MessageBox.Show("정보 입력을 마치고 설계를 시작합니다.", "창 닫기", MessageBoxButton.YesNo);
 
-                if (result == MessageBoxResult.No)
-                    return false;
-            }
+            //    if (result == MessageBoxResult.No)
+            //        return false;
+            //}
 
 
             RhinoDoc.SelectObjects -= SelectSlopePoint;
@@ -351,6 +351,8 @@ namespace TuringAndCorbusier
         private void GetPlot(object sender, RoutedEventArgs e)
         {
             var previewer = (TuringAndCorbusierPlugIn.InstanceClass.turing.GISSlot.Content as ServerUI).preview;
+            Btn_GetPlot.Background = System.Windows.Media.Brushes.Lime;
+            
             previewer.Enabled = true;
             Btn_GetPlot.Content = "선택 완료";
             Btn_GetPlot.Click -= GetPlot;
@@ -382,6 +384,8 @@ namespace TuringAndCorbusier
             Btn_GetPlot.Click -= GetPlotFinish;
             Rhino.RhinoDoc.SelectObjects -= (TuringAndCorbusierPlugIn.InstanceClass.turing.GISSlot.Content as ServerUI).OnSelectPilji;
 
+
+            Btn_GetPlot.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 158, 158, 158));
             SetCurve(merged.OutBounds[0].ToNurbsCurve());
         }
 

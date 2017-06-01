@@ -107,16 +107,17 @@ namespace Reports
             //같은 경로/타입 폴더 이미 존재?!
             if (exist)
             {
-                var msgBoxResult = MessageBox.Show("등록된 같은 타입의 보고서가 있습니다. 덮어 쓰시겠습니까?", "보고서 덮어쓰기", MessageBoxButton.OKCancel);
-                if (msgBoxResult == MessageBoxResult.Cancel)
-                {
-                    saveas = true;
-                }
-                else
-                {
-                    saveas = false;
-                    
-                }
+                //var msgBoxResult = MessageBox.Show("등록된 같은 타입의 보고서가 있습니다. 덮어 쓰시겠습니까?", "보고서 덮어쓰기", MessageBoxButton.OKCancel);
+                //if (msgBoxResult == MessageBoxResult.Cancel)
+                //{
+                //    saveas = true;
+                //}
+                //else
+                //{
+                //    saveas = false;
+
+                //}
+                saveas = true;
             }
 
                 projectpath = root + "\\" + pdfoutname;
@@ -184,21 +185,21 @@ namespace Reports
                         if (paths[index].ContainsKey("SECTION"))
                             paths[index].Remove("SECTION");
                         paths[index].Add("SECTION", SaveDocumentPagesToImages(CreateXps(i)));
-                        Rhino.RhinoApp.WriteLine(paths[index]["SECTION"]);
+                        //Rhino.RhinoApp.WriteLine(paths[index]["SECTION"]);
                     }
                     else if (_pagename[i] == "typicalPlanPage1")
                     {
                         if (paths[index].ContainsKey("GROUND_PLAN"))
                             paths[index].Remove("GROUND_PLAN");
                         paths[index].Add("GROUND_PLAN", SaveDocumentPagesToImages(CreateXps(i)));
-                        Rhino.RhinoApp.WriteLine(paths[index]["GROUND_PLAN"]);
+                        //Rhino.RhinoApp.WriteLine(paths[index]["GROUND_PLAN"]);
                     }
                     else if (_pagename[i] == "typicalPlanPage3")
                     {
                         if (paths[index].ContainsKey("TYPICAL_PLAN"))
                             paths[index].Remove("TYPICAL_PLAN");
                         paths[index].Add("TYPICAL_PLAN", SaveDocumentPagesToImages(CreateXps(i)));
-                        Rhino.RhinoApp.WriteLine(paths[index]["TYPICAL_PLAN"]);
+                        //Rhino.RhinoApp.WriteLine(paths[index]["TYPICAL_PLAN"]);
                     }
                     
                     else
@@ -448,19 +449,19 @@ namespace Reports
             var dictionaryTempIndex = TuringAndCorbusierPlugIn.InstanceClass.turing.MainPanel_reportspaths[TuringAndCorbusierPlugIn.InstanceClass.turing.tempIndex];
             if (dictionaryTempIndex.ContainsKey("REPORT") == true)
             {
-                var result = MessageBox.Show("이미 등록된 설계 보고서가 있습니다. 새 보고서를 서버에 저장하시겠습니까?", "설계 보고서 덮어쓰기", MessageBoxButton.OKCancel);
+                //var result = MessageBox.Show("이미 등록된 설계 보고서가 있습니다. 새 보고서를 서버에 저장하시겠습니까?", "설계 보고서 덮어쓰기", MessageBoxButton.OKCancel);
 
-                if (result == MessageBoxResult.OK)
-                {
-                    dictionaryTempIndex.Remove("REPORT");
-                    dictionaryTempIndex.Add("REPORT", outputpath);
-                    Rhino.RhinoApp.WriteLine("덮어쓰기 완료" + Environment.NewLine + "파일 경로 = " + outputpath);
-                }
+                //if (result == MessageBoxResult.OK)
+                //{
+                dictionaryTempIndex.Remove("REPORT");
+                dictionaryTempIndex.Add("REPORT", outputpath);
+                //    Rhino.RhinoApp.WriteLine("덮어쓰기 완료" + Environment.NewLine + "파일 경로 = " + outputpath);
+                //}
             }
             else
             { 
                 dictionaryTempIndex.Add("REPORT", outputpath);
-                Rhino.RhinoApp.WriteLine("등록 완료" + Environment.NewLine + "파일 경로 = " + outputpath);
+                //Rhino.RhinoApp.WriteLine("등록 완료" + Environment.NewLine + "파일 경로 = " + outputpath);
             }
 
             //var result = MessageBox.Show("출력 끝  파일열기 / 경로열기 / 닫기 ", "PDF로 보고서 출력", MessageBoxButton.YesNoCancel);
@@ -525,7 +526,7 @@ namespace Reports
 
         private void Ps_Exited(object sender, EventArgs e)
         {
-            Rhino.RhinoApp.WriteLine("프로세스종료됨");
+            //Rhino.RhinoApp.WriteLine("프로세스종료됨");
            
         }
 

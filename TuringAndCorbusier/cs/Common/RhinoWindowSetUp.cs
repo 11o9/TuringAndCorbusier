@@ -222,7 +222,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < toolbars.ToArray().Length; i++)
             {
                 asdfasdf.Add(toolbars[i].Path);
-                RhinoApp.WriteLine(toolbars[i].Path);
+                //RhinoApp.WriteLine(toolbars[i].Path);
                 toolbars[i].Close(false);
             }
 

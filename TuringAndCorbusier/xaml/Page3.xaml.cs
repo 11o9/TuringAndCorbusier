@@ -384,6 +384,7 @@ namespace TuringAndCorbusier
                 try
                 {
                     AG1 tempAG = new AG1();
+                    tempAG.Multiply(TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Multiply[0]);
 
                     List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, tempAG, tempTarget, !this.Preview_Toggle.IsChecked.Value);
 
@@ -411,29 +412,26 @@ namespace TuringAndCorbusier
                 if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse[i])
                 {
 
+                    var tempAG = agSet[i];
+                    tempAG.Multiply(TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Multiply[i]);
+                    List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
 
-                    //try
-                    //{
-                        List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
+                    string tempAGname = GetConvertedAGName(agSet[i]);
 
+                    if (tempTempOutputs == null)
+                        continue;
 
+                    for (int k = 0; k < tempTempOutputs.Count; k++)
+                    {
 
-                        string tempAGname = GetConvertedAGName(agSet[i]);
-
-                        if (tempTempOutputs == null)
-                            continue;
-
-                        for (int k = 0; k < tempTempOutputs.Count; k++)
+                        bool addResult = this.AddButtonToStackPanel(tempTempOutputs[k]);
+                        if (addResult)
                         {
-
-                            bool addResult = this.AddButtonToStackPanel(tempTempOutputs[k]);
-                            if (addResult)
-                            {
-                                this.tempOutput.Add(tempTempOutputs[k]);
-                                this.tempAGName.Add(tempAGname);
-                            }
-
+                            this.tempOutput.Add(tempTempOutputs[k]);
+                            this.tempAGName.Add(tempAGname);
                         }
+
+                    }
                 }
             }
         }
@@ -568,11 +566,25 @@ namespace TuringAndCorbusier
         public void calcWorkQuantity(List<ApartmentGeneratorBase> agList)
         {
             double output = 0;
-
+            var mult = TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Multiply;
             foreach (ApartmentGeneratorBase i in agList)
             {
+                int index = -1;
+                if (i.GetAGType == "PT-1")
+                    index = 0;
+                else if (i.GetAGType == "PT-3")
+                    index = 1;
+                else if (i.GetAGType == "PT-4")
+                    index = 2;
+                else
+                    index = -1;
+
+                if (index == -1)
+                    continue;
+
+
                 //population * (initialboost + generation)
-                output += (i.GAParameterSet[4] + i.GAParameterSet[2]) * i.GAParameterSet[3];
+                output += (i.GAParameterSet[4] * mult[index] + i.GAParameterSet[2]) * i.GAParameterSet[3];
             }
 
             this.currentWorkQuantity = output;

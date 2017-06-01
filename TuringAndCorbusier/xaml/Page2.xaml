@@ -80,8 +80,8 @@
                         <RowDefinition Height="35"/>
                         <RowDefinition Height="25"/>
                         <RowDefinition Height="93*"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="60"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="16"/>
@@ -100,13 +100,14 @@
                     <Button x:Name="Btn_AG1" Grid.Column="2" Grid.Row="2" Style="{StaticResource AGButtonStyle}" Margin="0,0,0,0" Background="Black" Opacity="0" Click="Btn_AG1_Click"/>
                     <TextBlock  x:Name="Txt_AG1" Text="판상형" Style="{StaticResource AGTypeDefaultTextStyle}" FontSize="14.667" FontFamily="Noto Sans CJK KR Regular" TextWrapping="Wrap" Grid.Column="2" Grid.Row="3" TextAlignment="Center"  VerticalAlignment="Center"/>
                     <ToggleButton x:Name="Toggle_AG1" Visibility="Hidden" Click="Toggle_AG1_Click" Style="{StaticResource AnimatedSwitch}"  Grid.Column="2" Grid.ColumnSpan="1" Margin="0,5,15,0" HorizontalAlignment="Right"  Grid.Row="3" Height="12" VerticalAlignment="Top" />
-
-
+                    <Button x:Name="MultiplyAG1" Style="{StaticResource XButton}" FontSize="20" FontWeight="ExtraBold" Background="Black" Foreground="Lime" Content="X1" Width="100" Height="30" Grid.Row="4" Grid.Column="2" Click="MultiplyAG1_Click" ></Button>
+            
                     <Image x:Name="Diagram_AG3" Grid.Column="4" Grid.Row="2" OpacityMask="White" />
                     <Button  x:Name="Btn_AG3" Grid.Column="4" Grid.Row="2" Style="{StaticResource AGButtonStyle}" Margin="0,0,0,0"  Click="Btn_AG3_Click" Background="Black" Opacity="0"/>
                     <TextBlock x:Name="Txt_AG3" FontSize="14.667" Style="{StaticResource AGTypeDefaultTextStyle}" FontFamily="Noto Sans CJK KR Regular" TextWrapping="Wrap" Grid.Column="4" Grid.Row="3" Text="중정형" TextAlignment="Center"  VerticalAlignment="Center"/>
                     <TextBlock x:Name="ag3errorMsg"  Visibility="Hidden" FontSize="14.667" FontFamily="Noto Sans CJK KR Regular" TextWrapping="Wrap" Grid.Column="4" Grid.Row="2" TextAlignment="Center" Margin="0,40,0,39" Foreground="White"><Run Text="선택한 대지에 "/><LineBreak/><Run Text="적합하지 않은 "/><LineBreak/><Run Text="형태입니다."/></TextBlock>
                     <ToggleButton  x:Name="Toggle_AG3" Visibility="Hidden" Style="{StaticResource AnimatedSwitch}" Grid.Column="4" Grid.ColumnSpan="1" Margin="0,5,15,0" HorizontalAlignment="Right"  Grid.Row="3" Height="12" VerticalAlignment="Top" Click="Toggle_AG3_Click"/>
+                    <Button x:Name="MultiplyAG3" Style="{StaticResource XButton}" FontSize="20" FontWeight="ExtraBold" Background="Black" Foreground="Lime" Content="X1" Width="100" Height="30" Grid.Row="4" Grid.Column="4" Click="MultiplyAG3_Click"></Button>
 
 
 
@@ -115,6 +116,7 @@
                     <TextBlock  x:Name="Txt_AG4" FontSize="14.667" Style="{StaticResource AGTypeDefaultTextStyle}"  FontFamily="Noto Sans CJK KR Regular" TextWrapping="Wrap" Grid.Column="6" Grid.Row="3" Text="ㄷ자형" TextAlignment="Center" VerticalAlignment="Center"/>
                     <ToggleButton  x:Name="Toggle_AG4" Visibility="Hidden" Style="{StaticResource AnimatedSwitch}"   Grid.Column="6" Grid.ColumnSpan="1" Margin="0,5,15,0" HorizontalAlignment="Right"  Grid.Row="3" Height="12" VerticalAlignment="Top" Click="Toggle_AG4_Click"/>
                     <TextBlock x:Name="ag4errorMsg" Visibility="Hidden" FontSize="14.667" FontFamily="Noto Sans CJK KR Regular" TextWrapping="Wrap" Grid.Column="6" Grid.Row="2" TextAlignment="Center" Margin="0,40,0,39" Foreground="White"><Run Text="선택한 대지에 "/><LineBreak/><Run Text="적합하지 않은 "/><LineBreak/><Run Text="형태입니다."/></TextBlock>
+                    <Button x:Name="MultiplyAG4" Style="{StaticResource XButton}" FontSize="20" FontWeight="ExtraBold" Background="Black" Foreground="Lime" Content="X1" Width="100" Height="30" Grid.Row="4" Grid.Column="6" Click="MultiplyAG4_Click"></Button>
 
 
                 </Grid>

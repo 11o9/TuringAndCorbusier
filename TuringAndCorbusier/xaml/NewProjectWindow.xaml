@@ -109,11 +109,11 @@
 
             <TextBlock Style="{StaticResource TextBlockStyleRight}" x:Name="textBlock_Copy5" Text="대지 입력" Grid.Row="6"  Grid.Column="0" />
 
-            <Button x:Name="Btn_GetPlot_Copy1" Content="대지 경계 입력" Style="{StaticResource MyButtonStyle}" Background="#FF9E9E9E" Click="Btn_GetPlot_Copy1_Click" Grid.Column="3" Grid.Row="6"  FontSize="8" />
+            <Button x:Name="Btn_GetPlot_Copy1" Content="직접 입력" Style="{StaticResource MyButtonStyle}" Background="#FF9E9E9E" Click="Btn_GetPlot_Copy1_Click" Grid.Column="1" Grid.Row="7"  FontSize="10" />
             <Button x:Name="Btn_GetSlant_Copy" Visibility="Hidden" Content="대지 경사 설정" Style="{StaticResource MyButtonStyle}" Background="#FF767676" Height="21" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120" Click="Btn_GetSlope_Copy_Click" FontSize="10.667" Grid.Column="3" Grid.Row="5" Grid.RowSpan="2"/>
-            <Button x:Name="Btn_GetPlot" Content="새로운 경계 입력"  Style="{StaticResource MyButtonStyle}"  Background="#FF9E9E9E" Click="GetPlot"  Grid.Row="6" Grid.Column="2" FontSize="8"/>
-            <Button x:Name="Btn_GetPlot_Copy" Content="인접 도로 폭 설정" Style="{StaticResource MyButtonStyle}" Background="#FF9E9E9E"  Click="Btn_SetWidth_Click"  Grid.Row="7" Grid.Column="3"  FontSize="8"/>
-            <TextBlock Style="{StaticResource TextBlockStyleRight}" x:Name="textBlock_Copy" Text="주변 환경" Grid.Row="7" Grid.Column="0" />
+            <Button x:Name="Btn_GetPlot" Content="새로운 경계 입력"  Style="{StaticResource MyButtonStyle}"  Background="#FF9E9E9E" Click="GetPlot"  Grid.Row="6" Grid.Column="1" FontSize="9"/>
+            <Button x:Name="Btn_GetPlot_Copy" Content="인접 도로 폭 설정" Style="{StaticResource MyButtonStyle}" Background="#FF9E9E9E"  Click="Btn_SetWidth_Click"  Grid.Row="6" Grid.Column="3"  FontSize="8"/>
+            <TextBlock Style="{StaticResource TextBlockStyleRight}" x:Name="textBlock_Copy" Text="주변 환경" Grid.Row="6" Grid.Column="2" />
 
             <Button x:Name="PlotType_1" Style="{StaticResource MyButtonStyle}" Background="#FF9E9E9E"  Grid.Row="2" Grid.RowSpan="2" Grid.Column="2" Click="PlotType_1_Click">
                 <TextBlock FontSize="10"  TextAlignment="Center">

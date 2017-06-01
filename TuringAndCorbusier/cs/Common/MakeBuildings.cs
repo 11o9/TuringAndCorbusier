@@ -262,8 +262,8 @@ namespace TuringAndCorbusier
                 {
                     att.MaterialIndex = index;
                 }
-
-                Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(green[i], att);
+                var extrusion = Extrusion.Create(plot.Boundary, 1, true).ToBrep();
+                Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(extrusion, att);
             }
 
             for (int i = 0; i < white.Length; i++)

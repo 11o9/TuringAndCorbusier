@@ -46,6 +46,15 @@ namespace TuringAndCorbusier
         public ServerUI()
         {
             InitializeComponent();
+
+            bool test = ServerConnection.TestConnection(SERVER.Azure);
+
+            if (!test)
+            {
+                //MessageBox.Show("서버 연결 에러");
+                return;
+            }
+
             string conn = ConnectionStringBuilder.GetConnectionString(SERVER.Azure);
             string comm = QueryBuilder.GetSiDoCode();
             try
