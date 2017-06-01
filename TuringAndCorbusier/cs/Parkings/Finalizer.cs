@@ -119,6 +119,9 @@ namespace TuringAndCorbusier
                 if (apt.AGtype == "PT-1")
                     return apt;
 
+                if (depth > 3)
+                    return apt;
+
                 Apartment reduced = Reduce(apt);
                 Finalizer finalizer = new Finalizer(reduced, depth);
                 finalizer.subtracted = true;
@@ -306,13 +309,20 @@ namespace TuringAndCorbusier
                 if (targetFA > currentFA)
                     return aptOverFAR;
 
-
+               
                 //initial setting
                 double toReduceArea = currentFA - targetFA;
                 double aptWidth = aptOverFAR.ParameterSet.Parameters[2];
 
                 List<Core> topFloorCore = aptOverFAR.Core.Last();
                 List<Household> topFloorHouseholds = aptOverFAR.Household.Last().First();
+
+                if (topFloorCore.Count == 0)
+                {
+                    aptOverFAR.Core.RemoveAt(aptOverFAR.Core.Count - 1);
+                    return aptOverFAR;
+                }
+
                 int initialHouseCount = topFloorHouseholds.Count;
                 double currentFloorZ = topFloorHouseholds.First().Origin.Z;
                 double currentCoreZ = topFloorCore.First().Origin.Z;
@@ -428,6 +438,7 @@ namespace TuringAndCorbusier
                     aptOverFAR.Household.RemoveAt(aptOverFAR.Household.Count - 1);
                     aptOverFAR.Core.RemoveAt(aptOverFAR.Core.Count - 1);
                 }
+
                 return aptOverFAR;
             }
 
