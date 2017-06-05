@@ -18,10 +18,13 @@ namespace TuringAndCorbusier
         {
             object content = this.Content;
             RemoveLogicalChild(this.Content);
+
             Grid output = new Grid();
             output.Width = 1240;
             output.Height = 1750;
+
             output.Children.Add((System.Windows.UIElement)content);
+
             return output;
         }
     }

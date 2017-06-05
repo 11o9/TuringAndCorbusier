@@ -4,27 +4,27 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using Rhino.Geometry;
-using System.Windows.Media;
 
 namespace TuringAndCorbusier
 {
     public class PlanDrawingFunction_90degree
     {
-        //방 orientation 방향 시계 반대 방향으로 정렬하기
         public static Household alignHousholdProperties(Household household)
         {
             Household tempHousehold = new Household(household);
+
             tempHousehold.XDirection = Vector3d.XAxis;
             tempHousehold.YDirection = Vector3d.YAxis;
+
             return tempHousehold;
         }
-
 
         public static void drawDimension(Rectangle3d tempBoundingBox, List<TuringAndCorbusier.FloorPlan.Dimension> dimensions, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas)
         {
             for (int i = 0; i < dimensions.Count; i++)
             {
                 FloorPlan.Dimension tempDimension = dimensions[i];
+
                 drawText(tempBoundingBox, tempDimension.NumberText, tempScaleFactor, tempOrigin, ref UnitPlanCanvas, 20, System.Windows.Media.Brushes.Black);
                 List<Curve> dimensionCurves = tempDimension.ExtensionLine;
                 dimensionCurves.Add(tempDimension.DimensionLine);
@@ -160,7 +160,6 @@ namespace TuringAndCorbusier
                             line.StrokeStartLineCap = System.Windows.Media.PenLineCap.Round;
 
                             line.StrokeThickness = strokeThickness;
-                            
 
                             UnitPlanCanvas.Children.Add(line);
 
@@ -218,195 +217,14 @@ namespace TuringAndCorbusier
                 }
             }
         }
-        
-
-        //JHL
-        public static void drawBoundaryPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
-        {
-            Curve[] shatteredCurves = curveToDraw.DuplicateSegments();
-            List<System.Windows.Point> polygonPointList = new List<System.Windows.Point>();
-            System.Windows.Point point = new System.Windows.Point();
-            if (shatteredCurves.Length > 1)
-            {
-                for (int i = 0; i < shatteredCurves.Length; i++)
-                {
-                    System.Windows.Point Start = pointConverter(tempBoundingBox, shatteredCurves[i].PointAt(shatteredCurves[i].Domain.T0), tempScaleFactor, tempOrigin);
-                    System.Windows.Point End = pointConverter(tempBoundingBox, shatteredCurves[i].PointAt(shatteredCurves[i].Domain.T1), tempScaleFactor, tempOrigin);
-
-                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                    line.Stroke = strokeBrush;
-
-                    line.X1 = Math.Abs(Start.X);
-                    line.X2 = Math.Abs(End.X);
-                    line.Y1 = Math.Abs(Start.Y);
-                    line.Y2 = Math.Abs(End.Y);
-
-                    //line.Stroke = new SolidColorBrush(Color.FromRgb(196, 215, 0));
-                    // line.StrokeThickness = strokeThickness;
-                    if (i == 0)
-                    {
-                        point = new System.Windows.Point(line.X1, line.Y1);
-                    }
-                    polygonPointList.Add(new System.Windows.Point(line.X2, line.Y2));
-                }
-
-                polygonPointList.Add(point);
-                Polygon polygon = new Polygon();
-                polygon.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-                polygon.StrokeThickness = strokeThickness;
-                PointCollection pointCollection = new PointCollection();
-                for (int i = 0; i < polygonPointList.Count; i++)
-                {
-                    pointCollection.Add(polygonPointList[i]);
-                }
-                polygon.Points = pointCollection;
-                SolidColorBrush fillColor = new SolidColorBrush();
-                fillColor.Color = Colors.White;
-                polygon.Fill = fillColor;
-                UnitPlanCanvas.Children.Add(polygon);
-            }
-            else
-            {
-
-                if (curveToDraw.PointAt(curveToDraw.Domain.Mid) != (curveToDraw.PointAtStart + curveToDraw.PointAtEnd) / 2)
-                {
-                    List<Curve> shatteredArc = shatterArc(curveToDraw);
-
-                    foreach (Curve j in shatteredArc)
-                    {
-                        System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
-                        System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
-
-                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                        line.Stroke = strokeBrush;
-
-                        line.X1 = Math.Abs(Start.X);
-                        line.X2 = Math.Abs(End.X);
-                        line.Y1 = Math.Abs(Start.Y);
-                        line.Y2 = Math.Abs(End.Y);
-
-                        line.StrokeThickness = strokeThickness;
-
-                        UnitPlanCanvas.Children.Add(line);
-
-                    }
-                }
-                else
-                {
-                    System.Windows.Point Start = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T0), tempScaleFactor, tempOrigin);
-                    System.Windows.Point End = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T1), tempScaleFactor, tempOrigin);
-
-                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                    line.Stroke = strokeBrush;
-
-                    line.X1 = Math.Abs(Start.X);
-                    line.X2 = Math.Abs(End.X);
-                    line.Y1 = Math.Abs(Start.Y);
-                    line.Y2 = Math.Abs(End.Y);
-
-                    line.StrokeThickness = strokeThickness;
-
-                    UnitPlanCanvas.Children.Add(line);
-
-                }
-            }
-        }
-
-        //JHL
-        public static void drawHouseBackGroundPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
-        {
-            Curve[] shatteredCurves = curveToDraw.DuplicateSegments();
-            List<System.Windows.Point> polygonPointList = new List<System.Windows.Point>();
-            System.Windows.Point point = new System.Windows.Point();
-            if (shatteredCurves.Length > 1)
-            {
-                for (int i = 0; i < shatteredCurves.Length; i++)
-                {
-                    System.Windows.Point Start = pointConverter(tempBoundingBox, shatteredCurves[i].PointAt(shatteredCurves[i].Domain.T0), tempScaleFactor, tempOrigin);
-                    System.Windows.Point End = pointConverter(tempBoundingBox, shatteredCurves[i].PointAt(shatteredCurves[i].Domain.T1), tempScaleFactor, tempOrigin);
-
-                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                    line.Stroke = strokeBrush;
-
-                    line.X1 = Math.Abs(Start.X);
-                    line.X2 = Math.Abs(End.X);
-                    line.Y1 = Math.Abs(Start.Y);
-                    line.Y2 = Math.Abs(End.Y);
-
-                    if (i == 0)
-                    {
-                        point = new System.Windows.Point(line.X1, line.Y1);
-                    }
-                    polygonPointList.Add(new System.Windows.Point(line.X2, line.Y2));
-                }
-
-                polygonPointList.Add(point);
-                Polygon polygon = new Polygon();
-                polygon.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-                polygon.StrokeThickness = strokeThickness;
-                PointCollection pointCollection = new PointCollection();
-                for (int i = 0; i < polygonPointList.Count; i++)
-                {
-                    pointCollection.Add(polygonPointList[i]);
-                }
-                polygon.Points = pointCollection;
-                SolidColorBrush fillColor = new SolidColorBrush();
-                fillColor.Color = Color.FromRgb(196,215,0);
-                polygon.Fill = fillColor;
-                UnitPlanCanvas.Children.Add(polygon);
-            }
-            else
-            {
-
-                if (curveToDraw.PointAt(curveToDraw.Domain.Mid) != (curveToDraw.PointAtStart + curveToDraw.PointAtEnd) / 2)
-                {
-                    List<Curve> shatteredArc = shatterArc(curveToDraw);
-
-                    foreach (Curve j in shatteredArc)
-                    {
-                        System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
-                        System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
-
-                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                        line.Stroke = strokeBrush;
-
-                        line.X1 = Math.Abs(Start.X);
-                        line.X2 = Math.Abs(End.X);
-                        line.Y1 = Math.Abs(Start.Y);
-                        line.Y2 = Math.Abs(End.Y);
-
-                        line.StrokeThickness = strokeThickness;
-
-                        UnitPlanCanvas.Children.Add(line);
-
-                    }
-                }
-                else
-                {
-                    System.Windows.Point Start = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T0), tempScaleFactor, tempOrigin);
-                    System.Windows.Point End = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T1), tempScaleFactor, tempOrigin);
-
-                    System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                    line.Stroke = strokeBrush;
-
-                    line.X1 = Math.Abs(Start.X);
-                    line.X2 = Math.Abs(End.X);
-                    line.Y1 = Math.Abs(Start.Y);
-                    line.Y2 = Math.Abs(End.Y);
-
-                    line.StrokeThickness = strokeThickness;
-
-                    UnitPlanCanvas.Children.Add(line);
-
-                }
-            }
-        }
 
         public static void drawPlan(Rectangle3d tempBoundingBox, List<Curve> curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, System.Windows.Media.Brush strokeBrush, double strokeThickness)
         {
             foreach (Curve i in curveToDraw)
             {
                 Curve[] shatteredCurves = i.DuplicateSegments();
+
+
                 if (shatteredCurves.Length > 1)
                 {
                     foreach (Curve j in shatteredCurves)
@@ -504,6 +322,7 @@ namespace TuringAndCorbusier
                         line.StrokeThickness = strokeThickness;
 
                         UnitPlanCanvas.Children.Add(line);
+
                     }
                 }
                 else
@@ -554,88 +373,6 @@ namespace TuringAndCorbusier
             }
 
         }
-
-
-        //JHL
-        public static void drawDashedPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, System.Windows.Media.Brush strokeBrush, double strokeThickness)
-        {
-            if (curveToDraw != null)
-
-            {
-                Curve[] shatteredCurves = curveToDraw.DuplicateSegments();
-
-                if (shatteredCurves.Length > 1)
-                {
-                    foreach (Curve j in shatteredCurves)
-                    {
-                        System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
-                        System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
-
-                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                        line.Stroke = strokeBrush;
-
-                        line.X1 = Math.Abs(Start.X);
-                        line.X2 = Math.Abs(End.X);
-                        line.Y1 = Math.Abs(Start.Y);
-                        line.Y2 = Math.Abs(End.Y);
-
-                        line.StrokeThickness = strokeThickness;
-                        DoubleCollection dashes = new DoubleCollection();
-                        dashes.Add(35);
-                        dashes.Add(30);
-                        line.StrokeDashArray = dashes;
-                        UnitPlanCanvas.Children.Add(line);
-                    }
-                }
-                else
-                {
-
-                    if (curveToDraw.PointAt(curveToDraw.Domain.Mid) != (curveToDraw.PointAtStart + curveToDraw.PointAtEnd) / 2)
-                    {
-                        List<Curve> shatteredArc = shatterArc(curveToDraw);
-
-                        foreach (Curve j in shatteredArc)
-                        {
-                            System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
-                            System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
-
-                            System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                            line.Stroke = strokeBrush;
-
-                            line.X1 = Math.Abs(Start.X);
-                            line.X2 = Math.Abs(End.X);
-                            line.Y1 = Math.Abs(Start.Y);
-                            line.Y2 = Math.Abs(End.Y);
-
-                            line.StrokeThickness = strokeThickness;
-
-                            UnitPlanCanvas.Children.Add(line);
-
-                        }
-                    }
-                    else
-                    {
-                        System.Windows.Point Start = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T0), tempScaleFactor, tempOrigin);
-                        System.Windows.Point End = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T1), tempScaleFactor, tempOrigin);
-
-                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
-                        line.Stroke = strokeBrush;
-
-                        line.X1 = Math.Abs(Start.X);
-                        line.X2 = Math.Abs(End.X);
-                        line.Y1 = Math.Abs(Start.Y);
-                        line.Y2 = Math.Abs(End.Y);
-
-                        line.StrokeThickness = strokeThickness;
-
-                        UnitPlanCanvas.Children.Add(line);
-
-                    }
-                }
-            }
-
-        }
-
 
         private static double getAngle(Vector3d baseVec, Vector3d targetVec)
         {

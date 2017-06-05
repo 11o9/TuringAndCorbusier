@@ -8,14 +8,6 @@ namespace TuringAndCorbusier
 {
     public class CorePlan
     {
-
-        //프로퍼티
-
-        public List<Curve> walls { get; private set; }
-        public List<Curve> normals { get; private set; }
-        public List<Curve> others { get; private set; }
-        public List<Curve> groundFloor { get; private set; }
-
         //생성자
 
         private CorePlan()
@@ -89,10 +81,10 @@ namespace TuringAndCorbusier
             this.normals = new List<Curve>(tempNormals);
             this.others = new List<Curve>(tempOthers);
             this.groundFloor = new List<Curve>(tempGroundFloor);
-
         }
 
         //메소드
+
         private string GetCoreString(CoreType coreType)
         {
             if (coreType == CoreType.Horizontal)
@@ -108,6 +100,13 @@ namespace TuringAndCorbusier
             else
                 return "&";
         }
+
+        //프로퍼티
+
+        public List<Curve> walls { get; private set; }
+        public List<Curve> normals { get; private set; }
+        public List<Curve> others { get; private set; }
+        public List<Curve> groundFloor { get; private set; }
 
     }
 }
