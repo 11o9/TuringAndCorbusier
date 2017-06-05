@@ -395,7 +395,7 @@ namespace TuringAndCorbusier
 
             bool hasToPlaceEscapeCore = maxEdge.GetLength() > Consts.escapeCoreCriteria;
             double escapeCoreEdgeLength = maxEdge.GetLength() - (coreDepth+Consts.corridorWidth) * 2;
-            int escapeCoreCountPerEdge = (int)(escapeCoreEdgeLength / Consts.escapeCoreCriteria)-1;
+            int escapeCoreCountPerEdge = (int)(escapeCoreEdgeLength / Consts.escapeCoreCriteria);
             
             Vector3d courtX = new Vector3d(lines[0].PointAtEnd - lines[0].PointAtStart);
             Vector3d courtY = new Vector3d(lines[3].PointAtStart - lines[3].PointAtEnd);
