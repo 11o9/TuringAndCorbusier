@@ -138,9 +138,9 @@
             </Button>
 
 
-            <TextBlock  Style="{StaticResource TextBlockStyleRight}" x:Name="Reg" Text="완화제한" Grid.Row="8" Grid.Column="0" />
-            <TextBlock  Style="{StaticResource TextBlockStyleRight}"  Text="주거층수" Grid.Row="8" Grid.Column="2"/>
-            <TextBox x:Name="easeFloor" Style="{StaticResource TextBoxStyleCenter}" Grid.Row="8" Grid.Column="3"></TextBox>
+            <TextBlock Visibility="Hidden" Style="{StaticResource TextBlockStyleRight}" x:Name="Reg" Text="완화제한" Grid.Row="8" Grid.Column="0" />
+            <TextBlock Visibility="Hidden" Style="{StaticResource TextBlockStyleRight}"  Text="주거층수" Grid.Row="8" Grid.Column="2"/>
+            <TextBox  Visibility="Hidden" x:Name="easeFloor" Style="{StaticResource TextBoxStyleCenter}" Grid.Row="8" Grid.Column="3"></TextBox>
 
             <CheckBox x:Name="NorthCheck" Content="일조 사선 무시" HorizontalAlignment="Left" Margin="81,3,0,0" Grid.Row="3" VerticalAlignment="Top" Visibility="Hidden" Grid.ColumnSpan="3"/>
             <CheckBox x:Name="SpecialCase" Content="채광방향 높이제한 특례 적용 (높이 * 1/4)" HorizontalAlignment="Left" Margin="6.225,8,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden" Grid.ColumnSpan="3" Grid.Column="1"/>

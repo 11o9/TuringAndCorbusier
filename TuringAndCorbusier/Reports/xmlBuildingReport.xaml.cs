@@ -134,7 +134,7 @@ namespace Reports
                 if (i <= numberOfHouses)
                 {
                     PlanDrawingFunction.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-                    PlanDrawingFunction.drawPlan(rectangleToFit, floorPlanList[i].balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+                    //PlanDrawingFunction.drawPlan(rectangleToFit, floorPlanList[i].balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
                 }
 
             }

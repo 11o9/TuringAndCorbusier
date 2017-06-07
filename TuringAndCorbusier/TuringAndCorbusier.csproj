@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="cs\Common\DataManager.cs" />
+    <Compile Include="cs\Common\SHServer\SHServer.cs" />
     <Compile Include="cs\NotUsed\Egg.cs" />
     <Compile Include="cs\NotUsed\FinalizeApartmentGeneratorOutput.cs" />
     <Compile Include="cs\Parkings\Finalizer.cs" />

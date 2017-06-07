@@ -242,12 +242,18 @@ namespace TuringAndCorbusier
         /// </summary>
         public bool CloseWithoutOkClick()
         {
+
             ButtonStateCheck(ButtonState.None);
 
             if (TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet == null)
             {
                 return false;
             }
+
+
+
+            //임시 코드
+            easeFloor.Text = maxFloors.Text;
 
 
             //if (points.Count == 0)
@@ -386,7 +392,12 @@ namespace TuringAndCorbusier
 
 
             Btn_GetPlot.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 158, 158, 158));
-            SetCurve(merged.OutBounds[0].ToNurbsCurve());
+            Curve bound = merged.OutBounds[0].ToNurbsCurve();
+
+            if (bound.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.Clockwise)
+                bound.Reverse();
+
+            SetCurve(bound);
         }
 
         #region NotUsed
@@ -430,9 +441,6 @@ namespace TuringAndCorbusier
 
 
             ButtonStateCheck(ButtonState.GetWidth);
-            RhinoApp.SendKeystrokes("Cancel", true);
-
-            RhinoApp.Wait();
 
             UIManager.getInstance().SnapSetter(UIManager.SnapMode.OffAll);
 
@@ -440,7 +448,7 @@ namespace TuringAndCorbusier
 
             if (TuringAndCorbusierPlugIn.InstanceClass.plot == null)
             {
-                MessageBox.Show("먼저 커브를 선택하세요");
+                MessageBox.Show("선택 완료를 눌러야 합니다.");
 
                 return;
             }
@@ -766,6 +774,7 @@ namespace TuringAndCorbusier
             string manualPlotArea = this.manualPlotArea.Text;
             List<char> manualPlotAreaList = manualPlotArea.ToList();
             string manualPlotAreaValue = manualPlotArea;
+
 
             TuringAndCorbusierPlugIn.InstanceClass.page1Settings = new Settings_Page1(this.projectName.Text, this.address.Text, this.plotType, double.Parse(manualPlotAreaValue), double.Parse(this.maxFloorAreaRatio.Text), double.Parse(this.maxBuildingCoverage.Text), int.Parse(this.maxFloors.Text));
             ((Rhino.UI.Panels.GetPanel(TuringHost.PanelId) as RhinoWindows.Controls.WpfElementHost).Child as Turing).RefreshProjectInfo();

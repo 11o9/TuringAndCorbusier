@@ -129,6 +129,7 @@ namespace TuringAndCorbusier
             if (lines[0].GetLength() > lines[1].GetLength())
             {
                 Array.Reverse(lines);
+                inlineCurve.Reverse();
                 centerLineCurve.Reverse();
                 centerLinePolyline.Reverse();
                 clockwise = -clockwise;
@@ -350,6 +351,7 @@ namespace TuringAndCorbusier
         #region New Apartment Generating Methods
         private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve)
         {
+            bool isCCW = false;
             bool isShortCore = false;
             double pilotiHeight = Consts.PilotiHeight;
             
@@ -360,11 +362,8 @@ namespace TuringAndCorbusier
             }
             
             //initial settings
-            Polyline inlinePolyline;
-            inlineCurve.TryGetPolyline(out inlinePolyline);
             Curve[] lines = inlineCurve.DuplicateSegments();
-            Curve minEdge = lines[0];
-            Curve maxEdge = lines[1];
+           
 
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
@@ -377,12 +376,16 @@ namespace TuringAndCorbusier
             //reverse Curve orientation & set index0 shortEdge
             if (lines[0].GetLength() > lines[1].GetLength())
             {
+                isCCW = true;
                 lines.Reverse();
                 for (int i = 0; i < lines.Length; i++)
                 {
                     lines[i].Reverse();
                 }
             }
+
+            Curve minEdge = lines[0];
+            Curve maxEdge = lines[1];
 
             //
             if (randomCoreType == CoreType.CourtShortEdge)
@@ -408,6 +411,9 @@ namespace TuringAndCorbusier
             List<double> coreWidths = new List<double>();
             List<double> coreDepths = new List<double>();
 
+            //core direction fix <= fucking code
+            if (isCCW)
+                courtY = -courtY;
 
             //Draw groundFloor cores
             //1

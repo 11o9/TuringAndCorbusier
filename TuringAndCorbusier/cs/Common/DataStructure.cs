@@ -2156,7 +2156,7 @@ namespace TuringAndCorbusier
 
             Polyline outlinePolyline = new Polyline(outlinePoints);
             Curve outlineCurve = outlinePolyline.ToNurbsCurve();
-            outlineCurve.RemoveShortSegments(0.05);
+            outlineCurve.RemoveShortSegments(1);
 
 
             if (outlineCurve.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.CounterClockwise)

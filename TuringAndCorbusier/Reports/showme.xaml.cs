@@ -28,21 +28,15 @@ namespace Reports
     public partial class showme : System.Windows.Window
     {
 
-
-        public string[] CurrentDataIdName = { "REGI_MST_NO", "REGI_SUB_MST_NO" };
-        public string[] CurrentDataId = { CommonFunc.getStringFromRegistry("REGI_MST_NO"), CommonFunc.getStringFromRegistry("REGI_SUB_MST_NO") };
-
         List<FixedPage> tempPagesToShow = new List<FixedPage>();
-        
-
-
-        int index = 0;/// 
 
         int projectcount = 0;
 
         string agtype = "";
-        string mst_no = CommonFunc.getStringFromRegistry("REGI_MST_NO");
-        string mst_sub_no = "_"+CommonFunc.getStringFromRegistry("REGI_SUB_MST_NO");
+
+        //받아옴
+        public string mst_no = "";
+        public string mst_sub_no = "";
 
         string projectname = "_Project";
         string pdfpath = "pdf\\";
@@ -91,35 +85,35 @@ namespace Reports
 
 
             ///Export\\mst_no+mst_sub_no+projectname+agtype 경로 생성
+            ///
+            if (mst_no != "" || mst_sub_no != "")
+                pdfoutname = mst_no + mst_sub_no + "_" + projectname + "_" + agtype;
+            else
+                pdfoutname = projectname + "_" + agtype;
 
-            pdfoutname = mst_no + mst_sub_no + "_" + projectname + "_" + agtype;
-            bool exist = Directory.Exists(root + "\\" + pdfoutname + "*");
+            DirectoryInfo[] directories = new DirectoryInfo(root).GetDirectories(pdfoutname + "*", SearchOption.TopDirectoryOnly);
+            //bool exist = Directory.Exists(root + "\\" + pdfoutname + "*");
+            bool exist = directories.Length > 0;
 
             if (exist)
             {
-                DirectoryInfo[] directories = new DirectoryInfo(root).GetDirectories(pdfoutname + "*", SearchOption.TopDirectoryOnly);
-
                 projectcount = directories.Length / 2;
+                List<string> tempIndexes = directories.Select(n => n.Name.Substring(0, n.Name.Length - 4).Last().ToString()).ToList();
+                for (int i = 1; i < projectcount + 1; i++)
+                {
+                    if (tempIndexes.Contains(i.ToString()))
+                        continue;
+                    else
+                    {
+                        projectcount = i;
+                        break;
+                    }
+                }
+
+                pdfoutname = pdfoutname + "_" + projectcount;
+                //saveas = true;
             }
-           
-
-
-            //같은 경로/타입 폴더 이미 존재?!
-            if (exist)
-            {
-                //var msgBoxResult = MessageBox.Show("등록된 같은 타입의 보고서가 있습니다. 덮어 쓰시겠습니까?", "보고서 덮어쓰기", MessageBoxButton.OKCancel);
-                //if (msgBoxResult == MessageBoxResult.Cancel)
-                //{
-                //    saveas = true;
-                //}
-                //else
-                //{
-                //    saveas = false;
-
-                //}
-                saveas = true;
-            }
-
+            
                 projectpath = root + "\\" + pdfoutname;
 
 

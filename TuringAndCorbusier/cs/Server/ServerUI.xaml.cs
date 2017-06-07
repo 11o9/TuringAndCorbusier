@@ -160,14 +160,28 @@ namespace TuringAndCorbusier
             //codeTest.Text = Code;
         }
 
+        string lastbonbun = "";
+        string lastbubun = "";
+        string lastdong = "";
         private void DrawPilji(object sender, RoutedEventArgs e)
         {
-            RhinoApp.RunScript("Show", false);
-            drawer.Draw(Piljis);
+            //동 같으면 카메라만 맞춤
+            if (Dong == lastdong)
+            {
+                
+            }
+            else
+            {
+                //RhinoApp.RunScript("Show", false);
+                drawer.Draw(Piljis);
+                lastdong = Dong;
+            }
+
             if (Bonbun == "")
             {
                 //동 전체 그리고 중심에 카메라 셋팅
                 SetCam(RhinoDoc.ActiveDoc.Objects.BoundingBox);
+                
             }
 
             else
@@ -184,8 +198,11 @@ namespace TuringAndCorbusier
                     BoundingBox bb = new BoundingBox(points);
                     SetCam(bb);
                 }
-                    
+
             }
+
+            lastbonbun = Bonbun;
+            lastbubun = Bubun;
 
         }
         private void SetCam(BoundingBox bb)
