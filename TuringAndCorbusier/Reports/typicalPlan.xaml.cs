@@ -156,7 +156,61 @@ namespace Reports
 
         //    return areaTypeColour;
         //}
+        private static void DrawPT3Corridor(List<CoreType> coreTypeList, List<Curve> aptLineList, string agType, double aptWidth, out Curve corridorOutline, out Curve currentInnerLine)
+        {
+            Curve currentCenterLine = aptLineList[0].DuplicateCurve();
+            if ((int)currentCenterLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+                currentCenterLine.Reverse();
+            currentInnerLine = currentCenterLine.Offset(Plane.WorldXY, aptWidth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+            if ((int)currentInnerLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+                currentInnerLine.Reverse();
+            corridorOutline = currentInnerLine.Offset(Plane.WorldXY, Consts.corridorWidth, 1, CurveOffsetCornerStyle.Sharp)[0];
+            return;
+        }
+        private static List<Curve> DrawPT1corridor(Apartment apartment)
+        {
 
+            List<Curve> corridorLines = new List<Curve>();
+
+            foreach (var hh in apartment.Household)
+            {
+                foreach (var h in hh)
+                {
+                    foreach (var household in h)
+                    {
+                        if (household.isCorridorType)
+                        {
+                            Curve corridorLine = new LineCurve(household.Origin, household.Origin + household.XDirection * household.XLengthA);
+                            corridorLines.Add(corridorLine);
+                        }
+                    }
+                }
+            }
+
+            corridorLines = Curve.JoinCurves(corridorLines).ToList();
+            List<Curve> innerLines = new List<Curve>();
+            for (int i = 0; i < corridorLines.Count; i++)
+            {
+                Curve offset = corridorLines[i].DuplicateCurve();
+                Vector3d dir = offset.TangentAtStart;
+                dir.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                offset.Transform(Rhino.Geometry.Transform.Translation(dir * Consts.corridorWidth));
+                innerLines.Add(offset);
+            }
+            List<Curve> finalCorridor = new List<Curve>();
+            List<Point3d> points = new List<Point3d>();
+            for (int i = 0; i < finalCorridor.Count; i++)
+            {
+                points.Add(corridorLines[i].PointAtStart);
+                points.Add(corridorLines[i].PointAtEnd);
+                points.Add(innerLines[i].PointAtEnd);
+                points.Add(innerLines[i].PointAtStart);
+                points.Add(corridorLines[i].PointAtStart);
+                Curve pl = new Rhino.Geometry.Polyline(points).ToNurbsCurve();
+                finalCorridor.Add(pl);
+            }
+            return finalCorridor;
+        }
 
 
         //--------JHL

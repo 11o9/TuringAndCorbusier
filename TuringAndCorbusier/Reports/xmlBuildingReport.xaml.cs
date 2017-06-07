@@ -73,9 +73,64 @@ namespace Reports
             return "지상 1층부터 지상 " + (AGoutput.ParameterSet.Stories + 1).ToString() + "층";
         }
 
+        private static void DrawPT3Corridor(List<CoreType> coreTypeList,List<Curve> aptLineList, string agType, double aptWidth,out Curve corridorOutline,out Curve currentInnerLine)
+        {
+                    Curve currentCenterLine = aptLineList[0].DuplicateCurve();
+                    if ((int)currentCenterLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+                        currentCenterLine.Reverse();
+                    currentInnerLine = currentCenterLine.Offset(Plane.WorldXY, aptWidth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+                    if ((int)currentInnerLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+                        currentInnerLine.Reverse();
+                    corridorOutline = currentInnerLine.Offset(Plane.WorldXY, Consts.corridorWidth, 1, CurveOffsetCornerStyle.Sharp)[0];
+                    return;
+        }
+        private static List<Curve> DrawPT1corridor(Apartment apartment)
+        {
+
+                List<Curve> corridorLines = new List<Curve>();
+
+                foreach (var hh in apartment.Household)
+                {
+                    foreach (var h in hh)
+                    {
+                        foreach (var household in h)
+                        {
+                            if (household.isCorridorType)
+                            {
+                                Curve corridorLine = new LineCurve(household.Origin, household.Origin + household.XDirection * household.XLengthA);
+                                corridorLines.Add(corridorLine);
+                            }
+                        }
+                    }
+                }
+
+            corridorLines = Curve.JoinCurves(corridorLines).ToList();
+            List<Curve> innerLines = new List<Curve>();
+            for (int i = 0; i < corridorLines.Count; i++)
+            {
+                Curve offset = corridorLines[i].DuplicateCurve();
+                Vector3d dir = offset.TangentAtStart;
+                dir.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                offset.Transform(Rhino.Geometry.Transform.Translation(dir * Consts.corridorWidth));
+                innerLines.Add(offset);
+            }
+            List<Curve> finalCorridor = new List<Curve>();
+            List<Point3d> points = new List<Point3d>();
+            for (int i = 0; i < finalCorridor.Count; i++)
+            {
+               points.Add(corridorLines[i].PointAtStart);
+                points.Add(corridorLines[i].PointAtEnd);
+                points.Add(innerLines[i].PointAtEnd);
+                points.Add(innerLines[i].PointAtStart);
+                points.Add(corridorLines[i].PointAtStart);
+                Curve pl = new Rhino.Geometry.Polyline(points).ToNurbsCurve();
+                finalCorridor.Add(pl);
+            }
+            return finalCorridor;
+        }
 
         //--------JHL
-        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics)
+        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics, string agType, List<Curve> aptLineList, ParameterSet paramSet, Apartment apartment)
         {
             List<double> exclusivArea = new List<double>();
           
@@ -89,6 +144,9 @@ namespace Reports
 
             List<CoreType> coreType = new List<CoreType>();
             List<Point3d> coreOriginPointList = new List<Point3d>();
+
+            double aptWidth = paramSet.Parameters[2];
+
             foreach (Core c in newCoreList)
             {
                 coreType.Add(c.coreType);
@@ -123,28 +181,38 @@ namespace Reports
             canvasRectangle.Height = typicalPlanCanvas.Height;
             System.Windows.Point initialOriginPoint = new System.Windows.Point();
             double scaleFactor = PlanDrawingFunction.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
-
-
             PlanDrawingFunction.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.2);
             PlanDrawingFunction.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 5);
-            //for(int i = 0; i < coreType.Count; i++)
-            //{
-            //    if (coreType[i] == CoreType.CourtShortEdge)
-            //    {
-            //        List<Curve> corridor = CreateCorridor(newCoreList);
-            //        PlanDrawingFunction.drawPlan(rectangleToFit, corridor, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
 
-            //    }
+            if(agType == "PT-3")
+            {
+            Curve corridorOutline;
+            Curve innerOutline;
+            DrawPT3Corridor(coreType,aptLineList, agType, aptWidth, out corridorOutline, out innerOutline);
+            if (corridorOutline != null && innerOutline != null)
+            {
 
-            //}
-           
-            //PlanDrawingFunction.drawBackGround(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
+                PlanDrawingFunction.drawBackGround(rectangleToFit, innerOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Gray);
+                PlanDrawingFunction.drawBackGround(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
+                PlanDrawingFunction.drawPlan(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.75);
+                }
+            }
+            if(agType == "PT-1")
+            {
+                List<Curve> corridor = DrawPT1corridor(apartment);
+                for(int i = 0; i < corridor.Count; i++)
+                {
+                    PlanDrawingFunction.drawBackGround(rectangleToFit, corridor[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
+                    PlanDrawingFunction.drawPlan(rectangleToFit, corridor[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.75);
+                }
+            }
+
+
             for (int i = 0; i < houseOutline.Count; i++)
             {
      
                 {
                     PlanDrawingFunction.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-                   // PlanDrawingFunction.drawPlan(rectangleToFit, floorPlanList[i].balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
                 }
 
             }

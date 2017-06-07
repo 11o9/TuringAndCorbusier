@@ -560,6 +560,10 @@ namespace TuringAndCorbusier
                 List<Curve> coreOutline = MainPanel_AGOutputList[tempIndex].drawEachCore();
 
                 List<Curve> houseOutline = MainPanel_AGOutputList[tempIndex].drawEachHouse();
+                List<Curve> aptLineList = MainPanel_AGOutputList[tempIndex].AptLines;
+                ParameterSet currentParamSet = MainPanel_AGOutputList[tempIndex].ParameterSet;
+                string agType = MainPanel_AGOutputList[tempIndex].AGtype;
+
                 List<Household> houseNumByFloor = new List<Household>();
                 for (int i = 0; i < MainPanel_AGOutputList[tempIndex].Household.Count; i++)
                 {
@@ -583,7 +587,7 @@ namespace TuringAndCorbusier
                         newCoreList.Add(core);
                     }
                 }
-                xmlBuildingInfo.SetHouseOutline(coreOutline, houseOutline, tempTypicalPlan_FL0, newCoreList, NumberOfHouses, uniqueHouseHoldProperties);
+                xmlBuildingInfo.SetHouseOutline(coreOutline, houseOutline, tempTypicalPlan_FL0, newCoreList, NumberOfHouses, uniqueHouseHoldProperties, agType,aptLineList, currentParamSet, MainPanel_AGOutputList[tempIndex]);
 
                 fps.Add(xmlBuildingInfo.fixedPage);
                 pagename.Add("buildingReport");
