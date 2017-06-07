@@ -51,7 +51,7 @@ namespace Reports
 
 
                 MemoryStream memoryStream = new MemoryStream();
-                newImage.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                newImage.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Tiff);
 
                 BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
@@ -88,7 +88,7 @@ namespace Reports
 
 
                 MemoryStream memoryStream = new MemoryStream();
-                newImage.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                newImage.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
 
                 BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();

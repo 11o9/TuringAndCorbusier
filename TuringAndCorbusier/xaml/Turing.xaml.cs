@@ -59,7 +59,6 @@ namespace TuringAndCorbusier
 
             //Calculate.Click += Btn_SetInputValues;
 
-            //GISSlot.Content = new ServerUI();
     //        try
     //        {
     //            this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
@@ -456,11 +455,9 @@ namespace TuringAndCorbusier
             this.ProjectArea.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea.ToString() + "m\xB2";
         }
 
-        //JHL
+        //JHL: 보고서 출력 버튼
         private void Btn_ExportReport_Click(object sender, RoutedEventArgs e)
         {
-
-
             try
             {
                 GetBirdEye();
@@ -476,7 +473,6 @@ namespace TuringAndCorbusier
                 List<FixedPage> fps = new List<FixedPage>();
                 if (tempIndex == -1)
                 {
-
                     errorMessage tempError = new errorMessage("설계안을 먼저 선택하세요.");
                     return;
                 }
@@ -484,6 +480,7 @@ namespace TuringAndCorbusier
                 List<System.Windows.Documents.FixedPage> FixedPageList = new List<System.Windows.Documents.FixedPage>();
 
                 FixedDocument currentDoc = new FixedDocument();
+                //보고서 출력 크기 설층
                 currentDoc.DocumentPaginator.PageSize = new Size(1240, 1750);
 
                 List<Page> pagesToVIew = new List<Page>();
@@ -509,7 +506,7 @@ namespace TuringAndCorbusier
 
                 //JHL:2017.5.30:17.11 리포트 커버 페이지
                 Reports.ReportCover reportCover = new Reports.ReportCover();
-                var hasImage = reportCover.setImage("test0.jpeg");
+                var hasImage = reportCover.setImage("test0.tiff");
                 reportCover.SetTitle(projectNameStr);
                 reportCover.SetPublishDate();
 
@@ -543,8 +540,8 @@ namespace TuringAndCorbusier
                 }
                 //조감도
                 Reports.Perspective persPage = new Reports.Perspective();
-                var persImage1 = persPage.setImage1("test2.jpeg");
-                var persImage2 = persPage.setImage2("test3.jpeg");
+                var persImage1 = persPage.setImage1("test2.tiff");
+                var persImage2 = persPage.setImage2("test3.tiff");
                 if (persImage1 && persImage2)
                 {
                     fps.Add(persPage.fixedPage);
@@ -559,9 +556,22 @@ namespace TuringAndCorbusier
                 TypicalPlan tempTypicalPlan_FL0 = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
                
                 List<Curve> coreOutline = MainPanel_AGOutputList[tempIndex].drawEachCore();
-                int NumberOfCores = MainPanel_AGOutputList[tempIndex].Core[0].Count;
+
                 List<Curve> houseOutline = MainPanel_AGOutputList[tempIndex].drawEachHouse();
-                int NumberOfHouses = houseOutline.Count/MainPanel_AGOutputList[tempIndex].Household.Count;
+                List<Household> houseNumByFloor = new List<Household>();
+                for(int i = 0; i < MainPanel_AGOutputList[tempIndex].Household.Count; i++)
+                {
+                   for(int j = 0; j < MainPanel_AGOutputList[tempIndex].Household[2].Count; j++)
+                    {
+                        for(int k = 0; k < MainPanel_AGOutputList[tempIndex].Household[2][j].Count; k++)
+                        {
+                            houseNumByFloor.Add(MainPanel_AGOutputList[tempIndex].Household[2][j][k]);
+                        }
+                    }
+                }
+
+                double NumberOfHouses = houseNumByFloor.Count / MainPanel_AGOutputList[tempIndex].ParameterSet.Stories+1;
+
                 List<List<Core>> coreDoubleList = MainPanel_AGOutputList[tempIndex].Core;
                 List<Core> newCoreList = new List<Core>();
                 foreach (List<Core> coreList in coreDoubleList)
@@ -571,7 +581,7 @@ namespace TuringAndCorbusier
                         newCoreList.Add(core);
                     }
                 }
-                xmlBuildingInfo.SetHouseOutline(coreOutline,houseOutline, tempTypicalPlan_FL0,newCoreList,NumberOfCores,NumberOfHouses,uniqueHouseHoldProperties);
+                xmlBuildingInfo.SetHouseOutline(coreOutline,houseOutline, tempTypicalPlan_FL0,newCoreList,NumberOfHouses,uniqueHouseHoldProperties);
 
                 fps.Add(xmlBuildingInfo.fixedPage);
                 pagename.Add("buildingReport");
@@ -629,7 +639,7 @@ namespace TuringAndCorbusier
                 }
                 else
                 {
-                for(int i = 0; i < multipleUnitPlanList.Count; i += 2)
+                for(int i = 0; i <= multipleUnitPlanList.Count; i += 2)
                 {
                         if (i == multipleUnitPlanList.Count && multipleUnitPlanList.Count%2!=0)
                         {
@@ -672,59 +682,123 @@ namespace TuringAndCorbusier
                 //JHL:2017.5.30:17:14 평면도 시작점
                 //1층 활성화되는지 가져오기
                 bool isUsing1F = MainPanel_AGOutputList[tempIndex].ParameterSet.using1F;
+                List<List<List<Household>>> householdTripleList = MainPanel_AGOutputList[tempIndex].Household;
+
                 List<Household> householdList = new List<Household>();
-                        List<List<List<Household>>> householdTripleList = MainPanel_AGOutputList[tempIndex].Household;
-                        foreach (List<List<Household>> householdDoubleList in householdTripleList)
-                        {
-                            foreach (List<Household> tempHouseholdList in householdDoubleList)
-                            {
-                                foreach (Household household in tempHouseholdList)
-                                {
-                                    householdList.Add(household);
-                                }
-                            }
-                        }
+                List<double> numOfHouseInEachFloorList = new List<double>();
 
-                for (int i = 0; i < MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2; i++)
+                for(int i = 0; i < householdTripleList.Count; i++)
                 {
-                  
-                        //아파트 하우스 홀드 리스트 가져오기
-                        if (isUsing1F != true && i==0)
+                    for(int j=0;j<householdTripleList[i].Count; j++)
+                    {
+                        double numOfHouseInEachFloor = householdTripleList[i].Count * householdTripleList[i][j].Count;
+                        numOfHouseInEachFloorList.Add(numOfHouseInEachFloor);
+                        for(int k = 0; k < householdTripleList[i][j].Count; k++)
                         {
-                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i+1);
-                            Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(1);
-                            //floorPlanDrawing1.SetCoreOutline(coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1));
-                            fps.Add(floorPlanDrawing1.fixedPage);
-                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                        householdList.Add(householdTripleList[i][j][k]);
                         }
+                    }
+                }
 
-                        if (i == MainPanel_AGOutputList[tempIndex].ParameterSet.Stories+2)
+
+                bool isTopFloorDifferent = false;
+                bool isTopFloorSetBack = false;
+                if (numOfHouseInEachFloorList[0] != numOfHouseInEachFloorList.Last())
+                {
+                    isTopFloorDifferent = true;
+                }
+                double topArea = 0;
+                for (int i = houseOutline.Count - 1; i > (houseOutline.Count - 1) - (int)numOfHouseInEachFloorList.Last(); i--)
+                {
+                    topArea += Rhino.Geometry.AreaMassProperties.Compute(houseOutline[i]).Area;
+                }
+                double firstArea = 0;
+                for(int i = 0; i < numOfHouseInEachFloorList[0]; i++)
+                {
+                    firstArea += Rhino.Geometry.AreaMassProperties.Compute(houseOutline[i]).Area;
+                }
+                if(Math.Round(topArea,2) != Math.Round(firstArea,2))
+                {
+                    isTopFloorSetBack = true;
+                }
+
+
+                    double totalNumOfFloors = MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2;
+               
+
+                for (int i = 0; i < totalNumOfFloors; i++)
+                {
+                    try
+                    {
+                    //1층 일 경우
+                    if (isUsing1F == false && i == 0)
+                    {
+                        TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i + 1);
+                        Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
+                        floorPlanDrawing.SetCoreOutline(coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1), newCoreList);
+                        fps.Add(floorPlanDrawing.fixedPage);
+                        pagename.Add("floorPlanDrawingPage" + i.ToString());
+                    }
+                    else if (i == 0 && isUsing1F == true)
+                    {
+                        TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i+1);
+                        Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
+                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                        fps.Add(floorPlanDrawing.fixedPage);
+                        pagename.Add("floorPlanDrawingPage" + i.ToString());
+                    }
+                    else if(isUsing1F == false && isTopFloorDifferent==false)
+                    {
+                        if(isTopFloorSetBack == false)
                         {
-                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries,i);
-                            Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(i,"LastFloor");
-                            //floorPlanDrawing1.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i),NumberOfHouses);
-                            fps.Add(floorPlanDrawing1.fixedPage);
-                            pagename.Add("floorPlanDrawingPage" + 5168456.ToString());
+                        TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                        Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2,totalNumOfFloors),isUsing1F);
+                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                        fps.Add(floorPlanDrawing.fixedPage);
+                        pagename.Add("floorPlanDrawingPage" + i.ToString());
+                        break;
+                        }
+                            else if(isTopFloorSetBack == true)
+                            {
+                                TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                                Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
+                                Reports.floorPlanDrawingPage topFloorPlanDrawing = new Reports.floorPlanDrawingPage(totalNumOfFloors, "topFloor");
+                                floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                                topFloorPlanDrawing.SetTopHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                                fps.Add(floorPlanDrawing.fixedPage);
+                                pagename.Add("floorPlanDrawingPage" + i.ToString());
+                                fps.Add(topFloorPlanDrawing.fixedPage);
+                                pagename.Add("topFloorPlanDrawingPage" + i.ToString());
+                                break;
+                            }
+                    }
+                    else if(isUsing1F==false && isTopFloorDifferent == true)
+                        {
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                            Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
+                            Reports.floorPlanDrawingPage topFloorPlanDrawing = new Reports.floorPlanDrawingPage(totalNumOfFloors, "topFloor");
+                            floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            topFloorPlanDrawing.SetTopHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            fps.Add(floorPlanDrawing.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                            fps.Add(topFloorPlanDrawing.fixedPage);
+                            pagename.Add("topFloorPlanDrawingPage" + i.ToString());
                             break;
                         }
-                }
-                //최고층 면적 계산
-                bool isTopFloorDifferent = false;
-                List<double> area = new List<double>();
-                for (int i = 0; i < houseOutline.Count; i++)
-                {
-                    int top = houseOutline.Count/(int)(MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2);
-                    if (i!=0&&i%top==0)
-                        area.Add(AreaMassProperties.Compute(houseOutline[i]).Area);
-    
+
+                    }catch(Exception ex)
+                    {
+                        continue;
+                    }
                 }
 
-                        List<HouseholdStatistics> householeStatisticsList = MainPanel_AGOutputList[tempIndex].HouseholdStatistics;
-                        Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1), isUsing1F);
-                        TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
-                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1),NumberOfHouses);
-                        fps.Add(floorPlanDrawing.fixedPage);
-                        pagename.Add("floorPlanDrawingPage" + (12312+1).ToString());
+
+                        //List<HouseholdStatistics> householeStatisticsList = MainPanel_AGOutputList[tempIndex].HouseholdStatistics;
+                        //Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1), isUsing1F);
+                        //TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
+                        //floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2),NumberOfHouses);
+                        //fps.Add(floorPlanDrawing.fixedPage);
+                        //pagename.Add("floorPlanDrawingPage" + (12312+1).ToString());
 
 
                     //Reports.wpfSection testSectionPage = new Reports.wpfSection();
@@ -803,12 +877,6 @@ namespace TuringAndCorbusier
                     //RhinoApp.Wait();
                 }
 
-                //List<Mesh> tempMeshs = MakeBuildings.MakeMeshBuildings(MainPanel_AGOutputList[index]);
-                //foreach (Mesh m in tempMeshs)
-                //{
-                //    tempGuid.Add(RhinoDoc.ActiveDoc.Objects.AddMesh(m));
-                //}
-
                 tempGuid.AddRange(MakeBuildings.DrawFoundation(MainPanel_AGOutputList[index]));
 
                 MainPanel_building3DPreview.Insert(index, tempGuid);
@@ -874,10 +942,187 @@ namespace TuringAndCorbusier
                 SHServer.SHServer.sendDataToServer(MainPanel_AGOutputList[tempIndex],MainPanel_reportspaths[tempIndex]);
 
 
+                ///현재 대지에 대한 DesignMaster입력 << 중복될 시 입력 안함
+
+                if (!CommonFunc.checkDesignMasterPresence(CurrentDataIdName.ToList(), CurrentDataId.ToList()))
+                {
+                    List<Point3d> tempBoundaryPts = new List<Point3d>();
+
+                    foreach (Curve i in MainPanel_AGOutputList[tempIndex].Plot.Boundary.DuplicateSegments())
+                        tempBoundaryPts.Add(i.PointAt(i.Domain.T0));
+
+                    CommonFunc.AddTdDesignMaster(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, (int)TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, (int)TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors, CommonFunc.GetPlotBoundaryVector(tempBoundaryPts), CommonFunc.ListToCSV(MainPanel_AGOutputList[tempIndex].Plot.Surroundings.ToList()), MainPanel_AGOutputList[tempIndex].Plot.GetArea());
+                }
+
+
+                ///가장 마지막 DESIGN_NO 다음 번호로 DesignDetail(설계 전체에 관한 내용) 입력
+
+
+              
+                int temp_REGI_PRE_DESIGN_NO;
+
+
+                CommonFunc.AddDesignDetail(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, MainPanel_AGOutputList[tempIndex], out temp_REGI_PRE_DESIGN_NO);
+
+
+                ///세대 타입 취합
+                Stack<HouseholdStatistics> hhsStack = new Stack<HouseholdStatistics>();
+                List<HouseholdStatistics> temphhs1 = new List<HouseholdStatistics>();
+
+                temphhs1 = new List<HouseholdStatistics>(MainPanel_AGOutputList[tempIndex].HouseholdStatistics);
+
+                double max = 0;
+                int maxindex = -1;
+                int index = temphhs1.Count;
+                for (int j = 0; j < index; j++)
+                {
+                    //0 3      1  3  2  3   
+                    max = 0;
+                    for (int i = 0; i < index - j; i++)
+                    {
+                        if (temphhs1[i].ExclusiveArea > max)
+                        {
+                            max = temphhs1[i].ExclusiveArea;
+                            maxindex = i;
+                        }
+                    }
+
+                    hhsStack.Push(temphhs1[maxindex]);
+                    temphhs1.RemoveAt(maxindex);
+
+                }
+
+                List<HouseholdStatistics> temphhs = new List<HouseholdStatistics>();
+                List<HouseholdStatistics> tomerge = new List<HouseholdStatistics>();
+                int time = hhsStack.Count;
+                for (int i = 0; i < time; i++)
+                {
+                    if (tomerge.Count != 0)
+                    {
+                        if (Math.Abs(Math.Round(tomerge.Last().ExclusiveArea / 3.3 / 1000000) - Math.Round(hhsStack.First().ExclusiveArea / 3.3 / 1000000)) < 2)
+                        {
+                            tomerge.Add(hhsStack.Pop());
+                        }
+
+                        else
+                        {
+                            temphhs.Add(new HouseholdStatistics(tomerge));
+                            //RhinoApp.WriteLine(tomerge.Count.ToString() + " 개의 householdstatistics 가 병합됨.");
+                            tomerge.Clear();
+                            tomerge.Add(hhsStack.Pop());
+                        }
+
+                    }
+                    else
+                        tomerge.Add(hhsStack.Pop());
+
+
+                    if (i == time - 1)
+                    {
+                        temphhs.Add(new HouseholdStatistics(tomerge));
+                    }
+                }
+
+
+                ///각 세대 타입별 정보 입력
+
+                //for (int i = 0; i < MainPanel_AGOutputList[tempIndex].HouseholdStatistics.Count; i++)
+                //{
+
+                //    HouseholdStatistics tempHouseholdStatistics = MainPanel_AGOutputList[tempIndex].HouseholdStatistics[i];
+                //    double tempExclusiveAreaSum = tempAGOutput.GetExclusiveAreaSum();
+                //    double tempExclusiveArea = tempHouseholdStatistics.GetExclusiveArea();
+
+                //    double GroundCoreAreaPerHouse = tempAGOutput.GetCoreAreaOnEarthSum() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
+                //    double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.GetCoreAreaOnEarthSum()) / tempExclusiveAreaSum * tempExclusiveArea;
+                //    double parkingLotAreaPerHouse = tempAGOutput.ParkingLotUnderGround.GetAreaSum() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
+                //    double plotAreaPerHouse = tempAGOutput.Plot.GetArea() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
+                //    double welfareAreaPerHouse = tempAGOutput.GetPublicFacilityArea() / tempExclusiveAreaSum * tempExclusiveArea;
+                //    double facilitiesAreaPerHouse = 0 / tempExclusiveAreaSum * tempExclusiveArea;
+
+                //    CommonFunc.AddTdDesignArea(CurrentDataIdName.ToList(), CurrentDataId.ToList(), temp_REGI_PRE_DESIGN_NO, USERID, tempAGOutput.AreaTypeString()[i], coreAreaPerHouse, welfareAreaPerHouse, facilitiesAreaPerHouse, parkingLotAreaPerHouse, plotAreaPerHouse, tempHouseholdStatistics);
+
+                //}
+
+                for (int i = 0; i < temphhs.Count; i++)
+                {
+
+                    HouseholdStatistics tempHouseholdStatistics = temphhs[i];
+                    double tempExclusiveAreaSum = tempAGOutput.GetExclusiveAreaSum();
+                    double tempExclusiveArea = temphhs[i].GetExclusiveArea();
+                    double rate = tempExclusiveArea / tempExclusiveAreaSum;
+                    //double GroundCoreAreaPerHouse = tempAGOutput.GetCoreAreaOnEarthSum() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
+
+                    //ground , rooftop cores
+                    double GroundCoreAreaPerHouse = tempAGOutput.Core[0].Sum(n => n.GetArea()) * 2 * rate;
+
+                    //double coreareaSum = tempAGOutput.GetCoreAreaSum();
+                    //double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.GetCoreAreaOnEarthSum()) / tempExclusiveAreaSum * tempExclusiveArea;
+                    //double floorCores = tempAGOutput.GetCoreAreaSum() - tempAGOutput.Core[0].Sum(n => n.GetArea()) * 2;
+                    double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.Core[0].Sum(n=>n.GetArea())*2)*rate;
+
+                    double parkingLotAreaPerHouse = tempAGOutput.ParkingLotUnderGround.ParkingArea / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
+
+                    double plotAreaPerHouse = tempAGOutput.Plot.GetArea() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
+                    double welfareAreaPerHouse = tempAGOutput.GetPublicFacilityArea() / tempExclusiveAreaSum * tempExclusiveArea;
+                    double facilitiesAreaPerHouse = 0 / tempExclusiveAreaSum * tempExclusiveArea;
+
+                    CommonFunc.AddTdDesignArea(CurrentDataIdName.ToList(), CurrentDataId.ToList(), temp_REGI_PRE_DESIGN_NO, USERID, "A", coreAreaPerHouse, welfareAreaPerHouse, facilitiesAreaPerHouse, parkingLotAreaPerHouse, plotAreaPerHouse, tempHouseholdStatistics);
+
+                }
+
+                CommonFunc.AddDesignModel(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, temp_REGI_PRE_DESIGN_NO, tempAGOutput.AGtype, CommonFunc.ListToCSV(tempAGOutput.ParameterSet.Parameters.ToList()), "Core", tempAGOutput.Target.Area, tempAGOutput.Target.Ratio);
+
+                if (tempAGOutput.Commercial.Count != 0)
+                {
+                    double plotAreaOfCommercial = tempAGOutput.Plot.GetArea() / (tempAGOutput.GetExclusiveAreaSum() + tempAGOutput.GetCommercialArea()) * tempAGOutput.GetCommercialArea();
+                    double coreAreaOfCommercial = tempAGOutput.GetCoreAreaOnEarthSum() / (tempAGOutput.GetExclusiveAreaSum() + tempAGOutput.GetCommercialArea()) * tempAGOutput.GetCommercialArea();
+                    double parkingLotAreaOfCommercial = tempAGOutput.ParkingLotUnderGround.ParkingArea / (tempAGOutput.GetExclusiveAreaSum() + tempAGOutput.GetCommercialArea()) * tempAGOutput.GetCommercialArea();
+
+                    CommonFunc.AddDesignNonResidential(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, temp_REGI_PRE_DESIGN_NO, CommonFunc.GetNonresiUseCode(CommonFunc.NonResiType.Commercial), tempAGOutput.GetCommercialArea(), 0, parkingLotAreaOfCommercial, (int)tempAGOutput.GetLegalParkingLotOfCommercial(), plotAreaOfCommercial);
+                }
+
+
+                //RhinoApp.WriteLine("설계 보고서 업로드 시작");
+                CommonFunc.AddTdDesignReport(CurrentDataIdName.ToList(), CurrentDataId.ToList(), MainPanel_reportspaths[tempIndex], temp_REGI_PRE_DESIGN_NO);
+
+
+
+                if (tempAGOutput.PublicFacility.Count != 0)
+                {
+                    double plotAreaOfPublic = 0;
+                    double parkingLotAreaOfPublic = 0;
+
+                    CommonFunc.AddDesignNonResidential(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, temp_REGI_PRE_DESIGN_NO, CommonFunc.GetNonresiUseCode(CommonFunc.NonResiType.Commercial), tempAGOutput.GetCommercialArea(), 0, parkingLotAreaOfPublic, (int)tempAGOutput.GetLegalParkingLotOfCommercial(), plotAreaOfPublic);
+                }
+
+
+                //CommonFunc.AddDesignReport(CurrentDataIdName.ToList(), CurrentDataId.ToList(),temp_REGI_PRE_DESIGN_NO);
+
+
+                ///임시 파일 경로 - 추가시 각 코드 밑에 넣기
+
+                //string dummypath = "C:\\Users\\user\\Desktop\\Dummyfiles\\";
+
+                //MainPanel_reportspaths[tempIndex].Add("ELEVATION", dummypath + "elevation.JPG");
+                //MainPanel_reportspaths[tempIndex].Add("SECTION", dummypath + "section.JPG");
+                //MainPanel_reportspaths[tempIndex].Add("DWG_PLANS", dummypath + "dwgplans.dwg");
+                //MainPanel_reportspaths[tempIndex].Add("GROUND_PLAN", dummypath + "groundplan.JPG");
+                //MainPanel_reportspaths[tempIndex].Add("TYPICAL_PLAN", dummypath + "typicalplan.JPG");
+                //MainPanel_reportspaths[tempIndex].Add("BIRDEYE1", dummypath + "birdeye1.JPG");
+                //MainPanel_reportspaths[tempIndex].Add("BIRDEYE2", dummypath + "birdeye2.JPG");
+
+
+
+
+
+
+                //RhinoApp.WriteLine("업로드 끝");
+
             }
             catch(Exception ex)
             {
-                
+                //RhinoApp.WriteLine("업로드 실패");
             }
            
         }
@@ -1167,17 +1412,17 @@ namespace TuringAndCorbusier
                 //-----------JHL 조감도 ---------------//
                 if(i ==0)
                 {
-                var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038, 812), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
-                string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
-                bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038*2, 812*2), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
+                string path = dirinfo.FullName + "\\test" + i.ToString() + ".tiff";
+                bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Tiff);
                 string key = "BIRDEYE" + (i + 1).ToString();
                 MainPanel_reportspaths[tempIndex].Add(key, path);
                 }
                 if (i > 0)
                 {
-                    var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1075, 695), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
-                    string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
-                    bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1075*2, 695*2), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
+                    string path = dirinfo.FullName + "\\test" + i.ToString() + ".tiff";
+                    bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Tiff);
                     string key = "BIRDEYE" + (i + 1).ToString();
                     MainPanel_reportspaths[tempIndex].Add(key, path);
                 }
@@ -1215,7 +1460,7 @@ namespace TuringAndCorbusier
                 Point3d center = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.center;
                 Point3d tempcampos = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.campos[i] + Vector3d.ZAxis * new Vector3d(center - TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.campos[i]).Length;
                 Vector3d tempdir = new Vector3d(center - tempcampos);
-                tempcampos = tempcampos - 2 * tempdir;
+                tempcampos = tempcampos - 1.5 * tempdir;
                 if (MainPanel_AGOutputList[tempIndex].Plot.PlotType == PlotType.상업지역)
                     tempcampos = tempcampos - 6 * tempdir;
                 RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(tempcampos, false);
@@ -1228,12 +1473,15 @@ namespace TuringAndCorbusier
                 RhinoApp.Wait();
                 string path = "";
                 //screenshot
-                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038, 812), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                if (i < 1)
                 {
-                    TypicalPlan typicalPlan = new TypicalPlan();
+                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038*3, 812*3), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                {
+                        
+                   TypicalPlan typicalPlan = new TypicalPlan();
                     Rectangle3d rec = new Rectangle3d(Plane.WorldXY,typicalPlan.GetBoundingBox().Min,typicalPlan.GetBoundingBox().Max);
                 
-                    path = dirinfo.FullName + "test" + i.ToString() + ".jpeg";
+                    path = dirinfo.FullName + "test" + i.ToString() + ".tiff";
                     //var files = dirinfo.GetFiles("test*.jpeg");
                     //foreach (var f in files)
                     //    f.Delete();
@@ -1244,7 +1492,7 @@ namespace TuringAndCorbusier
                     
                     
 
-                    newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Tiff);
                     newbitmap.Dispose();
                     
                 }
@@ -1257,12 +1505,49 @@ namespace TuringAndCorbusier
                 if (MainPanel_reportspaths[tempIndex].ContainsKey(key))
                     MainPanel_reportspaths[tempIndex].Remove(key);
                 MainPanel_reportspaths[tempIndex].Add(key, path);
-
-            }
             MainPanel_building2DPreview.Enabled = true;
             RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(backupPoint, false);
             RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(backupDir, false);
             RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
+
+                }else if (i>1)
+                {
+                    using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(939*3, 703*3), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                    {
+                        TypicalPlan typicalPlan = new TypicalPlan();
+                        Rectangle3d rec = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
+
+                        path = dirinfo.FullName + "test" + i.ToString() + ".tiff";
+                        //var files = dirinfo.GetFiles("test*.jpeg");
+                        //foreach (var f in files)
+                        //    f.Delete();
+                        System.Drawing.Bitmap newbitmap = new System.Drawing.Bitmap(bitmap);
+                        bitmap.Dispose();
+
+                        //var file = dirinfo.GetFiles("test" + i.ToString() + ".jpeg");
+
+
+
+                        newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Tiff);
+                        newbitmap.Dispose();
+
+                    }
+                    RhinoApp.Wait();
+
+
+                    string key = "BIRDEYE" + (i + 1).ToString();
+
+
+                    if (MainPanel_reportspaths[tempIndex].ContainsKey(key))
+                        MainPanel_reportspaths[tempIndex].Remove(key);
+                    MainPanel_reportspaths[tempIndex].Add(key, path);
+                    MainPanel_building2DPreview.Enabled = true;
+                    RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(backupPoint, false);
+                    RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(backupDir, false);
+                    RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
+                }
+
+            }
         }
 
         

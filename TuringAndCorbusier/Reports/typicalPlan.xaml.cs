@@ -27,20 +27,62 @@ namespace Reports
 
             }
         }
+        public floorPlanDrawingPage(Interval floorInterval, bool isUsing1F, bool isTopFloorDifferent,bool isTopSetBack)
+        {
+            InitializeComponent();
+
+            if(isUsing1F==false && isTopFloorDifferent == true)
+            {
+                this.SetTitleIsTopDifferent(floorInterval);
+            }else if(isUsing1F==true && isTopFloorDifferent == true)
+            {
+                if (isTopSetBack == false)
+                {
+                this.SetTitleIsUsingAndTopDifferent(floorInterval);
+
+                }else if(isTopSetBack == true)
+                {
+                    this.SetTitleIsTopDifferent(floorInterval);
+                }
+            }else if(isUsing1F==false && isTopFloorDifferent == false)
+            {
+                this.SetTitle(floorInterval);
+            }else if(isUsing1F==true&& isTopFloorDifferent == false)
+            {
+                if (isTopSetBack == false)
+                {
+                this.SetTitle2(floorInterval);
+                }
+                else if (isTopSetBack == true)
+                {
+                    this.SetTitleIsUsingAndTopDifferent(floorInterval);
+                }
+            }
+
+        }
+
         public floorPlanDrawingPage(int number)
         {
             InitializeComponent();
             this.planPageTitle.Text = "PLAN 1F";
         }
-        public floorPlanDrawingPage(int number,string lastFloor)
+
+        public floorPlanDrawingPage(double number,string lastFloor)
         {
             InitializeComponent();
             this.planPageTitle.Text = "PLAN "+number.ToString()+"F";
         }
-
+        private void SetTitleIsTopDifferent(Interval floorInterval)
+        {
+            this.planPageTitle.Text = "PLAN " + 2 + "-" + (floorInterval.Max-1).ToString() + "F";
+        }
+        private void SetTitleIsUsingAndTopDifferent(Interval floorInterval)
+        {
+            this.planPageTitle.Text = "PLAN " + 1 + "-" + (floorInterval.Max - 1).ToString() + "F";
+        }
         private void SetTitle(Interval floorInterval)
         {
-            this.planPageTitle.Text = "PLAN " + (floorInterval.Min+1).ToString() + "-" + floorInterval.Max.ToString() + "F";
+            this.planPageTitle.Text = "PLAN " + 2 + "-" + (floorInterval.Max - 1).ToString() + "F";
 
             //else
             //{
@@ -49,7 +91,7 @@ namespace Reports
         }
         private void SetTitle2(Interval floorInterval)
         {
-            this.planPageTitle.Text = "PLAN " + floorInterval.Min.ToString() + "-" + floorInterval.Max.ToString() + "F";
+            this.planPageTitle.Text = "PLAN " + 1 + "-" + floorInterval.Max.ToString() + "F";
 
             //else
             //{
@@ -65,8 +107,6 @@ namespace Reports
 
         private void AddAreaTypeToHouseOutline(System.Windows.Point newCentroid, string areaTypeInText)
         {
-
-            
             TextBlock areaType = new TextBlock();
             areaType.Text = areaTypeInText;
             areaType.FontSize = 20;
@@ -113,13 +153,140 @@ namespace Reports
         //            }
         //        }
 
-        
+
         //    return areaTypeColour;
         //}
 
 
+
         //--------JHL
-        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan,List<Household> householdList,Interval floor)
+        public void SetTopHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Household> householdList, int floor, List<double> numOfHouseInEachFloorList, List<Core> newCoreList)
+        {
+
+            Curve boundary = typicalPlan.Boundary;
+            List<Curve> surroundingSite = typicalPlan.SurroundingSite;
+            List<FloorPlan> housePlanList = typicalPlan.UnitPlans;
+            List<Curve> corePlanList = coreOutline;
+            List<FloorPlan> floorPlanList = typicalPlan.UnitPlans;
+            List<Curve> houseOutlineList = houseOutline;
+            List<Point3d> houseOutlinesCentroid = new List<Point3d>();
+            Rectangle3d rectangleToFit = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
+            Rectangle canvasRectangle = new Rectangle();
+            canvasRectangle.Width = typicalPlanCanvas.Width;
+            canvasRectangle.Height = typicalPlanCanvas.Height;
+            System.Windows.Point initialOriginPoint = new System.Windows.Point();
+            double scaleFactor = PlanDrawingFunction_90degree.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
+
+
+            List<CoreType> coreType = new List<CoreType>();
+            List<Point3d> coreOriginPointList = new List<Point3d>();
+            foreach (Core c in newCoreList)
+            {
+                coreType.Add(c.coreType);
+                coreOriginPointList.Add(c.origin);
+            }
+
+            List<List<Curve>> coreDetailDoubleList = new List<List<Curve>>();
+            for (int i = 0; i < coreType.Count; i++)
+            {
+                string pointString = GetSimplifiedCoreString(coreType[i]);
+                List<Curve> coreDetail = GetCoreDetail(pointString);
+                coreDetailDoubleList.Add(coreDetail);
+            }
+
+            for (int i = 0; i < coreDetailDoubleList.Count; i++)
+            {
+                Vector3d v = coreOriginPointList[i] - coreDetailDoubleList[i][0].PointAtStart;
+                for (int j = 0; j < coreDetailDoubleList[i].Count; j++)
+                {
+                    coreDetailDoubleList[i][j].Transform(Rhino.Geometry.Transform.Translation(v));
+                }
+
+            }
+
+            RotateToFit(ref coreDetailDoubleList, newCoreList, coreType, coreOutline);
+
+
+            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+            PlanDrawingFunction_90degree.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 5);
+
+            //세대 타입 구하기
+            List<string> roundedStringExclusiveAreaList = new List<string>();
+            //List<double> distinctRoundedExclusiveArea = new List<double>();
+            foreach (Household household in householdList)
+            {
+                roundedStringExclusiveAreaList.Add(ProcessExclusiveArea(household.GetExclusiveArea()));
+                //    distinctRoundedExclusiveArea.Add(Math.Round(household.GetExclusiveArea() / 1000000, 0));
+            }
+            //List<double> testing = distinctRoundedExclusiveArea.Distinct().ToList();
+
+            try
+            {
+                for (int i = 0; i < numOfHouseInEachFloorList[1]; i++)
+                {
+                    //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
+                    //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 3);
+                    //PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, areaTypeBackgroundColour);
+                    PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Gray);
+                }
+
+                for (int i = houseOutlineList.Count-1; i >(houseOutlineList.Count-1)-(int)numOfHouseInEachFloorList.Last(); i--)
+                {
+                    //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
+                    //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 3);
+                    //PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, areaTypeBackgroundColour);
+                    PlanDrawingFunction_90degree.drawHouseBackGroundPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGreen, 0);
+                }
+
+                for(int i = 0; i < corePlanList.Count; i++)
+                {
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
+                    PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, coreDetailDoubleList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+                }
+                
+
+                //foreach (FloorPlan floorPlan in floorPlanList)
+                //{
+                //    //PlanDrawingFunction_90degree.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+                //}
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+            }
+            catch (Exception e)
+            {
+               System.Windows.MessageBox.Show(e.Message);
+            }
+
+
+
+            //JHL 글씨 넣기 위해 중심 점 구함 
+            
+            for(int i = 0; i<houseOutlineList.Count; i++)
+            {
+                houseOutlinesCentroid.Add(Rhino.Geometry.AreaMassProperties.Compute(houseOutlineList[i]).Centroid);
+            }
+
+            for (int i = houseOutlinesCentroid.Count-1; i>(houseOutlinesCentroid.Count - 1) - (int)numOfHouseInEachFloorList.Last(); i--)
+            {
+                System.Windows.Point newCentroid = PlanDrawingFunction_90degree.pointConverter(rectangleToFit, houseOutlinesCentroid[i], scaleFactor, initialOriginPoint);
+                try
+                {
+                this.AddAreaTypeToHouseOutline(newCentroid, roundedStringExclusiveAreaList[i]);
+
+                }catch(Exception e)
+                {
+                    continue;
+                }
+            }
+
+          
+
+        }
+
+        //--------JHL
+        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan,List<Household> householdList,int numOfFloors,List<double> numOfHouseList, List<Core> newCoreList)
         {
 
             Curve boundary = typicalPlan.Boundary;
@@ -138,6 +305,35 @@ namespace Reports
             double scaleFactor = PlanDrawingFunction_90degree.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
 
 
+            List<CoreType> coreType = new List<CoreType>();
+            List<Point3d> coreOriginPointList = new List<Point3d>();
+            foreach (Core c in newCoreList)
+            {
+                coreType.Add(c.coreType);
+                coreOriginPointList.Add(c.origin);
+            }
+
+            List<List<Curve>> coreDetailDoubleList = new List<List<Curve>>();
+            for (int i = 0; i < coreType.Count; i++)
+            {
+                string pointString = GetSimplifiedCoreString(coreType[i]);
+                List<Curve> coreDetail = GetCoreDetail(pointString);
+                coreDetailDoubleList.Add(coreDetail);
+            }
+
+            for (int i = 0; i < coreDetailDoubleList.Count; i++)
+            {
+                Vector3d v = coreOriginPointList[i] - coreDetailDoubleList[i][0].PointAtStart;
+                for (int j = 0; j < coreDetailDoubleList[i].Count; j++)
+                {
+                    coreDetailDoubleList[i][j].Transform(Rhino.Geometry.Transform.Translation(v));
+                }
+
+            }
+
+            RotateToFit(ref coreDetailDoubleList, newCoreList, coreType, coreOutline);
+
+
             PlanDrawingFunction_90degree.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
             PlanDrawingFunction_90degree.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 5);
 
@@ -154,39 +350,40 @@ namespace Reports
             try
             {
 
-            for(int i = 0; i < houseOutlineList.Count; i++)
+            for(int i = 0; i < numOfHouseList[numOfFloors]; i++)
                 {
                     //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
                     //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
-                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 3);
                     //PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, areaTypeBackgroundColour);
                     PlanDrawingFunction_90degree.drawHouseBackGroundPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGreen,0);
                 }
 
-            foreach (Curve core in corePlanList)
-            {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
-                PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
-            }
+         for(int i = 0; i < corePlanList.Count; i++)
+                {
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
+                PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, coreDetailDoubleList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+
+                }
+
            
-            foreach (FloorPlan floorPlan in floorPlanList)
-            {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
-            }
+            //foreach (FloorPlan floorPlan in floorPlanList)
+            //{
+            //    //PlanDrawingFunction_90degree.drawPlan(rectangleToFit, floorPlan.balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+            //}
 
             }catch(Exception e)
             {
                 System.Windows.MessageBox.Show(e.Message);
             }
 
-
-
             //JHL 글씨 넣기 위해 중심 점 구함 
             foreach (Curve house in houseOutlineList)
             {
                 houseOutlinesCentroid.Add(Rhino.Geometry.AreaMassProperties.Compute(house).Centroid);
             }
-            for (int i = 0; i < houseOutlinesCentroid.Count; i++)
+            for (int i = 0; i <numOfHouseList[numOfFloors]; i++)
             {
                 System.Windows.Point newCentroid = PlanDrawingFunction_90degree.pointConverter(rectangleToFit, houseOutlinesCentroid[i], scaleFactor, initialOriginPoint);
                 try
@@ -199,12 +396,10 @@ namespace Reports
                 }
             }
 
-
-
             PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
         }
 
-        public void SetCoreOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, Interval floor)
+        public void SetCoreOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, Interval floor, List<Core> newCoreList)
         {
 
             Curve boundary = typicalPlan.Boundary;
@@ -222,11 +417,39 @@ namespace Reports
             System.Windows.Point initialOriginPoint = new System.Windows.Point();
             double scaleFactor = PlanDrawingFunction_90degree.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
 
+
+            List<CoreType> coreType = new List<CoreType>();
+            List<Point3d> coreOriginPointList = new List<Point3d>();
+            foreach (Core c in newCoreList)
+            {
+                coreType.Add(c.coreType);
+                coreOriginPointList.Add(c.origin);
+            }
+
+            List<List<Curve>> coreDetailDoubleList = new List<List<Curve>>();
+            for (int i = 0; i < coreType.Count; i++)
+            {
+                string pointString = GetSimplifiedCoreString(coreType[i]);
+                List<Curve> coreDetail = GetCoreDetail(pointString);
+                coreDetailDoubleList.Add(coreDetail);
+            }
+
+            for (int i = 0; i < coreDetailDoubleList.Count; i++)
+            {
+                Vector3d v = coreOriginPointList[i] - coreDetailDoubleList[i][0].PointAtStart;
+                for (int j = 0; j < coreDetailDoubleList[i].Count; j++)
+                {
+                    coreDetailDoubleList[i][j].Transform(Rhino.Geometry.Transform.Translation(v));
+                }
+
+            }
+
+            RotateToFit(ref coreDetailDoubleList, newCoreList, coreType, coreOutline);
+
+
             PlanDrawingFunction_90degree.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
             PlanDrawingFunction_90degree.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 5);
-           
-
-
+ 
             //draw the core
             //foreach (Curve detail in coreDetailList)
             //{
@@ -241,14 +464,172 @@ namespace Reports
             {
                 PlanDrawingFunction_90degree.drawPlan(rectangleToFit, parkingLine, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
             }
-            foreach (Curve core in corePlanList)
+            for(int i = 0; i < corePlanList.Count; i++)
             {
-                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
-                PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, core, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
+                PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
+                PlanDrawingFunction_90degree.drawPlan(rectangleToFit, coreDetailDoubleList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+
             }
+       
 
 
             PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
         }
-    }
-}
+        private void RotateToFit(ref List<List<Curve>> coreDetail, List<Core> coreList, List<CoreType> coreType, List<Curve> coreOutline)
+        {
+
+            for (int i = 0; i < coreDetail.Count; i++)
+            {
+                if (coreType[i] == CoreType.Vertical)
+                {
+
+                    Vector3d v1 = coreList[i].YDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                    }
+                }
+                else if (coreType[i] == CoreType.Parallel)
+                {
+
+                    Vector3d v1 = coreList[i].XDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                    }
+                }
+                else if (coreType[i] == CoreType.Horizontal)
+                {
+
+                    Vector3d v1 = coreList[i].XDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                    }
+                }
+                else if (coreType[i] == CoreType.Vertical_AG1)
+                {
+
+                    Vector3d v1 = coreList[i].XDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                    }
+                }
+                else if (coreType[i] == CoreType.CourtShortEdge)
+                {
+
+                    Vector3d v1 = coreList[i].YDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtStart - coreDetail[i][0].PointAtEnd);
+
+                    //Curve[] coreOutlineSegment = coreOutline[i].DuplicateSegments();
+                    //var longestCoreOutline = (from crv in coreOutlineSegment let len = crv.GetLength() where len > 0 orderby len descending select crv).First();
+                    //Point3d segmentMidPoint1 = longestCoreOutline.PointAtLength(longestCoreOutline.GetLength()/2);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Translation(coreList[i].YDirection * coreList[i].depth));
+
+                        //var longestCoreDetail = (from crv in coreDetail[i][j] let len = crv.GetLength() where len > 0 orderby len descending select crv).First();
+                        //Point3d segmentMidPoint2 = longestCoreDetail.PointAtLength(longestCoreDetail.GetLength()/2);
+                        //Vector3d v3 = new Vector3d(segmentMidPoint2 - segmentMidPoint1);
+
+
+                        //coreDetail[i][j].Transform(Rhino.Geometry.Transform.Translation(v3));
+                    }
+
+                }
+            }
+        }
+        private string GetSimplifiedCoreString(CoreType coreType)
+        {
+            if (coreType == CoreType.Horizontal)
+            {
+                return "{0,0,0}/{0,-7660,0}/{0,-7660,0}/{-4400,-7660,0}/{-4400,-7660,0}/{-4400,0,0}/{-4400,0,0}/{0,0,0}/{-1900,0,0}/{-1900,-1300,0}/{-1900,-1300,0}/{-1900,-4000,0}/{-1900,-4000,0}/{-1900,-5300,0}/{-1900,-5300,0}/{-1900,-7660,0}/{-1900,-5300,0}/{-4400,-5300,0}/{-1900,-4000,0}/{-4400,-4000,0}/{-1900,-1300,0}/{-4400,-1300,0}/{-1900,-1600,0}/{-4400,-1600,0}/{-1900,-1900,0}/{-4400,-1900,0}/{-1900,-2200,0}/{-4400,-2200,0}/{-1900,-2500,0}/{-4400,-2500,0}/{-1900,-2800,0}/{-4400,-2800,0}/{-1900,-3100,0}/{-4400,-3100,0}/{-1900,-3400,0}/{-4400,-3400,0}/{-1900,-3700,0}/{-4400,-3700,0}/{-3150,-4000,0}/{-3150,-1300,0}/{-1900,-5300,0}/{-4400,-7660,0}/{-1900,-7660,0}/{-4400,-5300,0}";
+            }
+            else if (coreType == CoreType.Parallel)
+            {
+                return "{4860,0,0}/{4860,-5200,0}/{4860,-5200,0}/{0,-5200,0}/{0,-5200,0}/{0,0,0}/{0,0,0}/{4860,0,0}/{0,-2600,0}/{1250,-2600,0}/{1250,-2600,0}/{1250,0,0}/{1530,-2600,0}/{1530,0,0}/{1810,-2600,0}/{1810,0,0}/{2090,-2600,0}/{2090,0,0}/{2370,-2600,0}/{2370,0,0}/{2650,-2600,0}/{2650,0,0}/{2930,-2600,0}/{2930,0,0}/{3210,-2600,0}/{3210,0,0}/{3490,-2600,0}/{3490,0,0}/{1250,-2600,0}/{3490,-2600,0}/{3490,-1300,0}/{1250,-1300,0}/{3490,-2600,0}/{3490,-5200,0}/{890,-5200,0}/{890,-2600,0}/{890,-5200,0}/{3490,-2600,0}/{890,-2600,0}/{3490,-5200,0}/{0,-5200,0}/{890,-2600,0}/{0,-2600,0}/{890,-5200,0}";
+            }
+            else if (coreType == CoreType.Vertical)
+            {
+                return "{0,0,0}/{-2500,0,0}/{-7600,-2500,0}/{-4900,-2500,0}/{-9000,-2500,0}/{-7600,-2500,0}/{0,0,0}/{-9000,0,0}/{-9000,0,0}/{-9000,-2500,0}/{-9000,-2500,0}/{-7600,-2500,0}/{-7600,-2500,0}/{-4900,-2500,0}/{-4900,-2500,0}/{-2500,-2500,0}/{-2500,-2500,0}/{0,-2500,0}/{0,-2500,0}/{0,0,0}/{-7600,-2500,0}/{-7600,0,0}/{-2500,-2500,0}/{-2500,0,0}/{-4900,-2500,0}/{-4900,0,0}/{-2500,-2500,0}/{0,0,0}/{-2500,0,0}/{0,-2500,0}/{-5200,-2500,0}/{-5200,0,0}/{-5500,-2500,0}/{-5500,0,0}/{-5800,-2500,0}/{-5800,0,0}/{-6100,-2500,0}/{-6100,0,0}/{-6400,-2500,0}/{-6400,0,0}/{-6700,-2500,0}/{-6700,0,0}/{-7000,-2500,0}/{-7000,0,0}/{-7300,-2500,0}/{-7300,0,0}/{-7600,-1250,0}/{-4900,-1250,0}";
+            }
+            else if (coreType == CoreType.Folded)
+            {
+                return "{-6060,0,0}/{0,0,0}/{0,-5800,0}/{-6060,-5800,0}/{-6060,0,0}/{0,0,0}/{-2260,0,0}/{-2260,0,0}/{-4660,0,0}/{-4660,0,0}/{-6060,0,0}/{-6060,0,0}/{-6060,-5800,0}/{-6060,-5800,0}/{0,-5800,0}/{0,-5800,0}/{0,-4400,0}/{0,-4400,0}/{0,-2300,0}/{0,-2300,0}/{0,0,0}/{-1400,-1400,0}/{-1400,-4400,0}/{-1400,-1400,0}/{-4660,-1400,0}/{-4660,-4400,0}/{-4660,-1400,0}/{-4660,-1400,0}/{-4660,0,0}/{-4660,-4400,0}/{-1400,-4400,0}/{-1400,-4400,0}/{0,-4400,0}/{-1400,-4100,0}/{0,-4100,0}/{-1400,-3800,0}/{0,-3800,0}/{-1400,-3500,0}/{0,-3500,0}/{-1400,-3200,0}/{0,-3200,0}/{-1400,-2900,0}/{0,-2900,0}/{-1400,-2600,0}/{0,-2600,0}/{-1400,-2300,0}/{0,-2300,0}/{-4360,-1400,0}/{-4360,0,0}/{-4060,-1400,0}/{-4060,0,0}/{-3760,-1400,0}/{-3760,0,0}/{-3460,-1400,0}/{-3460,0,0}/{-3160,-1400,0}/{-3160,0,0}/{-2860,-1400,0}/{-2860,0,0}/{-2560,-1400,0}/{-2560,0,0}/{-2260,-1400,0}/{-2260,0,0}/{-4660,-4400,0}/{-1400,-1400,0}/{-4660,-1400,0}/{-1400,-4400,0}";
+            }
+            else if (coreType == CoreType.Vertical_AG1)
+            {
+                return "{0,-2500,0}/{-2500,-2500,0}/{-6620,-2500,0}/{-3920,-2500,0}/{-7920,-2500,0}/{-6620,-2500,0}/{-7920,0,0}/{-7920,-2500,0}/{0,-2500,0}/{0,0,0}/{-7920,0,0}/{0,0,0}/{-7920,0,0}/{-7920,0,0}/{-7920,-2500,0}/{-7920,-2500,0}/{-6620,-2500,0}/{-6620,-2500,0}/{-3920,-2500,0}/{-3920,-2500,0}/{-2500,-2500,0}/{-2500,-2500,0}/{0,-2500,0}/{-6620,-2500,0}/{-6620,0,0}/{-3920,-2500,0}/{-3920,0,0}/{-2500,-2500,0}/{-2500,0,0}/{-2500,-2500,0}/{0,0,0}/{-2500,0,0}/{0,-2500,0}/{-4220,-2500,0}/{-4220,0,0}/{-4520,-2500,0}/{-4520,0,0}/{-4820,-2500,0}/{-4820,0,0}/{-5120,-2500,0}/{-5120,0,0}/{-5420,-2500,0}/{-5420,0,0}/{-5720,-2500,0}/{-5720,0,0}/{-6020,-2500,0}/{-6020,0,0}/{-6320,-2500,0}/{-6320,0,0}/{-6620,-1250,0}/{-3920,-1250,0}";
+            }
+
+            else if (coreType == CoreType.CourtShortEdge)
+            {
+                return "{0,0,0}/{2700,0,0}/{2700,0,0}/{2700,-1300,0}/{2700,-1300,0}/{2700,-4000,0}/{2700,-4000,0}/{2700,-5300,0}/{2700,-5300,0}/{2700,-7600,0}/{2700,-7600,0}/{0,-7600,0}/{0,-7600,0}/{0,0,0}/{2700,-1300,0}/{0,-1300,0}/{2700,-4000,0}/{0,-4000,0}/{2700,-5300,0}/{0,-5300,0}/{0,-7600,0}/{2700,-5300,0}/{2700,-7600,0}/{0,-5300,0}/{1350,-4000,0}/{1350,-1300,0}/{2700,-1600,0}/{0,-1600,0}/{2700,-1900,0}/{0,-1900,0}/{2700,-2200,0}/{0,-2200,0}/{2700,-2500,0}/{0,-2500,0}/{2700,-2800,0}/{0,-2800,0}/{2700,-3100,0}/{0,-3100,0}/{2700,-3400,0}/{0,-3400,0}/{2700,-3700,0}/{0,-3700,0}";
+            }
+            else
+            {
+                return "&";
+            }
+        }
+
+        private List<Curve> GetCoreDetail(string coreTypeString)
+        {
+
+            char[] separator = new char[] { '/' };
+            string[] pointStringArray = coreTypeString.Split(separator);
+            var secondSeparator = new string[] { "{", "}" };
+            for (int i = 0; i < pointStringArray.Length; i++)
+            {
+                foreach (var x in secondSeparator)
+                {
+                    pointStringArray[i] = pointStringArray[i].Replace(x, string.Empty);
+                }
+            }
+
+            List<Point3d> horizontalCorePointList = new List<Point3d>();
+            for (int i = 0; i < pointStringArray.Length; i++)
+            {
+                string[] xyz = pointStringArray[i].Split(',');
+                double x = Convert.ToDouble(xyz[0]);
+                double y = Convert.ToDouble(xyz[1]);
+                double z = Convert.ToDouble(xyz[2]);
+                Point3d point = new Point3d(x, y, z);
+                horizontalCorePointList.Add(point);
+            }
+
+            List<Curve> horizontalCoreCurve = new List<Curve>();
+            for (int i = 0; i < horizontalCorePointList.Count; i += 2)
+            {
+                if (i <= horizontalCorePointList.Count - 2)
+                {
+                    Rhino.Geometry.Line line = new Rhino.Geometry.Line(horizontalCorePointList[i], horizontalCorePointList[i + 1]);
+                    Curve curve = line.ToNurbsCurve();
+                    horizontalCoreCurve.Add(curve);
+                }
+            }
+
+            return horizontalCoreCurve;
+        }
+    }//class
+}//namespace

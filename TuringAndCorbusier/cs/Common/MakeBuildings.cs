@@ -402,17 +402,17 @@ namespace TuringAndCorbusier
 
             return output;
         }
-         
-        public static List<Guid> DrawFoundation(Apartment apt)
-        {
-            var plot = apt.Plot;
-            List<Guid> result = new List<Guid>();
+     
 
+
+public static List<Guid> DrawFoundation(Apartment apartment)
+        {
+            List<Guid> result = new List<Guid>();
+            Plot plot = apartment.Plot;
+            var LHGreen = System.Drawing.Color.FromArgb(127, 255, 0);
 
             Brep[] green = Brep.CreatePlanarBreps(plot.Boundary);
-            Brep[] white = Brep.CreatePlanarBreps(TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect);
-
-            var LHGreen = System.Drawing.Color.FromArgb(196, 215, 0);
+            Brep[] white = Brep.CreatePlanarBreps(plot.outrect);
 
             for (int i = 0; i < green.Length; i++)
             {
@@ -434,13 +434,8 @@ namespace TuringAndCorbusier
                     att.MaterialIndex = index;
                 }
                 var extrusion = Extrusion.Create(plot.Boundary, 1, true).ToBrep();
-                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(extrusion, att));
+                Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(extrusion, att);
             }
-
-
-           
-            if (plot.outrect == null)
-                return result;
 
             for (int i = 0; i < white.Length; i++)
             {
@@ -462,12 +457,13 @@ namespace TuringAndCorbusier
                     att.MaterialIndex = index;
                 }
 
-                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.Add(white[i], att));
+                Rhino.RhinoDoc.ActiveDoc.Objects.Add(white[i], att);
             }
 
             return result;
 
         }
+
         private static List<Brep> DrawWindowAll(Curve baseCurve, double height, bool drawComplexModeling)
         {
             Curve tempCurve = new LineCurve(baseCurve.PointAt(baseCurve.Domain.T0), baseCurve.PointAt(baseCurve.Domain.T1));
