@@ -39,32 +39,6 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        public static List<Mesh> MakeMeshBuildings(Apartment agOut)
-        {
-            List<Mesh> output = new List<Mesh>();
-
-            List<Household> hhps = new List<Household>();
-            foreach (var hh in agOut.Household)
-                foreach (var h in hh)
-                    hhps.AddRange(h);
-
-            List<Core> cps = new List<Core>();
-            foreach (var h in agOut.Core)
-                cps.AddRange(h);
-
-            foreach (var hhp in hhps)
-            {
-                //output.AddRange(DrawHouse(hhp,true));
-            }
-            foreach (var cp in cps)
-            {
-                //output.Add(DrawCore(cp));
-            }
-
-            //output.AddRange(DrawCorridor(agOut,true));
-            return output;
-        }
-
         public static List<Brep> DrawHouse(Household hhp, bool toMesh)
         {
             double height = Consts.FloorHeight;
@@ -79,9 +53,6 @@ namespace TuringAndCorbusier
             var floors = CurveTools.ToPolyline(outline);
             var ceilings = CurveTools.ToPolyline(outlineUp);
 
-            //Mesh floor = Mesh.CreateFromClosedPolyline(floors);
-            //Mesh ceiling = Mesh.CreateFromClosedPolyline(ceilings);
-
             Brep[] floor = Brep.CreatePlanarBreps(outline);
             Brep[] ceiling = Brep.CreatePlanarBreps(outlineUp);
 
@@ -92,19 +63,6 @@ namespace TuringAndCorbusier
                 points.Add(ceilings[i]);
             }
             
-
-            //List<Mesh> sides = new List<Mesh>();
-            //for (int i = 0; i < points.Count; i++)
-            //{
-            //    int start = i;
-            //    int mid = (i + 1) % points.Count;
-            //    int end = (i + 2) % points.Count;
-
-            //    Point3d[] tomesh = { points[start], points[mid], points[end] , points[start] };
-            //    var tempSideTriangle = Mesh.CreateFromClosedPolyline(new Polyline(tomesh));
-            //    sides.Add(tempSideTriangle);
-            //}.
-
             List<Brep> wallBreps = new List<Brep>();
 
             for (int i = 0; i < points.Count; i+=2)
@@ -120,9 +78,7 @@ namespace TuringAndCorbusier
                     continue;
 
                 var tempSideRectangle = Brep.CreatePlanarBreps(new Polyline(tomesh).ToNurbsCurve());
-                //sides.Add(tempSideRectangle);
-
-                //Brep wallBrep = Brep.CreateFromMesh(tempSideRectangle, false);
+          
                 if (tempSideRectangle.Length > 0)
                     wallBreps.AddRange(tempSideRectangle);
                 else
@@ -132,11 +88,8 @@ namespace TuringAndCorbusier
                 }
             }
 
-            //sides.Add(floor);
-            //sides.Add(ceiling);
             var union = Brep.CreateBooleanUnion(wallBreps, 0.1);
             var x = union.OrderByDescending(n => n.GetArea()).First();
-            //return sides;
 
             double windowSide = 300;
             double windowLow = 300;
@@ -217,8 +170,6 @@ namespace TuringAndCorbusier
             //3. 창 안쪽에서 20, 창문와꾸 30, 바깥쪽50 ,길이 1200 * 2 
             //4. ㅊ
 
-
-            //Brep w1 = Brep.create  hhp.LightingEdge[0]
 
             return wins;
 
@@ -451,9 +402,17 @@ namespace TuringAndCorbusier
 
             return output;
         }
+         
+        public static List<Guid> DrawFoundation(Apartment apt)
+        {
+            var plot = apt.Plot;
+            List<Guid> result = new List<Guid>();
+
 
             Brep[] green = Brep.CreatePlanarBreps(plot.Boundary);
             Brep[] white = Brep.CreatePlanarBreps(TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect);
+
+            var LHGreen = System.Drawing.Color.FromArgb(196, 215, 0);
 
             for (int i = 0; i < green.Length; i++)
             {
@@ -475,10 +434,11 @@ namespace TuringAndCorbusier
                     att.MaterialIndex = index;
                 }
                 var extrusion = Extrusion.Create(plot.Boundary, 1, true).ToBrep();
-                Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(extrusion, att);
+                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(extrusion, att));
             }
 
 
+           
             if (plot.outrect == null)
                 return result;
 
@@ -502,7 +462,7 @@ namespace TuringAndCorbusier
                     att.MaterialIndex = index;
                 }
 
-                Rhino.RhinoDoc.ActiveDoc.Objects.Add(white[i], att);
+                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.Add(white[i], att));
             }
 
             return result;

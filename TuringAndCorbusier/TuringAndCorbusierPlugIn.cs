@@ -7,6 +7,7 @@ using Rhino.UI;
 using System.Runtime.InteropServices;
 using System;
 using System.Text;
+using TuringAndCorbusier.SHServer;
 namespace TuringAndCorbusier
 {
     ///<summary>
@@ -132,7 +133,7 @@ namespace TuringAndCorbusier
 
             Rhino.ApplicationSettings.GeneralSettings.NewObjectIsoparmCount = -1;
 
-            InstanceClass.turing.ProjectAddress.Text = CommonFunc.getAddressFromServer(InstanceClass.turing.CurrentDataIdName.ToList(), InstanceClass.turing.CurrentDataId.ToList());
+            InstanceClass.turing.ProjectAddress.Text = SHServer.SHServer.GetAddressFromServer();
 
             Rhino.RhinoApp.Wait();
 

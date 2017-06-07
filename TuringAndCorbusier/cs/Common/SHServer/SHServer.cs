@@ -396,8 +396,14 @@ namespace TuringAndCorbusier.SHServer
             return areaMassSum;
         }
 
-        public static string GetAddressFromServer(List<string> idColumnName, List<string> idColumnCode)
+        public static string GetAddressFromServer()
         {
+
+            List<string> idColumnName = new List<string>{ "REGI_MST_NO", "REGI_SUB_MST_NO" };
+            List<string> idColumnCode = new List<string> { getStringFromRegistry("REGI_MST_NO"), getStringFromRegistry("REGI_SUB_MST_NO") };
+
+            
+
             List<string> addressList = new List<string>();
 
             string readSql = "select * FROM TN_PREV_ASSET";
@@ -565,7 +571,7 @@ namespace TuringAndCorbusier.SHServer
                     p_PROJECT_NAME.ParameterName = "p_PROJECT_NAME";
 
                     p_PLOT_ADDRESS.DbType = System.Data.DbType.String;
-                    p_PLOT_ADDRESS.Value = GetAddressFromServer(idColumnName, idColumnCode);
+                    p_PLOT_ADDRESS.Value = GetAddressFromServer();
                     p_PLOT_ADDRESS.ParameterName = "p_PLOT_ADDRESS";
 
                     p_PLOT_TYPE_CD.DbType = System.Data.DbType.String;

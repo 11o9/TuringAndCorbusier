@@ -8,10 +8,7 @@ using Microsoft.Win32;
 using System.IO.Ports;
 using Oracle.ManagedDataAccess.Client;
 using Rhino.Collections;
-
 using TuringAndCorbusier.Utility;
-
-
 
 namespace TuringAndCorbusier
 {

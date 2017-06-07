@@ -59,7 +59,7 @@ namespace TuringAndCorbusier
 
             //Calculate.Click += Btn_SetInputValues;
 
-            GISSlot.Content = new ServerUI();
+            //GISSlot.Content = new ServerUI();
     //        try
     //        {
     //            this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
@@ -693,7 +693,7 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i+1);
                             Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(1);
-                            floorPlanDrawing1.SetCoreOutline(coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1));
+                            //floorPlanDrawing1.SetCoreOutline(coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1));
                             fps.Add(floorPlanDrawing1.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + i.ToString());
                         }
@@ -702,7 +702,7 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries,i);
                             Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(i,"LastFloor");
-                            floorPlanDrawing1.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i),NumberOfHouses);
+                            //floorPlanDrawing1.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i),NumberOfHouses);
                             fps.Add(floorPlanDrawing1.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + 5168456.ToString());
                             break;
@@ -1473,12 +1473,12 @@ namespace TuringAndCorbusier
 
         private void Information_Click(object sender, RoutedEventArgs e)
         {
-            ProgramInformation information = new ProgramInformation();
-            information.GetMessage();
-            MessageBox.Show("Version    : " + information.Version + System.Environment.NewLine +
-                            "Company : " + information.Company + System.Environment.NewLine +
-                            "Message   : " + information.Message + System.Environment.NewLine , 
-                            "Information");
+            //ProgramInformation information = new ProgramInformation();
+            //information.GetMessage();
+            //MessageBox.Show("Version    : " + information.Version + System.Environment.NewLine +
+            //                "Company : " + information.Company + System.Environment.NewLine +
+            //                "Message   : " + information.Message + System.Environment.NewLine , 
+            //                "Information");
         }
 
 
