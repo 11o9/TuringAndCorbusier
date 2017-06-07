@@ -156,9 +156,9 @@ namespace TuringAndCorbusier
         {
             Rhino.RhinoApp.RunScript("ImportFile", false);
 
-            Rhino.RhinoApp.Wait();
+            //Rhino.RhinoApp.Wait();
 
-            findFileWithAdress();
+            //findFileWithAdress();
         }
 
         public void findFileWithAdress()
