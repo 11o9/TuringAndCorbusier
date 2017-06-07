@@ -64,7 +64,6 @@ namespace TuringAndCorbusier
 
             //Calculate.Click += Btn_SetInputValues;
 
-            GISSlot.Content = new ServerUI();
     //        try
     //        {
     //            this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
@@ -1757,15 +1756,6 @@ namespace TuringAndCorbusier
 
         }
 
-        private void Information_Click(object sender, RoutedEventArgs e)
-        {
-            ProgramInformation information = new ProgramInformation();
-            information.GetMessage();
-            MessageBox.Show("Version    : " + information.Version + System.Environment.NewLine +
-                            "Company : " + information.Company + System.Environment.NewLine +
-                            "Message   : " + information.Message + System.Environment.NewLine , 
-                            "Information");
-        }
 
 
         //private void Btn_Export3D_Copy_Click(object sender, RoutedEventArgs e)
