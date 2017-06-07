@@ -12,6 +12,8 @@ namespace TuringAndCorbusier
 {
     public class PlanDrawingFunction
     {
+
+
         public static Household alignHousholdProperties(Household household)
         {
             Household tempHousehold = new Household(household);
@@ -428,13 +430,6 @@ namespace TuringAndCorbusier
         public static void drawUnitPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
         {
             Curve[] shatteredCurves = curveToDraw.DuplicateSegments();
-            //List<System.Windows.Shapes.Line> householdLineList = new List<System.Windows.Shapes.Line>();
-            //List<TextBlock> dimensionList = GetDimensionList(lineLengthList);
-            //List<System.Windows.Point> pointList = new List<System.Windows.Point>();
-            //foreach(Point3d point in dimensionLocationPointList)
-            //{
-            //    pointList.Add(pointConverter(tempBoundingBox, point, tempScaleFactor, tempOrigin));
-            //}
             List<System.Windows.Shapes.Line> WPFLineList = new List<System.Windows.Shapes.Line>();
             double width, height;
             if (shatteredCurves.Length > 1)
@@ -513,7 +508,6 @@ namespace TuringAndCorbusier
                     height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
                     Canvas.SetLeft(line, -width);
                     Canvas.SetTop(line, -height);
-
                 }
             }
         }
@@ -521,41 +515,71 @@ namespace TuringAndCorbusier
         {
             List<TextBlock> dimensionTextBlockList = GetDimensionList(houseOutlineLength);
             List<System.Windows.Point> convertedPointList = new List<System.Windows.Point>();
-            foreach(Point3d point in dimensionLocationPointList)
+
+
+            foreach (Point3d point in dimensionLocationPointList)
             {
                 convertedPointList.Add(pointConverter(tempBoundingBox,point,scaleFactor,origin));
             }
-           // List<System.Windows.Vector> vectorList = GetVector3d(householdOutline);
-           // List<System.Windows.Point> newPointList = GetNewPointList(vectorList,convertedPointList);
-
-            DrawDimension(dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor);
+            List<TextBlock> horizontal = new List<TextBlock>();
+            List<TextBlock> vertical = new List<TextBlock>();
+            DrawDimension(dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor,householdOutline,out horizontal,out vertical);
+            FinalRepositioning(scaleFactor, tempBoundingBox, convertedPointList,horizontal,vertical, unitPlanCanvas);
         }
 
-        //private static List<System.Windows.Vector> GetVector3d(Curve householdOutlineList)
-        //{
-        //    List<Vector3d> householdVectorList = new List<Vector3d>();
-        //    double angle = Rhino.RhinoMath.ToRadians(-90);
-        //    Curve[] segmentArray = householdOutlineList.DuplicateSegments();
-        //    foreach (Curve segment in segmentArray)
-        //    {
-        //        Vector3d vector = segment.TangentAtStart;
-        //        vector.Transform(Rhino.Geometry.Transform.Rotation(angle, segment.PointAtStart));
-        //        householdVectorList.Add(vector);
-        //    }
-        //    List<System.Windows.Vector> WPFVectorList = VectorConverter(householdVectorList);
-        //    return WPFVectorList;
-        //}
+        private static void FinalRepositioning(double tempScaleFactor, Rectangle3d tempBoundingBox, List<System.Windows.Point> pointList, List<TextBlock>horizontal, List<TextBlock>vertical, Canvas unitPlanCanvas)
+        {
+            List<int> horizontalInt = new List<int>();
+            for(int i = 0; i < horizontal.Count; i++)
+            {
+                string s = horizontal[i].Text.Replace(",", "");
+                horizontalInt.Add(int.Parse(s));
+            }
+            int largestValueIndex = GetLargestValueIndex(horizontalInt);
+            double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
+            double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
 
-        //private static List<System.Windows.Vector> VectorConverter(List<Vector3d> vectorList)
-        //{
-        //    List<System.Windows.Vector> WPFVectorList = new List<System.Windows.Vector>();
-        //    foreach(Vector3d vector in vectorList)
-        //    {
-        //        System.Windows.Vector WPFVector = new System.Windows.Vector(vector.X, -vector.Y);
-        //        WPFVectorList.Add(WPFVector);
-        //    }
-        //    return WPFVectorList;
-        //}
+            Canvas.SetLeft(horizontal[largestValueIndex], (pointList[largestValueIndex].X - width) - 20);
+
+            List<int> verticalInt = new List<int>();
+            for (int i = 0; i < vertical.Count; i++)
+            {
+                string s = vertical[i].Text.Replace(",", "");
+                verticalInt.Add(int.Parse(s));
+            }
+            int largestValueIndex1 = GetLargestValueIndex(verticalInt);
+
+            Canvas.SetTop(vertical[largestValueIndex1], (pointList[largestValueIndex1].Y - height)-170);
+
+
+        }
+
+        private static int GetLargestValueIndex(List<int> textBlockList)
+        {
+            int index= 0;
+            for(int i = 0; i < textBlockList.Count; i++)
+            {
+
+                if (textBlockList[index] < textBlockList[i])
+                {
+                  index = i;
+                }
+
+            }
+            return index;
+        }
+
+        private static bool IsHorizontal(Curve segment)
+        {
+            bool isHorizontal = false;
+            if (segment.PointAtStart.X == segment.PointAtEnd.X)
+            {
+                isHorizontal = true;
+            }
+            return isHorizontal;
+        }
+
+
 
         private static List<TextBlock> GetDimensionList(List<double> lineLengthList)
         {
@@ -572,28 +596,28 @@ namespace TuringAndCorbusier
             return dimensionList;
         }
 
-        //private static List<System.Windows.Point> GetNewPointList(List<System.Windows.Vector> vectorList,List<System.Windows.Point> oldPointList)
-        //{
-        //    for (int i = 0; i < vectorList.Count; i++)
-        //    {
-        //        vectorList[i] = Vector.Multiply(vectorList[i], 30);
-        //    }
-
-
-        //    List<System.Windows.Point> newPointList = new List<System.Windows.Point>();
-
-        //    for (int i = 0; i < oldPointList.Count; i++)
-        //    {
-        //        System.Windows.Point point = oldPointList[i];
-        //        point = Vector.Add(vectorList[i], oldPointList[i]);
-        //        newPointList.Add(point);
-        //    }
-        //    return newPointList;
-        //}
-
-
-        private static void DrawDimension(List<TextBlock> dimensionList, List<System.Windows.Point> pointList, Canvas UnitPlanCanvas, Rectangle3d tempBoundingBox, double tempScaleFactor)
+        private static System.Windows.Shapes.Line DrawWPFLine(Point3d p1, Point3d p2)
         {
+
+            System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+            line.X1 = p1.X;
+            line.Y1 = p1.Y;
+            line.X2 = p2.X;
+            line.Y2 = p2.Y;
+            return line;
+        }
+
+        private static void DrawDimension(List<TextBlock> dimensionList, List<System.Windows.Point> pointList, Canvas UnitPlanCanvas, Rectangle3d tempBoundingBox, double tempScaleFactor,Curve householdOutline,out List<TextBlock>horizontal,out List<TextBlock>vertical)
+        {
+            Curve[] segments = householdOutline.DuplicateSegments();
+            List<bool> isHorizontal = new List<bool>();
+            horizontal = new List<TextBlock>();
+            vertical = new List<TextBlock>();
+            for(int i = 0; i < segments.Length; i++)
+            {
+                bool ih = IsHorizontal(segments[i]);
+                isHorizontal.Add(ih);
+            }
 
             for (int i = 0; i < dimensionList.Count; i++)
             {
@@ -604,7 +628,23 @@ namespace TuringAndCorbusier
                 double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
 
                 Canvas.SetLeft(dimensionList[i], pointList[i].X-width);
-                Canvas.SetTop(dimensionList[i], pointList[i].Y-height);
+                Canvas.SetTop(dimensionList[i],pointList[i].Y-height);
+                if (isHorizontal[i] == true)
+                {
+                    RotateTransform rt = new RotateTransform(-90);
+                    TransformGroup tg = new TransformGroup();
+                    tg.Children.Add(rt);
+                    dimensionList[i].RenderTransform = tg;
+                    Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)+15);
+                    horizontal.Add(dimensionList[i]);
+
+
+                }else
+                {
+                    Canvas.SetLeft(dimensionList[i], (pointList[i].X - width)-15);
+                    Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)-7);
+                    vertical.Add(dimensionList[i]);
+                }
             }
 
         }

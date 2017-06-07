@@ -82,7 +82,7 @@ namespace Reports
         }
         private void SetTitle(Interval floorInterval)
         {
-            this.planPageTitle.Text = "PLAN " + 2 + "-" + floorInterval.Max.ToString() + "F";
+            this.planPageTitle.Text = "PLAN " + 2 + "-" + (floorInterval.Max - 1).ToString() + "F";
 
             //else
             //{

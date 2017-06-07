@@ -32,40 +32,13 @@ namespace Reports
             this.AreaType.Text = Math.Round(houseHoldProperty.ExclusiveArea / 1000000, 0).ToString() + "m\xB2 " + typeString + "타입";
             this.NumberOfThisType.Text = numOfThisType.ToString() + "세대";
             this.exclusiveArea.Text = Math.Round(houseHoldProperty.GetExclusiveArea() / 1000000, 2).ToString() + "m\xB2";
-            //this.exclusiveArea_Py.Text = Math.Round(houseHoldProperty.GetExclusiveArea() / 1000000 / 3.3, 2).ToString() + "평";
             this.wallArea.Text = Math.Round(houseHoldProperty.GetWallArea() / 1000000, 2).ToString() + "m\xB2";
-            //this.wallArea_Py.Text = Math.Round(houseHoldProperty.GetWallArea() / 1000000 / 3.3, 2).ToString() + "평";
             this.coreArea.Text = Math.Round(coreArea / 1000000, 2).ToString() + "m\xB2";
-            //this.coreArea_Py.Text = Math.Round(coreArea / 1000000 / 3.3, 2).ToString() + "평";
             this.commonLivingArea.Text = Math.Round((houseHoldProperty.GetWallArea() + coreArea) / 1000000, 2).ToString() + "m\xB2";
-            //this.commonLivingArea_Py.Text = Math.Round((houseHoldProperty.GetWallArea() + coreArea) / 1000000 / 3.3, 2).ToString() + "평";
             this.providedArea.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea) / 1000000, 2).ToString() + "m\xB2";
-            //this.providedArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea) / 1000000 / 3.3, 2).ToString() + "평";
-            //this.publicFacilityArea.Text = Math.Round(publicFacilityArea / 1000000, 2) + "m\xB2";
-            //this.publicFacilityArea_Py.Text = Math.Round(publicFacilityArea / 1000000 / 3.3, 2) + "평";
-            //this.ServiceArea.Text = Math.Round(serviceArea / 1000000, 2) + "m\xB2";
-            //this.ServiceArea_Py.Text = Math.Round(serviceArea / 1000000 / 3.3, 2) + "평";
             this.ParkingLotArea.Text = Math.Round(parkingLotArea / 1000000, 2).ToString() + "m\xB2";
-            //this.ParkingLotArea_Py.Text = Math.Round(parkingLotArea / 1000000 / 3.3, 2).ToString() + "평";
             this.ContractArea.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea + publicFacilityArea + serviceArea + parkingLotArea) / 1000000).ToString() + "m\xB2";
-            // this.ContractArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea + publicFacilityArea + serviceArea + parkingLotArea) / 1000000 / 3.3).ToString() + "평";
             this.balconyArea.Text = Math.Round(houseHoldProperty.GetBalconyArea() / 1000000, 2).ToString() + "m\xB2";
-            //this.balconyArea_Py.Text = Math.Round(houseHoldProperty.GetBalconyArea() / 1000000 / 3.3, 2).ToString() + "평";
-            //this.usableArea.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea() + houseHoldProperty.GetWallArea()) / 1000000, 2).ToString() + "m\xB2";
-            //this.usableArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea() + houseHoldProperty.GetWallArea()) / 1000000 / 3.3, 2).ToString() + "평";
-        }
-
-        private List<double> GetLineLength(Curve houseOutline, out List<Point3d> dimensionLocationPointList)
-        {
-            List<double> houseOutlineLength = new List<double>();
-            Curve[] houseOutlineSegment = houseOutline.DuplicateSegments();
-            dimensionLocationPointList = new List<Point3d>();
-            foreach(Curve segment in houseOutlineSegment)
-            {
-                houseOutlineLength.Add(Math.Round(segment.GetLength()));
-                dimensionLocationPointList.Add(segment.PointAtNormalizedLength(0.5));
-            }
-            return houseOutlineLength;
         }
 
 
@@ -80,7 +53,7 @@ namespace Reports
             origin.X = canvas.Width / 2;
             origin.Y = canvas.Height / 2;
             List<Point3d> dimensionLocationPointList = new List<Point3d>();
-            List<double> houseOutlineLength = GetLineLength(householdOutline,out dimensionLocationPointList);
+            List<double> houseOutlineLength = GetLineLength(householdOutline,out dimensionLocationPointList,tempBoundingBox);
 
 
             //PlanDrawingFunction.drawUnitPlan(tempBoundingBox, householdOutline, scaleFactor-0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 1);
@@ -88,10 +61,41 @@ namespace Reports
 
             PlanDrawingFunction.DrawUnitPlanDimension(householdOutline, dimensionLocationPointList, houseOutlineLength, tempBoundingBox, scaleFactor - 0.01, origin, ref this.UnitCanvas);
 
-            //PlanDrawingFunction.drawDimension(tempBoundingBox, floorPlan.dimensions, scaleFactor, origin, ref this.UnitPlanCanvas);
         }
 
- 
+
+        private List<double> GetLineLength(Curve houseOutline, out List<Point3d> dimensionLocationPointList, Rectangle3d tempBoundingBox)
+        {
+            List<double> houseOutlineLength = new List<double>();
+            Curve[] houseOutlineSegment = houseOutline.DuplicateSegments();
+            dimensionLocationPointList = new List<Point3d>();
+            foreach(Curve segment in houseOutlineSegment)
+            {
+                houseOutlineLength.Add(Math.Round(segment.GetLength()));
+                Point3d p = new Point3d(segment.PointAtNormalizedLength(0.5));
+                bool isHorizontal = IsHorizontal(segment);
+                if (isHorizontal == true)
+                {
+                    p.X = tempBoundingBox.Corner(0).X-1500;
+                }else
+                {
+                    p.Y = tempBoundingBox.Corner(2).Y+900;
+                }
+                dimensionLocationPointList.Add(p);
+            }
+            return houseOutlineLength;
+        }
+
+
+        private bool IsHorizontal(Curve segment)
+        {
+            bool isHorizontal = false;
+            if (segment.PointAtStart.X == segment.PointAtEnd.X)
+            {
+                isHorizontal = true;
+            }
+            return isHorizontal;
+        }
 
         public static System.Windows.Shapes.Rectangle GetUnitPlanRectangle()
         {

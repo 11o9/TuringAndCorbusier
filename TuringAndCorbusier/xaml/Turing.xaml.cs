@@ -744,14 +744,14 @@ namespace TuringAndCorbusier
                         fps.Add(floorPlanDrawing.fixedPage);
                         pagename.Add("floorPlanDrawingPage" + i.ToString());
                     }
-                    //else if (i == 0 && isUsing1F == true)
-                    //{
-                    //    TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i+1);
-                    //    Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
-                    //    floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList);
-                    //    fps.Add(floorPlanDrawing.fixedPage);
-                    //    pagename.Add("floorPlanDrawingPage" + i.ToString());
-                    //}
+                    else if (i == 0 && isUsing1F == true)
+                    {
+                        TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i+1);
+                        Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
+                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                        fps.Add(floorPlanDrawing.fixedPage);
+                        pagename.Add("floorPlanDrawingPage" + i.ToString());
+                    }
                     else if(isUsing1F == false && isTopFloorDifferent==false)
                     {
                         if(isTopFloorSetBack == false)
