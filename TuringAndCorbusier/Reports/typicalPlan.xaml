@@ -13,7 +13,7 @@
         <TextBlock x:Name="planPageTitle"  Text="TITLE" FontSize="30" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="ExtraBlack" Margin="88,70,42,-70"/>
 
 
-        <Canvas  Width="1240" Height="1750" Margin="0,10,0,-10">
+        <Canvas  Width="1240" Height="1750">
             <Rectangle Fill="White"/>
 
             <Canvas  x:Name="typicalPlanCanvas"  VerticalAlignment="Bottom" Canvas.Left="85" Canvas.Top="150" Width="1075" Height="1400"  />

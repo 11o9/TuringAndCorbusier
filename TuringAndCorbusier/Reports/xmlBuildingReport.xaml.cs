@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Rhino.Display;
+using System.IO;
 
 namespace Reports
 {
@@ -74,7 +75,7 @@ namespace Reports
 
 
         //--------JHL
-        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, int numberOfCores, int numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics)
+        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics)
         {
             List<double> exclusivArea = new List<double>();
           
@@ -108,13 +109,11 @@ namespace Reports
                 for (int j = 0; j < coreDetailDoubleList[i].Count; j++)
                 {
                     coreDetailDoubleList[i][j].Transform(Rhino.Geometry.Transform.Translation(v));
-
                 }
 
             }
 
-            List<List<Curve>> RotatedCoreDetail = RotateToFit(coreDetailDoubleList,newCoreList,coreType);
-
+           RotateToFit(ref coreDetailDoubleList,newCoreList,coreType,coreOutline);
 
             List<Point3d> houseOutlinesCentroid = new List<Point3d>();
             Rectangle3d rectangleToFit = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
@@ -128,33 +127,34 @@ namespace Reports
 
             PlanDrawingFunction.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.2);
             PlanDrawingFunction.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 5);
+            //for(int i = 0; i < coreType.Count; i++)
+            //{
+            //    if (coreType[i] == CoreType.CourtShortEdge)
+            //    {
+            //        List<Curve> corridor = CreateCorridor(newCoreList);
+            //        PlanDrawingFunction.drawPlan(rectangleToFit, corridor, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+
+            //    }
+
+            //}
+           
             //PlanDrawingFunction.drawBackGround(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
-            for (int i = 0; i < numberOfHouses; i++)
+            for (int i = 0; i < houseOutline.Count; i++)
             {
-                if (i <= numberOfHouses)
+     
                 {
                     PlanDrawingFunction.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-                    PlanDrawingFunction.drawPlan(rectangleToFit, floorPlanList[i].balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+                   // PlanDrawingFunction.drawPlan(rectangleToFit, floorPlanList[i].balconyLines, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
                 }
 
             }
 
-            for (int i = 0; i < numberOfCores; i++)
+            for (int i = 0; i < corePlanList.Count ; i++)
             {
-                if (i <= numberOfCores)
-                {
+     
                     PlanDrawingFunction.drawPlan(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-                    PlanDrawingFunction.drawPlan(rectangleToFit, RotatedCoreDetail[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-                }
-            }
-
-
-            for (int i = 0; i < numberOfHouses; i++)
-            {
-                if (i <= numberOfHouses)
-                {
-                }
-
+                    PlanDrawingFunction.drawPlan(rectangleToFit, coreDetailDoubleList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+               
             }
 
             PlanDrawingFunction.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
@@ -235,73 +235,130 @@ namespace Reports
         //}
         //JHL
 
-        private List<List<Curve>> RotateToFit(List<List<Curve>> coreDetail,List<Core> coreList,List<CoreType> coreType)
+        private void RotateToFit(ref List<List<Curve>> coreDetail, List<Core> coreList, List<CoreType> coreType, List<Curve> coreOutline)
         {
-            
-            for(int i = 0; i < coreDetail.Count; i++)
+
+            for (int i = 0; i < coreDetail.Count; i++)
             {
-                if(coreType[i] == CoreType.Horizontal)
-                {
-
-                Vector3d v1 = coreList[i].YDirection;
-                Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
-                double radian = Vector3d.VectorAngle(v2,v1,Plane.WorldXY);
-
-                for(int j = 0; j < coreDetail[i].Count; j++)
-                {
-                    coreDetail[i][j].PointAtStart.Transform(Rhino.Geometry.Transform.Rotation(-radian,coreList[i].Origin));
-                    coreDetail[i][j].PointAtEnd.Transform(Rhino.Geometry.Transform.Rotation(-radian, coreList[i].Origin));
-                   // Rhino.RhinoDoc.ActiveDoc.Objects.Add(coreDetail[i][j]);
-                }
-            }
-                if(coreType[i] == CoreType.Parallel)
+                if (coreType[i] == CoreType.Vertical)
                 {
 
                     Vector3d v1 = coreList[i].YDirection;
                     Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
-                    Vector3d v3 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
-                    double radian = Vector3d.VectorAngle(v2, v3, Plane.WorldXY);
 
                     for (int j = 0; j < coreDetail[i].Count; j++)
                     {
-                        coreDetail[i][j].PointAtStart.Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
-                        coreDetail[i][j].PointAtEnd.Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
-                       // Rhino.RhinoDoc.ActiveDoc.Objects.Add(coreDetail[i][j]);
+                        double radian = Vector3d.VectorAngle(v2, v1,Plane.WorldXY);
+
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
                     }
                 }
-            }
+                else if (coreType[i] == CoreType.Parallel)
+                {
+      
+                    Vector3d v1 = coreList[i].XDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
 
-            return coreDetail;
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                    }
+                }
+                else if (coreType[i] == CoreType.Horizontal)
+                {
+
+                    Vector3d v1 = coreList[i].XDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                    }
+                }
+                else if (coreType[i] == CoreType.Vertical_AG1)
+                {
+
+                    Vector3d v1 = coreList[i].XDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                    }
+                }
+                else if (coreType[i] == CoreType.CourtShortEdge)
+                {
+
+                    Vector3d v1 = coreList[i].YDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtStart - coreDetail[i][0].PointAtEnd);
+
+                        //Curve[] coreOutlineSegment = coreOutline[i].DuplicateSegments();
+                        //var longestCoreOutline = (from crv in coreOutlineSegment let len = crv.GetLength() where len > 0 orderby len descending select crv).First();
+                        //Point3d segmentMidPoint1 = longestCoreOutline.PointAtLength(longestCoreOutline.GetLength()/2);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Translation(coreList[i].YDirection*coreList[i].depth));
+
+                        //var longestCoreDetail = (from crv in coreDetail[i][j] let len = crv.GetLength() where len > 0 orderby len descending select crv).First();
+                        //Point3d segmentMidPoint2 = longestCoreDetail.PointAtLength(longestCoreDetail.GetLength()/2);
+                        //Vector3d v3 = new Vector3d(segmentMidPoint2 - segmentMidPoint1);
+
+
+                        //coreDetail[i][j].Transform(Rhino.Geometry.Transform.Translation(v3));
+                    }
+
+                }
+            }
         }
 
-
+        private void ExportRadianToText(List<double> radians,List<Core> coreList)
+        {
+            StreamWriter sw = new StreamWriter("C:\\Users\\user\\Desktop\\radians\\Radians.txt");
+            for(int i = 0; i < radians.Count; i++)
+            {
+                sw.Write(Math.Round(radians[i],3).ToString()+",");
+                if (i>0&&i % coreList.Count == 0)
+                {
+                    sw.Write("\n[]");
+                }
+            }
+        }
 
         private string GetSimplifiedCoreString(CoreType coreType)
         {
             if (coreType == CoreType.Horizontal)
             {
-                return "{0,0,0}/{0,-7660,0}/{4400,-7660,0}/{4400,0,0}/{0,0,0}/{2500,0,0}/{2500,-7660,0}/{2500,-5300,0}/{0,-5300,0}/{0,-5300,0}/{2500,-7660,0}/{0,-7660,0}/{2500,-5300,0}/{0,-4000,0}/{2500,-4000,0}/{0,-1300,0}/{2500,-1300,0}/{1250,-1300,0}/{1250,-4000,0}/{0,-3700,0}/{2500,-3700,0}/{0,-3400,0}/{2500,-3400,0}/{0,-3100,0}/{2500,-3100,0}/{0,-2800,0}/{2500,-2800,0}/{0,-2500,0}/{2500,-2500,0}/{0,-2200,0}/{2500,-2200,0}/{0,-1900,0}/{2500,-1900,0}/{0,-1600,0}/{2500,-1600,0}";
+                return "{0,0,0}/{0,-7660,0}/{0,-7660,0}/{-4400,-7660,0}/{-4400,-7660,0}/{-4400,0,0}/{-4400,0,0}/{0,0,0}/{-1900,0,0}/{-1900,-1300,0}/{-1900,-1300,0}/{-1900,-4000,0}/{-1900,-4000,0}/{-1900,-5300,0}/{-1900,-5300,0}/{-1900,-7660,0}/{-1900,-5300,0}/{-4400,-5300,0}/{-1900,-4000,0}/{-4400,-4000,0}/{-1900,-1300,0}/{-4400,-1300,0}/{-1900,-1600,0}/{-4400,-1600,0}/{-1900,-1900,0}/{-4400,-1900,0}/{-1900,-2200,0}/{-4400,-2200,0}/{-1900,-2500,0}/{-4400,-2500,0}/{-1900,-2800,0}/{-4400,-2800,0}/{-1900,-3100,0}/{-4400,-3100,0}/{-1900,-3400,0}/{-4400,-3400,0}/{-1900,-3700,0}/{-4400,-3700,0}/{-3150,-4000,0}/{-3150,-1300,0}/{-1900,-5300,0}/{-4400,-7660,0}/{-1900,-7660,0}/{-4400,-5300,0}";
             }
             else if (coreType == CoreType.Parallel)
             {
-                return "{0,0,0}/{0,-5200,0}/{4860,-5200,0}/{4860,0,0}/{0,0,0}/{0,-5200,0}/{2430,-5200,0}/{2430,-5200,0}/{2430,-3900,0}/{2430,-3900,0}/{2430,-1200,0}/{2430,-1200,0}/{0,-1200,0}/{2430,-3900,0}/{0,-3900,0}/{1215,-3900,0}/{1215,-1200,0}/{2430,-3600,0}/{0,-3600,0}/{2430,-3300,0}/{0,-3300,0}/{2430,-3000,0}/{0,-3000,0}/{2430,-2700,0}/{0,-2700,0}/{2430,-2400,0}/{0,-2400,0}/{2430,-2100,0}/{0,-2100,0}/{2430,-1800,0}/{0,-1800,0}/{2430,-1500,0}/{0,-1500,0}/{4860,-5200,0}/{4860,-2700,0}/{4860,-2700,0}/{2430,-2700,0}/{2430,-5200,0}/{4860,-2700,0}/{2430,-2700,0}/{4860,-5200,0}";
+                return "{4860,0,0}/{4860,-5200,0}/{4860,-5200,0}/{0,-5200,0}/{0,-5200,0}/{0,0,0}/{0,0,0}/{4860,0,0}/{0,-2600,0}/{1250,-2600,0}/{1250,-2600,0}/{1250,0,0}/{1530,-2600,0}/{1530,0,0}/{1810,-2600,0}/{1810,0,0}/{2090,-2600,0}/{2090,0,0}/{2370,-2600,0}/{2370,0,0}/{2650,-2600,0}/{2650,0,0}/{2930,-2600,0}/{2930,0,0}/{3210,-2600,0}/{3210,0,0}/{3490,-2600,0}/{3490,0,0}/{1250,-2600,0}/{3490,-2600,0}/{3490,-1300,0}/{1250,-1300,0}/{3490,-2600,0}/{3490,-5200,0}/{890,-5200,0}/{890,-2600,0}/{890,-5200,0}/{3490,-2600,0}/{890,-2600,0}/{3490,-5200,0}/{0,-5200,0}/{890,-2600,0}/{0,-2600,0}/{890,-5200,0}";
             }
             else if (coreType == CoreType.Vertical)
             {
-                return "{0,0,0}/{0,-2500,0}/{9000,-2500,0}/{9000,0,0}/{0,0,0}/{0,-2500,0}/{1400,-2500,0}/{1400,-2500,0}/{1400,0,0}/{1400,-2500,0}/{4100,-2500,0}/{4100,-2500,0}/{4100,0,0}/{9000,0,0}/{6500,0,0}/{6500,0,0}/{6500,-2500,0}/{6500,-2500,0}/{9000,0,0}/{6500,0,0}/{9000,-2500,0}/{1400,-1250,0}/{4100,-1250,0}/{1700,-2500,0}/{1700,0,0}/{2000,-2500,0}/{2000,0,0}/{2300,-2500,0}/{2300,0,0}/{2600,-2500,0}/{2600,0,0}/{2900,-2500,0}/{2900,0,0}/{3200,-2500,0}/{3200,0,0}/{3500,-2500,0}/{3500,0,0}/{3800,-2500,0}/{3800,0,0}";
+                return "{0,0,0}/{-2500,0,0}/{-7600,-2500,0}/{-4900,-2500,0}/{-9000,-2500,0}/{-7600,-2500,0}/{0,0,0}/{-9000,0,0}/{-9000,0,0}/{-9000,-2500,0}/{-9000,-2500,0}/{-7600,-2500,0}/{-7600,-2500,0}/{-4900,-2500,0}/{-4900,-2500,0}/{-2500,-2500,0}/{-2500,-2500,0}/{0,-2500,0}/{0,-2500,0}/{0,0,0}/{-7600,-2500,0}/{-7600,0,0}/{-2500,-2500,0}/{-2500,0,0}/{-4900,-2500,0}/{-4900,0,0}/{-2500,-2500,0}/{0,0,0}/{-2500,0,0}/{0,-2500,0}/{-5200,-2500,0}/{-5200,0,0}/{-5500,-2500,0}/{-5500,0,0}/{-5800,-2500,0}/{-5800,0,0}/{-6100,-2500,0}/{-6100,0,0}/{-6400,-2500,0}/{-6400,0,0}/{-6700,-2500,0}/{-6700,0,0}/{-7000,-2500,0}/{-7000,0,0}/{-7300,-2500,0}/{-7300,0,0}/{-7600,-1250,0}/{-4900,-1250,0}";
             }
             else if (coreType == CoreType.Folded)
             {
-                return "{0,0,0}/{6060,0,0}/{6060,-5800,0}/{0,-5800,0}/{0,0,0}/{6060,-5800,0}/{4810,-5800,0}/{6060,0,0}/{6060,-1250,0}/{0,0,0}/{1250,0,0}/{1400,-1400,0}/{4660,-1400,0}/{4660,-4400,0}/{1400,-4400,0}/{1400,-1400,0}/{4660,-4400,0}/{6060,-4400,0}/{1400,-1400,0}/{1400,0,0}/{4660,-4100,0}/{6060,-4100,0}/{4660,-3800,0}/{6060,-3800,0}/{4660,-3500,0}/{6060,-3500,0}/{4660,-3200,0}/{6060,-3200,0}/{4660,-2900,0}/{6060,-2900,0}/{4660,-2600,0}/{6060,-2600,0}/{1700,-1400,0}/{1700,0,0}/{2000,-1400,0}/{2000,0,0}/{2300,-1400,0}/{2300,0,0}/{2600,-1400,0}/{2600,0,0}/{2900,-1400,0}/{2900,0,0}/{3200,-1400,0}/{3200,0,0}/{3500,-1400,0}/{3500,0,0}/{4660,-2300,0}/{6060,-2300,0}/{3800,-1400,0}/{3800,0,0}/{1400,-4400,0}/{4660,-1400,0}/{1400,-1400,0}/{4660,-4400,0}";
+                return "{-6060,0,0}/{0,0,0}/{0,-5800,0}/{-6060,-5800,0}/{-6060,0,0}/{0,0,0}/{-2260,0,0}/{-2260,0,0}/{-4660,0,0}/{-4660,0,0}/{-6060,0,0}/{-6060,0,0}/{-6060,-5800,0}/{-6060,-5800,0}/{0,-5800,0}/{0,-5800,0}/{0,-4400,0}/{0,-4400,0}/{0,-2300,0}/{0,-2300,0}/{0,0,0}/{-1400,-1400,0}/{-1400,-4400,0}/{-1400,-1400,0}/{-4660,-1400,0}/{-4660,-4400,0}/{-4660,-1400,0}/{-4660,-1400,0}/{-4660,0,0}/{-4660,-4400,0}/{-1400,-4400,0}/{-1400,-4400,0}/{0,-4400,0}/{-1400,-4100,0}/{0,-4100,0}/{-1400,-3800,0}/{0,-3800,0}/{-1400,-3500,0}/{0,-3500,0}/{-1400,-3200,0}/{0,-3200,0}/{-1400,-2900,0}/{0,-2900,0}/{-1400,-2600,0}/{0,-2600,0}/{-1400,-2300,0}/{0,-2300,0}/{-4360,-1400,0}/{-4360,0,0}/{-4060,-1400,0}/{-4060,0,0}/{-3760,-1400,0}/{-3760,0,0}/{-3460,-1400,0}/{-3460,0,0}/{-3160,-1400,0}/{-3160,0,0}/{-2860,-1400,0}/{-2860,0,0}/{-2560,-1400,0}/{-2560,0,0}/{-2260,-1400,0}/{-2260,0,0}/{-4660,-4400,0}/{-1400,-1400,0}/{-4660,-1400,0}/{-1400,-4400,0}";
             }
             else if (coreType == CoreType.Vertical_AG1)
             {
-                return "{0,0,0}/{0,-2500,0}/{7920,-2500,0}/{7920,0,0}/{0,0,0}/{0,-2500,0}/{1300,-2500,0}/{1300,-2500,0}/{1300,0,0}/{1300,-2500,0}/{4000,-2500,0}/{4000,-2500,0}/{4000,0,0}/{7920,-2500,0}/{5420,-2500,0}/{5420,-2500,0}/{5420,0,0}/{1600,-2500,0}/{1600,0,0}/{1900,-2500,0}/{1900,0,0}/{2200,-2500,0}/{2200,0,0}/{2500,-2500,0}/{2500,0,0}/{2800,-2500,0}/{2800,0,0}/{3100,-2500,0}/{3100,0,0}/{3400,-2500,0}/{3400,0,0}/{3100,-2500,0}/{3100,0,0}/{3700,-2500,0}/{3700,0,0}/{1300,-1250,0}/{4000,-1250,0}/{5420,-2500,0}/{7920,0,0}/{5420,0,0}/{7920,-2500,0}";
+                return "{0,-2500,0}/{-2500,-2500,0}/{-6620,-2500,0}/{-3920,-2500,0}/{-7920,-2500,0}/{-6620,-2500,0}/{-7920,0,0}/{-7920,-2500,0}/{0,-2500,0}/{0,0,0}/{-7920,0,0}/{0,0,0}/{-7920,0,0}/{-7920,0,0}/{-7920,-2500,0}/{-7920,-2500,0}/{-6620,-2500,0}/{-6620,-2500,0}/{-3920,-2500,0}/{-3920,-2500,0}/{-2500,-2500,0}/{-2500,-2500,0}/{0,-2500,0}/{-6620,-2500,0}/{-6620,0,0}/{-3920,-2500,0}/{-3920,0,0}/{-2500,-2500,0}/{-2500,0,0}/{-2500,-2500,0}/{0,0,0}/{-2500,0,0}/{0,-2500,0}/{-4220,-2500,0}/{-4220,0,0}/{-4520,-2500,0}/{-4520,0,0}/{-4820,-2500,0}/{-4820,0,0}/{-5120,-2500,0}/{-5120,0,0}/{-5420,-2500,0}/{-5420,0,0}/{-5720,-2500,0}/{-5720,0,0}/{-6020,-2500,0}/{-6020,0,0}/{-6320,-2500,0}/{-6320,0,0}/{-6620,-1250,0}/{-3920,-1250,0}";
             }
 
             else if (coreType == CoreType.CourtShortEdge)
             {
-                return "{0,0,0}/{0,-7600,0}/{2700,-7600,0}/{2700,0,0}/{0,0,0}/{2700,0,0}/{2700,-1300,0}/{2700,-1300,0}/{0,-1300,0}/{2700,-1300,0}/{2700,-4000,0}/{2700,-4000,0}/{0,-4000,0}/{2700,-4000,0}/{2700,-5300,0}/{2700,-5300,0}/{0,-5300,0}/{2700,-5300,0}/{0,-7600,0}/{0,-5300,0}/{2700,-7600,0}/{1350,-1300,0}/{1350,-4000,0}/{2700,-3700,0}/{0,-3700,0}/{2700,-3400,0}/{0,-3400,0}/{2700,-3100,0}/{0,-3100,0}/{2700,-2800,0}/{0,-2800,0}/{2700,-2500,0}/{0,-2500,0}/{2700,-2200,0}/{0,-2200,0}/{2700,-1900,0}/{0,-1900,0}/{2700,-1600,0}/{0,-1600,0}";
+                return "{0,0,0}/{2700,0,0}/{2700,0,0}/{2700,-1300,0}/{2700,-1300,0}/{2700,-4000,0}/{2700,-4000,0}/{2700,-5300,0}/{2700,-5300,0}/{2700,-7600,0}/{2700,-7600,0}/{0,-7600,0}/{0,-7600,0}/{0,0,0}/{2700,-1300,0}/{0,-1300,0}/{2700,-4000,0}/{0,-4000,0}/{2700,-5300,0}/{0,-5300,0}/{0,-7600,0}/{2700,-5300,0}/{2700,-7600,0}/{0,-5300,0}/{1350,-4000,0}/{1350,-1300,0}/{2700,-1600,0}/{0,-1600,0}/{2700,-1900,0}/{0,-1900,0}/{2700,-2200,0}/{0,-2200,0}/{2700,-2500,0}/{0,-2500,0}/{2700,-2800,0}/{0,-2800,0}/{2700,-3100,0}/{0,-3100,0}/{2700,-3400,0}/{0,-3400,0}/{2700,-3700,0}/{0,-3700,0}";
             }
             else
             {
@@ -368,10 +425,17 @@ namespace Reports
                 {
                     previousLeft += 60;
                 }
-               
-                    
-                
+
             }
+        }
+
+        private List<Curve> CreateCorridor(List<Core> coreList)
+        {
+            Rectangle3d innerCorridor = new Rectangle3d(Plane.WorldXY ,coreList[0].Origin,coreList[1].Origin);
+            List<Curve> curveRectangle = new List<Curve>();
+
+     
+            return curveRectangle;
         }
     }
 }

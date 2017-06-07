@@ -72,7 +72,7 @@ namespace Reports
         public void SetUnitPlan(Curve householdOutline, HouseholdStatistics value, double scaleFactor, System.Windows.Point origin, string agType)
         {
             Rectangle3d tempBoundingBox = new Rectangle3d(Plane.WorldXY, householdOutline.GetBoundingBox(true).Min, householdOutline.GetBoundingBox(true).Max);
-            Point3d householdOutlineCentroid = AreaMassProperties.Compute(householdOutline).Centroid;
+            //Point3d householdOutlineCentroid = AreaMassProperties.Compute(householdOutline).Centroid;
 
             System.Windows.Shapes.Rectangle canvas = new Rectangle();
             canvas.Height = UnitCanvas.Height;
