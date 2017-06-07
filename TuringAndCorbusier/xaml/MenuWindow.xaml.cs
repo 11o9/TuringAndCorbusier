@@ -67,17 +67,17 @@ namespace TuringAndCorbusier
         
         private void Upload_Data_Click(object sender, RoutedEventArgs e)
         {
-            for (int i = 0; i < 1; i++)
-            {
-                try
-                {
-                    ((Rhino.UI.Panels.GetPanel(TuringHost.PanelId) as RhinoWindows.Controls.WpfElementHost).Child as Turing).sendDataToServer();
-                }
-                catch (Exception x)
-                {
+            //for (int i = 0; i < 1; i++)
+            //{
+            //    try
+            //    {
+            //        ((Rhino.UI.Panels.GetPanel(TuringHost.PanelId) as RhinoWindows.Controls.WpfElementHost).Child as Turing).sendDataToServer();
+            //    }
+            //    catch (Exception x)
+            //    {
 
-                }
-            }
+            //    }
+            //}
 
 
             UIManager.getInstance().HideWindow(this, UIManager.WindowType.Menu);

@@ -19,6 +19,8 @@ namespace TuringAndCorbusier
     /// <summary>
     /// UserControl1.xaml에 대한 상호 작용 논리
     /// </summary>
+    /// 
+
     public partial class Turing : System.Windows.Controls.UserControl
     {
 
@@ -36,12 +38,7 @@ namespace TuringAndCorbusier
 
         public List<Apartment> MainPanel_AGOutputList = new List<Apartment>();
 
-        public string[] CurrentDataIdName = { "REGI_MST_NO", "REGI_SUB_MST_NO" };
-        public string[] CurrentDataId = { CommonFunc.getStringFromRegistry("REGI_MST_NO"), CommonFunc.getStringFromRegistry("REGI_SUB_MST_NO") };
-
-        public string USERID = CommonFunc.getStringFromRegistry("USERID");
-        public string DBURL = CommonFunc.getStringFromRegistry("DBURL");
-        
+   
         List<FloorPlanLibrary> MainPanel_planLibraries = new List<FloorPlanLibrary>();
 
         /*
@@ -60,59 +57,56 @@ namespace TuringAndCorbusier
         {
             InitializeComponent();
 
-            Calculate.Click += Btn_SetInputValues;
+            //Calculate.Click += Btn_SetInputValues;
 
-
-            try
-            {
-                this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
+            GISSlot.Content = new ServerUI();
+    //        try
+    //        {
+    //            this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
                 
-                this.ProjectAddress.Text = CommonFunc.getAddressFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList());
+    //            this.ProjectAddress.Text = CommonFunc.getAddressFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList());
 
-                
-                this.ProjectArea.Text = Math.Round(CommonFunc.GetManualAreaFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList()), 2).ToString();
-            }
-            catch (System.Exception)
-            {
-                errorMessage tempError = new errorMessage("서버와 연결할 수 없습니다.");
-            }
 
             bool is64 = System.Environment.Is64BitOperatingSystem;
-            string name = "plantype";
-            string dir = "";
-            if (is64)
-            {
-                dir = "C://Program Files (x86)//Boundless//TuringAndCorbusier//DataBase//floorPlanLibrary";
-                RhinoApp.WriteLine("fpldir64" + dir);
-            }
-            else
-            {
-                dir = "C://Program Files//Boundless//TuringAndCorbusier//DataBase//floorPlanLibrary";
-                RhinoApp.WriteLine("fpldir32" + dir);
-            }
+            //string name = "plantype";
+            //string dir = "";
+            //if (is64)
+            //{
+            //    dir = "C://Program Files (x86)//Boundless//TuringAndCorbusier//DataBase//floorPlanLibrary";
+            //    RhinoApp.WriteLine("fpldir64" + dir);
+            //}
+            //else
+            //{
+            //    dir = "C://Program Files//Boundless//TuringAndCorbusier//DataBase//floorPlanLibrary";
+            //    RhinoApp.WriteLine("fpldir32" + dir);
+            //}
 
 
-            string[] allFiles = System.IO.Directory.GetFiles(dir);
+            //string[] allFiles = System.IO.Directory.GetFiles(dir);
 
-            foreach (string file in allFiles)
-            {
-                if (file.Contains(name))
-                {
-                    try
-                    {
-                        FloorPlanLibrary tempFloorPlanLibrary = new FloorPlanLibrary(file);
-                        MainPanel_planLibraries.Add(tempFloorPlanLibrary);
-                    }
-                    catch (System.Exception ex)
-                    {
-                        //MessageBox.Show(ex.ToString());
-                        RhinoApp.WriteLine(ex.Message);
-                    }
-                }
-            }
+            //foreach (string file in allFiles)
+            //{
+            //    if (file.Contains(name))
+            //    {
+            //        try
+            //        {
+            //            FloorPlanLibrary tempFloorPlanLibrary = new FloorPlanLibrary(file);
+            //            MainPanel_planLibraries.Add(tempFloorPlanLibrary);
+            //        }
+            //        catch (System.Exception ex)
+            //        {
+            //            //MessageBox.Show(ex.ToString());
+            //            RhinoApp.WriteLine(ex.Message);
+            //        }
+            //    }
+            //}
 
             TuringAndCorbusierPlugIn.InstanceClass.turing = mainWindow;
+
+
             TuringAndCorbusierPlugIn.InstanceClass.page1Settings = new Datastructure_Settings.Settings_Page1(ProjectName.Text, ProjectAddress.Text, "제 2종 일반 주거지역", double.Parse(ProjectArea.Text.Replace("m2","")), 200, 60, 7);
+
+
             List<System.Guid> dummy = new List<System.Guid>();
             Dictionary<string, string> pathdummy = new Dictionary<string, string>();
             for (int i = 0; i < 10; i++)
@@ -145,7 +139,7 @@ namespace TuringAndCorbusier
             this.previousClickedButtonIndex = stackPanel.Children.IndexOf(sender as Button);
             this.previousClickedButtonBrush = (sender as Button).Background;
 
-            (sender as Button).Background = new SolidColorBrush(Color.FromArgb(255, 255, 255, 0));
+            (sender as Button).Background = Brushes.Lime;
 
 
 
@@ -180,7 +174,7 @@ namespace TuringAndCorbusier
 
             var tempoutput = MainPanel_AGOutputList[stackPanel.Children.IndexOf(sender as Button)];
 
-            RhinoApp.WriteLine("tempoutputplottype = " + tempoutput.Plot.PlotType.ToString());
+            //RhinoApp.WriteLine("tempoutputplottype = " + tempoutput.Plot.PlotType.ToString());
 
             Plot tempPlot = tempoutput.Plot;
             bool using1f = tempoutput.ParameterSet.using1F;
@@ -439,18 +433,18 @@ namespace TuringAndCorbusier
 
            // var makekdg = MessageBox.Show("건물이 있으면 안되는 블럭의 내부에 점을 찍으세요. 선택이 끝나면 esc", "도로 선택 완료", MessageBoxButton.YesNoCancel);
             //깍두기 최초 생성
-            if (stackPanel.Children.Count == 1)
-            {
-                var wantset = MessageBox.Show("주변 대지모형을 생성","주변 대지 모형",MessageBoxButton.YesNo);
-                if (wantset == MessageBoxResult.No)
-                    return;
+            //if (stackPanel.Children.Count == 1)
+            //{
+            //    var wantset = MessageBox.Show("주변 대지모형을 생성","주변 대지 모형",MessageBoxButton.YesNo);
+            //    if (wantset == MessageBoxResult.No)
+            //        return;
 
-                var makekdg = MessageBox.Show("주변 건물을 생성합니다. 건물이 있으면 안되는 블럭(도로/공지)의 내부에 점을 찍으세요."
-                    + System.Environment.NewLine + "선택이 끝나면 esc 후 완료버튼을, 잘못 입력했으면 esc 후 이전 취소를 눌러주세요.", "도로 선택 시작");
+            //    var makekdg = MessageBox.Show("주변 건물을 생성합니다. 건물이 있으면 안되는 블럭(도로/공지)의 내부에 점을 찍으세요."
+            //        + System.Environment.NewLine + "선택이 끝나면 esc 후 완료버튼을, 잘못 입력했으면 esc 후 이전 취소를 눌러주세요.", "도로 선택 시작");
 
-                SetKDG();
+            //    SetKDG();
 
-            }
+            //}
         }
 
 
@@ -708,7 +702,7 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries,i);
                             Reports.floorPlanDrawingPage floorPlanDrawing1 = new Reports.floorPlanDrawingPage(i,"LastFloor");
-                            floorPlanDrawing1.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i));
+                            floorPlanDrawing1.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, new Interval(i, i),NumberOfHouses);
                             fps.Add(floorPlanDrawing1.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + 5168456.ToString());
                             break;
@@ -728,7 +722,7 @@ namespace TuringAndCorbusier
                         List<HouseholdStatistics> householeStatisticsList = MainPanel_AGOutputList[tempIndex].HouseholdStatistics;
                         Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1), isUsing1F);
                         TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
-                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1));
+                        floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1),NumberOfHouses);
                         fps.Add(floorPlanDrawing.fixedPage);
                         pagename.Add("floorPlanDrawingPage" + (12312+1).ToString());
 
@@ -794,20 +788,39 @@ namespace TuringAndCorbusier
 
             }
 
+
+            List<Guid> tempGuid = new List<Guid>();
+
             try
             {
-                List<Brep>tempBreps = TuringAndCorbusier.MakeBuildings.makeBuildings(MainPanel_AGOutputList[index]);
-                List<Guid> tempGuid = new List<Guid>();
+                List<Brep> tempBreps = MakeBuildings.makeBuildings(MainPanel_AGOutputList[index]);
+
+
                 foreach (Brep i in tempBreps)
                 {
-                    tempGuid.Add(LoadManager.getInstance().DrawObjectWithSpecificLayer(i, LoadManager.NamedLayer.Model));
+                    //tempGuid.Add(LoadManager.getInstance().DrawObjectWithSpecificLayer(i, LoadManager.NamedLayer.Model));
+                    tempGuid.Add(RhinoDoc.ActiveDoc.Objects.AddBrep(i));
+                    //RhinoApp.Wait();
                 }
+
+                //List<Mesh> tempMeshs = MakeBuildings.MakeMeshBuildings(MainPanel_AGOutputList[index]);
+                //foreach (Mesh m in tempMeshs)
+                //{
+                //    tempGuid.Add(RhinoDoc.ActiveDoc.Objects.AddMesh(m));
+                //}
+
+                tempGuid.AddRange(MakeBuildings.DrawFoundation(MainPanel_AGOutputList[index]));
+
                 MainPanel_building3DPreview.Insert(index, tempGuid);
                 RhinoDoc.ActiveDoc.Views.Redraw();
             }
-            catch
+            catch(Exception ex)
             {
-                RhinoApp.WriteLine("모델링-BREP생성실패");
+                RhinoApp.WriteLine(ex.Message);
+            }
+            finally
+            {
+                MainPanel_building3DPreview.Insert(index, tempGuid);
             }
         }
 
@@ -847,207 +860,26 @@ namespace TuringAndCorbusier
             }
         }
 
-        public void sendDataToServer()
+        
+
+        private void Btn_SendToServer_Click(object sender, RoutedEventArgs e)
         {
             if (tempIndex == -1)
             {
                 errorMessage tempError = new errorMessage("설계안을 먼저 선택하세요.");
                 return;
             }
-
             try
             {
-                ///출력 할 Apartment
+                SHServer.SHServer.sendDataToServer(MainPanel_AGOutputList[tempIndex],MainPanel_reportspaths[tempIndex]);
 
-                Apartment tempAGOutput = MainPanel_AGOutputList[tempIndex];
-
-                ///현재 대지에 대한 DesignMaster입력 << 중복될 시 입력 안함
-
-                if (!CommonFunc.checkDesignMasterPresence(CurrentDataIdName.ToList(), CurrentDataId.ToList()))
-                {
-                    List<Point3d> tempBoundaryPts = new List<Point3d>();
-
-                    foreach (Curve i in MainPanel_AGOutputList[tempIndex].Plot.Boundary.DuplicateSegments())
-                        tempBoundaryPts.Add(i.PointAt(i.Domain.T0));
-
-                    CommonFunc.AddTdDesignMaster(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, (int)TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio, (int)TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors, CommonFunc.GetPlotBoundaryVector(tempBoundaryPts), CommonFunc.ListToCSV(MainPanel_AGOutputList[tempIndex].Plot.Surroundings.ToList()), MainPanel_AGOutputList[tempIndex].Plot.GetArea());
-                }
-
-
-                ///가장 마지막 DESIGN_NO 다음 번호로 DesignDetail(설계 전체에 관한 내용) 입력
-
-
-              
-                int temp_REGI_PRE_DESIGN_NO;
-
-
-                CommonFunc.AddDesignDetail(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, MainPanel_AGOutputList[tempIndex], out temp_REGI_PRE_DESIGN_NO);
-
-
-                ///세대 타입 취합
-                Stack<HouseholdStatistics> hhsStack = new Stack<HouseholdStatistics>();
-                List<HouseholdStatistics> temphhs1 = new List<HouseholdStatistics>();
-
-                temphhs1 = new List<HouseholdStatistics>(MainPanel_AGOutputList[tempIndex].HouseholdStatistics);
-
-                double max = 0;
-                int maxindex = -1;
-                int index = temphhs1.Count;
-                for (int j = 0; j < index; j++)
-                {
-                    //0 3      1  3  2  3   
-                    max = 0;
-                    for (int i = 0; i < index - j; i++)
-                    {
-                        if (temphhs1[i].ExclusiveArea > max)
-                        {
-                            max = temphhs1[i].ExclusiveArea;
-                            maxindex = i;
-                        }
-                    }
-
-                    hhsStack.Push(temphhs1[maxindex]);
-                    temphhs1.RemoveAt(maxindex);
-
-                }
-
-                List<HouseholdStatistics> temphhs = new List<HouseholdStatistics>();
-                List<HouseholdStatistics> tomerge = new List<HouseholdStatistics>();
-                int time = hhsStack.Count;
-                for (int i = 0; i < time; i++)
-                {
-                    if (tomerge.Count != 0)
-                    {
-                        if (Math.Abs(Math.Round(tomerge.Last().ExclusiveArea / 3.3 / 1000000) - Math.Round(hhsStack.First().ExclusiveArea / 3.3 / 1000000)) < 2)
-                        {
-                            tomerge.Add(hhsStack.Pop());
-                        }
-
-                        else
-                        {
-                            temphhs.Add(new HouseholdStatistics(tomerge));
-                            RhinoApp.WriteLine(tomerge.Count.ToString() + " 개의 householdstatistics 가 병합됨.");
-                            tomerge.Clear();
-                            tomerge.Add(hhsStack.Pop());
-                        }
-
-                    }
-                    else
-                        tomerge.Add(hhsStack.Pop());
-
-
-                    if (i == time - 1)
-                    {
-                        temphhs.Add(new HouseholdStatistics(tomerge));
-                    }
-                }
-
-
-                ///각 세대 타입별 정보 입력
-
-                //for (int i = 0; i < MainPanel_AGOutputList[tempIndex].HouseholdStatistics.Count; i++)
-                //{
-
-                //    HouseholdStatistics tempHouseholdStatistics = MainPanel_AGOutputList[tempIndex].HouseholdStatistics[i];
-                //    double tempExclusiveAreaSum = tempAGOutput.GetExclusiveAreaSum();
-                //    double tempExclusiveArea = tempHouseholdStatistics.GetExclusiveArea();
-
-                //    double GroundCoreAreaPerHouse = tempAGOutput.GetCoreAreaOnEarthSum() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
-                //    double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.GetCoreAreaOnEarthSum()) / tempExclusiveAreaSum * tempExclusiveArea;
-                //    double parkingLotAreaPerHouse = tempAGOutput.ParkingLotUnderGround.GetAreaSum() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
-                //    double plotAreaPerHouse = tempAGOutput.Plot.GetArea() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
-                //    double welfareAreaPerHouse = tempAGOutput.GetPublicFacilityArea() / tempExclusiveAreaSum * tempExclusiveArea;
-                //    double facilitiesAreaPerHouse = 0 / tempExclusiveAreaSum * tempExclusiveArea;
-
-                //    CommonFunc.AddTdDesignArea(CurrentDataIdName.ToList(), CurrentDataId.ToList(), temp_REGI_PRE_DESIGN_NO, USERID, tempAGOutput.AreaTypeString()[i], coreAreaPerHouse, welfareAreaPerHouse, facilitiesAreaPerHouse, parkingLotAreaPerHouse, plotAreaPerHouse, tempHouseholdStatistics);
-
-                //}
-
-                for (int i = 0; i < temphhs.Count; i++)
-                {
-
-                    HouseholdStatistics tempHouseholdStatistics = temphhs[i];
-                    double tempExclusiveAreaSum = tempAGOutput.GetExclusiveAreaSum();
-                    double tempExclusiveArea = temphhs[i].GetExclusiveArea();
-                    double rate = tempExclusiveArea / tempExclusiveAreaSum;
-                    //double GroundCoreAreaPerHouse = tempAGOutput.GetCoreAreaOnEarthSum() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
-
-                    //ground , rooftop cores
-                    double GroundCoreAreaPerHouse = tempAGOutput.Core[0].Sum(n => n.GetArea()) * 2 * rate;
-
-                    //double coreareaSum = tempAGOutput.GetCoreAreaSum();
-                    //double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.GetCoreAreaOnEarthSum()) / tempExclusiveAreaSum * tempExclusiveArea;
-                    //double floorCores = tempAGOutput.GetCoreAreaSum() - tempAGOutput.Core[0].Sum(n => n.GetArea()) * 2;
-                    double coreAreaPerHouse = GroundCoreAreaPerHouse + (tempAGOutput.GetCoreAreaSum() - tempAGOutput.Core[0].Sum(n=>n.GetArea())*2)*rate;
-
-                    double parkingLotAreaPerHouse = tempAGOutput.ParkingLotUnderGround.ParkingArea / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
-
-                    double plotAreaPerHouse = tempAGOutput.Plot.GetArea() / (tempExclusiveAreaSum + tempAGOutput.GetCommercialArea()) * tempExclusiveArea;
-                    double welfareAreaPerHouse = tempAGOutput.GetPublicFacilityArea() / tempExclusiveAreaSum * tempExclusiveArea;
-                    double facilitiesAreaPerHouse = 0 / tempExclusiveAreaSum * tempExclusiveArea;
-
-                    CommonFunc.AddTdDesignArea(CurrentDataIdName.ToList(), CurrentDataId.ToList(), temp_REGI_PRE_DESIGN_NO, USERID, "A", coreAreaPerHouse, welfareAreaPerHouse, facilitiesAreaPerHouse, parkingLotAreaPerHouse, plotAreaPerHouse, tempHouseholdStatistics);
-
-                }
-
-                CommonFunc.AddDesignModel(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, temp_REGI_PRE_DESIGN_NO, tempAGOutput.AGtype, CommonFunc.ListToCSV(tempAGOutput.ParameterSet.Parameters.ToList()), "Core", tempAGOutput.Target.Area, tempAGOutput.Target.Ratio);
-
-                if (tempAGOutput.Commercial.Count != 0)
-                {
-                    double plotAreaOfCommercial = tempAGOutput.Plot.GetArea() / (tempAGOutput.GetExclusiveAreaSum() + tempAGOutput.GetCommercialArea()) * tempAGOutput.GetCommercialArea();
-                    double coreAreaOfCommercial = tempAGOutput.GetCoreAreaOnEarthSum() / (tempAGOutput.GetExclusiveAreaSum() + tempAGOutput.GetCommercialArea()) * tempAGOutput.GetCommercialArea();
-                    double parkingLotAreaOfCommercial = tempAGOutput.ParkingLotUnderGround.ParkingArea / (tempAGOutput.GetExclusiveAreaSum() + tempAGOutput.GetCommercialArea()) * tempAGOutput.GetCommercialArea();
-
-                    CommonFunc.AddDesignNonResidential(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, temp_REGI_PRE_DESIGN_NO, CommonFunc.GetNonresiUseCode(CommonFunc.NonResiType.Commercial), tempAGOutput.GetCommercialArea(), 0, parkingLotAreaOfCommercial, (int)tempAGOutput.GetLegalParkingLotOfCommercial(), plotAreaOfCommercial);
-                }
-
-
-                RhinoApp.WriteLine("설계 보고서 업로드 시작");
-                CommonFunc.AddTdDesignReport(CurrentDataIdName.ToList(), CurrentDataId.ToList(), MainPanel_reportspaths[tempIndex], temp_REGI_PRE_DESIGN_NO);
-
-
-
-                if (tempAGOutput.PublicFacility.Count != 0)
-                {
-                    double plotAreaOfPublic = 0;
-                    double parkingLotAreaOfPublic = 0;
-
-                    CommonFunc.AddDesignNonResidential(CurrentDataIdName.ToList(), CurrentDataId.ToList(), USERID, temp_REGI_PRE_DESIGN_NO, CommonFunc.GetNonresiUseCode(CommonFunc.NonResiType.Commercial), tempAGOutput.GetCommercialArea(), 0, parkingLotAreaOfPublic, (int)tempAGOutput.GetLegalParkingLotOfCommercial(), plotAreaOfPublic);
-                }
-
-
-                //CommonFunc.AddDesignReport(CurrentDataIdName.ToList(), CurrentDataId.ToList(),temp_REGI_PRE_DESIGN_NO);
-
-
-                ///임시 파일 경로 - 추가시 각 코드 밑에 넣기
-
-                //string dummypath = "C:\\Users\\user\\Desktop\\Dummyfiles\\";
-
-                //MainPanel_reportspaths[tempIndex].Add("ELEVATION", dummypath + "elevation.JPG");
-                //MainPanel_reportspaths[tempIndex].Add("SECTION", dummypath + "section.JPG");
-                //MainPanel_reportspaths[tempIndex].Add("DWG_PLANS", dummypath + "dwgplans.dwg");
-                //MainPanel_reportspaths[tempIndex].Add("GROUND_PLAN", dummypath + "groundplan.JPG");
-                //MainPanel_reportspaths[tempIndex].Add("TYPICAL_PLAN", dummypath + "typicalplan.JPG");
-                //MainPanel_reportspaths[tempIndex].Add("BIRDEYE1", dummypath + "birdeye1.JPG");
-                //MainPanel_reportspaths[tempIndex].Add("BIRDEYE2", dummypath + "birdeye2.JPG");
-
-
-
-
-
-
-                RhinoApp.WriteLine("업로드 끝");
 
             }
-            catch(Exception x)
+            catch(Exception ex)
             {
-                RhinoApp.WriteLine("업로드 실패");
+                
             }
-        }
-
-        private void Btn_SendToServer_Click(object sender, RoutedEventArgs e)
-        {
-            this.sendDataToServer();
+           
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -1333,12 +1165,22 @@ namespace TuringAndCorbusier
                 RhinoApp.Wait();
 
                 //-----------JHL 조감도 ---------------//
+                if(i ==0)
+                {
                 var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038, 812), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
                 string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
                 bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
                 string key = "BIRDEYE" + (i + 1).ToString();
                 MainPanel_reportspaths[tempIndex].Add(key, path);
-                
+                }
+                if (i > 0)
+                {
+                    var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1075, 695), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
+                    string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
+                    bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    string key = "BIRDEYE" + (i + 1).ToString();
+                    MainPanel_reportspaths[tempIndex].Add(key, path);
+                }
             }
             MainPanel_building2DPreview.Enabled = true;
             RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(backupPoint, false);
@@ -1562,8 +1404,12 @@ namespace TuringAndCorbusier
             Rhino.RhinoApp.WriteLine(pd.projectName + "로드됨");
 
             if (pd.setting1 != null)
+            { 
                 TuringAndCorbusierPlugIn.InstanceClass.page1Settings = pd.setting1;
-
+                TuringAndCorbusierPlugIn.InstanceClass.turing.ProjectAddress.Text = pd.setting1.Address;
+                TuringAndCorbusierPlugIn.InstanceClass.turing.ProjectName.Text = pd.setting1.ProjectName;
+                TuringAndCorbusierPlugIn.InstanceClass.turing.ProjectArea.Text = Math.Round(pd.setting1.PlotArea,2).ToString();
+            } 
             if (pd.regsetting != null)
                 TuringAndCorbusierPlugIn.InstanceClass.regSettings = pd.regsetting;
 
@@ -1597,9 +1443,9 @@ namespace TuringAndCorbusier
             RhinoDoc.ActiveDoc.Views.Redraw();
 
 
-            Calculate.Content = "설계 시작";
-            Calculate.Click -= Btn_SetInputValues;
-            Calculate.Click += Calculate_Click;
+            //Calculate.Content = "설계 시작";
+            //Calculate.Click -= Btn_SetInputValues;
+            //Calculate.Click += Calculate_Click;
 
             ProjectName.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName;
             ProjectAddress.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.Address;
@@ -1620,9 +1466,19 @@ namespace TuringAndCorbusier
             //parkingLotPreview.CurveToDisplay = tempParkingLotArr.ToList();
             //parkingLotPreview.Enabled = true;
             RhinoDoc.ActiveDoc.Views.Redraw();
-
+            
             //RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(Rhino.RhinoDoc.ActiveDoc.Layers.Find("Default", true), true);
 
+        }
+
+        private void Information_Click(object sender, RoutedEventArgs e)
+        {
+            ProgramInformation information = new ProgramInformation();
+            information.GetMessage();
+            MessageBox.Show("Version    : " + information.Version + System.Environment.NewLine +
+                            "Company : " + information.Company + System.Environment.NewLine +
+                            "Message   : " + information.Message + System.Environment.NewLine , 
+                            "Information");
         }
 
 
