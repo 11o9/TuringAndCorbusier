@@ -221,7 +221,7 @@ namespace TuringAndCorbusier
 
                 polygonPointList.Add(point);
                 Polygon polygon = new Polygon();
-                polygon.Stroke = new SolidColorBrush(Color.FromRgb(196, 215, 0));
+                polygon.Stroke = new SolidColorBrush(Color.FromRgb(200, 229, 13));
                 polygon.StrokeThickness = strokeThickness;
                 PointCollection pointCollection = new PointCollection();
                 for(int i = 0; i < polygonPointList.Count; i++)
@@ -354,6 +354,93 @@ namespace TuringAndCorbusier
                 }
             }
         }
+
+
+        public static void drawDashedPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, System.Windows.Media.Brush strokeBrush, double strokeThickness)
+        {
+            if (curveToDraw != null)
+
+            {
+                Curve[] shatteredCurves = curveToDraw.DuplicateSegments();
+
+                if (shatteredCurves.Length > 1)
+                {
+                    foreach (Curve j in shatteredCurves)
+                    {
+                        System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
+                        System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
+
+                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                        line.Stroke = strokeBrush;
+
+                        line.X1 = Math.Abs(Start.X);
+                        line.X2 = Math.Abs(End.X);
+                        line.Y1 = Math.Abs(Start.Y);
+                        line.Y2 = Math.Abs(End.Y);
+
+                        line.StrokeThickness = strokeThickness;
+                        DoubleCollection dashes = new DoubleCollection();
+                        dashes.Add(35);
+                        dashes.Add(30);
+                        line.StrokeDashArray = dashes;
+                        UnitPlanCanvas.Children.Add(line);
+                    }
+                }
+                else
+                {
+
+                    if (curveToDraw.PointAt(curveToDraw.Domain.Mid) != (curveToDraw.PointAtStart + curveToDraw.PointAtEnd) / 2)
+                    {
+                        List<Curve> shatteredArc = shatterArc(curveToDraw);
+
+                        foreach (Curve j in shatteredArc)
+                        {
+                            System.Windows.Point Start = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T0), tempScaleFactor, tempOrigin);
+                            System.Windows.Point End = pointConverter(tempBoundingBox, j.PointAt(j.Domain.T1), tempScaleFactor, tempOrigin);
+
+                            System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                            line.Stroke = strokeBrush;
+
+                            line.X1 = Math.Abs(Start.X);
+                            line.X2 = Math.Abs(End.X);
+                            line.Y1 = Math.Abs(Start.Y);
+                            line.Y2 = Math.Abs(End.Y);
+
+                            line.StrokeThickness = strokeThickness;
+                            DoubleCollection dashes = new DoubleCollection();
+                            dashes.Add(35);
+                            dashes.Add(30);
+                            line.StrokeDashArray = dashes;
+                            UnitPlanCanvas.Children.Add(line);
+
+                        }
+                    }
+                    else
+                    {
+                        System.Windows.Point Start = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T0), tempScaleFactor, tempOrigin);
+                        System.Windows.Point End = pointConverter(tempBoundingBox, curveToDraw.PointAt(curveToDraw.Domain.T1), tempScaleFactor, tempOrigin);
+
+                        System.Windows.Shapes.Line line = new System.Windows.Shapes.Line();
+                        line.Stroke = strokeBrush;
+
+                        line.X1 = Math.Abs(Start.X);
+                        line.X2 = Math.Abs(End.X);
+                        line.Y1 = Math.Abs(Start.Y);
+                        line.Y2 = Math.Abs(End.Y);
+
+                        line.StrokeThickness = strokeThickness;
+                        DoubleCollection dashes = new DoubleCollection();
+                        dashes.Add(35);
+                        dashes.Add(30);
+                        line.StrokeDashArray = dashes;
+                        UnitPlanCanvas.Children.Add(line);
+
+                    }
+                }
+            }
+
+        }
+
 
         public static void drawPlan(Rectangle3d tempBoundingBox, Curve curveToDraw, double tempScaleFactor, System.Windows.Point tempOrigin, ref Canvas UnitPlanCanvas, Brush strokeBrush, double strokeThickness)
         {

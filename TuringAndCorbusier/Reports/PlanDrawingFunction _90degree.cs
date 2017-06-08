@@ -351,7 +351,7 @@ namespace TuringAndCorbusier
                 }
                 polygon.Points = pointCollection;
                 SolidColorBrush fillColor = new SolidColorBrush();
-                fillColor.Color = Color.FromRgb(196,215,0);
+                fillColor.Color = Color.FromRgb(200, 229, 13);
                 polygon.Fill = fillColor;
                 UnitPlanCanvas.Children.Add(polygon);
             }
@@ -608,7 +608,10 @@ namespace TuringAndCorbusier
                             line.Y2 = Math.Abs(End.Y);
 
                             line.StrokeThickness = strokeThickness;
-
+                            DoubleCollection dashes = new DoubleCollection();
+                            dashes.Add(35);
+                            dashes.Add(30);
+                            line.StrokeDashArray = dashes;
                             UnitPlanCanvas.Children.Add(line);
 
                         }
@@ -627,7 +630,10 @@ namespace TuringAndCorbusier
                         line.Y2 = Math.Abs(End.Y);
 
                         line.StrokeThickness = strokeThickness;
-
+                        DoubleCollection dashes = new DoubleCollection();
+                        dashes.Add(35);
+                        dashes.Add(30);
+                        line.StrokeDashArray = dashes;
                         UnitPlanCanvas.Children.Add(line);
 
                     }

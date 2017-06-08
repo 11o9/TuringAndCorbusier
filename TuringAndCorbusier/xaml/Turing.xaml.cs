@@ -741,7 +741,7 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i + 1);
                             Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
-                            floorPlanDrawing.SetCoreOutline(coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1), newCoreList);
+                            floorPlanDrawing.SetCoreOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1), newCoreList);
                             fps.Add(floorPlanDrawing.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + i.ToString());
                         }
@@ -749,7 +749,7 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i + 1);
                             Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
-                            floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
                             fps.Add(floorPlanDrawing.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + i.ToString());
                         }
@@ -759,7 +759,7 @@ namespace TuringAndCorbusier
                             {
                                 TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
                                 Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F);
-                                floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                                floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
                                 fps.Add(floorPlanDrawing.fixedPage);
                                 pagename.Add("floorPlanDrawingPage" + i.ToString());
                                 break;
@@ -769,8 +769,8 @@ namespace TuringAndCorbusier
                                 TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
                                 Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
                                 Reports.floorPlanDrawingPage topFloorPlanDrawing = new Reports.floorPlanDrawingPage(totalNumOfFloors, "topFloor");
-                                floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
-                                topFloorPlanDrawing.SetTopHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                                floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                                topFloorPlanDrawing.SetTopHouseOutline(MainPanel_AGOutputList[tempIndex],coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
                                 fps.Add(floorPlanDrawing.fixedPage);
                                 pagename.Add("floorPlanDrawingPage" + i.ToString());
                                 fps.Add(topFloorPlanDrawing.fixedPage);
@@ -783,8 +783,8 @@ namespace TuringAndCorbusier
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
                             Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
                             Reports.floorPlanDrawingPage topFloorPlanDrawing = new Reports.floorPlanDrawingPage(totalNumOfFloors, "topFloor");
-                            floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
-                            topFloorPlanDrawing.SetTopHouseOutline(coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            topFloorPlanDrawing.SetTopHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
                             fps.Add(floorPlanDrawing.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + i.ToString());
                             fps.Add(topFloorPlanDrawing.fixedPage);
@@ -800,31 +800,6 @@ namespace TuringAndCorbusier
                 }
 
 
-                //List<HouseholdStatistics> householeStatisticsList = MainPanel_AGOutputList[tempIndex].HouseholdStatistics;
-                //Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1), isUsing1F);
-                //TypicalPlan testTypicalPlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
-                //floorPlanDrawing.SetHouseOutline(coreOutline, houseOutline, testTypicalPlan,householdList,new Interval(1, MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2),NumberOfHouses);
-                //fps.Add(floorPlanDrawing.fixedPage);
-                //pagename.Add("floorPlanDrawingPage" + (12312+1).ToString());
-
-
-                //Reports.wpfSection testSectionPage = new Reports.wpfSection();
-                //DrawSection drawsection = new DrawSection(MainPanel_AGOutputList[tempIndex]);
-
-                //try
-                //{
-                //    //testSectionPage.setPlan(drawsection.Draw());
-                //    fps.Add(testSectionPage.fixedPage);
-                //    pagename.Add("sectionPage");
-                //}
-                //catch (Exception df)
-                //{
-
-                //}
-                //finally
-                //{
-
-                //}
 
                 var a = TuringAndCorbusierPlugIn.InstanceClass.showmewindow.showmeinit(fps, pagename, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName, MainPanel_AGOutputList[tempIndex], ref MainPanel_reportspaths, tempIndex);
             }

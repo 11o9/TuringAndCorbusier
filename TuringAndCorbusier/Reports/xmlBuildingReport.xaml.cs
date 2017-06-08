@@ -24,7 +24,7 @@ namespace Reports
             List<double> area = new List<double>();
             for (int i = 0; i < statistics.Count; i++)
             {
-              double exclusiveArea = statistics[i].GetExclusiveArea();
+                double exclusiveArea = statistics[i].GetExclusiveArea();
                 area.Add(exclusiveArea);
             }
             CreateAreaTypeTextBlock(area);
@@ -73,67 +73,128 @@ namespace Reports
             return "지상 1층부터 지상 " + (AGoutput.ParameterSet.Stories + 1).ToString() + "층";
         }
 
-        private static void DrawPT3Corridor(List<CoreType> coreTypeList,List<Curve> aptLineList, string agType, double aptWidth,out Curve corridorOutline,out Curve currentInnerLine)
+        private static List<List<Curve>> DrawBalconyLine(Apartment apartment)
         {
-                    Curve currentCenterLine = aptLineList[0].DuplicateCurve();
-                    if ((int)currentCenterLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
-                        currentCenterLine.Reverse();
-                    currentInnerLine = currentCenterLine.Offset(Plane.WorldXY, aptWidth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
-                    if ((int)currentInnerLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
-                        currentInnerLine.Reverse();
-                    corridorOutline = currentInnerLine.Offset(Plane.WorldXY, Consts.corridorWidth, 1, CurveOffsetCornerStyle.Sharp)[0];
-                    return;
+            double aptWidth = apartment.ParameterSet.Parameters[2];
+           List<List<Curve>> balconyLine = new List<List<Curve>>();
+            List<Curve> aptLine = apartment.AptLines;
+            List<List<Rhino.Geometry.Line>> lightingEdges = new List<List<Rhino.Geometry.Line>>();
+            List<Household> householdLists = new List<Household>();
+            foreach (var householdDoubleList in apartment.Household)
+            {
+                foreach (var householdList in householdDoubleList)
+                {
+                    foreach (var household in householdList)
+                    {
+                        List<Rhino.Geometry.Line> lineList = new List<Rhino.Geometry.Line>();
+                        for (int i = 0; i < household.LightingEdge.Count; i++)
+                        {
+                            Rhino.Geometry.Line line = new Rhino.Geometry.Line(new Point3d(household.LightingEdge[i].FromX, household.LightingEdge[i].FromY, household.LightingEdge[i].FromZ), new Point3d(household.LightingEdge[i].ToX, household.LightingEdge[i].ToY, household.LightingEdge[i].ToZ));
+                            lineList.Add(line);
+                        }
+                        householdLists.Add(household);
+                        lightingEdges.Add(lineList);
+                    }
+                }
+            }
+
+            for(int i = 0; i < lightingEdges.Count; i++)
+            {
+                List<Curve> balconyLineList = new List<Curve>();
+                for(int j = 0; j < lightingEdges[i].Count; j++)
+                {
+                    Rhino.Geometry.Line line = new Rhino.Geometry.Line(new Point3d(lightingEdges[i][j].FromX, lightingEdges[i][j].FromY, lightingEdges[i][j].FromZ),new Point3d(lightingEdges[i][j].ToX, lightingEdges[i][j].ToY, lightingEdges[i][j].ToZ));
+                    Vector3d dir = line.UnitTangent;
+                    dir.Rotate(Math.PI/2,Vector3d.ZAxis);
+                    line.Transform(Rhino.Geometry.Transform.Translation(dir*10));
+                    var pointContainment = householdLists[i].GetOutline().Contains(line.PointAt(0.5));
+                   if (pointContainment == PointContainment.Outside)
+                    {
+                        dir.Rotate(Math.PI, Vector3d.ZAxis);
+                        Rhino.Geometry.Line line1 = new Rhino.Geometry.Line(new Point3d(lightingEdges[i][j].FromX, lightingEdges[i][j].FromY, lightingEdges[i][j].FromZ), new Point3d(lightingEdges[i][j].ToX, lightingEdges[i][j].ToY, lightingEdges[i][j].ToZ));
+                        line1.Transform(Rhino.Geometry.Transform.Translation(dir*1500));
+                        balconyLineList.Add(line1.ToNurbsCurve());
+                    }
+                    else
+                    {
+                        Rhino.Geometry.Line line1 = new Rhino.Geometry.Line(new Point3d(lightingEdges[i][j].FromX, lightingEdges[i][j].FromY, lightingEdges[i][j].FromZ), new Point3d(lightingEdges[i][j].ToX, lightingEdges[i][j].ToY, lightingEdges[i][j].ToZ));
+                        line1.Transform(Rhino.Geometry.Transform.Translation(dir * 1500));
+                        balconyLineList.Add(line1.ToNurbsCurve());
+                    }
+                }
+                balconyLine.Add(balconyLineList);
+            }
+            return balconyLine;
         }
+
+
+        private static void DrawPT3Corridor(List<CoreType> coreTypeList, List<Curve> aptLineList, string agType, double aptWidth, out Curve corridorOutline, out Curve currentInnerLine)
+        {
+            Curve currentCenterLine = aptLineList[0].DuplicateCurve();
+            if ((int)currentCenterLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+                currentCenterLine.Reverse();
+
+            currentInnerLine = currentCenterLine.Offset(Plane.WorldXY, aptWidth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+
+
+            if ((int)currentInnerLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+                currentInnerLine.Reverse();
+
+            corridorOutline = currentInnerLine.Offset(Plane.WorldXY, Consts.corridorWidth, 1, CurveOffsetCornerStyle.Sharp)[0];
+            return;
+        }
+
         private static List<Curve> DrawPT1corridor(Apartment apartment)
         {
 
-                List<Curve> corridorLines = new List<Curve>();
+            List<Curve> corridorLines = new List<Curve>();
 
-                foreach (var hh in apartment.Household)
+            foreach (var hh in apartment.Household)
+            {
+                foreach (var h in hh)
                 {
-                    foreach (var h in hh)
+                    foreach (var household in h)
                     {
-                        foreach (var household in h)
+                        if (household.isCorridorType)
                         {
-                            if (household.isCorridorType)
-                            {
-                                Curve corridorLine = new LineCurve(household.Origin, household.Origin + household.XDirection * household.XLengthA);
-                                corridorLines.Add(corridorLine);
-                            }
+                            Curve corridorLine = new LineCurve(household.Origin, household.Origin + household.XDirection * household.XLengthA);
+                            corridorLines.Add(corridorLine);
                         }
                     }
                 }
+            }
 
             corridorLines = Curve.JoinCurves(corridorLines).ToList();
-            List<Curve> innerLines = new List<Curve>();
+
+            List<Curve> finalCorridor = new List<Curve>();
             for (int i = 0; i < corridorLines.Count; i++)
             {
                 Curve offset = corridorLines[i].DuplicateCurve();
                 Vector3d dir = offset.TangentAtStart;
                 dir.Rotate(Math.PI / 2, Vector3d.ZAxis);
                 offset.Transform(Rhino.Geometry.Transform.Translation(dir * Consts.corridorWidth));
-                innerLines.Add(offset);
+                PolylineCurve floor = new PolylineCurve(new Point3d[] { corridorLines[i].PointAtStart, offset.PointAtStart, offset.PointAtEnd, corridorLines[i].PointAtEnd, corridorLines[i].PointAtStart });
+                finalCorridor.Add(floor.ToNurbsCurve());
             }
-            List<Curve> finalCorridor = new List<Curve>();
-            List<Point3d> points = new List<Point3d>();
-            for (int i = 0; i < finalCorridor.Count; i++)
-            {
-               points.Add(corridorLines[i].PointAtStart);
-                points.Add(corridorLines[i].PointAtEnd);
-                points.Add(innerLines[i].PointAtEnd);
-                points.Add(innerLines[i].PointAtStart);
-                points.Add(corridorLines[i].PointAtStart);
-                Curve pl = new Rhino.Geometry.Polyline(points).ToNurbsCurve();
-                finalCorridor.Add(pl);
-            }
+
             return finalCorridor;
         }
 
         //--------JHL
         public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics, string agType, List<Curve> aptLineList, ParameterSet paramSet, Apartment apartment)
         {
+            System.Windows.Media.SolidColorBrush SCBGray = new SolidColorBrush();
+            SCBGray.Color = System.Windows.Media.Color.FromRgb(225, 225, 225);
+
+            System.Windows.Media.SolidColorBrush SCBCorridor = new SolidColorBrush();
+            SCBCorridor.Color = System.Windows.Media.Color.FromRgb(242, 242, 242);
+
+            System.Windows.Media.SolidColorBrush SCBLime = new SolidColorBrush();
+            SCBLime.Color = System.Windows.Media.Color.FromRgb(200, 229, 13);
+
+            List<List<Curve>> balconyLines = DrawBalconyLine(apartment);
             List<double> exclusivArea = new List<double>();
-          
+
             Curve boundary = typicalPlan.Boundary;
             List<Curve> surroundingSite = typicalPlan.SurroundingSite;
             List<FloorPlan> housePlanList = typicalPlan.UnitPlans;
@@ -171,7 +232,7 @@ namespace Reports
 
             }
 
-           RotateToFit(ref coreDetailDoubleList,newCoreList,coreType,coreOutline);
+            RotateToFit(ref coreDetailDoubleList, newCoreList, coreType, coreOutline);
 
             List<Point3d> houseOutlinesCentroid = new List<Point3d>();
             Rectangle3d rectangleToFit = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
@@ -184,25 +245,25 @@ namespace Reports
             PlanDrawingFunction.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.2);
             PlanDrawingFunction.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 5);
 
-            if(agType == "PT-3")
+            if (agType == "PT-3")
             {
-            Curve corridorOutline;
-            Curve innerOutline;
-            DrawPT3Corridor(coreType,aptLineList, agType, aptWidth, out corridorOutline, out innerOutline);
-            if (corridorOutline != null && innerOutline != null)
-            {
-
-                PlanDrawingFunction.drawBackGround(rectangleToFit, innerOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Gray);
-                PlanDrawingFunction.drawBackGround(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
-                PlanDrawingFunction.drawPlan(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.75);
+                Curve corridorOutline;
+                Curve innerOutline;
+                DrawPT3Corridor(coreType, aptLineList, agType, aptWidth, out corridorOutline, out innerOutline);
+                if (corridorOutline != null && innerOutline != null)
+                {
+                    PlanDrawingFunction.drawBackGround(rectangleToFit, innerOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBCorridor);
+                    PlanDrawingFunction.drawBackGround(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
+                    PlanDrawingFunction.drawPlan(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.75);
                 }
             }
-            if(agType == "PT-1")
+
+            if (agType == "PT-1")
             {
                 List<Curve> corridor = DrawPT1corridor(apartment);
-                for(int i = 0; i < corridor.Count; i++)
+                for (int i = 0; i < corridor.Count; i++)
                 {
-                    PlanDrawingFunction.drawBackGround(rectangleToFit, corridor[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
+                    PlanDrawingFunction.drawBackGround(rectangleToFit, corridor[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBCorridor);
                     PlanDrawingFunction.drawPlan(rectangleToFit, corridor[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.75);
                 }
             }
@@ -210,98 +271,37 @@ namespace Reports
 
             for (int i = 0; i < houseOutline.Count; i++)
             {
-     
+
                 {
+                    PlanDrawingFunction.drawBackGround(rectangleToFit, houseOutline[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBGray);
                     PlanDrawingFunction.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
                 }
 
             }
 
-            for (int i = 0; i < corePlanList.Count ; i++)
+            for (int i = 0; i < balconyLines.Count; i++)
             {
-     
-                    PlanDrawingFunction.drawPlan(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-                    PlanDrawingFunction.drawPlan(rectangleToFit, coreDetailDoubleList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
-               
+                if (balconyLines[i].Count > 1) {
+                PlanDrawingFunction.drawDashedPlan(rectangleToFit, balconyLines[i][1], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+
+                }
+                else
+                {
+                    PlanDrawingFunction.drawDashedPlan(rectangleToFit, balconyLines[i][0], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+                }
+
+            }
+
+            for (int i = 0; i < corePlanList.Count; i++)
+            {
+                PlanDrawingFunction.drawBackGround(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBGray);
+                PlanDrawingFunction.drawPlan(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+                PlanDrawingFunction.drawPlan(rectangleToFit, coreDetailDoubleList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+
             }
 
             PlanDrawingFunction.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
         }
-
-
-
-        //public TypicalPlan SetTypicalPlan
-        //{
-        //    set
-        //    {
-        //        TypicalPlan tempPlan = value;
-
-        //        Rectangle3d tempBoundingBox = new Rectangle3d(Plane.WorldXY, tempPlan.GetBoundingBox().Min, tempPlan.GetBoundingBox().Max);
-        //        Rectangle canvasRectangle = new Rectangle();
-        //        canvasRectangle.Width = typicalPlanCanvas.Width;
-        //        canvasRectangle.Height = typicalPlanCanvas.Height;
-
-        //        System.Windows.Point tempOrigin = new System.Windows.Point();
-        //        double tempScaleFactor = PlanDrawingFunction.scaleToFitFactor(canvasRectangle, tempBoundingBox, out tempOrigin);
-
-        //        //doc.Objects.AddCurve(Boundary);
-
-        //        PlanDrawingFunction.drawPlan(tempBoundingBox, tempPlan.SurroundingSite, tempScaleFactor, tempOrigin, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.2);
-        //        PlanDrawingFunction.drawBackGround(tempBoundingBox, tempPlan.Boundary, tempScaleFactor, tempOrigin, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
-        //        PlanDrawingFunction.drawPlan(tempBoundingBox, tempPlan.Boundary, tempScaleFactor, tempOrigin, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
-
-        //        foreach (Text3d i in tempPlan.RoadWidth)
-        //            PlanDrawingFunction.drawText(tempBoundingBox, i, tempScaleFactor, tempOrigin, ref this.typicalPlanCanvas, 10, System.Windows.Media.Brushes.HotPink);
-
-        //        foreach (CorePlan i in tempPlan.CorePlans)
-        //        {
-        //            PlanDrawingFunction.drawPlan(tempBoundingBox, i.normals, tempScaleFactor, tempOrigin, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.2);
-        //            PlanDrawingFunction.drawPlan(tempBoundingBox, i.others, tempScaleFactor, tempOrigin, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.DimGray, 0.2);
-        //            PlanDrawingFunction.drawPlan(tempBoundingBox, i.walls, tempScaleFactor, tempOrigin, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.2);
-        //        }
-
-        //        PlanDrawingFunction.drawPlan(tempBoundingBox, tempPlan.OutLine.ToNurbsCurve(), tempScaleFactor, tempOrigin, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
-
-        //        //doc.Objects.AddCurve(OutLine.ToNurbsCurve());
-
-        //        //foreach (Text3d i in RoadWidth)
-        //        //    doc.Objects.AddText(i);
-
-        //        //foreach (FloorPlan i in UnitPlans)
-        //        //{
-        //        //    List<Curve> floorPlans = i.caps;
-
-        //        //    foreach (List<Curve> j in i.centerLines)
-        //        //        floorPlans.AddRange(j);
-        //        //    foreach (List<Curve> j in i.walls)
-        //        //        floorPlans.AddRange(j);
-        //        //    foreach (List<Curve> j in i.windows)
-        //        //        floorPlans.AddRange(j);
-        //        //    foreach (List<Curve> j in i.tilings)
-        //        //        floorPlans.AddRange(j);
-        //        //    foreach (List<Curve> j in i.doors)
-        //        //        floorPlans.AddRange(j);
-
-        //        //    foreach (Curve j in floorPlans)
-        //        //        doc.Objects.AddCurve(j);
-        //        //}
-
-        //        //foreach (CorePlan i in CorePlans)
-        //        //{
-        //        //    List<Curve> corePlans = i.normals;
-        //        //    corePlans.AddRange(i.others);
-        //        //    corePlans.AddRange(i.walls);
-
-        //        //    foreach (Curve j in corePlans)
-        //        //        doc.Objects.AddCurve(j);
-        //        //}
-
-        //        //foreach (Curve i in SurroundingSite)
-        //        //    doc.Objects.AddCurve(i);
-
-        //    }
-        //}
-        //JHL
 
         private void RotateToFit(ref List<List<Curve>> coreDetail, List<Core> coreList, List<CoreType> coreType, List<Curve> coreOutline)
         {
@@ -316,14 +316,14 @@ namespace Reports
 
                     for (int j = 0; j < coreDetail[i].Count; j++)
                     {
-                        double radian = Vector3d.VectorAngle(v2, v1,Plane.WorldXY);
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
 
                         coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
                     }
                 }
                 else if (coreType[i] == CoreType.Parallel)
                 {
-      
+
                     Vector3d v1 = coreList[i].XDirection;
                     Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtEnd - coreDetail[i][0].PointAtStart);
 
@@ -366,15 +366,15 @@ namespace Reports
                     Vector3d v1 = coreList[i].YDirection;
                     Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtStart - coreDetail[i][0].PointAtEnd);
 
-                        //Curve[] coreOutlineSegment = coreOutline[i].DuplicateSegments();
-                        //var longestCoreOutline = (from crv in coreOutlineSegment let len = crv.GetLength() where len > 0 orderby len descending select crv).First();
-                        //Point3d segmentMidPoint1 = longestCoreOutline.PointAtLength(longestCoreOutline.GetLength()/2);
+                    //Curve[] coreOutlineSegment = coreOutline[i].DuplicateSegments();
+                    //var longestCoreOutline = (from crv in coreOutlineSegment let len = crv.GetLength() where len > 0 orderby len descending select crv).First();
+                    //Point3d segmentMidPoint1 = longestCoreOutline.PointAtLength(longestCoreOutline.GetLength()/2);
 
                     for (int j = 0; j < coreDetail[i].Count; j++)
                     {
                         double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
                         coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
-                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Translation(coreList[i].YDirection*coreList[i].depth));
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Translation(coreList[i].YDirection * coreList[i].depth));
 
                         //var longestCoreDetail = (from crv in coreDetail[i][j] let len = crv.GetLength() where len > 0 orderby len descending select crv).First();
                         //Point3d segmentMidPoint2 = longestCoreDetail.PointAtLength(longestCoreDetail.GetLength()/2);
@@ -388,13 +388,13 @@ namespace Reports
             }
         }
 
-        private void ExportRadianToText(List<double> radians,List<Core> coreList)
+        private void ExportRadianToText(List<double> radians, List<Core> coreList)
         {
             StreamWriter sw = new StreamWriter("C:\\Users\\user\\Desktop\\radians\\Radians.txt");
-            for(int i = 0; i < radians.Count; i++)
+            for (int i = 0; i < radians.Count; i++)
             {
-                sw.Write(Math.Round(radians[i],3).ToString()+",");
-                if (i>0&&i % coreList.Count == 0)
+                sw.Write(Math.Round(radians[i], 3).ToString() + ",");
+                if (i > 0 && i % coreList.Count == 0)
                 {
                     sw.Write("\n[]");
                 }
@@ -409,7 +409,7 @@ namespace Reports
             }
             else if (coreType == CoreType.Parallel)
             {
-                return "{4860,0,0}/{4860,-5200,0}/{4860,-5200,0}/{0,-5200,0}/{0,-5200,0}/{0,0,0}/{0,0,0}/{4860,0,0}/{0,-2600,0}/{1250,-2600,0}/{1250,-2600,0}/{1250,0,0}/{1530,-2600,0}/{1530,0,0}/{1810,-2600,0}/{1810,0,0}/{2090,-2600,0}/{2090,0,0}/{2370,-2600,0}/{2370,0,0}/{2650,-2600,0}/{2650,0,0}/{2930,-2600,0}/{2930,0,0}/{3210,-2600,0}/{3210,0,0}/{3490,-2600,0}/{3490,0,0}/{1250,-2600,0}/{3490,-2600,0}/{3490,-1300,0}/{1250,-1300,0}/{3490,-2600,0}/{3490,-5200,0}/{890,-5200,0}/{890,-2600,0}/{890,-5200,0}/{3490,-2600,0}/{890,-2600,0}/{3490,-5200,0}/{0,-5200,0}/{890,-2600,0}/{0,-2600,0}/{890,-5200,0}";
+                return "{4860,0,0}/{4860,-5200,0}/{4860,-5200,0}/{0,-5200,0}/{0,-5200,0}/{0,0,0}/{0,0,0}/{4860,0,0}/{3540,-1300,0}/{1300,-1300,0}/{1300,-2600,0}/{3540,-2600,0}/{3540,-2600,0}/{3540,0,0}/{3260,-2600,0}/{3260,0,0}/{2980,-2600,0}/{2980,0,0}/{2700,-2600,0}/{2700,0,0}/{2420,-2600,0}/{2420,0,0}/{2140,-2600,0}/{2140,0,0}/{1860,-2600,0}/{1860,0,0}/{1580,-2600,0}/{1580,0,0}/{1300,-2600,0}/{1300,0,0}/{3540,-2600,0}/{4860,-2600,0}/{1300,-5200,0}/{1300,-2600,0}/{3900,-5200,0}/{3900,-2600,0}/{3900,-5200,0}/{4860,-2600,0}/{3900,-2600,0}/{4860,-5200,0}/{1300,-5200,0}/{3900,-2600,0}/{1300,-2600,0}/{3900,-5200,0}";
             }
             else if (coreType == CoreType.Vertical)
             {
@@ -462,11 +462,11 @@ namespace Reports
             List<Curve> horizontalCoreCurve = new List<Curve>();
             for (int i = 0; i < horizontalCorePointList.Count; i += 2)
             {
-                if (i <= horizontalCorePointList.Count-2)
+                if (i <= horizontalCorePointList.Count - 2)
                 {
-                Rhino.Geometry.Line line = new Rhino.Geometry.Line(horizontalCorePointList[i], horizontalCorePointList[i + 1]);
-                Curve curve = line.ToNurbsCurve();
-                horizontalCoreCurve.Add(curve);
+                    Rhino.Geometry.Line line = new Rhino.Geometry.Line(horizontalCorePointList[i], horizontalCorePointList[i + 1]);
+                    Curve curve = line.ToNurbsCurve();
+                    horizontalCoreCurve.Add(curve);
                 }
             }
 
@@ -478,14 +478,15 @@ namespace Reports
 
             int previousTop = 780;
             int previousLeft = 640;
+            double size = 18.667;
             System.Windows.Media.FontFamily family = new System.Windows.Media.FontFamily("NanumSquareOTF");
-            for(int i = 0; i < exclusiveArea.Count; i++)
+            for (int i = 0; i < exclusiveArea.Count; i++)
             {
                 TextBlock textBlock = new TextBlock();
-                textBlock.Text = Math.Round(exclusiveArea[i]/1000000,0).ToString() + "m\xB2";
-                textBlock.FontSize = 18.667;
+                textBlock.Text = Math.Round(exclusiveArea[i] / 1000000, 0).ToString() + "m\xB2";
                 textBlock.FontFamily = family;
                 buildingCanvas.Children.Add(textBlock);
+                textBlock.FontSize = size;
                 Canvas.SetTop(textBlock, previousTop);
                 Canvas.SetLeft(textBlock, previousLeft);
                 count++;
@@ -499,10 +500,10 @@ namespace Reports
 
         private List<Curve> CreateCorridor(List<Core> coreList)
         {
-            Rectangle3d innerCorridor = new Rectangle3d(Plane.WorldXY ,coreList[0].Origin,coreList[1].Origin);
+            Rectangle3d innerCorridor = new Rectangle3d(Plane.WorldXY, coreList[0].Origin, coreList[1].Origin);
             List<Curve> curveRectangle = new List<Curve>();
 
-     
+
             return curveRectangle;
         }
     }
