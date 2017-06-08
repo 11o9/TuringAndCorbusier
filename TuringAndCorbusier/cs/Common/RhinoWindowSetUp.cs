@@ -32,7 +32,7 @@ namespace TuringAndCorbusier
         //레이어 검정 => 하양
         public static void LayerColorChange(RhinoDoc doc,Color layercolor)
         {
-            Color defaultcolor = Color.Gold;
+            Color defaultcolor = Color.Black;
             Color tempcolor = Color.Black;
             if (layercolor == Color.Black)
                 tempcolor = Color.Black;
@@ -57,7 +57,7 @@ namespace TuringAndCorbusier
 
                     if (matching_layers[i].Name == "Default")
                     {
-                        matching_layers[i].Color = Color.Gold;
+                        matching_layers[i].Color = Color.Black;
                         matching_layers[i].CommitChanges();
                         continue;
                     }
@@ -108,16 +108,16 @@ namespace TuringAndCorbusier
             //editregi("normal_end", "14474460");
             //editregi("hot_start", "14474460");
             //editregi("normal_border", "14474460");
-            Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.NormalBorder, Color.LightGray);
-            Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.NormalEnd, Color.LightGray);
-            Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.NormalStart, Color.LightGray);
-            Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.HotStart, Color.LightGray);
-            Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.TextEnabled, Color.Black);
-            Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.TextDisabled, Color.Gray);
-            Rhino.ApplicationSettings.AppearanceSettings.CommandPromptBackgroundColor = Color.White;
-            Rhino.ApplicationSettings.AppearanceSettings.CommandPromptTextColor = Color.Black;
+            //Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.NormalBorder, Color.LightGray);
+            //Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.NormalEnd, Color.LightGray);
+            //Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.NormalStart, Color.LightGray);
+            //Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.HotStart, Color.LightGray);
+            //Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.TextEnabled, Color.Black);
+            //Rhino.ApplicationSettings.AppearanceSettings.SetPaintColor(Rhino.ApplicationSettings.PaintColor.TextDisabled, Color.Gray);
+            //Rhino.ApplicationSettings.AppearanceSettings.CommandPromptBackgroundColor = Color.White;
+            //Rhino.ApplicationSettings.AppearanceSettings.CommandPromptTextColor = Color.Black;
 
-            Rhino.ApplicationSettings.AppearanceSettings.ViewportBackgroundColor = Color.LightGray;
+            //Rhino.ApplicationSettings.AppearanceSettings.ViewportBackgroundColor = Color.LightGray;
 
             
 
@@ -168,9 +168,6 @@ namespace TuringAndCorbusier
 
                             if (english_name == "Render")
                                 vp.DisplayMode = Rhino.Display.DisplayModeDescription.FindByName(dms[j].EnglishName);
-
-
-
                         }
                     }
 
@@ -280,7 +277,7 @@ namespace TuringAndCorbusier
                     vp.WorldAxesVisible = false;
                     vp.ParentView.Maximized = true;
                     Rhino.Display.DisplayModeDescription dm = vp.DisplayMode;
-                    if (dm.EnglishName != "Shaded")
+                    if (dm.EnglishName != "Rendered")
                     {
                         Rhino.Display.DisplayModeDescription[] dms = Rhino.Display.DisplayModeDescription.GetDisplayModes();
 
@@ -293,11 +290,12 @@ namespace TuringAndCorbusier
                             english_name = english_name.Replace(",", "");
                             english_name = english_name.Replace(".", "");
 
-                            if (english_name == "Shaded")
+                            if (english_name == "Rendered")
                             {
  
                                 vp.DisplayMode = Rhino.Display.DisplayModeDescription.FindByName(dms[j].EnglishName);
-
+                                vp.DisplayMode.DisplayAttributes.ShowCurves = true;
+                                //vp.DisplayMode.
                             }
 
                         }

@@ -32,6 +32,7 @@ namespace TuringAndCorbusier
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
+            
             //TuringAndCorbusierPlugIn.Instance.initEvent();
             System.Guid panelId = TuringHost.PanelId;
             bool bVisible = Rhino.UI.Panels.IsPanelVisible(panelId);
