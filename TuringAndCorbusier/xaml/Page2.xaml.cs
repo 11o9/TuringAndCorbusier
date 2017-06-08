@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using TuringAndCorbusier.Datastructure_Settings;
 using Rhino.Geometry;
 using TuringAndCorbusier.xaml;
+using TuringAndCorbusier.Utility;
 namespace TuringAndCorbusier
 {
     /// <summary>
@@ -26,6 +27,8 @@ namespace TuringAndCorbusier
         //double s3bak = 0;
         //double s4bak = 0;
         //double s5bak = 0;
+        List<int> mult = new List<int>() { 1, 1, 1 };
+        int multMax = 2;
         public bool isAG34Valid = true;
         UnitTypeSetting targetsetting = new UnitTypeSetting();
         public string Format(double x)
@@ -46,8 +49,12 @@ namespace TuringAndCorbusier
         {
             InitializeComponent();
             stackpanelslot.Content = targetsetting;
- 
-            Disable34();
+
+            Btn_AG_Click(0);
+            Btn_AG_Click(1);
+            Btn_AG_Click(2);
+
+            //Disable34();
         }
 
         public void Disable34()
@@ -82,7 +89,7 @@ namespace TuringAndCorbusier
         }
         private void Btn_ToNext_Click(object sender, RoutedEventArgs e)
         {
-            bool[] whichAgToUse = { !Toggle_AG1.IsChecked.Value, !Toggle_AG3.IsChecked.Value, !Toggle_AG4.IsChecked.Value };
+            bool[] whichAgToUse = selected;
 
             List<double> areas = new List<double>();
             List<double> ratios = new List<double>();
@@ -134,7 +141,7 @@ namespace TuringAndCorbusier
             storiesList.Sort();
 
             TuringAndCorbusierPlugIn.InstanceClass.page2Settings = new Settings_Page2(whichAgToUse.ToList(), target, new Interval(directionList[0], directionList[1]), new Interval(storiesList[0], storiesList[1]), !UndergroundParking_Button.IsChecked.Value);
-
+            TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Multiply = mult;
             NavigationService.Navigate(TuringAndCorbusierPlugIn.InstanceClass.page3);
         }
 
@@ -156,36 +163,55 @@ namespace TuringAndCorbusier
             }
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// agButtonClickMethod
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
+
+        bool[] selected = { false, false, false };
+        System.Drawing.Bitmap[] icons = {
+            Properties.Resources.PT1off, Properties.Resources.PT1on,
+            Properties.Resources.PT3off, Properties.Resources.PT3on,
+            Properties.Resources.PT4off, Properties.Resources.PT4on};
+        
+
+
+        public void Btn_AG_Click(int index)
+        {
+            Image[] diagrams = { Diagram_AG1, Diagram_AG3, Diagram_AG4 };
+            TextBlock[] titles = { Txt_AG1, Txt_AG3, Txt_AG4 };
+
+            selected[index] = !selected[index];
+            int alpha = selected[index] ? 1 : 0;
+            diagrams[index].Source = XamlTools.CreateBitmapSourceFromGdiBitmap(icons[index * 2 + alpha]);
+
+            titles[index].Foreground = selected[index] ? Brushes.Lime : Brushes.White;
+
+        }
+
+        
         private void Btn_AG1_Click(object sender, RoutedEventArgs e)
         {
-            if (Btn_AG1.Opacity == 0)
-            {
-                Btn_AG1.Opacity = 0.4;
-                Toggle_AG1.IsChecked = true;
-                return;
-            }
-            else
-            {
-                Btn_AG1.Opacity = 0;
-                Toggle_AG1.IsChecked = false;
-                return;
-            }
+            Btn_AG_Click(0);
         }
 
         private void Toggle_AG1_Click(object sender, RoutedEventArgs e)
         {
-            if ((sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked.Value)
-            {
-                (sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked = true;
-                Btn_AG1.Opacity = 0.4;
-                return;
-            }
-            else
-            {
-                (sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked = false;
-                Btn_AG1.Opacity = 0;
-                return;
-            }
+
         }
 
         private void Btn_AG2_Click(object sender, RoutedEventArgs e)
@@ -226,67 +252,21 @@ namespace TuringAndCorbusier
 
         public void Btn_AG3_Click(object sender, RoutedEventArgs e)
         {
-            if (Btn_AG3.Opacity == 0)
-            {
-                Btn_AG3.Opacity = 0.4;
-                Toggle_AG3.IsChecked = true;
-                return;
-            }
-            else
-            {
-                Btn_AG3.Opacity = 0;
-                Toggle_AG3.IsChecked = false;
-                return;
-            }
+            Btn_AG_Click(1);
         }
 
         public void Toggle_AG3_Click(object sender, RoutedEventArgs e)
         {
-            if ((sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked.Value)
-            {
-                (sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked = true;
-                Btn_AG3.Opacity = 0.4;
-                return;
-            }
-            else
-            {
-                (sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked = false;
-                Btn_AG3.Opacity = 0;
-                return;
-            }
+       
         }
 
         public void Btn_AG4_Click(object sender, RoutedEventArgs e)
         {
-            if (Btn_AG4.Opacity == 0)
-            {
-                Btn_AG4.Opacity = 0.4;
-                Toggle_AG4.IsChecked = true;
-                return;
-            }
-            else
-            {
-                Btn_AG4.Opacity = 0;
-                Toggle_AG4.IsChecked = false;
-                return;
-            }
-
+            Btn_AG_Click(2);
         }
 
         public void Toggle_AG4_Click(object sender, RoutedEventArgs e)
         {
-            if ((sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked.Value)
-            {
-                (sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked = true;
-                Btn_AG4.Opacity = 0.4;
-                return;
-            }
-            else
-            {
-                (sender as System.Windows.Controls.Primitives.ToggleButton).IsChecked = false;
-                Btn_AG4.Opacity = 0;
-                return;
-            }
 
         }
 
@@ -451,5 +431,36 @@ namespace TuringAndCorbusier
 
         }
 
+        private void TextBlock_PreviewStylusSystemGesture(object sender, StylusSystemGestureEventArgs e)
+        {
+
+        }
+
+        private void MultiplyAG1_Click(object sender, RoutedEventArgs e)
+        {
+            if (mult[0] > multMax)
+                mult[0] = 1;
+            else
+                mult[0]++;
+            MultiplyAG1.Content = "X" + mult[0].ToString();
+        }
+
+        private void MultiplyAG3_Click(object sender, RoutedEventArgs e)
+        {
+            if (mult[1] > multMax)
+                mult[1] = 1;
+            else
+                mult[1]++;
+            MultiplyAG3.Content = "X" + mult[1].ToString();
+        }
+
+        private void MultiplyAG4_Click(object sender, RoutedEventArgs e)
+        {
+            if (mult[2] > multMax)
+                mult[2] = 1;
+            else
+                mult[2]++;
+            MultiplyAG4.Content = "X" + mult[2].ToString();
+        }
     }
 }

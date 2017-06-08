@@ -4,31 +4,47 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TuringAndCorbusier.xaml"
-             mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="500">
-    <Grid>
+             mc:Ignorable="d" Height="50" Width="583" 
+             >
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="XamlSettings.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-        <Button x:Name="mainButton" Height="50" Margin="0,0,50,0"/>
-        <Button x:Name="closeButton" Click="mainButton_Click" Height="50" Width="50" HorizontalAlignment="Right" Margin="0,0,0,0" FontSize="10" FontWeight="ExtraBold" Foreground="Red">
-            <Button.Background>
-                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                    <GradientStop Color="#FF1D1D1D" Offset="0"/>
-                    <GradientStop Color="Black" Offset="0.5"/>
-                    <GradientStop Color="#FF040404" Offset="0.5"/>
-                    <GradientStop Color="Black" Offset="1"/>
-                </LinearGradientBrush>
-            </Button.Background> X
-        </Button>
-        <TextBlock x:Name="name" Text="이름" Margin="32,14,404,11" FontSize="15" TextAlignment="Left"/>
-        <TextBlock x:Name="minimum" Text="하한" Margin="104,14,364,11" FontSize="15" TextAlignment="Left"/>
-        <TextBox x:Name="minimum_Input" Margin="136,15,326,15" TextChanged="minimum_Input_TextChanged"/>
-        <TextBlock x:Name="maximum" Text="상한" Margin="196,14,272,11" FontSize="15" TextAlignment="Left"/>
-        <TextBox x:Name="maximum_Input" Margin="228,15,234,15" TextChanged="maximum_Input_TextChanged" />
-        <TextBlock x:Name="mandatory" Text="필수" Margin="286,14,182,11" FontSize="15" TextAlignment="Left"/>
-        <TextBox x:Name="mandatory_Input" Margin="318,15,144,15" TextChanged="mandatory_Input_TextChanged"/>
-        <TextBlock x:Name="percentage" Text="비율" Margin="366,13,10,2" FontSize="15" TextAlignment="Left" Visibility="Hidden"/>
-        <TextBlock Text="비율" FontSize="15" Margin="372,15,50,10"></TextBlock>
-        <TextBox x:Name="Input" Text="" FontSize="15" Margin="407,15,59,15" TextChanged="Input_TextChanged"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Canvas x:Name="mainButton" Background="Black" Height="50" Grid.ColumnSpan="13"/>
+        <Rectangle Stroke="Gray" Grid.ColumnSpan="13"/>
+        <Button x:Name="closeButton" Grid.Column="1"  Style="{StaticResource GrayButton}"  Click="mainButton_Click" Width="20" Height="20" HorizontalAlignment="Center"  FontSize="10" FontWeight="ExtraBold" Background="#FF727171" />
+        <Image x:Name="X" Grid.Column="1" Width="20" Height="20" IsHitTestVisible="False"/>
+        <TextBlock x:Name="name" Text="이름" Style="{StaticResource TextBlockStyle_Gray}" Height="20" Margin="10,0,10,0" FontSize="15" TextAlignment="Center" Grid.Column="2" Grid.ColumnSpan="2"/>
+        <TextBlock x:Name="minimum" Text="하한" Style="{StaticResource TextBlockStyle}" Grid.Column="4"/>
+        <TextBox x:Name="minimum_Input" Style="{StaticResource TextBoxStyle}" TextChanged="minimum_Input_TextChanged"   Grid.Column="5" />
+        <TextBlock x:Name="maximum" Text="상한" Style="{StaticResource TextBlockStyle}" Grid.Column="6"/>
+        <TextBox x:Name="maximum_Input" Style="{StaticResource TextBoxStyle}" TextChanged="maximum_Input_TextChanged" Grid.Column="7" />
+        <TextBlock x:Name="mandatory" Text="필수" Style="{StaticResource TextBlockStyle}" Grid.Column="10" />
+        <TextBox x:Name="mandatory_Input" Style="{StaticResource TextBoxStyle}" TextChanged="mandatory_Input_TextChanged" Grid.Column="11"/>
+        <TextBlock x:Name="percentage" Text="비율"  Visibility="Hidden" Grid.Column="9" Grid.ColumnSpan="4"/>
+        <TextBlock Text="비율"  Style="{StaticResource TextBlockStyle}" Grid.Column="8"/>
+        <TextBox x:Name="Input" Text="" Style="{StaticResource TextBoxStyle}" TextChanged="Input_TextChanged" Grid.Column="9"/>
 
     </Grid>
 </UserControl>

@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using TuringAndCorbusier.Utility;
 namespace TuringAndCorbusier.xaml
 {
     /// <summary>
@@ -39,6 +40,8 @@ namespace TuringAndCorbusier.xaml
             InitializeComponent();
 
             Input.Text = "1";
+
+            X.Source = XamlTools.CreateBitmapSourceFromGdiBitmap(Properties.Resources.Transparent_X);
 
         }
 
@@ -124,7 +127,7 @@ namespace TuringAndCorbusier.xaml
         private void OnPropertyChanged(string info)
         {
             //scrollvalue = 1;
-            Rhino.RhinoApp.WriteLine(info + "has been changed");
+            //Rhino.RhinoApp.WriteLine(info + "has been changed");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
 
@@ -143,7 +146,7 @@ namespace TuringAndCorbusier.xaml
 
             maxarea = area;
             minarea = area;
-            mandatory = 1;
+            mandatory = 0;
         }
 
       

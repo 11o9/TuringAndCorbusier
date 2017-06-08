@@ -13,7 +13,7 @@ namespace TuringAndCorbusier
     {
         CurveConduit regulationDebug = new CurveConduit(System.Drawing.Color.Red);
         
-
+        
 
         public override Apartment generator(Plot plot, ParameterSet parameterSet, Target target)
         {
@@ -432,14 +432,10 @@ namespace TuringAndCorbusier
             List<List<List<Household>>> hhps = new List<List<List<Household>>>();
             for (int i = 0; i < storiesHigh; i++)
             {
-
-         
                 double tempStoryHeight = pilotiHeight + i * Consts.FloorHeight;
                 Regulation tempStoryReg = new Regulation(i);
                 Curve[] Reg = wholeRegulationHigh;
 
-                if (Reg.Length == 0)
-                { bool ohno = true; }
                 List<List<Household>> tempfloor = new List<List<Household>>();
 
                 foreach (var xx in Low)
@@ -746,8 +742,10 @@ namespace TuringAndCorbusier
         private double[] maxInput = { TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors-1, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, 13000, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
+        private double[] GAparameterset = { 0.1, 0.05, 3, 120, 2, 3, 1 }; //원본
+        //private double[] GAparameterset = { 0.1, 0.05, 3, 10, 2, 3, 1 };                                                                 //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
        // private double[] GAparameterset = { 0.1, 0.05, 3, 120, 2, 3, 1 }; //원본
-        private double[] GAparameterset = { 0.1, 0.05, 1, 10, 1, 3, 1 };                                                                 //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
+        //private double[] GAparameterset = { 0.1, 0.05, 1, 10, 1, 3, 1 };                                                                 //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
 
 
         //private double[] GAparameterset = { 0.2, 0.03, 1, 100, 5, 3, 1 };
@@ -1268,10 +1266,6 @@ namespace TuringAndCorbusier
                     if (lengthToReduce <= 0.1) //tolerance
                         break;
                 }
-
-                if (lengthToReduce >=0.1)
-                    lengthToReduce = lengthToReduce;
-                 
             }
 
 

@@ -423,22 +423,45 @@ namespace TuringAndCorbusier
             Point3d eighth = seventh - vx * outerArcR - vy * outerArcR;
             Point3d ninth = start;
             //polyline1
-            PolylineCurve plc1 = new PolylineCurve(new Point3d[] { start, second, third});
+            Polyline plc1 = new Polyline(new Point3d[] { start, second, third}); 
             ArcCurve arc1 = new ArcCurve(new Arc(third, vy, forth));
-            PolylineCurve plc2 = new PolylineCurve(new Point3d[] { forth,fifth, sixth, seventh });
+            Polyline arc1plc = ArcToPolyline(arc1);
+            Polyline plc2 = new Polyline(new Point3d[] { forth,fifth, sixth, seventh });
             ArcCurve arc2 = new ArcCurve(new Arc(seventh, -vx, eighth));
-            PolylineCurve plc3 = new PolylineCurve(new Point3d[] { eighth, ninth });
-            Curve[] curvesToJoin = new Curve[] { plc1, arc1, plc2, arc2, plc3 };
+            Polyline arc2plc = ArcToPolyline(arc2);
+            Polyline plc3 = new Polyline(new Point3d[] { eighth, ninth });
+            Polyline[] polysToJoin = new Polyline[] { plc1, arc1plc, plc2, arc2plc, plc3 };
             //Rhino.RhinoDoc.ActiveDoc.Objects.Add(Curve.JoinCurves(curvesToJoin)[0]);
-            var joined = Curve.JoinCurves(curvesToJoin);
-            if (joined.Length > 0)
-                return joined[0];
-            else
-                return null;
+            return JoinPolys(polysToJoin);
 
             //return plc;
         }
 
+        private Polyline ArcToPolyline(ArcCurve arc)
+        {
+            List<Point3d> points = new List<Point3d>();
+            for (int i = 0; i < 10; i++)
+            {
+                points.Add(arc.PointAtNormalizedLength(i * 0.1));
+            }
+            points.Add(arc.PointAtEnd);
+            return new Polyline(points);
+        }
+
+        private PolylineCurve JoinPolys(Polyline[] polys)
+        {
+            List<Point3d> merged = new List<Point3d>();
+            for (int i = 0; i < polys.Length; i++)
+            {
+                for (int j = 0; j < polys[i].Count; j++)
+                {
+                    if (i != 0 && j == 0)
+                        continue;
+                    merged.Add(polys[i][j]);
+                }
+            }
+            return new PolylineCurve(merged);
+        }
 
         public bool Calculate()
         {

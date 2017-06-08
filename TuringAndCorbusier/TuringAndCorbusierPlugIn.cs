@@ -7,7 +7,6 @@ using Rhino.UI;
 using System.Runtime.InteropServices;
 using System;
 using System.Text;
-using TuringAndCorbusier.SHServer;
 namespace TuringAndCorbusier
 {
     ///<summary>
@@ -82,10 +81,10 @@ namespace TuringAndCorbusier
             System.Type panel_type = typeof(TuringHost);
 
 
-            Rhino.UI.Panels.RegisterPanel(this, panel_type, "SH_ApartmentGenerator", TuringAndCorbusier.Properties.Resources.Icon1);
+            Rhino.UI.Panels.RegisterPanel(this, panel_type, "SPACEWALK_ApartmentGenerator", TuringAndCorbusier.Properties.Resources.Icon1);
 
 
-            Rhino.RhinoApp.Idle += idleEvent;
+            //Rhino.RhinoApp.Idle += idleEvent;
             Rhino.RhinoApp.Initialized += CallinitEvent;
             //(Rhino.UI.Panels.GetPanel(MainPaenlHost.PanelId) as Rhino.UI.Panels);
             return Rhino.PlugIns.LoadReturnCode.Success;
@@ -133,13 +132,13 @@ namespace TuringAndCorbusier
 
             Rhino.ApplicationSettings.GeneralSettings.NewObjectIsoparmCount = -1;
 
-            InstanceClass.turing.ProjectAddress.Text = SHServer.SHServer.GetAddressFromServer();
+            InstanceClass.turing.ProjectAddress.Text = "";// CommonFunc.getAddressFromServer(InstanceClass.turing.CurrentDataIdName.ToList(), InstanceClass.turing.CurrentDataId.ToList());
 
             Rhino.RhinoApp.Wait();
 
             Rhino.RhinoApp.Wait();
 
-            LoadManager.getInstance().importFileWithAdress();
+            //LoadManager.getInstance().importFileWithAdress();
             LoadManager.getInstance().LayerSetting();
 
 

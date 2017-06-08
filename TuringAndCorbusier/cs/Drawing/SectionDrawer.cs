@@ -2622,7 +2622,7 @@ namespace TuringAndCorbusier
             //만약 축선이 안구해지면 리턴
             if (Axis == null)
             {
-                RhinoApp.WriteLine("여기구나");
+                //RhinoApp.WriteLine("여기구나");
                 return null;
             }
                

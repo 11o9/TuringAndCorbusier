@@ -22,7 +22,7 @@ namespace TuringAndCorbusier.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace TuringAndCorbusier.Properties {
         ///   이 클래스에서 사용하는 캐시된 ResourceManager 인스턴스를 반환합니다.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TuringAndCorbusier.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace TuringAndCorbusier.Properties {
         ///   속성을 재정의합니다.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap diagram1 {
+        public static System.Drawing.Bitmap diagram1 {
             get {
                 object obj = ResourceManager.GetObject("diagram1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -73,7 +73,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap diagram2 {
+        public static System.Drawing.Bitmap diagram2 {
             get {
                 object obj = ResourceManager.GetObject("diagram2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -83,7 +83,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap diagram3 {
+        public static System.Drawing.Bitmap diagram3 {
             get {
                 object obj = ResourceManager.GetObject("diagram3", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -93,7 +93,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap diagram4 {
+        public static System.Drawing.Bitmap diagram4 {
             get {
                 object obj = ResourceManager.GetObject("diagram4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -103,7 +103,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap diagram5 {
+        public static System.Drawing.Bitmap diagram5 {
             get {
                 object obj = ResourceManager.GetObject("diagram5", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -113,7 +113,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   (아이콘)과(와) 유사한 System.Drawing.Icon 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Icon Icon1 {
+        public static System.Drawing.Icon Icon1 {
             get {
                 object obj = ResourceManager.GetObject("Icon1", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -123,7 +123,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap plotPlan {
+        public static System.Drawing.Bitmap plotPlan {
             get {
                 object obj = ResourceManager.GetObject("plotPlan", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -133,7 +133,67 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap Regulation_02 {
+        public static System.Drawing.Bitmap PT1off {
+            get {
+                object obj = ResourceManager.GetObject("PT1off", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        public static System.Drawing.Bitmap PT1on {
+            get {
+                object obj = ResourceManager.GetObject("PT1on", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        public static System.Drawing.Bitmap PT3off {
+            get {
+                object obj = ResourceManager.GetObject("PT3off", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        public static System.Drawing.Bitmap PT3on {
+            get {
+                object obj = ResourceManager.GetObject("PT3on", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        public static System.Drawing.Bitmap PT4off {
+            get {
+                object obj = ResourceManager.GetObject("PT4off", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        public static System.Drawing.Bitmap PT4on {
+            get {
+                object obj = ResourceManager.GetObject("PT4on", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        public static System.Drawing.Bitmap Regulation_02 {
             get {
                 object obj = ResourceManager.GetObject("Regulation_02", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -143,7 +203,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap Regulation_03 {
+        public static System.Drawing.Bitmap Regulation_03 {
             get {
                 object obj = ResourceManager.GetObject("Regulation_03", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -153,7 +213,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap Regulation_04 {
+        public static System.Drawing.Bitmap Regulation_04 {
             get {
                 object obj = ResourceManager.GetObject("Regulation_04", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -163,7 +223,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap Regulation_05 {
+        public static System.Drawing.Bitmap Regulation_05 {
             get {
                 object obj = ResourceManager.GetObject("Regulation_05", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -173,7 +233,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap Regulation_06 {
+        public static System.Drawing.Bitmap Regulation_06 {
             get {
                 object obj = ResourceManager.GetObject("Regulation_06", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -183,7 +243,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap Regulation_07 {
+        public static System.Drawing.Bitmap Regulation_07 {
             get {
                 object obj = ResourceManager.GetObject("Regulation_07", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -193,7 +253,7 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap Regulation_08 {
+        public static System.Drawing.Bitmap Regulation_08 {
             get {
                 object obj = ResourceManager.GetObject("Regulation_08", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -203,9 +263,19 @@ namespace TuringAndCorbusier.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap Regulation_09 {
+        public static System.Drawing.Bitmap Regulation_09 {
             get {
                 object obj = ResourceManager.GetObject("Regulation_09", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        public static System.Drawing.Bitmap Transparent_X {
+            get {
+                object obj = ResourceManager.GetObject("Transparent_X", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -30,6 +30,9 @@ namespace TuringAndCorbusier.xaml
 
         private void toadd_Click(object sender, RoutedEventArgs e)
         {
+
+            bool cancled = false;
+
             UnitTypeButton tempbutton = new UnitTypeButton();
             
             tempbutton.removethisCallBack += (UnitTypeButton button) => { stackpanel.Children.Remove(button); VM.UnitTypes.Remove(button.Unittype); };
@@ -43,9 +46,13 @@ namespace TuringAndCorbusier.xaml
             win.Content = typeinput;
             win.WindowStyle = WindowStyle.None;
             win.SizeToContent = SizeToContent.WidthAndHeight;
+            win.BorderThickness = new Thickness(0);
             win.Topmost = true;
-            typeinput.CallBack += (string n) => { if (n == "") n = "59"; tempbutton.Unittype = new UnitType(double.Parse(n)); tempbutton.Unittype.ScrollValue = 1; win.Close(); return n; };
+            typeinput.CallBack += (string n) => { if (n == "Cancle") { win.Close(); cancled = true; return n; } if (n == "") n = "59"; tempbutton.Unittype = new UnitType(double.Parse(n)); tempbutton.Unittype.ScrollValue = 1; win.Close(); return n; };
             win.ShowDialog();
+
+            if (cancled)
+                return;
 
             int insertindex = GetInsertIndex(tempbutton.Unittype.Area);
 

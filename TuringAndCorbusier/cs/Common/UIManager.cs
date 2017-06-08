@@ -57,7 +57,7 @@ namespace TuringAndCorbusier
             {
                 case SnapMode.Default:
                    
-                    Rhino.RhinoApp.WriteLine("Default");
+                    //Rhino.RhinoApp.WriteLine("Default");
                     break;
                 case SnapMode.EndOnly:
                    
@@ -65,18 +65,18 @@ namespace TuringAndCorbusier
                     setting.OsnapModes = Rhino.ApplicationSettings.OsnapModes.None;
                     setting.OsnapModes = Rhino.ApplicationSettings.OsnapModes.End;
         
-                    Rhino.RhinoApp.WriteLine("EndOnly");
+                    //Rhino.RhinoApp.WriteLine("EndOnly");
                     break;
                 case SnapMode.OffAll:
                   
                     smtsetting.UseSmartTrack = false;
                     setting.OsnapModes = Rhino.ApplicationSettings.OsnapModes.None;
 
-                    Rhino.RhinoApp.WriteLine("OffAll");
+                    //Rhino.RhinoApp.WriteLine("OffAll");
                     break;
                 case SnapMode.Current:
                    
-                    Rhino.RhinoApp.WriteLine("Current");
+                    //Rhino.RhinoApp.WriteLine("Current");
                     break;
                 default:
                     break;

@@ -8,6 +8,8 @@ using Microsoft.Win32;
 using System.IO.Ports;
 using Oracle.ManagedDataAccess.Client;
 using Rhino.Collections;
+using GISData.DataStruct;
+
 using TuringAndCorbusier.Utility;
 
 namespace TuringAndCorbusier
@@ -15,6 +17,8 @@ namespace TuringAndCorbusier
 
     class CommonFunc
     {
+        
+
         public static List<Curve> NewJoin(IEnumerable<Curve> spl)
         {
             Queue<Curve> q = new Queue<Curve>(spl);
@@ -101,6 +105,7 @@ namespace TuringAndCorbusier
                 double distance = height * k;
 
                 List<Curve> result = new List<Curve>();
+
                 List<List<Household>> baseFloorHouses = output.Household[output.Household.Count-2];
 
                 for (int i = 0; i < baseFloorHouses.Count; i++)
@@ -111,6 +116,7 @@ namespace TuringAndCorbusier
                         for (int l = 0; l < baseFloorHouses[i][j].LightingEdge.Count; l++)
                         {
                             Line tempLighting = baseFloorHouses[i][j].LightingEdge[l];
+
                             Curve ligtingBox = DrawLightingBox(tempLighting, outline, distance);
                             result.Add(ligtingBox);
                         }
@@ -195,11 +201,14 @@ namespace TuringAndCorbusier
            
 
             //sub
+        
             private static Curve DrawLightingBox(Line lightingEdge, Curve outline, double distance)
             {
+
                 Line currentLighting = lightingEdge;
                 Point3d windowMidPt = currentLighting.From + currentLighting.Direction / 2;
 
+             
                 Vector3d algin = currentLighting.UnitTangent;
                 Vector3d perp = currentLighting.UnitTangent;
                 perp.Rotate(Math.PI / 2, Vector3d.ZAxis);
@@ -226,6 +235,7 @@ namespace TuringAndCorbusier
                 List<Curve> result = new List<Curve>();
                 foreach (var aptline in output.AptLines)
                 {
+                    
                     if (output.AptLines.IndexOf(aptline) == 0)
                         continue;
                     Curve front = aptline.DuplicateCurve();
@@ -237,6 +247,7 @@ namespace TuringAndCorbusier
                     front.Translate(v * d);
                     back.Translate(v * d * -1);
 
+                 
                     Curve front2 = front.DuplicateCurve();
                     Curve back2 = back.DuplicateCurve();
 
@@ -304,6 +315,7 @@ namespace TuringAndCorbusier
 
                     if (coreCount <= 2)
                     {
+                       
                         //add short
                         Line dimLine1 = PCXTools.PCXByEquation(dimOrigin1, innerRectPoly, dimBaseCore.XDirection);
                         Line dimLine1sub = PCXTools.PCXByEquation(dimOrigin1, innerRectPoly, -dimBaseCore.XDirection);
@@ -338,6 +350,7 @@ namespace TuringAndCorbusier
 
                         return result;
                     }
+                
 
                     else if (coreCount > 2)
                     {
@@ -395,9 +408,11 @@ namespace TuringAndCorbusier
                     }
 
                     else
+              
                         return result;
                 }
 
+          
                 else if (output.ParameterSet.fixedCoreType == CoreType.CourtShortEdge)
                 {
                     Core dimBaseCore = baseFloorCore.First();
@@ -503,6 +518,7 @@ namespace TuringAndCorbusier
           
                 return new List<Curve>();
             }
+
 
             private static List<Curve> AG4AptDistance(Apartment output, ref List<string> dim)
             {
@@ -2366,7 +2382,8 @@ namespace TuringAndCorbusier
                 {
                     return System.Drawing.Color.Gray;
                 }
-
+                if (i > 19)
+                    i = 19;
                 int myInt1 = (i <= 10) ? 25 * i : 255;
                 int myInt2 = (i >= 10) ? 25 * (20 - i) : 255;
                 System.Drawing.Color tempColor = System.Drawing.Color.FromArgb(myInt2, myInt1, 0);

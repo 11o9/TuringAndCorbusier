@@ -180,8 +180,6 @@ namespace TuringAndCorbusier
                     }
                 }
             }
-
-            aptLines = aptLines;
         }
 
         //not used

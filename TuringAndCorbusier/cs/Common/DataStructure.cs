@@ -5,6 +5,14 @@ using System.Linq;
 using Rhino.Display;
 using System.IO;
 using Rhino;
+using TuringAndCorbusier.Utility;
+namespace TuringAndCorbusier.Document
+{
+    public class Document
+    {
+
+    }
+}
 
 namespace TuringAndCorbusier
 {
@@ -756,6 +764,11 @@ namespace TuringAndCorbusier
         public abstract double[] GAParameterSet { get; }
         public abstract bool IsCoreProtrude { get; }
         public abstract string GetAGType { get; }
+        public virtual void Multiply(int x)
+        {
+            //generation 뻥튀기
+            this.GAParameterSet[4] = this.GAParameterSet[4] * x;
+        }
     }
 
     public class Apartment : IDisposable
@@ -2444,7 +2457,13 @@ namespace TuringAndCorbusier
                 }
 
             }
-            return true;
+           
+            var diff = Curve.CreateBooleanDifference(GetOutline(), regulationLine);
+
+            if (diff.Length == 0)
+                return true;
+            else
+                return false;
         }
 
         private double CalculateSetBackDistance(Curve testCurve, Curve testline)
@@ -3773,7 +3792,7 @@ namespace TuringAndCorbusier
         }
 
         public List<Curve> CurveToDisplay { protected get; set; }
-        protected System.Drawing.Color displayColor = System.Drawing.Color.Red;
+        protected System.Drawing.Color displayColor = System.Drawing.Color.Lime;
     }
 
     public class BrepConduit : Rhino.Display.DisplayConduit

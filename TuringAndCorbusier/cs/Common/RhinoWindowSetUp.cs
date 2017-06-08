@@ -35,8 +35,7 @@ namespace TuringAndCorbusier
             Color defaultcolor = Color.Gold;
             Color tempcolor = Color.Black;
             if (layercolor == Color.Black)
-            
-                tempcolor = Color.White;
+                tempcolor = Color.Black;
            
 
             var matching_layers = (from layer in doc.Layers
@@ -44,14 +43,12 @@ namespace TuringAndCorbusier
                                    select layer).ToList<Rhino.DocObjects.Layer>();
 
             Rhino.DocObjects.Layer layer_to_change = null;
-            if (matching_layers.Count == 0)
-            {
-                RhinoApp.WriteLine("Layer" + layercolor.ToKnownColor() + "does not exist.");
 
-            }
-
-
-            else if (matching_layers.Count > 0)
+            //if (matching_layers.Count == 0)
+            //{
+            //    RhinoApp.WriteLine("Layer" + layercolor.ToKnownColor() + "does not exist.");
+            //}
+            if (matching_layers.Count > 0)
             {
 
                 
@@ -96,7 +93,7 @@ namespace TuringAndCorbusier
 
             
 
-            LayerColorChange(doc,Color.White);
+            //LayerColorChange(doc,Color.White);
             //Rhino.Render.RenderContent[] rendercontents = Rhino.Render.UI.UserInterfaceSection.FromWindow(RhinoApp.MainWindow()).GetContentList();
             //for (int i = 0; i < rendercontents.Length; i++)
             //{
@@ -156,7 +153,7 @@ namespace TuringAndCorbusier
                     vp.ParentView.Maximized = false;
                     vp.ConstructionGridVisible = true;
                     Rhino.Display.DisplayModeDescription dm = vp.DisplayMode;
-                    if (dm.EnglishName != "Shaded")
+                    if (dm.EnglishName != "Render")
                     {
                         Rhino.Display.DisplayModeDescription[] dms = Rhino.Display.DisplayModeDescription.GetDisplayModes();
 
@@ -169,7 +166,7 @@ namespace TuringAndCorbusier
                             english_name = english_name.Replace(",", "");
                             english_name = english_name.Replace(".", "");
 
-                            if (english_name == "Shaded")
+                            if (english_name == "Render")
                                 vp.DisplayMode = Rhino.Display.DisplayModeDescription.FindByName(dms[j].EnglishName);
 
 
@@ -225,7 +222,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < toolbars.ToArray().Length; i++)
             {
                 asdfasdf.Add(toolbars[i].Path);
-                RhinoApp.WriteLine(toolbars[i].Path);
+                //RhinoApp.WriteLine(toolbars[i].Path);
                 toolbars[i].Close(false);
             }
 
@@ -252,19 +249,7 @@ namespace TuringAndCorbusier
             Guid currentPanel = TuringHost.PanelId;
 
 
-            
-            
 
-            
-            
-            
-
-            RhinoApp.WriteLine("PROJECT BOUNDLESS-X");
-            RhinoApp.WriteLine("BY BOUNDLESS");
-            RhinoApp.WriteLine("Ver 2.10 For SH");
-            RhinoApp.WriteLine("Load Complete");
-
-            //
             //레이어 검정색 -> 하얀색
             LayerColorChange(doc, Color.Black);
 

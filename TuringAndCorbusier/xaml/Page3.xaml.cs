@@ -162,8 +162,8 @@ namespace TuringAndCorbusier
 
             string[] stackPannelButtonStyle = { "stackPannelButtonStyle1", "stackPannelButtonStyle2" };
             string tempStyle = stackPannelButtonStyle[stackPanel.Children.Count % 2];
-            System.Windows.Style style = this.FindResource(tempStyle) as System.Windows.Style;
-
+            ResourceDictionary tempDictionary = this.Resources.MergedDictionaries[0];
+            System.Windows.Style style = tempDictionary[tempStyle] as Style;
             btn.Style = style;
             btn.Content = tempGrid;
             btn.Height = 21;
@@ -203,7 +203,7 @@ namespace TuringAndCorbusier
             this.previousClickedButtonIndex = stackPanel.Children.IndexOf(sender as Button);
             this.previousClickedButtonBrush = (sender as Button).Background;
 
-            (sender as Button).Background = new SolidColorBrush(Color.FromArgb(255, 255, 204, 0));
+            (sender as Button).Background = Brushes.Lime;
             this.preview(tempOutput[stackPanel.Children.IndexOf(sender as Button)]);
 
             UpdateSummary(tempOutput[stackPanel.Children.IndexOf(sender as Button)]);
@@ -259,6 +259,7 @@ namespace TuringAndCorbusier
             BuildingArea_Py.Text = "(" + Math.Round(agOutput.GetBuildingArea() / 1000000 / 3.3, 2).ToString() + " 평)";
             BuildingCoverage.Text = ((int)agOutput.GetBuildingCoverage()).ToString() + " %";
             LegalBuildingCoverage.Text = "(법정 : " + TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage.ToString() + " %)";
+            LegalFloorAreaRatio.Text = "(법정 : " + TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio.ToString() + " %)";
 
             GrossArea.Text = Math.Round(agOutput.GetGrossArea() / 1000000, 2).ToString() + " m\xB2";
             GrossArea_Py.Text = "(" + Math.Round(agOutput.GetGrossArea() / 1000000 / 3.3, 2).ToString() + " 평)";
@@ -337,6 +338,9 @@ namespace TuringAndCorbusier
 
         private void Btn_Calculate_Click(object sender, RoutedEventArgs e)
         {
+
+            
+
             currentProgressFactor = 0;
 
             //building3DPreview.BrepToDisplay = new List<Brep>();
@@ -380,6 +384,7 @@ namespace TuringAndCorbusier
                 try
                 {
                     AG1 tempAG = new AG1();
+                    tempAG.Multiply(TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Multiply[0]);
 
                     List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, tempAG, tempTarget, !this.Preview_Toggle.IsChecked.Value);
 
@@ -407,29 +412,26 @@ namespace TuringAndCorbusier
                 if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse[i])
                 {
 
+                    var tempAG = agSet[i];
+                    tempAG.Multiply(TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Multiply[i]);
+                    List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
 
-                    //try
-                    //{
-                        List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
+                    string tempAGname = GetConvertedAGName(agSet[i]);
 
+                    if (tempTempOutputs == null)
+                        continue;
 
+                    for (int k = 0; k < tempTempOutputs.Count; k++)
+                    {
 
-                        string tempAGname = GetConvertedAGName(agSet[i]);
-
-                        if (tempTempOutputs == null)
-                            continue;
-
-                        for (int k = 0; k < tempTempOutputs.Count; k++)
+                        bool addResult = this.AddButtonToStackPanel(tempTempOutputs[k]);
+                        if (addResult)
                         {
-
-                            bool addResult = this.AddButtonToStackPanel(tempTempOutputs[k]);
-                            if (addResult)
-                            {
-                                this.tempOutput.Add(tempTempOutputs[k]);
-                                this.tempAGName.Add(tempAGname);
-                            }
-
+                            this.tempOutput.Add(tempTempOutputs[k]);
+                            this.tempAGName.Add(tempAGname);
                         }
+
+                    }
                 }
             }
         }
@@ -556,7 +558,7 @@ namespace TuringAndCorbusier
             double percentage = progressBarFactor / workQuantity * 100;
 
             CurrentPercentage.Text = Math.Round(percentage, 0).ToString() + "%";
-            CurrentProgressBar.Width = ProgressBarBase.Width * percentage / 100;
+            CurrentProgressBar.Width = ProgressBarBase.ActualWidth * percentage / 100;
 
             CurrentCondition.Text = currentConditionString;
         }
@@ -564,11 +566,25 @@ namespace TuringAndCorbusier
         public void calcWorkQuantity(List<ApartmentGeneratorBase> agList)
         {
             double output = 0;
-
+            var mult = TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Multiply;
             foreach (ApartmentGeneratorBase i in agList)
             {
+                int index = -1;
+                if (i.GetAGType == "PT-1")
+                    index = 0;
+                else if (i.GetAGType == "PT-3")
+                    index = 1;
+                else if (i.GetAGType == "PT-4")
+                    index = 2;
+                else
+                    index = -1;
+
+                if (index == -1)
+                    continue;
+
+
                 //population * (initialboost + generation)
-                output += (i.GAParameterSet[4] + i.GAParameterSet[2]) * i.GAParameterSet[3];
+                output += (i.GAParameterSet[4] * mult[index] + i.GAParameterSet[2]) * i.GAParameterSet[3];
             }
 
             this.currentWorkQuantity = output;

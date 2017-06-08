@@ -23,19 +23,48 @@ namespace TuringAndCorbusier.xaml
 
         public UnitTypeInputBox()
         {
+            this.BorderThickness = new Thickness(0);
+            
             InitializeComponent();
             result.Focus();
         }
 
         private void button_ok_Click(object sender, RoutedEventArgs e)
         {
-            CallBack?.Invoke(result.Text);
+            string c = result.Text;
+            int i = -1;
+            if (int.TryParse(c, out i))
+            {
+                CallBack?.Invoke(result.Text);
+            }
+            else
+            {
+                result.Text = "";
+            }
+           
         }
 
         private void result_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+
+            if(e.Key == Key.Escape)
+                CallBack?.Invoke("Cancle");
+
+            if (e.Key != Key.Enter)
+                return;
+
+            
+
+            string c = result.Text;
+            int i = -1;
+            if (int.TryParse(c, out i))
+            {
                 CallBack?.Invoke(result.Text);
+            }
+            else
+            {
+                result.Text = "";
+            }
         }
     }
 }

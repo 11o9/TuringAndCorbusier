@@ -418,7 +418,7 @@ namespace TuringAndCorbusier
                         temp = d;
                     }
 
-                    Rhino.RhinoApp.WriteLine("maxdgree = " + maxdgree + " d.dgree = " + d.Degree + " c.dgree = " + c.Degree);
+                    //Rhino.RhinoApp.WriteLine("maxdgree = " + maxdgree + " d.dgree = " + d.Degree + " c.dgree = " + c.Degree);
 
                 }
 
@@ -583,7 +583,7 @@ namespace TuringAndCorbusier
                 cTemp.Transform(Transform.Translation(new Vector3d(c.CenterPoint())));
                 buildings.Add(Surface.CreateExtrusion(cTemp, Vector3d.ZAxis * 20000).ToBrep().CapPlanarHoles(1));
             }
-            Rhino.RhinoApp.WriteLine(" temp2 = " + temp2.Count + "edges = " + edges.Count + " buildings = " + buildings.Count);
+            //Rhino.RhinoApp.WriteLine(" temp2 = " + temp2.Count + "edges = " + edges.Count + " buildings = " + buildings.Count);
             return buildings;
         }
         // use

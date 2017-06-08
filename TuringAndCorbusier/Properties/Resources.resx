@@ -163,4 +163,25 @@
   <data name="Icon1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icon1.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="PT1off" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PT1off.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PT1on" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PT1on.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PT3off" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PT3off.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PT3on" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PT3on.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PT4off" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PT4off.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PT4on" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PT4on.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Transparent_X" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Transparent_X.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

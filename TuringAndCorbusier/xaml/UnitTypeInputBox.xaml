@@ -6,11 +6,19 @@
              xmlns:local="clr-namespace:TuringAndCorbusier.xaml"
              mc:Ignorable="d" 
              d:DesignHeight="50" Width="291.333">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="XamlSettings.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
     <Grid>
-        <Canvas Background="LightGray" Margin="0,0,0,0"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="9,4,0,0" TextWrapping="Wrap" Text="기준 평형 설정" VerticalAlignment="Top" FontSize="15"/>
-        <TextBox x:Name="result" HorizontalAlignment="Left" Height="22" Margin="120,4,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="115" TextAlignment="Right"  KeyUp="result_KeyUp"/>
-        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="240,4,0,0" TextWrapping="Wrap" Text="m2 형" VerticalAlignment="Top" FontSize="15" Width="43" />
-        <Button x:Name="button_ok" Margin="0,31,0,0" FontSize="10" Content="확인" Click="button_ok_Click"/>
+        <Canvas Background="Black" Margin="0,0,0,0"/>
+        <TextBlock Style="{StaticResource TextBlockStyle}" x:Name="textBlock" HorizontalAlignment="Left" Margin="9,4,0,0" TextWrapping="Wrap" Text="기준 평형 설정" VerticalAlignment="Top" FontSize="15"/>
+        <TextBox Style="{StaticResource TextBoxStyle}" x:Name="result" HorizontalAlignment="Left" Height="22" Margin="120,4,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="115" KeyUp="result_KeyUp"/>
+        <TextBlock  Style="{StaticResource TextBlockStyle}"  x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="240,4,0,0" TextWrapping="Wrap" Text="m2 형" VerticalAlignment="Top" FontSize="15" Width="43" />
+        <Button  Style="{StaticResource GrayButton}" BorderBrush ="White" BorderThickness="5" Background="Gray" x:Name="button_ok" Margin="0,30,0,0" FontSize="10" Content="확인" Click="button_ok_Click"/>
     </Grid>
 </UserControl>
