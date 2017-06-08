@@ -478,8 +478,14 @@ namespace TuringAndCorbusier
                 {
                     att.MaterialIndex = index;
                 }
-                var extrusion = Extrusion.Create(plot.Boundary, 1, true).ToBrep();
-                Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(extrusion, att);
+
+                var surface = Brep.CreatePlanarBreps(plot.Boundary);
+
+                for (int j = 0; j < surface.Length; j++)
+                {
+                    surface[j].Translate(Vector3d.ZAxis);
+                    Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(surface[j], att);
+                }
             }
 
 

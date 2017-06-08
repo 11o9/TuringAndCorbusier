@@ -7,7 +7,7 @@ namespace TuringAndCorbusier
 {
     class ProgramInformation
     {
-        public string Version = "1.010530";
+        public string Version = "1.010608";
         public string Company = "SPACEWALK";
         public string MessageURL = @"Data Source=spacewalk.koreasouth.cloudapp.azure.com,1433;Initial Catalog=mssql_System;USER ID=sa;PASSWORD=building39!";
         

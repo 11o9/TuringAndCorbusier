@@ -107,13 +107,13 @@ namespace TuringAndCorbusier
             TuringAndCorbusierPlugIn.InstanceClass.page1Settings = new Datastructure_Settings.Settings_Page1(ProjectName.Text, ProjectAddress.Text, "제 2종 일반 주거지역", double.Parse(ProjectArea.Text.Replace("m2","")), 200, 60, 7);
 
 
-            List<System.Guid> dummy = new List<System.Guid>();
-            Dictionary<string, string> pathdummy = new Dictionary<string, string>();
-            for (int i = 0; i < 10; i++)
-            {
-                MainPanel_building3DPreview.Add(dummy);
-                MainPanel_reportspaths.Add(pathdummy);
-            }
+            //List<System.Guid> dummy = new List<System.Guid>();
+            //Dictionary<string, string> pathdummy = new Dictionary<string, string>();
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    MainPanel_building3DPreview.Add(dummy);
+            //    MainPanel_reportspaths.Add(pathdummy);
+            //}
 
         }
 
@@ -144,7 +144,7 @@ namespace TuringAndCorbusier
 
 
 
-            tempIndex = stackPanel.Children.IndexOf(sender as System.Windows.Controls.Button);
+            tempIndex = stackPanel.Children.IndexOf(sender as Button);
 
             //법규선..땜시
             TuringAndCorbusierPlugIn.InstanceClass.plot.PlotType = MainPanel_AGOutputList[tempIndex].Plot.PlotType;
@@ -430,7 +430,8 @@ namespace TuringAndCorbusier
             ///
             stackPanel.Children.Add(btn);
             MainPanel_AGOutputList.Add(AGOutput);
-
+            MainPanel_building3DPreview.Add(new List<Guid>());
+            MainPanel_reportspaths.Add(new Dictionary<string, string>());
            // var makekdg = MessageBox.Show("건물이 있으면 안되는 블럭의 내부에 점을 찍으세요. 선택이 끝나면 esc", "도로 선택 완료", MessageBoxButton.YesNoCancel);
             //깍두기 최초 생성
             //if (stackPanel.Children.Count == 1)
@@ -778,18 +779,11 @@ namespace TuringAndCorbusier
 
             int index = tempIndex;
 
-            try
-            {
-                if (TuringAndCorbusierPlugIn.InstanceClass.turing.MainPanel_building3DPreview[index] != null)
-                    TuringAndCorbusierPlugIn.InstanceClass.turing.MainPanel_building3DPreview.RemoveAt(index);
-            }
-            catch (System.ArgumentOutOfRangeException)
-            {
-
-            }
-
 
             List<Guid> tempGuid = new List<Guid>();
+
+            if (MainPanel_building3DPreview[tempIndex].Count != 0)
+                return;
 
             try
             {
@@ -810,8 +804,8 @@ namespace TuringAndCorbusier
                 //}
 
                 tempGuid.AddRange(MakeBuildings.DrawFoundation(MainPanel_AGOutputList[index]));
-
-                MainPanel_building3DPreview.Insert(index, tempGuid);
+                
+              //  MainPanel_building3DPreview.Insert(index, tempGuid);
                 RhinoDoc.ActiveDoc.Views.Redraw();
             }
             catch(Exception ex)
@@ -820,7 +814,7 @@ namespace TuringAndCorbusier
             }
             finally
             {
-                MainPanel_building3DPreview.Insert(index, tempGuid);
+                MainPanel_building3DPreview[index] = tempGuid;
             }
         }
 
@@ -1198,6 +1192,7 @@ namespace TuringAndCorbusier
             string dir32 = "C://Program Files//Boundless//TuringAndCorbusier//DataBase//temp//";
 
 
+
             if (is64)
                 dirinfo = new DirectoryInfo(dir64);
             else
@@ -1205,6 +1200,13 @@ namespace TuringAndCorbusier
 
             if (!dirinfo.Exists)
                 dirinfo.Create();
+
+
+
+            RhinoDoc.ActiveDoc.Objects.Select(MainPanel_building3DPreview[tempIndex], true);
+            RhinoApp.RunScript("ZSA", false);
+            RhinoDoc.ActiveDoc.Objects.UnselectAll();
+
 
             Point3d backupPoint = RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.CameraLocation;
             Vector3d backupDir = RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.CameraDirection;
@@ -1215,13 +1217,21 @@ namespace TuringAndCorbusier
                 Point3d center = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.center;
                 Point3d tempcampos = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.campos[i] + Vector3d.ZAxis * new Vector3d(center - TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.campos[i]).Length;
                 Vector3d tempdir = new Vector3d(center - tempcampos);
-                tempcampos = tempcampos - 2 * tempdir;
+                tempcampos = tempcampos - 3 * tempdir;
+                tempcampos += Vector3d.ZAxis * 2000;
                 if (MainPanel_AGOutputList[tempIndex].Plot.PlotType == PlotType.상업지역)
-                    tempcampos = tempcampos - 6 * tempdir;
+                    tempcampos = tempcampos - 9 * tempdir;
+
+
                 RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(tempcampos, false);
+                RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(new Vector3d(center - tempcampos), false);
+
+                RhinoDoc.ActiveDoc.Objects.Select(MainPanel_building3DPreview[tempIndex], true);
+                RhinoApp.RunScript("ZSA",false);
+                RhinoDoc.ActiveDoc.Objects.UnselectAll();
                 //RhinoDoc.ActiveDoc.Objects.AddLine(new Line(tempcampos, tempdir * 3));
                 RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
-                RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(new Vector3d(center - tempcampos), false);
+               
 
                 RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
 

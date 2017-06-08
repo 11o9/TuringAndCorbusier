@@ -141,9 +141,14 @@ namespace TuringAndCorbusier
             //LoadManager.getInstance().importFileWithAdress();
             LoadManager.getInstance().LayerSetting();
 
-
+            RhinoDoc.ActiveDoc.ModelUnitSystem = UnitSystem.Millimeters;
+            Rhino.Render.RenderSettings r = new Rhino.Render.RenderSettings();
+            //r.
+            //Rhino.ApplicationSettings.FileSettings.TemplateFile = @"C://Users//user//AppData//Roaming//McNeel//Rhinoceros//5.0//Localization//en - US//Template Files//SPACEWALK - Millimeters.3dm";
+            //string temptemplate = Rhino.ApplicationSettings.FileSettings.TemplateFile;
             ///6.3
             RhinoWindowSetUp.SetUIForTC(Rhino.RhinoDoc.ActiveDoc);
+            RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.ChangeToParallelProjection(true);
             ///~6.3
             Rhino.RhinoApp.WriteLine("InitComplete");
         }

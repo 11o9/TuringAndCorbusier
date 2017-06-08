@@ -285,9 +285,20 @@ namespace TuringAndCorbusier
             //1.setups for parking
             #region setup
             //parking curves setting
-            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY, cores[0][0].Depth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+
+            if ((int)inlineCurve.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+            {
+                inlineCurve.Reverse();
+            }
+
+            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY, cores[0][0].Depth / 2 + Consts.corridorWidth, 1, CurveOffsetCornerStyle.Sharp)[0];
+
             Curve[] parkingLineSegments = parkingLine.DuplicateSegments();
             Curve[] shortSegments = parkingLineSegments.OrderBy(n => n.GetLength()).Take(2).ToArray();
+
+            //디버그
+           
+
             //세배 길이의 라인으로
             List<Line> toLine = shortSegments.Select(n => new Line(n.PointAtStart - n.TangentAtStart * n.GetLength(), n.PointAtEnd + n.TangentAtStart * n.GetLength())).ToList();
             //둘중 하나 역으로
@@ -307,6 +318,9 @@ namespace TuringAndCorbusier
                 obstacles[i].Translate(cores[0][i].YDirection * (cores[0][i].Depth - width) / 2);
             }
 
+            obstacles.AddRange(cores[0].Select(n => n.DrawOutline(width)).ToList());
+
+
             //distance setting
             double lineDistance = toLine[0].From.DistanceTo(toLine[1].From);
 
@@ -320,8 +334,10 @@ namespace TuringAndCorbusier
             pm.Boundary = plot.Boundary;
             pm.Distance = lineDistance;
             pm.CoreDepth = coreDepth;
+            pm.LineType = ParkingLineType.SingleLine;
             pm.AddBack = true;
 
+            
             ParkingLotOnEarth parkingLotOnEarth = pm.GetParking();
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
             #endregion
@@ -329,11 +345,17 @@ namespace TuringAndCorbusier
 
             List<Curve> aptLines = new List<Curve>();
             aptLines.Add(centerLineCurve);
+            aptLines.Add(parkingLine);
+            aptLines.AddRange(obstacles);
 
             Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
 
             //#######################################################################################################################
-            if (parameterSet.using1F || parameterSet.setback)
+            if (parameterSet.using1F)
+            {
+                result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, new ParkingLotOnEarth(), parkingLotUnderGround, buildingOutlines, aptLines);
+            }
+            else if (parameterSet.setback)
             {
 
             }
@@ -341,6 +363,7 @@ namespace TuringAndCorbusier
 
             else
             {
+
                 Finalizer finalizer = new Finalizer(result);
                 result = finalizer.Finalize();
             }
