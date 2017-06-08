@@ -1388,8 +1388,8 @@ namespace TuringAndCorbusier
             double output = 0;
 
 
-            output = Household[0].Sum(n => n.Sum(m => m.GetArea() + m.CorridorArea));
-            output += Core[0].Sum(n => n.GetArea());
+            output = Household[1].Sum(n => n.Sum(m => m.GetArea() + m.CorridorArea));
+            output += Core[1].Sum(n => n.GetArea());
 
             foreach (NonResidential i in Commercial)
             {

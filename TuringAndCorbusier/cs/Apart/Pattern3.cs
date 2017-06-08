@@ -182,6 +182,7 @@ namespace TuringAndCorbusier
             }
 
             //################################################################################################
+            #region Setback AfterTreatment
             if (parameterSet.setback)
             {
                 //최상층 외곽선 후퇴옵션 사용하는 경우 최상층 조정...?
@@ -269,6 +270,106 @@ namespace TuringAndCorbusier
                         households.RemoveAt(households.Count - 1);
                 }
             }
+            #endregion
+
+            #region Using1F AfterTreatment
+            if (parameterSet.using1F)
+            {
+                //search most accessible road
+                List<int> roadWidths = plot.Surroundings.ToList();
+                Curve[] boundSegments = plot.Boundary.DuplicateSegments();
+                List<double> roadLength = boundSegments.Select(n => n.GetLength()).ToList();
+
+                List<int> initialRoadIndices = new List<int>();
+                for (int i = 0; i < roadWidths.Count; i++)
+                    initialRoadIndices.Add(i);
+
+                initialRoadIndices.Sort((a,b)=>-(roadWidths[a]*roadLength[a]).CompareTo(roadWidths[b]*roadLength[b]));
+                int mostAccessibleRoadIndex = initialRoadIndices.First();
+                Curve mostAccessibleRoad = boundSegments[mostAccessibleRoadIndex];
+
+
+                //search entranceEdgeIndex
+                Curve[] centerSegments = centerLineCurve.DuplicateSegments();
+                List<int> initialCenterIndices = new List<int>();
+
+                List<double> centerSegToRoadDist = new List<double>();
+                for (int i = 0; i < centerSegments.Count(); i++)
+                {
+                    //add index
+                    initialCenterIndices.Add(i);
+
+                    //add distance to accessible road
+                    Point3d midPt = (centerSegments[i].PointAtStart + centerSegments[i].PointAtEnd)/2;
+
+                    double closestParam;
+                    mostAccessibleRoad.ClosestPoint(midPt, out closestParam);
+                    Point3d closestPtOnRoad = mostAccessibleRoad.PointAt(closestParam);
+
+                    centerSegToRoadDist.Add(midPt.DistanceTo(closestPtOnRoad));
+                }
+
+                if (randomCoreType == CoreType.CourtShortEdge) //remove shortEdge when using shortEdgeCore
+                {
+                    if (centerSegments[0].GetLength() > centerSegments[1].GetLength())
+                    {
+                        initialCenterIndices.Remove(1);
+                        initialCenterIndices.Remove(3);
+                    }
+
+                    else
+                    {
+                        initialCenterIndices.Remove(0);
+                        initialCenterIndices.Remove(2);
+                    }
+                }
+
+                initialCenterIndices.Sort((a, b) => centerSegToRoadDist[a].CompareTo(centerSegToRoadDist[b]));
+                int entranceEdgeIndex = initialCenterIndices.First();
+
+                //subtract unit
+                List<Household> firstFloorHouses = households.First().First();
+                List<double> houseParamOnCurve = new List<double>(parametersOnCurve); //household Parameter만 추출, vertical core 추가 되면 수정해야 할 수도
+                int searchStartIndex = houseParamOnCurve.FindIndex(n => n >= entranceEdgeIndex);
+                int searchEndIndex = houseParamOnCurve.FindIndex(n => n >= (entranceEdgeIndex+1)% centerSegments.Count());
+                searchEndIndex = (searchEndIndex+ houseParamOnCurve.Count - 1) % houseParamOnCurve.Count;
+
+                if (searchEndIndex == searchStartIndex || searchEndIndex == searchStartIndex-1)
+                    firstFloorHouses.RemoveAt(searchStartIndex);
+
+                else
+                {
+                    double currentLengthOnCurve = 0;
+                    double totalEntranceWidth = 0;
+                    bool isNearCorner = true;
+
+                    double entranceEdgeCoreDepth = randomCoreType.GetDepth();
+
+                    for (int i = searchStartIndex; i < searchEndIndex; i++)
+                    {
+                        int indexFromSearchEnd = (searchEndIndex - 1 +searchStartIndex) - i;
+                        Household currentHouse = firstFloorHouses[indexFromSearchEnd];
+                        double expectedEntranceWidth = currentHouse.GetArea() / width;
+                        if (currentLengthOnCurve > entranceEdgeCoreDepth)
+                            isNearCorner = false; 
+
+                        currentLengthOnCurve += expectedEntranceWidth;
+
+                        if (currentLengthOnCurve - randomCoreType.GetDepth() >= 3000)
+                        {
+                            firstFloorHouses.RemoveAt(indexFromSearchEnd);
+                            totalEntranceWidth += expectedEntranceWidth;
+                            if (isNearCorner)
+                                totalEntranceWidth -= entranceEdgeCoreDepth;
+                        }
+                            
+                        if (totalEntranceWidth >= 6000)
+                            break;
+                    }
+                }
+
+            }
+            #endregion
             //################################################################################################
 
 
@@ -332,14 +433,8 @@ namespace TuringAndCorbusier
 
             Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
 
-            //#######################################################################################################################
-            if (parameterSet.using1F || parameterSet.setback)
-            {
-
-            }
-            //#######################################################################################################################
-
-            else
+      
+            if(!parameterSet.using1F && !parameterSet.setback)
             {
                 Finalizer finalizer = new Finalizer(result);
                 result = finalizer.Finalize();

@@ -361,12 +361,16 @@ namespace TuringAndCorbusier
             #region P3Corridor
             else if (apartment.AGtype == "PT-3")
             {
+                bool isUsing1F = apartment.ParameterSet.using1F;
                 List<Brep> courtCorridorBrep = new List<Brep>();
                 List<Curve> centerLine = apartment.AptLines;
                 double width = apartment.ParameterSet.Parameters[2];
 
                 for (int i = 0; i < apartment.Household.Count; i++)
                 {
+                    if (i == 0 && isUsing1F)
+                        continue;
+
                     for (int j = 0; j < apartment.Household[i].Count; j++)
                     {
                         List<Household> currentDongHouseholds = apartment.Household[i][j];
