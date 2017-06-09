@@ -493,7 +493,7 @@ namespace TuringAndCorbusier
 
             bool hasToPlaceEscapeCore = maxEdge.GetLength() > Consts.escapeCoreCriteria;
             double escapeCoreEdgeLength = maxEdge.GetLength() - (coreDepth+Consts.corridorWidth) * 2;
-            int escapeCoreCountPerEdge = (int)(escapeCoreEdgeLength / Consts.escapeCoreCriteria)-1;
+            int escapeCoreCountPerEdge = (int)(escapeCoreEdgeLength / Consts.escapeCoreCriteria);
             
             Vector3d courtX = new Vector3d(lines[0].PointAtEnd - lines[0].PointAtStart);
             Vector3d courtY = new Vector3d(lines[3].PointAtStart - lines[3].PointAtEnd);
@@ -526,7 +526,7 @@ namespace TuringAndCorbusier
             {
                 Vector3d coreXDirec = courtY;
                 Vector3d coreYDirec = -courtX;
-                Point3d coreOriginBase = lines[1].PointAtStart + coreXDirec * escapeCoreDepth + (coreXDirec+coreYDirec)*Consts.corridorWidth;
+                Point3d coreOriginBase = lines[1].PointAtStart + coreXDirec * coreDepth + (coreXDirec+coreYDirec)*Consts.corridorWidth;
                 double devidedLength = escapeCoreEdgeLength / (escapeCoreCountPerEdge+1);
                
                 for (int i = 0; i < escapeCoreCountPerEdge; i++)
@@ -556,7 +556,7 @@ namespace TuringAndCorbusier
             {
                 Vector3d coreXDirec = -courtY;
                 Vector3d coreYDirec = courtX;
-                Point3d coreOriginBase = lines[3].PointAtStart + coreXDirec * escapeCoreDepth+(coreXDirec + coreYDirec) * Consts.corridorWidth;
+                Point3d coreOriginBase = lines[3].PointAtStart + coreXDirec * coreDepth + (coreXDirec + coreYDirec) * Consts.corridorWidth;
                 double devidedLength = escapeCoreEdgeLength / (escapeCoreCountPerEdge + 1);
 
                 for (int i = 0; i < escapeCoreCountPerEdge; i++)
