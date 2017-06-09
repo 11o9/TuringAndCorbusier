@@ -740,7 +740,7 @@ namespace TuringAndCorbusier
                     totalNumOfFloors= MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2;
                 }else if(isUsing1F == false)
                 {
-                    totalNumOfFloors = MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 3;
+                    totalNumOfFloors = MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1;
                 }
 
                 for (int i = 0; i < totalNumOfFloors; i++)
