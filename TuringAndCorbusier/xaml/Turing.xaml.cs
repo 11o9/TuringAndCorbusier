@@ -737,10 +737,10 @@ namespace TuringAndCorbusier
                 double totalNumOfFloors = 0;
                 if (isUsing1F == true)
                 {
-                    totalNumOfFloors= MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2;
+                    totalNumOfFloors= MainPanel_AGOutputList[tempIndex].Household.Count+2;
                 }else if(isUsing1F == false)
                 {
-                    totalNumOfFloors = MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1;
+                    totalNumOfFloors = MainPanel_AGOutputList[tempIndex].Household.Count+2;
                 }
 
                 for (int i = 0; i < totalNumOfFloors; i++)
