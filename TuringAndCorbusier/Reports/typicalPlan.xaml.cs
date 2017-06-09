@@ -56,7 +56,7 @@ namespace Reports
             {
                 if (isTopSetBack == false)
                 {
-                    this.SetTitle2(floorInterval);
+                    this.SetTitle(floorInterval);
                 }
                 else if (isTopSetBack == true)
                 {
@@ -411,6 +411,166 @@ namespace Reports
 
         }
 
+        public void SetFirstFloorHouseOutline(Apartment apartment, List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Household> householdList, int numOfFloors, List<double> numOfHouseList, List<Core> newCoreList)
+        {
+            System.Windows.Media.SolidColorBrush SCBGray = new SolidColorBrush();
+            SCBGray.Color = System.Windows.Media.Color.FromRgb(225, 225, 225);
+            System.Windows.Media.SolidColorBrush SCBCorridor = new SolidColorBrush();
+            SCBCorridor.Color = System.Windows.Media.Color.FromRgb(242, 242, 242);
+            System.Windows.Media.SolidColorBrush SCBLime = new SolidColorBrush();
+            SCBLime.Color = System.Windows.Media.Color.FromRgb(200, 229, 13);
+
+            List<List<Curve>> balconyLines = DrawBalconyLine(apartment);
+            Curve boundary = typicalPlan.Boundary;
+            List<Curve> surroundingSite = typicalPlan.SurroundingSite;
+            List<FloorPlan> housePlanList = typicalPlan.UnitPlans;
+            List<Curve> corePlanList = coreOutline;
+            List<FloorPlan> floorPlanList = typicalPlan.UnitPlans;
+
+            List<Curve> houseOutlineList = houseOutline;
+            List<Point3d> houseOutlinesCentroid = new List<Point3d>();
+            Rectangle3d rectangleToFit = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
+            Rectangle canvasRectangle = new Rectangle();
+            canvasRectangle.Width = typicalPlanCanvas.Width;
+            canvasRectangle.Height = typicalPlanCanvas.Height;
+            System.Windows.Point initialOriginPoint = new System.Windows.Point();
+            double scaleFactor = PlanDrawingFunction_90degree.scaleToFitFactor(canvasRectangle, rectangleToFit, out initialOriginPoint);
+            List<Curve> aptLineList = apartment.AptLines;
+            double aptWidth = apartment.ParameterSet.Parameters[2];
+            string agType = apartment.AGtype;
+
+            List<CoreType> coreType = new List<CoreType>();
+            List<Point3d> coreOriginPointList = new List<Point3d>();
+            foreach (Core c in newCoreList)
+            {
+                coreType.Add(c.coreType);
+                coreOriginPointList.Add(c.origin);
+            }
+
+            List<List<Curve>> coreDetailDoubleList = new List<List<Curve>>();
+            for (int i = 0; i < coreType.Count; i++)
+            {
+                string pointString = GetSimplifiedCoreString(coreType[i]);
+                List<Curve> coreDetail = GetCoreDetail(pointString);
+                coreDetailDoubleList.Add(coreDetail);
+            }
+
+            for (int i = 0; i < coreDetailDoubleList.Count; i++)
+            {
+                Vector3d v = coreOriginPointList[i] - coreDetailDoubleList[i][0].PointAtStart;
+                for (int j = 0; j < coreDetailDoubleList[i].Count; j++)
+                {
+                    coreDetailDoubleList[i][j].Transform(Rhino.Geometry.Transform.Translation(v));
+                }
+
+            }
+
+            RotateToFit(ref coreDetailDoubleList, newCoreList, coreType, coreOutline);
+
+
+            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, surroundingSite, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+            PlanDrawingFunction_90degree.drawBoundaryPlan(rectangleToFit, boundary, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Red, 5);
+
+
+            //if (agType == "PT-3")
+            //{
+            //    Curve corridorOutline;
+            //    Curve innerOutline;
+            //    DrawPT3Corridor(coreType, aptLineList, agType, aptWidth, out corridorOutline, out innerOutline);
+            //    if (corridorOutline != null && innerOutline != null)
+            //    {
+
+            //        PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, innerOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBCorridor);
+            //        PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
+            //        PlanDrawingFunction_90degree.drawPlan(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.75);
+            //    }
+            //}
+
+            //if (agType == "PT-1")
+            //{
+            //    List<Curve> corridor = DrawPT1Corridor(apartment);
+            //    for (int i = 0; i < corridor.Count; i++)
+            //    {
+            //        PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, corridor[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBCorridor);
+            //        PlanDrawingFunction_90degree.drawPlan(rectangleToFit, corridor[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.75);
+            //    }
+            //}
+
+
+            //세대 타입 구하기
+            List<string> roundedStringExclusiveAreaList = new List<string>();
+            //List<double> distinctRoundedExclusiveArea = new List<double>();
+            foreach (Household household in householdList)
+            {
+                roundedStringExclusiveAreaList.Add(ProcessExclusiveArea(household.GetExclusiveArea()));
+                //    distinctRoundedExclusiveArea.Add(Math.Round(household.GetExclusiveArea() / 1000000, 0));
+            }
+            //List<double> testing = distinctRoundedExclusiveArea.Distinct().ToList();
+
+            try
+            {
+
+                for (int i = 0; i < numOfHouseList[0]; i++)
+                {
+                    //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
+                    //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 3);
+                    //PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, areaTypeBackgroundColour);
+                    PlanDrawingFunction_90degree.drawHouseBackGroundPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBLime, 0);
+
+                }
+
+
+                for (int i = 0; i < numOfHouseList[0]; i++)
+                {
+                    if (balconyLines[i].Count > 1)
+                    {
+                        PlanDrawingFunction_90degree.drawDashedPlan(rectangleToFit, balconyLines[i][1], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+
+                    }
+                    else
+                    {
+                        PlanDrawingFunction_90degree.drawDashedPlan(rectangleToFit, balconyLines[i][0], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
+                    }
+
+                }
+
+                for (int i = 0; i < corePlanList.Count; i++)
+                {
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 2);
+                    PlanDrawingFunction_90degree.drawBackGround(rectangleToFit, corePlanList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBGray);
+                    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, coreDetailDoubleList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+
+                }
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show(e.Message);
+            }
+
+            //JHL 글씨 넣기 위해 중심 점 구함 
+            foreach (Curve house in houseOutlineList)
+            {
+                houseOutlinesCentroid.Add(Rhino.Geometry.AreaMassProperties.Compute(house).Centroid);
+            }
+            for (int i = 0; i < numOfHouseList[numOfFloors]; i++)
+            {
+                System.Windows.Point newCentroid = PlanDrawingFunction_90degree.pointConverter(rectangleToFit, houseOutlinesCentroid[i], scaleFactor, initialOriginPoint);
+                try
+                {
+                    this.AddAreaTypeToHouseOutline(newCentroid, roundedStringExclusiveAreaList[i]);
+
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
+            }
+
+            PlanDrawingFunction_90degree.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+
+        }
+
         //--------JHL
         public void SetHouseOutline(Apartment apartment, List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Household> householdList, int numOfFloors, List<double> numOfHouseList, List<Core> newCoreList)
         {
@@ -514,7 +674,7 @@ namespace Reports
             try
             {
 
-                for (int i = 0; i < numOfHouseList[numOfFloors]; i++)
+                for (int i = 0; i <= numOfHouseList[numOfFloors]; i++)
                 {
                     //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
                     //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
@@ -564,7 +724,7 @@ namespace Reports
             {
                 houseOutlinesCentroid.Add(Rhino.Geometry.AreaMassProperties.Compute(house).Centroid);
             }
-            for (int i = 0; i < numOfHouseList[numOfFloors]; i++)
+            for (int i = 0; i <= numOfHouseList[numOfFloors]; i++)
             {
                 System.Windows.Point newCentroid = PlanDrawingFunction_90degree.pointConverter(rectangleToFit, houseOutlinesCentroid[i], scaleFactor, initialOriginPoint);
                 try

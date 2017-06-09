@@ -101,7 +101,7 @@ namespace TuringAndCorbusier
             Polygon polygonToDraw = new Polygon();
             polygonToDraw.Points = new PointCollection(pointSet);
             SolidColorBrush LHGreen = new SolidColorBrush();
-            LHGreen.Color = Color.FromRgb(196,215,0);
+            LHGreen.Color = Color.FromRgb(200,229,13);
             polygonToDraw.Fill = LHGreen;
 
             UnitPlanCanvas.Children.Add(polygonToDraw);
@@ -610,14 +610,16 @@ namespace TuringAndCorbusier
             }
             List<TextBlock> horizontal = new List<TextBlock>();
             List<TextBlock> vertical = new List<TextBlock>();
-            DrawDimension(dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor,householdOutline,out horizontal,out vertical);
-            FinalRepositioning(scaleFactor, tempBoundingBox, convertedPointList,horizontal,vertical, unitPlanCanvas);
+            List<System.Windows.Point> horizontalPoints = new List<System.Windows.Point>();
+            List<System.Windows.Point> verticalPoints = new List<System.Windows.Point>();
+            DrawDimension(dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor,householdOutline,out horizontal,out vertical, out horizontalPoints, out verticalPoints);
+            FinalRepositioning(scaleFactor, tempBoundingBox, convertedPointList,horizontal,vertical, unitPlanCanvas,horizontalPoints,verticalPoints);
         }
 
-        private static void FinalRepositioning(double tempScaleFactor, Rectangle3d tempBoundingBox, List<System.Windows.Point> pointList, List<TextBlock>horizontal, List<TextBlock>vertical, Canvas unitPlanCanvas)
+        private static void FinalRepositioning(double tempScaleFactor, Rectangle3d tempBoundingBox, List<System.Windows.Point> pointList, List<TextBlock> horizontal, List<TextBlock> vertical, Canvas unitPlanCanvas, List<System.Windows.Point> horizontalPoints, List<System.Windows.Point> verticalPoints)
         {
             List<int> horizontalInt = new List<int>();
-            for(int i = 0; i < horizontal.Count; i++)
+            for (int i = 0; i < horizontal.Count; i++)
             {
                 string s = horizontal[i].Text.Replace(",", "");
                 horizontalInt.Add(int.Parse(s));
@@ -626,7 +628,13 @@ namespace TuringAndCorbusier
             double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
             double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
 
-            Canvas.SetLeft(horizontal[largestValueIndex], (pointList[largestValueIndex].X - width) - 20);
+            if (horizontal.Count > 2)
+            {
+                Canvas.SetLeft(horizontal[largestValueIndex], (horizontalPoints[largestValueIndex].X - (width + 15)));
+            }else
+            {
+                horizontal.RemoveAt(largestValueIndex);
+            }
 
             List<int> verticalInt = new List<int>();
             for (int i = 0; i < vertical.Count; i++)
@@ -636,12 +644,20 @@ namespace TuringAndCorbusier
             }
             int largestValueIndex1 = GetLargestValueIndex(verticalInt);
 
-            Canvas.SetTop(vertical[largestValueIndex1], (pointList[largestValueIndex1].Y - height)-170);
-
-
+            if (vertical.Count > 2)
+            {
+                Canvas.SetTop(vertical[largestValueIndex1], (verticalPoints[largestValueIndex1].Y - (height + 20)));
+            }else
+            {
+                vertical.RemoveAt(largestValueIndex1);
+            }
         }
 
-        private static int GetLargestValueIndex(List<int> textBlockList)
+
+
+    
+
+    private static int GetLargestValueIndex(List<int> textBlockList)
         {
             int index= 0;
             for(int i = 0; i < textBlockList.Count; i++)
@@ -694,12 +710,14 @@ namespace TuringAndCorbusier
             return line;
         }
 
-        private static void DrawDimension(List<TextBlock> dimensionList, List<System.Windows.Point> pointList, Canvas UnitPlanCanvas, Rectangle3d tempBoundingBox, double tempScaleFactor,Curve householdOutline,out List<TextBlock>horizontal,out List<TextBlock>vertical)
+        private static void DrawDimension(List<TextBlock> dimensionList, List<System.Windows.Point> pointList, Canvas UnitPlanCanvas, Rectangle3d tempBoundingBox, double tempScaleFactor,Curve householdOutline,out List<TextBlock>horizontal,out List<TextBlock>vertical,out List<System.Windows.Point> horizontalPoints,out List<System.Windows.Point> verticalPoints)
         {
             Curve[] segments = householdOutline.DuplicateSegments();
             List<bool> isHorizontal = new List<bool>();
             horizontal = new List<TextBlock>();
             vertical = new List<TextBlock>();
+            horizontalPoints = new List<System.Windows.Point>();
+            verticalPoints = new List<System.Windows.Point>();
             for(int i = 0; i < segments.Length; i++)
             {
                 bool ih = IsHorizontal(segments[i]);
@@ -724,6 +742,7 @@ namespace TuringAndCorbusier
                     dimensionList[i].RenderTransform = tg;
                     Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)+15);
                     horizontal.Add(dimensionList[i]);
+                    horizontalPoints.Add(pointList[i]);
 
 
                 }else
@@ -731,6 +750,7 @@ namespace TuringAndCorbusier
                     Canvas.SetLeft(dimensionList[i], (pointList[i].X - width)-15);
                     Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)-7);
                     vertical.Add(dimensionList[i]);
+                    verticalPoints.Add(pointList[i]);
                 }
             }
 

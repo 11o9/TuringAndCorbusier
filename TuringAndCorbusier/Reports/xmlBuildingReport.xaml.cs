@@ -184,7 +184,7 @@ namespace Reports
         public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics, string agType, List<Curve> aptLineList, ParameterSet paramSet, Apartment apartment)
         {
             System.Windows.Media.SolidColorBrush SCBGray = new SolidColorBrush();
-            SCBGray.Color = System.Windows.Media.Color.FromRgb(225, 225, 225);
+            SCBGray.Color = System.Windows.Media.Color.FromRgb(235, 235, 235);
 
             System.Windows.Media.SolidColorBrush SCBCorridor = new SolidColorBrush();
             SCBCorridor.Color = System.Windows.Media.Color.FromRgb(242, 242, 242);
@@ -253,7 +253,7 @@ namespace Reports
                 if (corridorOutline != null && innerOutline != null)
                 {
                     PlanDrawingFunction.drawBackGround(rectangleToFit, innerOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBCorridor);
-                    PlanDrawingFunction.drawBackGround(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.White);
+                    PlanDrawingFunction.drawBackGround(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray);
                     PlanDrawingFunction.drawPlan(rectangleToFit, corridorOutline, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.75);
                 }
             }

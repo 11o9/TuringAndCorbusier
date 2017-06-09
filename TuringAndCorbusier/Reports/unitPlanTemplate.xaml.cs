@@ -53,10 +53,10 @@ namespace Reports
             origin.X = canvas.Width / 2;
             origin.Y = canvas.Height / 2;
             List<Point3d> dimensionLocationPointList = new List<Point3d>();
-            List<double> houseOutlineLength = GetLineLength(householdOutline,out dimensionLocationPointList,tempBoundingBox);
+            List<double> houseOutlineLength = GetLineLength(householdOutline, out dimensionLocationPointList, tempBoundingBox);
 
 
-            //PlanDrawingFunction.drawUnitPlan(tempBoundingBox, householdOutline, scaleFactor-0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 1);
+            PlanDrawingFunction.drawUnitPlan(tempBoundingBox, householdOutline, scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 1);
             PlanDrawingFunction.drawUnitBackGround(tempBoundingBox, householdOutline, scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.LightGreen);
 
             PlanDrawingFunction.DrawUnitPlanDimension(householdOutline, dimensionLocationPointList, houseOutlineLength, tempBoundingBox, scaleFactor - 0.01, origin, ref this.UnitCanvas);
@@ -69,17 +69,17 @@ namespace Reports
             List<double> houseOutlineLength = new List<double>();
             Curve[] houseOutlineSegment = houseOutline.DuplicateSegments();
             dimensionLocationPointList = new List<Point3d>();
-            foreach(Curve segment in houseOutlineSegment)
+            foreach (Curve segment in houseOutlineSegment)
             {
                 houseOutlineLength.Add(Math.Round(segment.GetLength()));
                 Point3d p = new Point3d(segment.PointAtNormalizedLength(0.5));
                 bool isHorizontal = IsHorizontal(segment);
                 if (isHorizontal == true)
                 {
-                    p.X = tempBoundingBox.Corner(0).X-1500;
-                }else
+                    p.X = tempBoundingBox.Corner(0).X - 1500;
+                } else
                 {
-                    p.Y = tempBoundingBox.Corner(2).Y+900;
+                    p.Y = tempBoundingBox.Corner(2).Y + 900;
                 }
                 dimensionLocationPointList.Add(p);
             }
@@ -87,7 +87,7 @@ namespace Reports
         }
 
 
-        private bool IsHorizontal(Curve segment)
+        private static bool IsHorizontal(Curve segment)
         {
             bool isHorizontal = false;
             if (segment.PointAtStart.X == segment.PointAtEnd.X)
@@ -96,6 +96,25 @@ namespace Reports
             }
             return isHorizontal;
         }
+
+        private static void DimensionLines(Curve householdeOutline)
+        {
+            Curve[] segment = householdeOutline.DuplicateSegments();
+            List<Curve> horizontal = new List<Curve>();
+            List<Curve> vertical = new List<Curve>();
+            for (int i = 0; i < segment.Length; i++)
+            {
+                bool isHorizontal = IsHorizontal(segment[i]);
+                if (isHorizontal == true)
+                {
+                    horizontal.Add(segment[i]);
+                } else
+                {
+                    vertical.Add(segment[i]);
+                }
+            }
+        }
+
 
         public static System.Windows.Shapes.Rectangle GetUnitPlanRectangle()
         {

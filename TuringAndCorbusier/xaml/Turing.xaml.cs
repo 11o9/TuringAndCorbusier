@@ -696,38 +696,42 @@ namespace TuringAndCorbusier
 
                 for (int i = 0; i < householdTripleList.Count; i++)
                 {
+                        double numOfHouseInEachFloor = 0;
                     for (int j = 0; j < householdTripleList[i].Count; j++)
                     {
-                        double numOfHouseInEachFloor = householdTripleList[i].Count * householdTripleList[i][j].Count;
-                        numOfHouseInEachFloorList.Add(numOfHouseInEachFloor);
+                            numOfHouseInEachFloor += householdTripleList[i][j].Count;
                         for (int k = 0; k < householdTripleList[i][j].Count; k++)
                         {
                             householdList.Add(householdTripleList[i][j][k]);
                         }
                     }
+                        numOfHouseInEachFloorList.Add(numOfHouseInEachFloor);
                 }
 
 
                 bool isTopFloorDifferent = false;
                 bool isTopFloorSetBack = false;
-                if (numOfHouseInEachFloorList[0] != numOfHouseInEachFloorList.Last())
+                if (numOfHouseInEachFloorList[1] != numOfHouseInEachFloorList.Last())
                 {
                     isTopFloorDifferent = true;
                 }
-                double topArea = 0;
-                for (int i = houseOutline.Count - 1; i > (houseOutline.Count - 1) - (int)numOfHouseInEachFloorList.Last(); i--)
-                {
-                    topArea += Rhino.Geometry.AreaMassProperties.Compute(houseOutline[i]).Area;
-                }
-                double firstArea = 0;
-                for (int i = 0; i < numOfHouseInEachFloorList[0]; i++)
-                {
-                    firstArea += Rhino.Geometry.AreaMassProperties.Compute(houseOutline[i]).Area;
-                }
-                if (Math.Round(topArea, 2) != Math.Round(firstArea, 2))
+                if (MainPanel_AGOutputList[tempIndex].ParameterSet.setback == true)
                 {
                     isTopFloorSetBack = true;
                 }
+                //for (int i = houseOutline.Count - 1; i > (houseOutline.Count - 1) - (int)numOfHouseInEachFloorList.Last(); i--)
+                //{
+                //    topArea += Rhino.Geometry.AreaMassProperties.Compute(houseOutline[i]).Area;
+                //}
+                //double firstArea = 0;
+                //for (int i = 0; i < numOfHouseInEachFloorList[1]; i++)
+                //{
+                //    firstArea += Rhino.Geometry.AreaMassProperties.Compute(houseOutline[i]).Area;
+                //}
+                //if (Math.Round(topArea, 2) != Math.Round(firstArea, 2))
+                //{
+                //    isTopFloorSetBack = true;
+                //}
 
 
                 double totalNumOfFloors = MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2;
@@ -750,7 +754,7 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i + 1);
                             Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
-                            floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            floorPlanDrawing.SetFirstFloorHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
                             fps.Add(floorPlanDrawing.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + i.ToString());
                         }
@@ -792,7 +796,15 @@ namespace TuringAndCorbusier
                             pagename.Add("topFloorPlanDrawingPage" + i.ToString());
                             break;
                         }
-
+                        else if (isUsing1F == true && isTopFloorDifferent == false && i!=0)
+                        {
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                            Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
+                            floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            fps.Add(floorPlanDrawing.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                            break;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -1334,7 +1346,7 @@ namespace TuringAndCorbusier
                 }
                 else if (i > 1)
                 {
-                    using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(939 * 3, 703 * 3), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                    using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(929 * 3, 685 * 3), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
                     {
                         TypicalPlan typicalPlan = new TypicalPlan();
                         Rectangle3d rec = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);

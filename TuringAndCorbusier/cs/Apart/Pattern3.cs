@@ -269,7 +269,7 @@ namespace TuringAndCorbusier
                         households.RemoveAt(households.Count - 1);
                 }
             }
-            #endregion
+        
 
             #region Using1F AfterTreatment
             if (parameterSet.using1F)

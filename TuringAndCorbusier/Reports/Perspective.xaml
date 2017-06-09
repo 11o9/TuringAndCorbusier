@@ -14,10 +14,10 @@
 
 
         <Canvas  Width="1240" Height="1750">
-            <Rectangle Height="705" Width="940" Canvas.Left="150" Canvas.Top="150" Stroke="Black"/>
+            <Rectangle Height="695" Width="940" Canvas.Left="150" Canvas.Top="150" Stroke="Black"/>
             <Rectangle Height="695" Width="940" Canvas.Left="150" Canvas.Top="890" Stroke="Black"/>
-            <Image  x:Name="perspective1"  VerticalAlignment="Bottom" Canvas.Left="151" Canvas.Top="151" Width="958" Height="703"  />
-            <Image  x:Name="perspective2"  VerticalAlignment="Bottom" Canvas.Left="151" Canvas.Top="895" Width="958" Height="687"  />
+            <Image  x:Name="perspective1"  VerticalAlignment="Bottom" Canvas.Left="155" Canvas.Top="155" Width="929" Height="685"  />
+            <Image  x:Name="perspective2"  VerticalAlignment="Bottom" Canvas.Left="155" Canvas.Top="895" Width="929" Height="685"  />
             <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="Din Alternate" FontWeight="Bold" />
         </Canvas>
 

@@ -352,8 +352,8 @@ namespace TuringAndCorbusier
 
                 //firstfloor test
                 double firstfloorBonus = 0;
-                //if (gene[j].using1F)
-                //    firstfloorBonus = 1000;
+               // if (gene[j].using1F)
+               //    firstfloorBonus = 1000;
                 //setback test
                 double setbackBonus = 0;
                 //if (gene[j].setback)
