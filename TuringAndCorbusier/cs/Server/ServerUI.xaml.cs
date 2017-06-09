@@ -66,7 +66,7 @@ namespace TuringAndCorbusier
             }
             catch (Exception e)
             {
-                MessageBox.Show("서버 연결 에러");
+                MessageBox.Show("서버 연결 실패");
             }
         }
         private void SiChanged(object sender, SelectionChangedEventArgs e)
@@ -192,6 +192,8 @@ namespace TuringAndCorbusier
             {
                 //동 전체 그리고 주소 찾아서 카메라 셋팅, 검색결과 없을시 중심에 셋팅
                 string jibun = bonbun.Text + "-" + bubun.Text;
+                if (bubun.Text == "")
+                    jibun = bonbun.Text;
                 var result = drawer.FindDrawn(jibun);
                 if (result == null)
                 {
