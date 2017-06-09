@@ -15,6 +15,8 @@ using GISData.DataStruct;
 using GISData;
 using Rhino.Geometry;
 using Rhino;
+using System.Collections;
+
 namespace TuringAndCorbusier
 {
     /// <summary>
@@ -168,38 +170,48 @@ namespace TuringAndCorbusier
             //동 같으면 카메라만 맞춤
             if (Dong == lastdong)
             {
-                
+                SetCam();
             }
             else
             {
                 //RhinoApp.RunScript("Show", false);
                 drawer.Draw(Piljis);
                 lastdong = Dong;
+                SetCam();
             }
 
             if (Bonbun == "")
             {
                 //동 전체 그리고 중심에 카메라 셋팅
-                SetCam(RhinoDoc.ActiveDoc.Objects.BoundingBox);
-                
+                //SetCam(RhinoDoc.ActiveDoc.Objects.BoundingBox);
+                SetCam();
+             
             }
 
             else
             {
                 //동 전체 그리고 주소 찾아서 카메라 셋팅, 검색결과 없을시 중심에 셋팅
                 string jibun = bonbun.Text + "-" + bubun.Text;
-                var result = drawer.Find(jibun);
+                var result = drawer.FindDrawn(jibun);
                 if (result == null)
-                    SetCam(RhinoDoc.ActiveDoc.Objects.BoundingBox);
+                {
+                    RhinoApp.WriteLine("존재하지 않는 지번 주소입니다.");
+                    SetCam();
+                }
+                    
                 else
                 {
                     List<Point3d> points = new List<Point3d>();
-                    result.Outbound.ForEach(n => points.AddRange(n.DuplicateSegments().Select(m => m.PointAtStart)));
-                    BoundingBox bb = new BoundingBox(points);
-                    SetCam(bb);
+                    //RhinoApp.RunScript("SelAll", false);
+                    SetCam(result.drawnObj);
+                    //result.Outbound.ForEach(n => points.AddRange(n.DuplicateSegments().Select(m => m.PointAtStart)));
+                    //BoundingBox bb = new BoundingBox(points);
+                    //SetCam(bb);
                 }
 
             }
+
+
 
             lastbonbun = Bonbun;
             lastbubun = Bubun;
@@ -212,7 +224,18 @@ namespace TuringAndCorbusier
             Rhino.RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(new Vector3d(0, 0, -1), false);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
-
+        private void SetCam(IEnumerable<Guid> guid)
+        {
+            RhinoDoc.ActiveDoc.Objects.Select(guid);
+            RhinoApp.RunScript("ZSA", false);
+            RhinoDoc.ActiveDoc.Objects.UnselectAll();
+        }
+        private void SetCam()
+        {
+            RhinoApp.RunScript("SelAll", false);
+            RhinoApp.RunScript("ZSA", false);
+            RhinoDoc.ActiveDoc.Objects.UnselectAll();
+        }
 
 
         public void OnSelectPilji(object sender, Rhino.DocObjects.RhinoObjectSelectionEventArgs e)

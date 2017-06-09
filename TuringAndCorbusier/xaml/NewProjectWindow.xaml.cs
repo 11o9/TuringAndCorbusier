@@ -729,7 +729,7 @@ namespace TuringAndCorbusier
             /// checkpoint 테스트용
             /// 
 
-            LoadManager.getInstance().DrawObjectWithSpecificLayer(tempKDGinfo.surrbuildings, LoadManager.NamedLayer.Model);
+            LoadManager.getInstance().DrawObjectsWithSpecificLayer(tempKDGinfo.surrbuildings, LoadManager.NamedLayer.Model);
 
             //foreach (var surrcurve in TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings)
             //{

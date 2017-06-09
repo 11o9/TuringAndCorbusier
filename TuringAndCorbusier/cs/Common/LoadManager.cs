@@ -408,140 +408,166 @@ namespace TuringAndCorbusier
 
         }
 
-        public Guid DrawObjectWithSpecificLayer<T>(object o, NamedLayer layername)
-        {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
-            if (o is Rhino.Geometry.GeometryBase)
-            {
-                var result = Rhino.RhinoDoc.ActiveDoc.Objects.Add((Rhino.Geometry.GeometryBase)o);
-                return result;
-            }
-            return Guid.Empty;
-            
-        }
+        //public Guid DrawObjectWithSpecificLayer<T>(object o, NamedLayer layername)
+        //{
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+        //    if (o is Rhino.Geometry.GeometryBase)
+        //    {
+        //        var result = Rhino.RhinoDoc.ActiveDoc.Objects.Add((Rhino.Geometry.GeometryBase)o);
+        //        return result;
+        //    }
+        //    return Guid.Empty;
 
-        public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.Curve curve,NamedLayer layername)
-        {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+        //}
 
-            var result =  Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(curve);
+        //public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.Curve curve,NamedLayer layername)
+        //{
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
 
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
+        //    var result =  Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(curve);
 
-            return result;
-        }
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
 
-        public List<Guid> DrawObjectWithSpecificLayer(List<Rhino.Geometry.Curve> curves, NamedLayer layername)
-        {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
-            var result = new List<Guid>();
-            foreach (var c in curves)
-            {
-                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(c));
-            }
+        //    return result;
+        //}
 
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
-            return result;
-        }
+        //public List<Guid> DrawObjectWithSpecificLayer(List<Rhino.Geometry.Curve> curves, NamedLayer layername)
+        //{
+        //    var result = new List<Guid>();
+        //    foreach (var c in curves)
+        //    {
+        //        Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
+        //        att.LayerIndex = (int)layername;
+        //        result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(c,att));
+        //    }
+        //    return result;
+        //}
 
-        public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.Point3d point, NamedLayer layername)
-        {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+        //public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.Point3d point, NamedLayer layername)
+        //{
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
 
-            var result = Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(point);
+        //    var result = Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(point);
 
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
-            return result;
-        }
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
+        //    return result;
+        //}
 
-        public List<Guid> DrawObjectWithSpecificLayer(List<Rhino.Geometry.Point3d> points, NamedLayer layername)
-        {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
-            var result = new List<Guid>();
-            foreach (var p in points)
-            {
-                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(p));
-            }
+        //public List<Guid> DrawObjectWithSpecificLayer(List<Rhino.Geometry.Point3d> points, NamedLayer layername)
+        //{
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+        //    var result = new List<Guid>();
+        //    foreach (var p in points)
+        //    {
+        //        result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(p));
+        //    }
 
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
-            return result;
-        }
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
+        //    return result;
+        //}
 
-        public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.Brep brep, NamedLayer layername)
-        {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+        //public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.Brep brep, NamedLayer layername)
+        //{
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
 
-            var result = Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(brep);
+        //    var result = Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(brep);
 
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
-            return result;
-        }
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
+        //    return result;
+        //}
 
-        public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.Mesh mesh, NamedLayer layername)
-        {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+        //public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.Mesh mesh, NamedLayer layername)
+        //{
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
 
-            var result = Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh);
+        //    var result = Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh);
 
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
-            return result;
-        }
-
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
+        //    return result;
+        //}
 
 
-        public List<Guid> DrawObjectWithSpecificLayer(List<Rhino.Geometry.Brep> breps, NamedLayer layername)
-        {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
-            var result = new List<Guid>();
-            foreach (var p in breps)
-            {
-                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(p));
-            }
 
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
-            return result;
-        }
+        //public List<Guid> DrawObjectWithSpecificLayer(List<Rhino.Geometry.Brep> breps, NamedLayer layername)
+        //{
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+        //    var result = new List<Guid>();
+        //    foreach (var p in breps)
+        //    {
+        //        result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(p));
+        //    }
+
+        //    Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
+        //    return result;
+        //}
+
+       
+
+        //A Text
 
         public Guid DrawObjectWithSpecificLayer(Rhino.Display.Text3d text, NamedLayer layername)
         {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
-            Rhino.DocObjects.ObjectAttributes attribute = new Rhino.DocObjects.ObjectAttributes();
+            Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
+            att.LayerIndex = (int)layername;
 
-            var result = Rhino.RhinoDoc.ActiveDoc.Objects.AddText(text.Text, text.TextPlane, 200, "Arial", false, false, Rhino.Geometry.TextJustification.Center);
+            var result = Rhino.RhinoDoc.ActiveDoc.Objects.AddText(text.Text, text.TextPlane, 200, "Arial", false, false, Rhino.Geometry.TextJustification.Center, att);
 
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
             return result;
         }
 
 
+        //Texts
 
         public List<Guid> DrawObjectWithSpecificLayer(List<Rhino.Display.Text3d> texts, NamedLayer layername)
         {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+            Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
+            att.LayerIndex = (int)layername;
+
             var result = new List<Guid>();
             foreach (var t in texts)
             {
-                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddText(t.Text, t.TextPlane, 200, "Arial", false, false, Rhino.Geometry.TextJustification.Center));
+                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddText(t.Text, t.TextPlane, 200, "Arial", false, false, Rhino.Geometry.TextJustification.Center,att));
             }
-
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
             return result;
         }
+
+
+        //A Texts with justification
 
         public List<Guid> DrawObjectWithSpecificLayer(List<Rhino.Display.Text3d> texts, NamedLayer layername, Rhino.Geometry.TextJustification justification)
         {
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(layerIndexes[(int)layername], false);
+            Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
+            att.LayerIndex = (int)layername;
             var result = new List<Guid>();
             foreach (var t in texts)
             {
-                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddText(t.Text, t.TextPlane, 200, "Arial", false, false, justification));
+                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.AddText(t.Text, t.TextPlane, 200, "Arial", false, false, justification,att));
             }
-
-            Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(0, false);
             return result;
         }
 
+        // Geoms
 
+        public List<Guid> DrawObjectsWithSpecificLayer(IEnumerable<Rhino.Geometry.GeometryBase> geometry, NamedLayer layername)
+        {
+            var result = new List<Guid>();
+            Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
+            att.LayerIndex = (int)layername;
+
+            foreach (var c in geometry)
+            {
+                result.Add(Rhino.RhinoDoc.ActiveDoc.Objects.Add(c, att));
+            }
+            return result;
+        }
+
+        //A Geom
+        public Guid DrawObjectWithSpecificLayer(Rhino.Geometry.GeometryBase geometry, NamedLayer layername)
+        {
+            Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
+            att.LayerIndex = (int)layername;
+            return Rhino.RhinoDoc.ActiveDoc.Objects.Add(geometry, att);
+        }
 
     }
 }

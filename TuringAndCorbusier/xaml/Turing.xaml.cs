@@ -1073,7 +1073,7 @@ namespace TuringAndCorbusier
                 //long mem1 = GC.GetTotalMemory(false);
                 var kdgs = KDG.getInstance().KDGmaker(mg, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.boundary, newpoints, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.ground);
                 //long mem2 = GC.GetTotalMemory(false);
-                LoadManager.getInstance().DrawObjectWithSpecificLayer(kdgs, LoadManager.NamedLayer.ETC);
+                LoadManager.getInstance().DrawObjectsWithSpecificLayer(kdgs, LoadManager.NamedLayer.ETC);
                 //long mem3 = GC.GetTotalMemory(false);
 
                 //Rhino.RhinoApp.WriteLine("addkdg : {0},{1},{2}", mem1, mem2, mem3);
@@ -1554,7 +1554,7 @@ namespace TuringAndCorbusier
             var guid = LoadManager.getInstance().DrawObjectWithSpecificLayer(scaledBoundary, LoadManager.NamedLayer.Guide);
             LoadManager.getInstance().DrawObjectWithSpecificLayer(TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect, LoadManager.NamedLayer.Model);
             int index = TuringAndCorbusierPlugIn.InstanceClass.turing.stackPanel.Children.Count;
-            LoadManager.getInstance().DrawObjectWithSpecificLayer(TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, LoadManager.NamedLayer.Model);
+            LoadManager.getInstance().DrawObjectsWithSpecificLayer(TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, LoadManager.NamedLayer.Model);
 
             RhinoDoc.ActiveDoc.Objects.Select(guid);
             RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.ZoomExtentsSelected();

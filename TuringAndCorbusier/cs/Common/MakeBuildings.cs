@@ -27,7 +27,12 @@ namespace TuringAndCorbusier
 
             foreach (var hhp in hhps)
             {
-                output.AddRange(DrawHouse(hhp,true));
+                try
+                {
+                    output.AddRange(DrawHouse(hhp, true));
+                }
+                catch
+                { continue; }
             }
             foreach (var cp in cps)
             {
@@ -416,7 +421,7 @@ public static List<Guid> DrawFoundation(Apartment apartment)
             var LHGreen = System.Drawing.Color.FromArgb(127, 255, 0);
 
             Brep[] green = Brep.CreatePlanarBreps(plot.Boundary);
-            Brep[] white = Brep.CreatePlanarBreps(plot.outrect);
+            Brep[] white = Brep.CreatePlanarBreps(TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect);
 
             for (int i = 0; i < green.Length; i++)
             {
@@ -494,9 +499,16 @@ public static List<Guid> DrawFoundation(Apartment apartment)
                 {
                     int index = windowTypeList.IndexOf(type[i].ToString());
 
-                    List<Brep> tempWindow = drawWindow((WindowType)index, shatteredBase[i], height);
+                    try
+                    {
+                        List<Brep> tempWindow = drawWindow((WindowType)index, shatteredBase[i], height);
 
-                    output.AddRange(tempWindow);
+                        output.AddRange(tempWindow);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
 
                     if (drawComplexModeling)
                     {
@@ -685,7 +697,11 @@ public static List<Guid> DrawFoundation(Apartment apartment)
             Curve boundaryCurve = offsetOneSide(baseCurve, height, Vector3d.ZAxis);
 
             curves.Add(boundaryCurve);
-            curves.Add(offsetInside(boundaryCurve, frameWidth, tempPlane));
+            //curves.Add(offsetInside(boundaryCurve, frameWidth, tempPlane));
+
+            Curve[] offsets = boundaryCurve.Offset(tempPlane, frameWidth, 0.1, CurveOffsetCornerStyle.Sharp);
+            curves.Add(offsets[0]);
+
 
             Curve pathCurve = new LineCurve(tempPlane.Origin, tempPlane.Origin + new Point3d(tempPlane.ZAxis * frameDepth));
 
@@ -816,12 +832,22 @@ public static List<Guid> DrawFoundation(Apartment apartment)
                 int h = (i + offsettedCurveSet.Count() - 1) % offsettedCurveSet.Count();
                 int j = (i + offsettedCurveSet.Count() + 1) % offsettedCurveSet.Count();
 
-                Point3d tempStartPoint = Rhino.Geometry.Intersect.Intersection.CurveCurve(offsettedCurveSet[h], offsettedCurveSet[i], 0, 0)[0].PointA;
-                Point3d tempEndPoint = Rhino.Geometry.Intersect.Intersection.CurveCurve(offsettedCurveSet[j], offsettedCurveSet[i], 0, 0)[0].PointA;
+                try
+                {
+                    Point3d tempStartPoint = Rhino.Geometry.Intersect.Intersection.CurveCurve(offsettedCurveSet[h], offsettedCurveSet[i], 0, 0)[0].PointA;
+                    Point3d tempEndPoint = Rhino.Geometry.Intersect.Intersection.CurveCurve(offsettedCurveSet[j], offsettedCurveSet[i], 0, 0)[0].PointA;
 
-                Curve tempCurve = new LineCurve(tempStartPoint, tempEndPoint);
 
-                outputBase.Add(tempCurve);
+
+                    Curve tempCurve = new LineCurve(tempStartPoint, tempEndPoint);
+
+                    outputBase.Add(tempCurve);
+                }
+                catch
+                {
+                    continue;
+                }
+
             }
 
             Curve[] joinedCurve = Curve.JoinCurves(outputBase);

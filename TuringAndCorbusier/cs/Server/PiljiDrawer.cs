@@ -59,11 +59,23 @@ namespace TuringAndCorbusier
             //올일은 없겠지만.
             return null;
         }
+
+        public PiljiObj FindDrawn(string jibun)
+        {
+            for (int i = 0; i < drawn.Count; i++)
+            {
+                if (drawn[i].piljiData.Name != jibun)
+                    continue;
+                return drawn[i];
+            }
+            //올일은 없겠지만.
+            return null;
+        }
     }
 
-    class PiljiObj
+    public class PiljiObj
     {
-        List<Guid> drawnObj = new List<Guid>();
+        public List<Guid> drawnObj = new List<Guid>();
         public Pilji piljiData;
         
 

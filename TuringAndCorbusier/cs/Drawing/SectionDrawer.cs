@@ -138,7 +138,7 @@ namespace TuringAndCorbusier
         public List<Guid> Print()
         {
             List<Guid> result = new List<Guid>();
-            result.AddRange(LoadManager.getInstance().DrawObjectWithSpecificLayer(curves, LoadManager.NamedLayer.Guide));
+            result.AddRange(LoadManager.getInstance().DrawObjectsWithSpecificLayer(curves, LoadManager.NamedLayer.Guide));
             result.AddRange(LoadManager.getInstance().DrawObjectWithSpecificLayer(text, LoadManager.NamedLayer.Guide,TextJustification.MiddleCenter));
             return result;
 
@@ -1126,7 +1126,7 @@ namespace TuringAndCorbusier
             drawnGuids.AddRange(LoadManager.getInstance().DrawObjectWithSpecificLayer(texts, LoadManager.NamedLayer.Guide));
 
 
-            drawnGuids.AddRange(LoadManager.getInstance().DrawObjectWithSpecificLayer(this.Guides, LoadManager.NamedLayer.Guide));
+            drawnGuids.AddRange(LoadManager.getInstance().DrawObjectsWithSpecificLayer(this.Guides, LoadManager.NamedLayer.Guide));
 
             drawnGuids.Add(LoadManager.getInstance().DrawObjectWithSpecificLayer(Axis, LoadManager.NamedLayer.Guide));
 
@@ -2332,7 +2332,7 @@ namespace TuringAndCorbusier
             drawnGuids.AddRange(LoadManager.getInstance().DrawObjectWithSpecificLayer(texts, LoadManager.NamedLayer.Guide));
 
 
-            drawnGuids.AddRange(LoadManager.getInstance().DrawObjectWithSpecificLayer(this.Guides, LoadManager.NamedLayer.Guide));
+            drawnGuids.AddRange(LoadManager.getInstance().DrawObjectsWithSpecificLayer(this.Guides, LoadManager.NamedLayer.Guide));
 
             drawnGuids.Add(LoadManager.getInstance().DrawObjectWithSpecificLayer(Axis, LoadManager.NamedLayer.Guide));
 
@@ -3376,7 +3376,7 @@ namespace TuringAndCorbusier
             }
             drawnGuids.AddRange(LoadManager.getInstance().DrawObjectWithSpecificLayer(texts, LoadManager.NamedLayer.Guide));
 
-            drawnGuids.AddRange(LoadManager.getInstance().DrawObjectWithSpecificLayer(this.RegsOutput, LoadManager.NamedLayer.Guide));
+            drawnGuids.AddRange(LoadManager.getInstance().DrawObjectsWithSpecificLayer(this.RegsOutput, LoadManager.NamedLayer.Guide));
 
             drawnGuids.Add(LoadManager.getInstance().DrawObjectWithSpecificLayer(Axis, LoadManager.NamedLayer.Guide));
 
