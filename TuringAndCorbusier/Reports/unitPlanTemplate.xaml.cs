@@ -54,13 +54,17 @@ namespace Reports
             origin.Y = canvas.Height / 2;
             List<Point3d> dimensionLocationPointList = new List<Point3d>();
             List<double> houseOutlineLength = GetLineLength(householdOutline, out dimensionLocationPointList, tempBoundingBox);
+           // List<Curve> horizontal = DimensionLines(householdOutline, tempBoundingBox);
 
-
-            PlanDrawingFunction.drawUnitPlan(tempBoundingBox, householdOutline, scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 1);
+          //  PlanDrawingFunction.drawUnitPlan(tempBoundingBox, householdOutline, scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 1);
             PlanDrawingFunction.drawUnitBackGround(tempBoundingBox, householdOutline, scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.LightGreen);
 
             PlanDrawingFunction.DrawUnitPlanDimension(householdOutline, dimensionLocationPointList, houseOutlineLength, tempBoundingBox, scaleFactor - 0.01, origin, ref this.UnitCanvas);
 
+            //for(int i = 0; i < horizontal.Count; i++)
+            //{
+            //    PlanDrawingFunction.drawUnitPlan(tempBoundingBox, horizontal[i], scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 1);
+            //}
         }
 
 
@@ -97,23 +101,40 @@ namespace Reports
             return isHorizontal;
         }
 
-        private static void DimensionLines(Curve householdeOutline)
-        {
-            Curve[] segment = householdeOutline.DuplicateSegments();
-            List<Curve> horizontal = new List<Curve>();
-            List<Curve> vertical = new List<Curve>();
-            for (int i = 0; i < segment.Length; i++)
-            {
-                bool isHorizontal = IsHorizontal(segment[i]);
-                if (isHorizontal == true)
-                {
-                    horizontal.Add(segment[i]);
-                } else
-                {
-                    vertical.Add(segment[i]);
-                }
-            }
-        }
+        //private static List<Curve> DimensionLines(Curve householdeOutline, Rectangle3d boundingBox)
+        //{
+        //    Curve[] segment = householdeOutline.DuplicateSegments();
+        //    List<Curve> horizontal = new List<Curve>();
+        //    List<Curve> vertical = new List<Curve>();
+        //    List<double> horizontalLength = new List<double>();
+
+        //    for (int i = 0; i < segment.Length; i++)
+        //    {
+        //        bool isHorizontal = IsHorizontal(segment[i]);
+        //        if (isHorizontal == true)
+        //        {
+        //            horizontal.Add(segment[i]);
+        //        } else
+        //        {
+        //            vertical.Add(segment[i]);
+        //        }
+        //    }
+        //    for(int i = 0; i < horizontal.Count; i++)
+        //    {
+        //        Curve curve = horizontal[i].DuplicateCurve();
+        //        Vector3d dir = curve.TangentAt(0.5);
+        //        dir.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+        //        curve.Transform(Rhino.Geometry.Transform.Translation(dir*500));
+        //        horizontal[i] = curve;
+        //        horizontalLength.Add(horizontal[i].GetLength());
+        //    }
+        //    //int longestIndex = GetLargestValueIndex(horizontalLength);
+        //    //Vector3d dir1 = horizontal[longestIndex].TangentAtStart;
+        //    //dir1.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+        //    //horizontal[longestIndex].Transform(Rhino.Geometry.Transform.Translation(dir1 * 1000));
+        //    return horizontal;
+
+        //}
 
 
         public static System.Windows.Shapes.Rectangle GetUnitPlanRectangle()
@@ -123,5 +144,22 @@ namespace Reports
             unitPlanRectangle.Height = 298;
             return unitPlanRectangle;
         }
+
+        private static int GetLargestValueIndex(List<double> textBlockList)
+        {
+            int index = 0;
+            for (int i = 0; i < textBlockList.Count; i++)
+            {
+
+                if (textBlockList[index] < textBlockList[i])
+                {
+                    index = i;
+                }
+
+            }
+            return index;
+        }
+
+       
     }
 }

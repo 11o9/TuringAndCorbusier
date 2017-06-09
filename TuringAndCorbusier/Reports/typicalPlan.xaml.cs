@@ -83,7 +83,7 @@ namespace Reports
         }
         private void SetTitleIsUsingAndTopDifferent(Interval floorInterval)
         {
-            this.planPageTitle.Text = "PLAN " + 1 + "-" + (floorInterval.Max - 1).ToString() + "F";
+            this.planPageTitle.Text = "PLAN " + 2 + "-" + (floorInterval.Max - 2).ToString() + "F";
         }
         private void SetTitle(Interval floorInterval)
         {
@@ -320,7 +320,7 @@ namespace Reports
 
             try
             {
-                for (int i = 0; i < numOfHouseInEachFloorList[1]; i++)
+                for (int i = 0; i<houseOutlineList.Count; i++)
                 {
                     //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
                     //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
@@ -674,7 +674,7 @@ namespace Reports
             try
             {
 
-                for (int i = 0; i <= numOfHouseList[numOfFloors]; i++)
+                for (int i =(int)numOfHouseList[numOfFloors]; i <= houseOutlineList.Count-1; i++)
                 {
                     //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
                     //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
@@ -724,7 +724,7 @@ namespace Reports
             {
                 houseOutlinesCentroid.Add(Rhino.Geometry.AreaMassProperties.Compute(house).Centroid);
             }
-            for (int i = 0; i <= numOfHouseList[numOfFloors]; i++)
+            for (int i =(int)numOfHouseList[numOfFloors]; i <= houseOutlineList.Count-numOfHouseList.Last(); i++)
             {
                 System.Windows.Point newCentroid = PlanDrawingFunction_90degree.pointConverter(rectangleToFit, houseOutlinesCentroid[i], scaleFactor, initialOriginPoint);
                 try

@@ -612,7 +612,7 @@ namespace TuringAndCorbusier
             List<TextBlock> vertical = new List<TextBlock>();
             List<System.Windows.Point> horizontalPoints = new List<System.Windows.Point>();
             List<System.Windows.Point> verticalPoints = new List<System.Windows.Point>();
-            DrawDimension(dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor,householdOutline,out horizontal,out vertical, out horizontalPoints, out verticalPoints);
+            DrawDimension(origin,dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor,householdOutline,out horizontal,out vertical, out horizontalPoints, out verticalPoints);
             FinalRepositioning(scaleFactor, tempBoundingBox, convertedPointList,horizontal,vertical, unitPlanCanvas,horizontalPoints,verticalPoints);
         }
 
@@ -710,7 +710,7 @@ namespace TuringAndCorbusier
             return line;
         }
 
-        private static void DrawDimension(List<TextBlock> dimensionList, List<System.Windows.Point> pointList, Canvas UnitPlanCanvas, Rectangle3d tempBoundingBox, double tempScaleFactor,Curve householdOutline,out List<TextBlock>horizontal,out List<TextBlock>vertical,out List<System.Windows.Point> horizontalPoints,out List<System.Windows.Point> verticalPoints)
+        private static void DrawDimension(System.Windows.Point tempOrigin,List<TextBlock> dimensionList, List<System.Windows.Point> pointList, Canvas UnitPlanCanvas, Rectangle3d tempBoundingBox, double tempScaleFactor,Curve householdOutline,out List<TextBlock>horizontal,out List<TextBlock>vertical,out List<System.Windows.Point> horizontalPoints,out List<System.Windows.Point> verticalPoints)
         {
             Curve[] segments = householdOutline.DuplicateSegments();
             List<bool> isHorizontal = new List<bool>();
@@ -718,7 +718,9 @@ namespace TuringAndCorbusier
             vertical = new List<TextBlock>();
             horizontalPoints = new List<System.Windows.Point>();
             verticalPoints = new List<System.Windows.Point>();
-            for(int i = 0; i < segments.Length; i++)
+
+
+            for (int i = 0; i < segments.Length; i++)
             {
                 bool ih = IsHorizontal(segments[i]);
                 isHorizontal.Add(ih);
@@ -726,14 +728,18 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < dimensionList.Count; i++)
             {
+     
 
                 UnitPlanCanvas.Children.Add(dimensionList[i]);
+
 
                 double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
                 double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
 
                 Canvas.SetLeft(dimensionList[i], pointList[i].X-width);
                 Canvas.SetTop(dimensionList[i],pointList[i].Y-height);
+
+
                 if (isHorizontal[i] == true)
                 {
                     RotateTransform rt = new RotateTransform(-90);
@@ -744,13 +750,13 @@ namespace TuringAndCorbusier
                     horizontal.Add(dimensionList[i]);
                     horizontalPoints.Add(pointList[i]);
 
-
                 }else
                 {
                     Canvas.SetLeft(dimensionList[i], (pointList[i].X - width)-15);
                     Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)-7);
                     vertical.Add(dimensionList[i]);
                     verticalPoints.Add(pointList[i]);
+
                 }
             }
 

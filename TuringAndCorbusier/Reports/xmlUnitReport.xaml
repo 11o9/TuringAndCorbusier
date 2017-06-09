@@ -15,6 +15,6 @@
         <ContentControl x:Name="unitPlanCanvasControl1" Content="" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-910"/>
 
         <ContentControl x:Name="unitPlanCanvasControl2" Content="" Width="1240" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="759" Margin="0,0,0,-1670"/>
-        <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="Din Alternate" FontWeight="Bold" Margin="980,1675,-980.7,-1676.78" />
+        <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="Din Alternate" FontWeight="Bold" Margin="980,1633,-981.05,-1635.67" />
     </FixedPage>
 </UserControl>

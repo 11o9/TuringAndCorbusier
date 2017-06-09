@@ -10,7 +10,7 @@
 
     <FixedPage Name="fixedPage" Width="1240" Height="1750">
         <Rectangle Fill="#FFC4D700" Height="3" Canvas.Left="120" Canvas.Top="120" Margin="90,100,-680,-38" VerticalAlignment="Top"/>
-        <TextBlock Text="OUTLINE" FontSize="28" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="ExtraBlack" Margin="88,70,42,-70"/>
+        <TextBlock Text="OUTLINE" FontSize="28" Height="50" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Canvas.Left="120" Canvas.Top="80" FontFamily="Din Alternate" FontWeight="Bold" Margin="88,70,42,-70"/>
 
 
         <Canvas x:Name="buildingCanvas"  Grid.ColumnSpan="3" Grid.RowSpan="4">

@@ -734,8 +734,14 @@ namespace TuringAndCorbusier
                 //}
 
 
-                double totalNumOfFloors = MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2;
-
+                double totalNumOfFloors = 0;
+                if (isUsing1F == true)
+                {
+                    totalNumOfFloors= MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2;
+                }else if(isUsing1F == false)
+                {
+                    totalNumOfFloors = MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 3;
+                }
 
                 for (int i = 0; i < totalNumOfFloors; i++)
                 {
@@ -803,6 +809,19 @@ namespace TuringAndCorbusier
                             floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
                             fps.Add(floorPlanDrawing.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + i.ToString());
+                            break;
+                        }
+                        else if (isUsing1F == true && isTopFloorDifferent == true && i != 0)
+                        {
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                            Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
+                            Reports.floorPlanDrawingPage topFloorPlanDrawing = new Reports.floorPlanDrawingPage(totalNumOfFloors, "topFloor");
+                            floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            topFloorPlanDrawing.SetTopHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            fps.Add(floorPlanDrawing.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                            fps.Add(topFloorPlanDrawing.fixedPage);
+                            pagename.Add("topFloorPlanDrawingPage" + i.ToString());
                             break;
                         }
                     }
