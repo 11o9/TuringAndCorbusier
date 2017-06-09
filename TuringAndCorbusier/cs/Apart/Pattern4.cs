@@ -1143,9 +1143,16 @@ namespace TuringAndCorbusier
 
                             if (i % 3 == 0) //if it is formerPart
                             {
+                                if (!isToLineEndEnough)
+                                {
+                                    IsNextPartDrawable = false;
+                                    currentUnitIndex++;
+                                    continue;
+                                }
+
                                 allocated.Add(unallocated[currentUnitIndex]);
                                 homeOri.Add(eOri);
-                                currentUnitIndex++;
+                                currentUnitIndex++;       
                             }
 
                             else //if it is laterPart
@@ -1175,6 +1182,47 @@ namespace TuringAndCorbusier
                         }
                     }
 
+                    else if ((int)mappedVals[i] + 2 == (int)(mappedVals[(i + 1)] - 0.001)) //if mapped over fold
+                    {
+                        Point3d checkP1 = centerLines[(int)mappedVals[i]].PointAt(1);
+                        Point3d checkP2 = centerLines[(int)mappedVals[(i+1)]].PointAt(0);
+                        Point3d sOri = centerline.PointAt(mappedVals[i]);
+
+                        Vector3d v1 = new Vector3d(sOri - checkP1);
+                        Vector3d v2 = new Vector3d(checkP2 - checkP1);
+                        double l1 = v1.Length;
+                        double l2 = v2.Length;
+
+                        v1.Unitize();
+                        v2.Unitize();
+
+                        if (i % 3 == 1) //if it is core
+                        {
+                            if (!IsNextPartDrawable)
+                            {
+                                IsNextPartDrawable = false;
+                                continue;
+                            }
+
+                            sOri.Transform(Transform.Translation(-v2 * width / 2));
+                            corePoint.Add(sOri);
+                            coreVecX.Add(Vector3d.Multiply(-v1, 1));
+                            coreVecY.Add(Vector3d.Multiply(-v2, -1));
+                            IsNextPartDrawable = false;
+                            continue;
+                        }
+
+                        //if it is not core
+                        if (currentUnitIndex >= mappedHouseholdCount)
+                        {
+                            canLoop = false;
+                            break;
+                        }
+
+
+                            IsNextPartDrawable = true;
+                            currentUnitIndex++;
+                    }
 
                     else //if it is corner
                     {
