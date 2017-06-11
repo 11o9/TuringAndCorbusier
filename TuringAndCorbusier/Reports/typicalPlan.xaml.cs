@@ -50,7 +50,15 @@ namespace Reports
             }
             else if (isUsing1F == false && isTopFloorDifferent == false)
             {
+                if (isTopSetBack == true)
+                {
+                    SetTitleIsTopDifferent(floorInterval);
+                }
+                else
+                {
                 this.SetTitle(floorInterval);
+
+                }
             }
             else if (isUsing1F == true && isTopFloorDifferent == false)
             {
@@ -674,7 +682,7 @@ namespace Reports
             try
             {
 
-                for (int i =(int)numOfHouseList[numOfFloors]; i <= houseOutlineList.Count-1; i++)
+                for (int i =(int)numOfHouseList[numOfFloors]; i <= (houseOutlineList.Count-1)-(int)numOfHouseList.Last(); i++)
                 {
                     //double actualRoundExclusiveArea = Math.Round(householdList[i].GetExclusiveArea() / 1000000, 0);
                     //System.Windows.Media.SolidColorBrush areaTypeBackgroundColour = SetAreaTypeColor(distinctRoundedExclusiveArea, actualRoundExclusiveArea);
@@ -685,7 +693,7 @@ namespace Reports
                 }
 
 
-                for (int i = 0; i < balconyLines.Count; i++)
+                for (int i = 0; i < balconyLines.Count- (int)numOfHouseList.Last(); i++)
                 {
                     if (balconyLines[i].Count > 1)
                     {

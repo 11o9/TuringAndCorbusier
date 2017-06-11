@@ -46,7 +46,6 @@ namespace Reports
         {
             Rectangle3d tempBoundingBox = new Rectangle3d(Plane.WorldXY, householdOutline.GetBoundingBox(true).Min, householdOutline.GetBoundingBox(true).Max);
             //Point3d householdOutlineCentroid = AreaMassProperties.Compute(householdOutline).Centroid;
-
             System.Windows.Shapes.Rectangle canvas = new Rectangle();
             canvas.Height = UnitCanvas.Height;
             canvas.Width = UnitCanvas.Width;
@@ -54,20 +53,53 @@ namespace Reports
             origin.Y = canvas.Height / 2;
             List<Point3d> dimensionLocationPointList = new List<Point3d>();
             List<double> houseOutlineLength = GetLineLength(householdOutline, out dimensionLocationPointList, tempBoundingBox);
-           // List<Curve> horizontal = DimensionLines(householdOutline, tempBoundingBox);
-
-          //  PlanDrawingFunction.drawUnitPlan(tempBoundingBox, householdOutline, scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 1);
+            List<Curve> horizontal = new List<Curve>();
+            List<Curve> vertical = new List<Curve>();
+           DimensionLines(householdOutline, tempBoundingBox,out horizontal,out vertical);
+            horizontal = HorizontalDimensionLineDetail(horizontal,tempBoundingBox);
+            vertical = VerticalDimensionLineDetail(vertical, tempBoundingBox);
             PlanDrawingFunction.drawUnitBackGround(tempBoundingBox, householdOutline, scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.LightGreen);
+          //  PlanDrawingFunction.drawUnitPlan(tempBoundingBox, householdOutline, scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 3);
 
             PlanDrawingFunction.DrawUnitPlanDimension(householdOutline, dimensionLocationPointList, houseOutlineLength, tempBoundingBox, scaleFactor - 0.01, origin, ref this.UnitCanvas);
 
-            //for(int i = 0; i < horizontal.Count; i++)
-            //{
-            //    PlanDrawingFunction.drawUnitPlan(tempBoundingBox, horizontal[i], scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 1);
-            //}
+            for (int i = 0; i < horizontal.Count; i++)
+            {
+                PlanDrawingFunction.drawUnitPlan(tempBoundingBox, horizontal[i], scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 0.075);
+            }
+
+            for (int i = 0; i < vertical.Count; i++)
+            {
+                PlanDrawingFunction.drawUnitPlan(tempBoundingBox, vertical[i], scaleFactor - 0.01, origin, ref this.UnitCanvas, System.Windows.Media.Brushes.Black, 0.075);
+            }
+        }
+        private static List<Curve> HorizontalDimensionLineDetail(List<Curve> dimensionLines,Rectangle3d boundingBox)
+        {
+            List<Curve> horizontal = new List<Curve>();
+            for(int i = 0; i < dimensionLines.Count; i++)
+            {
+                Rhino.Geometry.Line line1 = new Rhino.Geometry.Line(dimensionLines[i].PointAtStart, new Point3d(boundingBox.Corner(0).X, dimensionLines[i].PointAtStart.Y, dimensionLines[i].PointAtStart.Z));
+                Rhino.Geometry.Line line2 = new Rhino.Geometry.Line(dimensionLines[i].PointAtEnd, new Point3d(boundingBox.Corner(0).X, dimensionLines[i].PointAtEnd.Y, dimensionLines[i].PointAtEnd.Z));
+                horizontal.Add(line1.ToNurbsCurve());
+                horizontal.Add(line2.ToNurbsCurve());
+                horizontal.Add(dimensionLines[i]);
+            }
+            return horizontal;
         }
 
-
+        private static List<Curve> VerticalDimensionLineDetail(List<Curve> dimensionLines, Rectangle3d boundingBox)
+        {
+            List<Curve> vertical = new List<Curve>();
+            for (int i = 0; i < dimensionLines.Count; i++)
+            {
+                Rhino.Geometry.Line line1 = new Rhino.Geometry.Line(dimensionLines[i].PointAtStart, new Point3d(dimensionLines[i].PointAtStart.X, boundingBox.Corner(2).Y, dimensionLines[i].PointAtStart.Z));
+                Rhino.Geometry.Line line2 = new Rhino.Geometry.Line(dimensionLines[i].PointAtEnd, new Point3d(dimensionLines[i].PointAtEnd.X, boundingBox.Corner(2).Y, dimensionLines[i].PointAtEnd.Z));
+                vertical.Add(line1.ToNurbsCurve());
+                vertical.Add(line2.ToNurbsCurve());
+                vertical.Add(dimensionLines[i]);
+            }
+            return vertical;
+        }
         private List<double> GetLineLength(Curve houseOutline, out List<Point3d> dimensionLocationPointList, Rectangle3d tempBoundingBox)
         {
             List<double> houseOutlineLength = new List<double>();
@@ -80,7 +112,7 @@ namespace Reports
                 bool isHorizontal = IsHorizontal(segment);
                 if (isHorizontal == true)
                 {
-                    p.X = tempBoundingBox.Corner(0).X - 1500;
+                    p.X = tempBoundingBox.Corner(0).X - 1200;
                 } else
                 {
                     p.Y = tempBoundingBox.Corner(2).Y + 900;
@@ -101,41 +133,121 @@ namespace Reports
             return isHorizontal;
         }
 
-        //private static List<Curve> DimensionLines(Curve householdeOutline, Rectangle3d boundingBox)
-        //{
-        //    Curve[] segment = householdeOutline.DuplicateSegments();
-        //    List<Curve> horizontal = new List<Curve>();
-        //    List<Curve> vertical = new List<Curve>();
-        //    List<double> horizontalLength = new List<double>();
+        private static void DimensionLines(Curve householdeOutline, Rectangle3d boundingBox,out List<Curve>finalHorizontal,out List<Curve>finalVertical)
+        {
+            Curve[] segment = householdeOutline.DuplicateSegments();
+            List<Curve> horizontal = new List<Curve>();
+            List<Curve> vertical = new List<Curve>();
+            List<double> horizontalLength = new List<double>();
 
-        //    for (int i = 0; i < segment.Length; i++)
-        //    {
-        //        bool isHorizontal = IsHorizontal(segment[i]);
-        //        if (isHorizontal == true)
-        //        {
-        //            horizontal.Add(segment[i]);
-        //        } else
-        //        {
-        //            vertical.Add(segment[i]);
-        //        }
-        //    }
-        //    for(int i = 0; i < horizontal.Count; i++)
-        //    {
-        //        Curve curve = horizontal[i].DuplicateCurve();
-        //        Vector3d dir = curve.TangentAt(0.5);
-        //        dir.Rotate(-Math.PI / 2, Vector3d.ZAxis);
-        //        curve.Transform(Rhino.Geometry.Transform.Translation(dir*500));
-        //        horizontal[i] = curve;
-        //        horizontalLength.Add(horizontal[i].GetLength());
-        //    }
-        //    //int longestIndex = GetLargestValueIndex(horizontalLength);
-        //    //Vector3d dir1 = horizontal[longestIndex].TangentAtStart;
-        //    //dir1.Rotate(-Math.PI / 2, Vector3d.ZAxis);
-        //    //horizontal[longestIndex].Transform(Rhino.Geometry.Transform.Translation(dir1 * 1000));
-        //    return horizontal;
+            for (int i = 0; i < segment.Length; i++)
+            {
+                bool isHorizontal = IsHorizontal(segment[i]);
+                if (isHorizontal == true)
+                {
+                    horizontal.Add(segment[i]);
+                }
+                else
+                {
+                    vertical.Add(segment[i]);
+                }
+            }
+            finalHorizontal = new List<Curve>();
+            finalVertical = new List<Curve>();
+            finalHorizontal = HorizontalDimensionLinePlacement(horizontal,boundingBox);
+            finalVertical = VerticalDimensionLinePlacement(vertical, boundingBox);
+  
+        }
 
-        //}
+        private static List<Curve> HorizontalDimensionLinePlacement(List<Curve> dimensionLine, Rectangle3d boundingBox)
+        {
+            List<double> lengthList = new List<double>();
+            for (int i = 0; i < dimensionLine.Count; i++)
+            {
+                Curve curve = dimensionLine[i].DuplicateCurve();
+                double t = 0;
+                Rhino.Geometry.Line line = new Rhino.Geometry.Line(curve.PointAtStart, curve.PointAtEnd);
+                Point3d point = line.ClosestPoint(boundingBox.Corner(0), false);
+                Vector3d dir = boundingBox.Corner(0) - point;
+                curve.Transform(Rhino.Geometry.Transform.Translation(dir));
+                dimensionLine[i] = curve;
+                lengthList.Add(dimensionLine[i].GetLength());
+            }
+            for (int i = 0; i < dimensionLine.Count; i++)
+            {
+                Vector3d direction = dimensionLine[i].TangentAtStart;
+                if (direction.Y == -1)
+                {
+                    direction.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+                }
+                else
+                {
+                    direction.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                }
+                dimensionLine[i].Transform(Rhino.Geometry.Transform.Translation(direction * 500));
+            }
+            if (dimensionLine.Count > 2)
+            {
+                int longestLength = GetLargestValueIndex(lengthList);
+                Vector3d dir1 = dimensionLine[longestLength].TangentAtStart;
+                if (dir1.Y == -1)
+                {
+                    dir1.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+                }
+                else
+                {
+                    dir1.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                }
+                dimensionLine[longestLength].Transform(Rhino.Geometry.Transform.Translation(dir1 * 800));
 
+            }
+            return dimensionLine;
+        }
+
+        private static List<Curve> VerticalDimensionLinePlacement(List<Curve> dimensionLine, Rectangle3d boundingBox)
+        {
+            List<double> lengthList = new List<double>();
+            for (int i = 0; i < dimensionLine.Count; i++)
+            {
+                Curve curve = dimensionLine[i].DuplicateCurve();
+                double t = 0;
+                Rhino.Geometry.Line line = new Rhino.Geometry.Line(curve.PointAtStart, curve.PointAtEnd);
+                Point3d point = line.ClosestPoint(boundingBox.Corner(2), false);
+                Vector3d dir = boundingBox.Corner(2) - point;
+                curve.Transform(Rhino.Geometry.Transform.Translation(dir));
+                dimensionLine[i] = curve;
+                lengthList.Add(dimensionLine[i].GetLength());
+            }
+            for (int i = 0; i < dimensionLine.Count; i++)
+            {
+                Vector3d direction = dimensionLine[i].TangentAtStart;
+                if (direction.X == -1)
+                {
+                    direction.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+                }
+                else
+                {
+                    direction.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                }
+                dimensionLine[i].Transform(Rhino.Geometry.Transform.Translation(direction * 500));
+            }
+            if (dimensionLine.Count > 2)
+            {
+                int longestLength = GetLargestValueIndex(lengthList);
+                Vector3d dir1 = dimensionLine[longestLength].TangentAtStart;
+                if (dir1.X == -1)
+                {
+                    dir1.Rotate(-Math.PI / 2, Vector3d.ZAxis);
+                }
+                else
+                {
+                    dir1.Rotate(Math.PI / 2, Vector3d.ZAxis);
+                }
+                dimensionLine[longestLength].Transform(Rhino.Geometry.Transform.Translation(dir1 * 800));
+
+            }
+            return dimensionLine;
+        }
 
         public static System.Windows.Shapes.Rectangle GetUnitPlanRectangle()
         {

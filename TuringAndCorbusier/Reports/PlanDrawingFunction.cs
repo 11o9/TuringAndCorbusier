@@ -598,11 +598,25 @@ namespace TuringAndCorbusier
                 }
             }
         }
+
+
+        private static bool IsLineHorizontal(System.Windows.Shapes.Line WPFLineList)
+        {
+
+                if(WPFLineList.X1 == WPFLineList.X2)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            
+        }
         public static void DrawUnitPlanDimension(Curve householdOutline,List<Point3d> dimensionLocationPointList, List<double> houseOutlineLength, Rectangle3d tempBoundingBox,double scaleFactor,System.Windows.Point origin, ref Canvas unitPlanCanvas)
         {
             List<TextBlock> dimensionTextBlockList = GetDimensionList(houseOutlineLength);
             List<System.Windows.Point> convertedPointList = new List<System.Windows.Point>();
-
 
             foreach (Point3d point in dimensionLocationPointList)
             {
@@ -614,6 +628,7 @@ namespace TuringAndCorbusier
             List<System.Windows.Point> verticalPoints = new List<System.Windows.Point>();
             DrawDimension(origin,dimensionTextBlockList, convertedPointList, unitPlanCanvas, tempBoundingBox,scaleFactor,householdOutline,out horizontal,out vertical, out horizontalPoints, out verticalPoints);
             FinalRepositioning(scaleFactor, tempBoundingBox, convertedPointList,horizontal,vertical, unitPlanCanvas,horizontalPoints,verticalPoints);
+
         }
 
         private static void FinalRepositioning(double tempScaleFactor, Rectangle3d tempBoundingBox, List<System.Windows.Point> pointList, List<TextBlock> horizontal, List<TextBlock> vertical, Canvas unitPlanCanvas, List<System.Windows.Point> horizontalPoints, List<System.Windows.Point> verticalPoints)
@@ -693,7 +708,7 @@ namespace TuringAndCorbusier
                 string formattedLength = lineLength.ToString("N0");
                 TextBlock dimension = new TextBlock();
                 dimension.Text = formattedLength;
-                dimension.FontSize = 12;
+                dimension.FontSize = 10;
                 dimensionList.Add(dimension);
             }
             return dimensionList;
@@ -728,10 +743,8 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < dimensionList.Count; i++)
             {
-     
 
                 UnitPlanCanvas.Children.Add(dimensionList[i]);
-
 
                 double width = ((tempBoundingBox.Width / 2) * tempScaleFactor);
                 double height = ((tempBoundingBox.Height / 2) * tempScaleFactor);
@@ -746,14 +759,14 @@ namespace TuringAndCorbusier
                     TransformGroup tg = new TransformGroup();
                     tg.Children.Add(rt);
                     dimensionList[i].RenderTransform = tg;
-                    Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)+15);
+                    Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)+10);
                     horizontal.Add(dimensionList[i]);
                     horizontalPoints.Add(pointList[i]);
 
                 }else
                 {
                     Canvas.SetLeft(dimensionList[i], (pointList[i].X - width)-15);
-                    Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)-7);
+                    Canvas.SetTop(dimensionList[i], (pointList[i].Y - height)-5);
                     vertical.Add(dimensionList[i]);
                     verticalPoints.Add(pointList[i]);
 
