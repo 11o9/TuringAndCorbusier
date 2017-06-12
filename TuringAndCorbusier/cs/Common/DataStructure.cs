@@ -1391,6 +1391,9 @@ namespace TuringAndCorbusier
             double output = 0;
 
 
+            if (Household.Count == 0)
+                return output;
+
             output = Household[1].Sum(n => n.Sum(m => m.GetArea() + m.CorridorArea));
             output += Core[1].Sum(n => n.GetArea());
 

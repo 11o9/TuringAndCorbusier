@@ -637,8 +637,8 @@ namespace TuringAndCorbusier
                 try
                 {
                     //testSectionPage.setPlan(drawsection.Draw());
-                    fps.Add(testSectionPage.fixedPage);
-                    pagename.Add("sectionPage");
+                    //fps.Add(testSectionPage.fixedPage);
+                    //pagename.Add("sectionPage");
                 }
                 catch (Exception df)
                 {

@@ -138,8 +138,10 @@ namespace TuringAndCorbusier
 
                     //반환값 조정
                     double legalFAR = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio;
+                    double legalCVR = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage;
                     var fars = distinctApartment.Select(n => n.GetGrossAreaRatio()).ToList();
-                    var suits = distinctApartment.Where(n => n.GetGrossAreaRatio() < legalFAR && n.ParameterSet != null).ToList();
+                    var cvrs = distinctApartment.Select(n => n.GetBuildingCoverage()).ToList();
+                    var suits = distinctApartment.Where(n => n.GetGrossAreaRatio() < legalFAR && n.ParameterSet != null && n.GetBuildingCoverage() < legalCVR ).ToList();
 
                     var normals = suits.Where(n => !n.ParameterSet.setback && !n.ParameterSet.using1F).ToList();
                     var using1fs = suits.Where(n => n.ParameterSet.using1F).ToList();
@@ -196,6 +198,19 @@ namespace TuringAndCorbusier
             }
 
             //best 1
+            if (bestOutputs.Count == 0)
+            {
+                string agType = ag.GetAGType;
+                if (agType == "PT-1")
+                    agType = "판상형";
+                if (agType == "PT-3")
+                    agType = "ㅁ형";
+                if (agType == "PT-4")
+                    agType = "ㄷ형";
+                System.Windows.MessageBox.Show(agType + " 타입 설계에 적합하지 않은 대지입니다.");
+            }
+
+
             return bestOutputs;
         }
 

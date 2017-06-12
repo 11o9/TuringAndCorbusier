@@ -15,6 +15,8 @@ namespace TuringAndCorbusier
     /// </summary>
     public partial class Page3 : Page
     {
+        public bool stop = false;
+
 
         private List<Guid> sectionpreview = new List<Guid>();
 
@@ -659,6 +661,11 @@ namespace TuringAndCorbusier
         private void Btn_CheckReg_Click(object sender, RoutedEventArgs e)
         {
            
+        }
+
+        private void Btn_Stop_Click(object sender, RoutedEventArgs e)
+        {
+            stop = true;
         }
     }
 }

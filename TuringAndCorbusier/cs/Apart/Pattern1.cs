@@ -736,7 +736,7 @@ namespace TuringAndCorbusier
         ///////////////////////////////////////////
 
         //Parameter 최소값 ~ 최대값 {storiesHigh, storiesLow, width, angle, moveFactor}
-        private double[] minInput = { 3, 3, 5000, 0, 0 };
+        private double[] minInput = { 3, 3, 7000, 0, 0 };
         //private double[] minInput = { 6, 6, 10500, 0, 0 };
         private double[] maxInput = { TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, 13000, 2 * Math.PI, 1 };
 

@@ -2706,7 +2706,7 @@ namespace TuringAndCorbusier
 
             string REPORT_path = "";
             //string ELEVATION_path = "";
-            string SECTION_path = "";
+            //string SECTION_path = "";
             //string DWG_PLANS_path = "";
             string GROUND_PLAN_path = "";
             string TYPICAL_PLAN_path = "";
@@ -2715,7 +2715,7 @@ namespace TuringAndCorbusier
 
             path.TryGetValue("REPORT", out REPORT_path);
             //path.TryGetValue("ELEVATION", out ELEVATION_path);
-            path.TryGetValue("SECTION", out SECTION_path);
+            //path.TryGetValue("SECTION", out SECTION_path);
             //path.TryGetValue("DWG_PLANS", out DWG_PLANS_path);
             path.TryGetValue("GROUND_PLAN", out GROUND_PLAN_path);
             path.TryGetValue("TYPICAL_PLAN", out TYPICAL_PLAN_path);
@@ -2737,8 +2737,8 @@ namespace TuringAndCorbusier
 
 
 
-            string sql = "INSERT INTO TD_DESIGN_REPORT (REGI_MST_NO,REGI_SUB_MST_NO,REGI_PRE_DESIGN_NO,PDF_REPORT,PDF_REPORT_SIZE,IMG_BIRD_EYE_1,IMG_BIRD_EYE_1_SIZE,IMG_BIRD_EYE_2,IMG_BIRD_EYE_2_SIZE,IMG_GROUND_FLOOR_PLAN,IMG_GROUND_FLOOR_PLAN_SIZE,IMG_TYPICAL_FLOOR_PLAN,IMG_TYPICAL_FLOOR_PLAN_SIZE,IMG_SECTION,IMG_SECTION_SIZE,FRST_REGIST_DT,FRST_REGISTER_ID)"
-                + "VALUES(:p_REGI_MST_NO,:p_REGI_SUB_MST_NO,:p_REGI_PRE_DESIGN_NO,:p_PDF_REPORT,:p_PDF_REPORT_SIZE,:p_IMG_BIRD_EYE_1,:p_IMG_BIRD_EYE_1_SIZE,:p_IMG_BIRD_EYE_2,:p_IMG_BIRD_EYE_2_SIZE,:p_IMG_GROUND_FLOOR_PLAN,:p_IMG_GROUND_FLOOR_PLAN_SIZE,:p_IMG_TYPICAL_FLOOR_PLAN,:p_IMG_TYPICAL_FLOOR_PLAN_SIZE,:p_IMG_SECTION,:p_IMG_SECTION_SIZE,SYSDATE,:p_FRST_REGISTER_ID)";
+            string sql = "INSERT INTO TD_DESIGN_REPORT (REGI_MST_NO,REGI_SUB_MST_NO,REGI_PRE_DESIGN_NO,PDF_REPORT,PDF_REPORT_SIZE,IMG_BIRD_EYE_1,IMG_BIRD_EYE_1_SIZE,IMG_BIRD_EYE_2,IMG_BIRD_EYE_2_SIZE,IMG_GROUND_FLOOR_PLAN,IMG_GROUND_FLOOR_PLAN_SIZE,IMG_TYPICAL_FLOOR_PLAN,IMG_TYPICAL_FLOOR_PLAN_SIZE,FRST_REGIST_DT,FRST_REGISTER_ID)"
+                + "VALUES(:p_REGI_MST_NO,:p_REGI_SUB_MST_NO,:p_REGI_PRE_DESIGN_NO,:p_PDF_REPORT,:p_PDF_REPORT_SIZE,:p_IMG_BIRD_EYE_1,:p_IMG_BIRD_EYE_1_SIZE,:p_IMG_BIRD_EYE_2,:p_IMG_BIRD_EYE_2_SIZE,:p_IMG_GROUND_FLOOR_PLAN,:p_IMG_GROUND_FLOOR_PLAN_SIZE,:p_IMG_TYPICAL_FLOOR_PLAN,:p_IMG_TYPICAL_FLOOR_PLAN_SIZE,SYSDATE,:p_FRST_REGISTER_ID)";
 
 
             using (OracleConnection connection = new OracleConnection(Consts.connectionString))
@@ -2750,7 +2750,7 @@ namespace TuringAndCorbusier
 
                     Oracle.ManagedDataAccess.Types.OracleBlob REPORT_blob = GetBlobDataFromFile(REPORT_path, connection);
                     //Oracle.ManagedDataAccess.Types.OracleBlob ELEVATION_blob = GetBlobDataFromFile(ELEVATION_path, connection);
-                    Oracle.ManagedDataAccess.Types.OracleBlob SECTION_blob = GetBlobDataFromFile(SECTION_path, connection);
+                    //Oracle.ManagedDataAccess.Types.OracleBlob SECTION_blob = GetBlobDataFromFile(SECTION_path, connection);
                     //Oracle.ManagedDataAccess.Types.OracleBlob DWG_PLANS_blob = GetBlobDataFromFile(DWG_PLANS_path, connection);
                     Oracle.ManagedDataAccess.Types.OracleBlob GROUND_PLAN = GetBlobDataFromFile(GROUND_PLAN_path, connection);
                     Oracle.ManagedDataAccess.Types.OracleBlob TYPICAL_PLAN = GetBlobDataFromFile(TYPICAL_PLAN_path, connection);
@@ -2775,8 +2775,8 @@ namespace TuringAndCorbusier
                     OracleParameter p_IMG_TYPICAL_FLOOR_PLAN_SIZE = new OracleParameter();
                     //OracleParameter p_IMG_ELEVATION = new OracleParameter();
                     //OracleParameter p_IMG_ELEVATION_SIZE = new OracleParameter();
-                    OracleParameter p_IMG_SECTION = new OracleParameter();
-                    OracleParameter p_IMG_SECTION_SIZE = new OracleParameter();
+                    //OracleParameter p_IMG_SECTION = new OracleParameter();
+                    //OracleParameter p_IMG_SECTION_SIZE = new OracleParameter();
                     //OracleParameter p_DWG_PLANS = new OracleParameter();
                     //OracleParameter p_DWG_PLANS_SIZE = new OracleParameter();
                     OracleParameter p_FRST_REGISTER_ID = new OracleParameter();
@@ -2842,13 +2842,13 @@ namespace TuringAndCorbusier
                     //p_IMG_ELEVATION_SIZE.Value = ELEVATION_blob.Length;
                     //p_IMG_ELEVATION_SIZE.ParameterName = "p_IMG_ELEVATION_SIZE";
 
-                    p_IMG_SECTION.OracleDbType = OracleDbType.Blob;
-                    p_IMG_SECTION.Value = SECTION_blob;  ///?
-                    p_IMG_SECTION.ParameterName = "p_IMG_SECTION";
+                    //p_IMG_SECTION.OracleDbType = OracleDbType.Blob;
+                    //p_IMG_SECTION.Value = SECTION_blob;  ///?
+                    //p_IMG_SECTION.ParameterName = "p_IMG_SECTION";
 
-                    p_IMG_SECTION_SIZE.OracleDbType = OracleDbType.Decimal;
-                    p_IMG_SECTION_SIZE.Value = SECTION_blob.Length;
-                    p_IMG_SECTION_SIZE.ParameterName = "p_IMG_SECTION_SIZE";
+                    //p_IMG_SECTION_SIZE.OracleDbType = OracleDbType.Decimal;
+                    //p_IMG_SECTION_SIZE.Value = SECTION_blob.Length;
+                    //p_IMG_SECTION_SIZE.ParameterName = "p_IMG_SECTION_SIZE";
 
                     //p_DWG_PLANS.OracleDbType = OracleDbType.Blob;
                     //p_DWG_PLANS.Value = DWG_PLANS_blob;  ///?
@@ -2885,8 +2885,8 @@ namespace TuringAndCorbusier
                     comm.Parameters.Add(p_IMG_TYPICAL_FLOOR_PLAN_SIZE);
                     //comm.Parameters.Add(p_IMG_ELEVATION);
                     //comm.Parameters.Add(p_IMG_ELEVATION_SIZE);
-                    comm.Parameters.Add(p_IMG_SECTION);
-                    comm.Parameters.Add(p_IMG_SECTION_SIZE);
+                    //comm.Parameters.Add(p_IMG_SECTION);
+                    //comm.Parameters.Add(p_IMG_SECTION_SIZE);
                     //comm.Parameters.Add(p_DWG_PLANS);
                     //comm.Parameters.Add(p_DWG_PLANS_SIZE);
                     comm.Parameters.Add(p_FRST_REGISTER_ID);

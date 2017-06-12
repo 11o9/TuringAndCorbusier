@@ -218,6 +218,7 @@
         <Button x:Name="Btn_Next" Content="다음" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="0,0,20,10" Background="#ff676868" HorizontalAlignment="Right" Width="75" Click="Btn_Next_Click" Height="24" VerticalAlignment="Bottom" Grid.Row="6" />
         <Button x:Name="Btn_Calculate" Content="계산" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="20,0,0,10" Background="#ff676868" HorizontalAlignment="Left" Width="75" Click="Btn_Calculate_Click" Height="24" VerticalAlignment="Bottom" Grid.Row="6" />
         <Button x:Name="Btn_CheckReg" Content="법규선체크" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="0,0,275,10" Background="#ff676868" HorizontalAlignment="Right" Width="75" Click="Btn_CheckReg_Click"  Height="24" VerticalAlignment="Bottom" Grid.Row="6" Visibility="Hidden" />
+        <Button Visibility="Hidden" x:Name="Btn_Stop" Content="중지" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="106,0,0,10" Background="#ff676868" HorizontalAlignment="Left" Width="75" Click="Btn_Stop_Click"  Height="24" VerticalAlignment="Bottom" Grid.Row="6" />
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -355,7 +356,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="33"/>
                     </Grid.RowDefinitions>
-                   
+
                 </Grid>
             </Border>
 
@@ -400,7 +401,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="33"/>
                     </Grid.RowDefinitions>
-                    
+
                 </Grid>
             </Border>
 
