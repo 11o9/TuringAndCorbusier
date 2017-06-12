@@ -27,7 +27,12 @@ namespace TuringAndCorbusier
 
             foreach (var hhp in hhps)
             {
-                output.AddRange(DrawHouse(hhp));
+                try
+                {
+                    output.AddRange(DrawHouse(hhp, true));
+                }
+                catch
+                { continue; }
             }
             foreach (var cp in cps)
             {
@@ -39,15 +44,57 @@ namespace TuringAndCorbusier
             return output;
         }
 
-        public static List<Brep> DrawHouse(Household hhp)
+        public static List<Brep> DrawHouse(Household hhp, bool toMesh)
         {
             double height = Consts.FloorHeight;
             Curve outline = hhp.GetOutline();
-            Polyline outPoly = CurveTools.ToPolyline(outline);
+
             if (outline == null)
                 return new List<Brep>();
-            Brep x = Extrusion.Create(outline, height, true).ToBrep();
-            x.CapPlanarHoles(10);
+
+            Curve outlineUp = outline.DuplicateCurve();
+            outlineUp.Translate(Vector3d.ZAxis * height);
+
+            var floors = CurveTools.ToPolyline(outline);
+            var ceilings = CurveTools.ToPolyline(outlineUp);
+
+            Brep[] floor = Brep.CreatePlanarBreps(outline);
+            Brep[] ceiling = Brep.CreatePlanarBreps(outlineUp);
+
+            List<Point3d> points = new List<Point3d>();
+            for (int i = 0; i < floors.Count; i++)
+            {
+                points.Add(floors[i]);
+                points.Add(ceilings[i]);
+            }
+
+            List<Brep> wallBreps = new List<Brep>();
+
+            for (int i = 0; i < points.Count; i += 2)
+            {
+                int start = i;
+                int second = (i + 2) % points.Count;
+                int third = (i + 3) % points.Count;
+                int end = (i + 1) % points.Count;
+
+                Point3d[] tomesh = { points[start], points[second], points[third], points[end], points[start] };
+
+                if (points[start] == points[second])
+                    continue;
+
+                var tempSideRectangle = Brep.CreatePlanarBreps(new Polyline(tomesh).ToNurbsCurve());
+
+                if (tempSideRectangle.Length > 0)
+                    wallBreps.AddRange(tempSideRectangle);
+                else
+                {
+                    int c = tomesh.Length;
+                    int d = tempSideRectangle.Length;
+                }
+            }
+
+            var union = Brep.CreateBooleanUnion(wallBreps, 0.1);
+            var x = union.OrderByDescending(n => n.GetArea()).First();
 
             double windowSide = 300;
             double windowLow = 300;
@@ -118,6 +165,120 @@ namespace TuringAndCorbusier
                 Curve pathCurve = new LineCurve(Point3d.Origin, new Point3d(windowNormal * (-windowDepth + 100)));
                 wins.Add(Brep.JoinBreps(Brep.CreateFromLoft(tempLoftBase, Point3d.Unset, Point3d.Unset, LoftType.Normal, false), 0)[0]);
             }
+            wins.Add(x);
+            wins.AddRange(floor);
+            wins.AddRange(ceiling);
+            //1. 양쪽에서 300씩 , 위400 아래300 사각형.빵꾸. 안쪽으로 200
+            //->창틀
+            //2. 사방 30씩, 안쪽으로 100
+            //->창문와꾸
+            //3. 창 안쪽에서 20, 창문와꾸 30, 바깥쪽50 ,길이 1200 * 2 
+            //4. ㅊ
+
+
+            return wins;
+
+
+
+        }
+
+        public static List<Brep> DrawHouse(Household hhp)
+        {
+            double height = Consts.FloorHeight;
+            Curve outline = hhp.GetOutline();
+
+            if (outline == null)
+                return new List<Brep>();
+
+            Curve outlineUp = outline.DuplicateCurve();
+            outlineUp.Translate(Vector3d.ZAxis * height);
+
+            LineCurve rail = new LineCurve(outline.PointAtStart, outline.PointAtStart + Vector3d.ZAxis * height);
+            Brep[] houseLofts = Brep.CreateFromSweep(rail, outline, true, 0.5);
+
+            Brep[] p1 = Brep.CreatePlanarBreps(outline);
+            Brep[] p2 = Brep.CreatePlanarBreps(outlineUp);
+
+
+            //Brep[] houseLofts = Brep.CreateFromLoft(new List<Curve> { outline, outlineUp }, Point3d.Unset, Point3d.Unset, LoftType.Straight, true);
+            if (houseLofts.Length == 0)
+                return new List<Brep>();
+            Brep x = houseLofts[0];
+
+            List<Brep> wins = new List<Brep>();
+            wins.AddRange(houseLofts);
+            wins.AddRange(p1);
+            wins.AddRange(p2);
+
+            double windowSide = 300;
+            double windowLow = 300;
+            double windowHeight = 2100;
+            double windowDepth = 200;
+
+
+
+            //for (int i = 0; i < hhp.LightingEdge.Count; i++)
+            //{
+            //    Line tempLine = hhp.LightingEdge[i];
+
+            //    Point3d midPoint = tempLine.PointAt(0.5);
+            //    Vector3d windowVec = tempLine.UnitTangent;
+            //    windowVec.Rotate(Math.PI / 2, Vector3d.ZAxis);
+            //    midPoint.Transform(Transform.Translation(Vector3d.Multiply(windowVec, 10)));
+
+            //    if (hhp.GetOutline().Contains(midPoint) == Rhino.Geometry.PointContainment.Inside)
+            //    {
+            //        tempLine.Flip();
+            //    }
+
+            //    tempLine.Extend(-windowSide, -windowSide);
+
+            //    Curve tempCurve = tempLine.ToNurbsCurve();
+            //    tempCurve.Translate(Vector3d.Multiply(Vector3d.ZAxis, windowLow));
+            //    Point3d pt1 = tempCurve.PointAtStart;
+            //    Point3d pt2 = tempCurve.PointAtEnd;
+            //    Point3d pt3 = tempCurve.PointAtEnd;
+            //    pt3.Transform(Transform.Translation(Vector3d.Multiply(Vector3d.ZAxis, windowHeight)));
+            //    Point3d pt4 = tempCurve.PointAtStart;
+            //    pt4.Transform(Transform.Translation(Vector3d.Multiply(Vector3d.ZAxis, windowHeight)));
+            //    Point3d pt5 = tempCurve.PointAtStart;
+            //    List<Point3d> windowPoints = new List<Point3d>();
+            //    windowPoints.Add(pt1);
+            //    windowPoints.Add(pt2);
+            //    windowPoints.Add(pt3);
+            //    windowPoints.Add(pt4);
+            //    windowPoints.Add(pt5);
+            //    Polyline windowPolyline = new Polyline(windowPoints);
+            //    Curve win = windowPolyline.ToNurbsCurve();
+
+
+            //    Plane windowPlane;
+            //    win.TryGetPlane(out windowPlane);
+            //    Vector3d windowNormal = windowPlane.Normal;
+            //    Curve windowCurve = win.Duplicate() as Curve;
+            //    windowCurve.Translate(Vector3d.Multiply(windowNormal, windowDepth));
+            //    Surface windowSurface = Surface.CreateExtrusion(windowCurve, Vector3d.Multiply(windowNormal, -windowDepth * 2));
+            //    Brep windowBrep = windowSurface.ToBrep();
+            //    Brep[] withHolesTemp = x.Split(windowBrep, 1);
+
+            //    if (withHolesTemp.Length != 0)
+            //    {
+            //        x = withHolesTemp[0];
+            //    }
+
+            //    Curve duplicatedWindowCurve = (win.Duplicate() as Curve);
+            //    duplicatedWindowCurve.Transform(Transform.Translation(windowNormal * (windowDepth - 100)));
+
+            //    Curve windowCurveBottom = duplicatedWindowCurve.DuplicateSegments()[0];
+            //    Curve heightCurve = duplicatedWindowCurve.DuplicateSegments()[1];
+
+            //    wins.AddRange(DrawWindowAll(windowCurveBottom, heightCurve.GetLength(), false));
+
+            //    Curve[] tempLoftBase = { win, duplicatedWindowCurve };
+
+            //    Curve pathCurve = new LineCurve(Point3d.Origin, new Point3d(windowNormal * (-windowDepth + 100)));
+            //    wins.Add(Brep.JoinBreps(Brep.CreateFromLoft(tempLoftBase, Point3d.Unset, Point3d.Unset, LoftType.Normal, false), 0)[0]);
+            //}
 
 
             //1. 양쪽에서 300씩 , 위400 아래300 사각형.빵꾸. 안쪽으로 200
@@ -130,7 +291,7 @@ namespace TuringAndCorbusier
 
 
             //Brep w1 = Brep.create  hhp.LightingEdge[0]
-            wins.Add(x);
+
             return wins;
 
         }
@@ -145,10 +306,10 @@ namespace TuringAndCorbusier
 
             PolylineCurve plc = new PolylineCurve(new Point3d[] { hhp.Origin, hhp.Origin + x * width, hhp.Origin + x * width + y * depth, hhp.Origin + y * depth, hhp.Origin });
 
-            if(plc.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.CounterClockwise)
+            if (plc.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.CounterClockwise)
                 plc.Reverse();
             return Extrusion.Create(plc, height, true).ToBrep();
-            
+
         }
 
         public static List<Brep> DrawCorridor(Apartment apartment)
@@ -178,7 +339,7 @@ namespace TuringAndCorbusier
                 corridorLines = Curve.JoinCurves(corridorLines).ToList();
 
 
-                for(int i = 0; i < corridorLines.Count;i++)
+                for (int i = 0; i < corridorLines.Count; i++)
                 {
                     Curve offset = corridorLines[i].DuplicateCurve();
                     Vector3d dir = offset.TangentAtStart;
@@ -205,17 +366,32 @@ namespace TuringAndCorbusier
             #region P3Corridor
             else if (apartment.AGtype == "PT-3")
             {
+                bool isUsing1F = apartment.ParameterSet.using1F;
                 List<Brep> courtCorridorBrep = new List<Brep>();
                 List<Curve> centerLine = apartment.AptLines;
                 double width = apartment.ParameterSet.Parameters[2];
 
                 for (int i = 0; i < apartment.Household.Count; i++)
                 {
+                    if (i == 0 && isUsing1F)
+                        continue;
+
                     for (int j = 0; j < apartment.Household[i].Count; j++)
                     {
                         List<Household> currentDongHouseholds = apartment.Household[i][j];
-                        Curve currentCenterLine = centerLine[j];
+                        Curve currentCenterLine = centerLine[j].DuplicateCurve();
+
+                        if ((int)currentCenterLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+                        {
+                            currentCenterLine.Reverse();
+                        }
                         Curve currentInnerLine = currentCenterLine.Offset(Plane.WorldXY, width / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+
+                        if ((int)currentInnerLine.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+                        {
+                            currentInnerLine.Reverse();
+                        }
+
                         Curve corridorOutline = currentInnerLine.Offset(Plane.WorldXY, Consts.corridorWidth, 1, CurveOffsetCornerStyle.Sharp)[0];
 
                         Brep corridorFloorBrep = Brep.CreatePlanarBreps(new List<Curve> { currentInnerLine, corridorOutline }).First();
@@ -230,10 +406,77 @@ namespace TuringAndCorbusier
                 }
                 output = courtCorridorBrep;
             }
-        
+
             #endregion P3Corridor
 
             return output;
+        }
+
+
+
+        public static List<Guid> DrawFoundation(Apartment apartment)
+        {
+            List<Guid> result = new List<Guid>();
+            Plot plot = apartment.Plot;
+            var LHGreen = System.Drawing.Color.FromArgb(127, 255, 0);
+
+            Brep[] green = Brep.CreatePlanarBreps(plot.Boundary);
+            Brep[] white = Brep.CreatePlanarBreps(TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect);
+
+            for (int i = 0; i < green.Length; i++)
+            {
+                var att = new Rhino.DocObjects.ObjectAttributes() { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromMaterial, MaterialSource = Rhino.DocObjects.ObjectMaterialSource.MaterialFromObject };
+
+                int index = Rhino.RhinoDoc.ActiveDoc.Materials.Find("LHGreen", true);
+                if (index == -1)
+                {
+                    Rhino.DocObjects.Material matt = new Rhino.DocObjects.Material();
+                    matt.DiffuseColor = LHGreen;
+                    matt.Name = "LHGreen";
+                    matt.CommitChanges();
+
+                    Rhino.RhinoDoc.ActiveDoc.Materials.Add(matt);
+                    att.MaterialIndex = Rhino.RhinoDoc.ActiveDoc.Materials.Find("LHGreen", true);
+                }
+                else
+                {
+                    att.MaterialIndex = index;
+                }
+
+                var surface = Brep.CreatePlanarBreps(plot.Boundary);
+
+                for (int j = 0; j < surface.Length; j++)
+                {
+                    surface[j].Translate(Vector3d.ZAxis);
+                    Rhino.RhinoDoc.ActiveDoc.Objects.AddBrep(surface[j], att);
+                }
+            }
+
+            for (int i = 0; i < white.Length; i++)
+            {
+                var att = new Rhino.DocObjects.ObjectAttributes() { ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromMaterial, MaterialSource = Rhino.DocObjects.ObjectMaterialSource.MaterialFromObject };
+
+                int index = Rhino.RhinoDoc.ActiveDoc.Materials.Find("LHWhite", true);
+                if (index == -1)
+                {
+                    Rhino.DocObjects.Material matt = new Rhino.DocObjects.Material();
+                    matt.DiffuseColor = System.Drawing.Color.White;
+                    matt.Name = "LHWhite";
+                    matt.CommitChanges();
+
+                    Rhino.RhinoDoc.ActiveDoc.Materials.Add(matt);
+                    att.MaterialIndex = Rhino.RhinoDoc.ActiveDoc.Materials.Find("LHWhite", true);
+                }
+                else
+                {
+                    att.MaterialIndex = index;
+                }
+
+                Rhino.RhinoDoc.ActiveDoc.Objects.Add(white[i], att);
+            }
+
+            return result;
+
         }
 
         private static List<Brep> DrawWindowAll(Curve baseCurve, double height, bool drawComplexModeling)
@@ -256,9 +499,16 @@ namespace TuringAndCorbusier
                 {
                     int index = windowTypeList.IndexOf(type[i].ToString());
 
-                    List<Brep> tempWindow = drawWindow((WindowType)index, shatteredBase[i], height);
+                    try
+                    {
+                        List<Brep> tempWindow = drawWindow((WindowType)index, shatteredBase[i], height);
 
-                    output.AddRange(tempWindow);
+                        output.AddRange(tempWindow);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
 
                     if (drawComplexModeling)
                     {
@@ -447,7 +697,11 @@ namespace TuringAndCorbusier
             Curve boundaryCurve = offsetOneSide(baseCurve, height, Vector3d.ZAxis);
 
             curves.Add(boundaryCurve);
-            curves.Add(offsetInside(boundaryCurve, frameWidth, tempPlane));
+            //curves.Add(offsetInside(boundaryCurve, frameWidth, tempPlane));
+
+            Curve[] offsets = boundaryCurve.Offset(tempPlane, frameWidth, 0.1, CurveOffsetCornerStyle.Sharp);
+            curves.Add(offsets[0]);
+
 
             Curve pathCurve = new LineCurve(tempPlane.Origin, tempPlane.Origin + new Point3d(tempPlane.ZAxis * frameDepth));
 
@@ -578,12 +832,22 @@ namespace TuringAndCorbusier
                 int h = (i + offsettedCurveSet.Count() - 1) % offsettedCurveSet.Count();
                 int j = (i + offsettedCurveSet.Count() + 1) % offsettedCurveSet.Count();
 
-                Point3d tempStartPoint = Rhino.Geometry.Intersect.Intersection.CurveCurve(offsettedCurveSet[h], offsettedCurveSet[i], 0, 0)[0].PointA;
-                Point3d tempEndPoint = Rhino.Geometry.Intersect.Intersection.CurveCurve(offsettedCurveSet[j], offsettedCurveSet[i], 0, 0)[0].PointA;
+                try
+                {
+                    Point3d tempStartPoint = Rhino.Geometry.Intersect.Intersection.CurveCurve(offsettedCurveSet[h], offsettedCurveSet[i], 0, 0)[0].PointA;
+                    Point3d tempEndPoint = Rhino.Geometry.Intersect.Intersection.CurveCurve(offsettedCurveSet[j], offsettedCurveSet[i], 0, 0)[0].PointA;
 
-                Curve tempCurve = new LineCurve(tempStartPoint, tempEndPoint);
 
-                outputBase.Add(tempCurve);
+
+                    Curve tempCurve = new LineCurve(tempStartPoint, tempEndPoint);
+
+                    outputBase.Add(tempCurve);
+                }
+                catch
+                {
+                    continue;
+                }
+
             }
 
             Curve[] joinedCurve = Curve.JoinCurves(outputBase);

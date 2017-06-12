@@ -87,11 +87,13 @@ namespace Reports
 
                 }
 
-                if (typicalPlanValue.Floor == 1)
-                {
+
+                if(typicalPlanValue.ParkingLines != null)
                     PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, typicalPlanValue.ParkingLines, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.075);
+
+                if (typicalPlanValue.Nonresidentials != null)
                     PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, typicalPlanValue.Nonresidentials, tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 0.2);
-                }
+
 
                 PlanDrawingFunction_90degree.drawPlan(tempBoundingBox, tempPlan.OutLine.ToNurbsCurve(), tempScaleFactor, tempOrigin, ref this.typicalPlan, System.Windows.Media.Brushes.Black, 1);
 

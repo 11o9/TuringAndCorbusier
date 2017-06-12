@@ -528,7 +528,7 @@ namespace TuringAndCorbusier
                 BoundingBox tempBBox = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect.GetBoundingBox(true);
                 Rectangle3d tempRectangle = new Rectangle3d(Plane.WorldXY, tempBBox.Min, tempBBox.Max);
 
-                typicalPlan tempTypicalPlan_FL0 = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
+                typicalPlan tempTypicalPlan_FL0 = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2 , false);
 
                 buildingReport.SetTypicalPlan = tempTypicalPlan_FL0;
 
@@ -575,12 +575,44 @@ namespace TuringAndCorbusier
                     pagename.Add("unitReport" + (i + 1).ToString());
                 }
 
-                for (int i = 1; i < MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 2; i++)
+
+
+                for (int i = 1; i < MainPanel_AGOutputList[tempIndex].Household.Count + 2; i++)
                 {
+
+                    bool drawParking = false;
+                    if (!MainPanel_AGOutputList[tempIndex].ParameterSet.using1F)
+                    {
+                    
+                        if (i == 1)
+                            drawParking = true; 
+                        try
+                        {
+                            Reports.wpfTypicalPlan testTypicalPlanPage = new Reports.wpfTypicalPlan(new Interval(i, i));
+                            typicalPlan testTypicalPlan = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i-1, drawParking);
+                            testTypicalPlanPage.SetTypicalPlan = testTypicalPlan;
+                            fps.Add(testTypicalPlanPage.fixedPage);
+                            pagename.Add("typicalPlanPage" + i.ToString());
+
+                            continue;
+                        }
+                        catch (System.Exception EX)
+                        {
+                            continue;
+                            //MessageBox.Show(EX.ToString());
+                        }
+
+                    }
+
+                
+                    if (MainPanel_AGOutputList[tempIndex].ParameterSet.using1F && i == 1)
+                        drawParking = true; 
+
+
                     try
                     {
                         Reports.wpfTypicalPlan testTypicalPlanPage = new Reports.wpfTypicalPlan(new Interval(i, i));
-                        typicalPlan testTypicalPlan = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                        typicalPlan testTypicalPlan = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i, drawParking);
 
                         testTypicalPlanPage.SetTypicalPlan = testTypicalPlan;
 
@@ -592,9 +624,11 @@ namespace TuringAndCorbusier
                         continue;
                         //MessageBox.Show(EX.ToString());
                     }
-
                 }
 
+
+
+       
 
 
                 Reports.wpfSection testSectionPage = new Reports.wpfSection();
@@ -657,30 +691,42 @@ namespace TuringAndCorbusier
 
             int index = tempIndex;
 
-            try
-            {
-                if (TuringAndCorbusierPlugIn.InstanceClass.turing.MainPanel_building3DPreview[index] != null)
-                    TuringAndCorbusierPlugIn.InstanceClass.turing.MainPanel_building3DPreview.RemoveAt(index);
-            }
-            catch (System.ArgumentOutOfRangeException)
-            {
 
-            }
+            List<Guid> tempGuid = new List<Guid>();
+
+            if (MainPanel_building3DPreview[tempIndex].Count != 0)
+                return;
 
             try
             {
-                List<Brep>tempBreps = TuringAndCorbusier.MakeBuildings.makeBuildings(MainPanel_AGOutputList[index]);
-                List<Guid> tempGuid = new List<Guid>();
+                List<Brep> tempBreps = MakeBuildings.makeBuildings(MainPanel_AGOutputList[index]);
+
+
                 foreach (Brep i in tempBreps)
                 {
-                    tempGuid.Add(LoadManager.getInstance().DrawObjectWithSpecificLayer(i, LoadManager.NamedLayer.Model));
+                    //tempGuid.Add(LoadManager.getInstance().DrawObjectWithSpecificLayer(i, LoadManager.NamedLayer.Model));
+                    tempGuid.Add(RhinoDoc.ActiveDoc.Objects.AddBrep(i));
+                    //RhinoApp.Wait();
                 }
-                MainPanel_building3DPreview.Insert(index, tempGuid);
+
+                //List<Mesh> tempMeshs = MakeBuildings.MakeMeshBuildings(MainPanel_AGOutputList[index]);
+                //foreach (Mesh m in tempMeshs)
+                //{
+                //    tempGuid.Add(RhinoDoc.ActiveDoc.Objects.AddMesh(m));
+                //}
+
+                tempGuid.AddRange(MakeBuildings.DrawFoundation(MainPanel_AGOutputList[index]));
+
+                //  MainPanel_building3DPreview.Insert(index, tempGuid);
                 RhinoDoc.ActiveDoc.Views.Redraw();
             }
-            catch
+            catch (Exception ex)
             {
-                RhinoApp.WriteLine("모델링-BREP생성실패");
+                RhinoApp.WriteLine(ex.Message);
+            }
+            finally
+            {
+                MainPanel_building3DPreview[index] = tempGuid;
             }
         }
 
@@ -1257,7 +1303,7 @@ namespace TuringAndCorbusier
 
                 RhinoApp.Wait();
                 string path = "";
-                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(940, 665), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(940, 665), Rhino.Display.DisplayModeDescription.FindByName("Shaded")))
                 {
 
                     path = dirinfo.FullName + "test" + i.ToString() + ".jpeg";

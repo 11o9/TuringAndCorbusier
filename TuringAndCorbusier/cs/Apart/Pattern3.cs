@@ -129,6 +129,7 @@ namespace TuringAndCorbusier
             if (lines[0].GetLength() > lines[1].GetLength())
             {
                 Array.Reverse(lines);
+                inlineCurve.Reverse();
                 centerLineCurve.Reverse();
                 centerLinePolyline.Reverse();
                 clockwise = -clockwise;
@@ -152,7 +153,7 @@ namespace TuringAndCorbusier
             ///////////////////////////////
 
             //set right coreType
-            bool isSquareCoreAvailable = width*2 +regulationHigh.DistanceLW + CoreType.Folded.GetDepth() < Math.Min(lines[0].GetLength(), lines[1].GetLength());
+            bool isSquareCoreAvailable = width * 2 + regulationHigh.DistanceLW + CoreType.Folded.GetDepth() < Math.Min(lines[0].GetLength(), lines[1].GetLength());
             if (!isSquareCoreAvailable)
                 parameterSet.fixedCoreType = randomCoreType = CoreType.CourtShortEdge;
             else
@@ -160,7 +161,7 @@ namespace TuringAndCorbusier
             //Draw cores and households
             List<List<Core>> cores = MakeCores(parameterSet, inlineCurve);
             List<List<List<Household>>> households = MakeHouseholds(parameterSet, lines, centerLinePolyline, parametersOnCurve, targetAreaIndices, area.Count);
-           
+
             //복도면적..?
             double eachfloorCorridorArea = inlineCurve.GetLength() * Consts.corridorWidth - (Consts.corridorWidth * Consts.corridorWidth) * 4;
             double corridorAreaSum = eachfloorCorridorArea * storiesHigh;
@@ -268,6 +269,107 @@ namespace TuringAndCorbusier
                         households.RemoveAt(households.Count - 1);
                 }
             }
+
+
+            #region Using1F AfterTreatment
+            if (parameterSet.using1F)
+            {
+                //search most accessible road
+                List<int> roadWidths = plot.Surroundings.ToList();
+                Curve[] boundSegments = plot.Boundary.DuplicateSegments();
+                List<double> roadLength = boundSegments.Select(n => n.GetLength()).ToList();
+
+                List<int> initialRoadIndices = new List<int>();
+                for (int i = 0; i < roadWidths.Count; i++)
+                    initialRoadIndices.Add(i);
+
+                initialRoadIndices.Sort((a, b) => -(roadWidths[a] * roadLength[a]).CompareTo(roadWidths[b] * roadLength[b]));
+                int mostAccessibleRoadIndex = initialRoadIndices.First();
+                Curve mostAccessibleRoad = boundSegments[mostAccessibleRoadIndex];
+
+
+                //search entranceEdgeIndex
+                Curve[] centerSegments = centerLineCurve.DuplicateSegments();
+                List<int> initialCenterIndices = new List<int>();
+
+                List<double> centerSegToRoadDist = new List<double>();
+                for (int i = 0; i < centerSegments.Count(); i++)
+                {
+                    //add index
+                    initialCenterIndices.Add(i);
+
+                    //add distance to accessible road
+                    Point3d midPt = (centerSegments[i].PointAtStart + centerSegments[i].PointAtEnd) / 2;
+
+                    double closestParam;
+                    mostAccessibleRoad.ClosestPoint(midPt, out closestParam);
+                    Point3d closestPtOnRoad = mostAccessibleRoad.PointAt(closestParam);
+
+                    centerSegToRoadDist.Add(midPt.DistanceTo(closestPtOnRoad));
+                }
+
+                if (randomCoreType == CoreType.CourtShortEdge) //remove shortEdge when using shortEdgeCore
+                {
+                    if (centerSegments[0].GetLength() > centerSegments[1].GetLength())
+                    {
+                        initialCenterIndices.Remove(1);
+                        initialCenterIndices.Remove(3);
+                    }
+
+                    else
+                    {
+                        initialCenterIndices.Remove(0);
+                        initialCenterIndices.Remove(2);
+                    }
+                }
+
+                initialCenterIndices.Sort((a, b) => centerSegToRoadDist[a].CompareTo(centerSegToRoadDist[b]));
+                int entranceEdgeIndex = initialCenterIndices.First();
+
+                //subtract unit
+                List<Household> firstFloorHouses = households.First().First();
+                List<double> houseParamOnCurve = new List<double>(parametersOnCurve); //household Parameter만 추출, vertical core 추가 되면 수정해야 할 수도
+                int searchStartIndex = houseParamOnCurve.FindIndex(n => n >= entranceEdgeIndex);
+                int searchEndIndex = houseParamOnCurve.FindIndex(n => n >= (entranceEdgeIndex + 1) % centerSegments.Count());
+                searchEndIndex = (searchEndIndex + houseParamOnCurve.Count - 1) % houseParamOnCurve.Count;
+
+                if (searchEndIndex == searchStartIndex || searchEndIndex == searchStartIndex - 1)
+                    firstFloorHouses.RemoveAt(searchStartIndex);
+
+                else
+                {
+                    double currentLengthOnCurve = 0;
+                    double totalEntranceWidth = 0;
+                    bool isNearCorner = true;
+
+                    double entranceEdgeCoreDepth = randomCoreType.GetDepth();
+
+                    for (int i = searchStartIndex; i < searchEndIndex; i++)
+                    {
+                        int indexFromSearchEnd = (searchEndIndex - 1 + searchStartIndex) - i;
+                        Household currentHouse = firstFloorHouses[indexFromSearchEnd];
+                        double expectedEntranceWidth = currentHouse.GetArea() / width;
+                        if (currentLengthOnCurve > entranceEdgeCoreDepth)
+                            isNearCorner = false;
+
+                        currentLengthOnCurve += expectedEntranceWidth;
+
+                        if (currentLengthOnCurve - randomCoreType.GetDepth() >= 3000)
+                        {
+                            firstFloorHouses.RemoveAt(indexFromSearchEnd);
+                            totalEntranceWidth += expectedEntranceWidth;
+                            if (isNearCorner)
+                                totalEntranceWidth -= entranceEdgeCoreDepth;
+                        }
+
+                        if (totalEntranceWidth >= 6000)
+                            break;
+                    }
+                }
+
+            }
+            #endregion
+
             //################################################################################################
 
 
@@ -284,9 +386,20 @@ namespace TuringAndCorbusier
             //1.setups for parking
             #region setup
             //parking curves setting
-            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY, cores[0][0].Depth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
+
+            if ((int)inlineCurve.ClosedCurveOrientation(new Vector3d(0, 0, 1)) == -1)
+            {
+                inlineCurve.Reverse();
+            }
+
+            Curve parkingLine = inlineCurve.Offset(Plane.WorldXY, cores[0][0].Depth / 2 + Consts.corridorWidth, 1, CurveOffsetCornerStyle.Sharp)[0];
+
             Curve[] parkingLineSegments = parkingLine.DuplicateSegments();
             Curve[] shortSegments = parkingLineSegments.OrderBy(n => n.GetLength()).Take(2).ToArray();
+
+            //디버그
+
+
             //세배 길이의 라인으로
             List<Line> toLine = shortSegments.Select(n => new Line(n.PointAtStart - n.TangentAtStart * n.GetLength(), n.PointAtEnd + n.TangentAtStart * n.GetLength())).ToList();
             //둘중 하나 역으로
@@ -306,6 +419,9 @@ namespace TuringAndCorbusier
                 obstacles[i].Translate(cores[0][i].YDirection * (cores[0][i].Depth - width) / 2);
             }
 
+            obstacles.AddRange(cores[0].Select(n => n.DrawOutline(width)).ToList());
+
+
             //distance setting
             double lineDistance = toLine[0].From.DistanceTo(toLine[1].From);
 
@@ -319,7 +435,9 @@ namespace TuringAndCorbusier
             pm.Boundary = plot.Boundary;
             pm.Distance = lineDistance;
             pm.CoreDepth = coreDepth;
-            pm.AddBack = true;
+            pm.LineType = ParkingLineType.SingleLine;
+            //pm.AddBack = true;
+
 
             ParkingLotOnEarth parkingLotOnEarth = pm.GetParking();
             ParkingLotUnderGround parkingLotUnderGround = new ParkingLotUnderGround();
@@ -328,11 +446,17 @@ namespace TuringAndCorbusier
 
             List<Curve> aptLines = new List<Curve>();
             aptLines.Add(centerLineCurve);
+            aptLines.Add(parkingLine);
+            aptLines.AddRange(obstacles);
 
             Apartment result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, parkingLotOnEarth, parkingLotUnderGround, buildingOutlines, aptLines);
 
             //#######################################################################################################################
-            if (parameterSet.using1F || parameterSet.setback)
+            if (parameterSet.using1F)
+            {
+                result = new Apartment(this.GetAGType, plot, buildingType, parameterSet, target, cores, households, new ParkingLotOnEarth(), parkingLotUnderGround, buildingOutlines, aptLines);
+            }
+            else if (parameterSet.setback)
             {
 
             }
@@ -350,21 +474,19 @@ namespace TuringAndCorbusier
         #region New Apartment Generating Methods
         private List<List<Core>> MakeCores(ParameterSet parameterSet, Curve inlineCurve)
         {
+            bool isCCW = false;
             bool isShortCore = false;
             double pilotiHeight = Consts.PilotiHeight;
-            
+
             if (parameterSet.using1F) //1층 사용
             {
                 randomCoreType = parameterSet.fixedCoreType;
                 pilotiHeight = 0;
             }
-            
+
             //initial settings
-            Polyline inlinePolyline;
-            inlineCurve.TryGetPolyline(out inlinePolyline);
             Curve[] lines = inlineCurve.DuplicateSegments();
-            Curve minEdge = lines[0];
-            Curve maxEdge = lines[1];
+
 
             double[] parameters = parameterSet.Parameters;
             double storiesHigh = Math.Max((int)parameters[0], (int)parameters[1]);
@@ -377,6 +499,7 @@ namespace TuringAndCorbusier
             //reverse Curve orientation & set index0 shortEdge
             if (lines[0].GetLength() > lines[1].GetLength())
             {
+                isCCW = true;
                 lines.Reverse();
                 for (int i = 0; i < lines.Length; i++)
                 {
@@ -384,19 +507,22 @@ namespace TuringAndCorbusier
                 }
             }
 
+            Curve minEdge = lines[0];
+            Curve maxEdge = lines[1];
+
             //
             if (randomCoreType == CoreType.CourtShortEdge)
             {
                 isShortCore = true;
-                coreWidth = minEdge.GetLength()-2* Consts.corridorWidth;
+                coreWidth = minEdge.GetLength() - 2 * Consts.corridorWidth;
                 if (minEdge.GetLength() > 16000)
                     coreWidth = CoreType.CourtShortEdge.GetWidth();
             }
 
             bool hasToPlaceEscapeCore = maxEdge.GetLength() > Consts.escapeCoreCriteria;
-            double escapeCoreEdgeLength = maxEdge.GetLength() - (coreDepth+Consts.corridorWidth) * 2;
+            double escapeCoreEdgeLength = maxEdge.GetLength() - (coreDepth + Consts.corridorWidth) * 2;
             int escapeCoreCountPerEdge = (int)(escapeCoreEdgeLength / Consts.escapeCoreCriteria);
-            
+
             Vector3d courtX = new Vector3d(lines[0].PointAtEnd - lines[0].PointAtStart);
             Vector3d courtY = new Vector3d(lines[3].PointAtStart - lines[3].PointAtEnd);
             courtX.Unitize();
@@ -408,6 +534,9 @@ namespace TuringAndCorbusier
             List<double> coreWidths = new List<double>();
             List<double> coreDepths = new List<double>();
 
+            //core direction fix <= 임시방편.. 원인파악 필요
+            if (isCCW)
+                courtY = -courtY;
 
             //Draw groundFloor cores
             //1
@@ -421,16 +550,16 @@ namespace TuringAndCorbusier
             coreDepths.Add(coreDepth);
 
             //2(escapeCore)
-            if (hasToPlaceEscapeCore && escapeCoreCountPerEdge >0)
+            if (hasToPlaceEscapeCore && escapeCoreCountPerEdge > 0)
             {
                 Vector3d coreXDirec = courtY;
                 Vector3d coreYDirec = -courtX;
-                Point3d coreOriginBase = lines[1].PointAtStart + coreXDirec * escapeCoreDepth + (coreXDirec+coreYDirec)*Consts.corridorWidth;
-                double devidedLength = escapeCoreEdgeLength / (escapeCoreCountPerEdge+1);
-               
+                Point3d coreOriginBase = lines[1].PointAtStart + coreXDirec * coreDepth + (coreXDirec + coreYDirec) * Consts.corridorWidth;
+                double devidedLength = escapeCoreEdgeLength / (escapeCoreCountPerEdge + 1);
+
                 for (int i = 0; i < escapeCoreCountPerEdge; i++)
                 {
-                    Point3d coreOrigin = coreOriginBase + coreXDirec * devidedLength* (i + 1) - coreXDirec * escapeCoreWidth / 2;
+                    Point3d coreOrigin = coreOriginBase + coreXDirec * devidedLength * (i + 1) - coreXDirec * escapeCoreWidth / 2;
 
                     coreOrigins.Add(coreOrigin);
                     coreXVectors.Add(coreXDirec);
@@ -455,12 +584,12 @@ namespace TuringAndCorbusier
             {
                 Vector3d coreXDirec = -courtY;
                 Vector3d coreYDirec = courtX;
-                Point3d coreOriginBase = lines[3].PointAtStart + coreXDirec * escapeCoreDepth+(coreXDirec + coreYDirec) * Consts.corridorWidth;
+                Point3d coreOriginBase = lines[3].PointAtStart + coreXDirec * coreDepth + (coreXDirec + coreYDirec) * Consts.corridorWidth;
                 double devidedLength = escapeCoreEdgeLength / (escapeCoreCountPerEdge + 1);
 
                 for (int i = 0; i < escapeCoreCountPerEdge; i++)
                 {
-                    Point3d coreOrigin = coreOriginBase + coreXDirec * devidedLength * (i+1) - coreXDirec * escapeCoreWidth / 2;
+                    Point3d coreOrigin = coreOriginBase + coreXDirec * devidedLength * (i + 1) - coreXDirec * escapeCoreWidth / 2;
 
                     coreOrigins.Add(coreOrigin);
                     coreXVectors.Add(coreXDirec);
@@ -695,7 +824,7 @@ namespace TuringAndCorbusier
                     Point3d ent = hp.EntrancePoint;
                     ori.Transform(Transform.Translation(Vector3d.Multiply(pilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
                     ent.Transform(Transform.Translation(Vector3d.Multiply(pilotiHeight + Consts.FloorHeight * j, Vector3d.ZAxis)));
-                    List<Line> win = new List<Line>(hp.LightingEdge); 
+                    List<Line> win = new List<Line>(hp.LightingEdge);
 
                     Household newTemp = new Household(ori, hp.XDirection, hp.YDirection, hp.XLengthA, hp.XLengthB, hp.YLengthA, hp.YLengthB, hp.HouseholdSizeType, hp.GetExclusiveArea() + hp.GetWallArea(), win, ent, hp.WallFactor);
                     newTemp.MovableEdge = new List<Line>(hp.MovableEdge);
@@ -997,7 +1126,7 @@ namespace TuringAndCorbusier
                         double maxEdgeLength = Math.Max(widthTemp, widthTemp / ratios[k]);
                         double minEdgeLength = Math.Min(widthTemp, widthTemp / ratios[k]);
 
-                        bool isSatisfyingLL = aptWidth * 2 + Math.Max(CoreType.CourtShortEdge.GetWidth()+Consts.corridorWidth, regulationHigh.DistanceLL) < minEdgeLength;
+                        bool isSatisfyingLL = aptWidth * 2 + Math.Max(CoreType.CourtShortEdge.GetWidth() + Consts.corridorWidth, regulationHigh.DistanceLL) < minEdgeLength;
                         bool isEscapeCoreAvailable = minEdgeLength > (CoreType.CourtShortEdge.GetDepth() + Consts.corridorWidth) * 2 + aptWidth * 2 + regulationHigh.DistanceWW;
                         bool hasToPlaceEscapeCore = maxEdgeLength - aptWidth * 2 > Consts.escapeCoreCriteria;
 
@@ -1349,6 +1478,7 @@ namespace TuringAndCorbusier
             }
             return n;
         }
+
         private List<double> GetHouseEndParameters(List<int> unallocatedLengthIndices, List<double> areaLength, Curve centerLineCurve, double width, out List<int> targetAreaIndices)
         {
             //
@@ -1367,7 +1497,7 @@ namespace TuringAndCorbusier
             double nineHouseR = 1.5;
 
             //stretch
- 
+
 
 
             //less than 10 units
@@ -1388,7 +1518,7 @@ namespace TuringAndCorbusier
                 {
                     stretchedLength.Add(areaLength[i] * stretchRatio);
                 }
-              
+
 
                 List<int> indices = new List<int>();
                 //junction 2 : specific solutions for 6~9 houses
@@ -1477,7 +1607,7 @@ namespace TuringAndCorbusier
                 List<double> leftLengthAtCorner = new List<double>();
 
                 for (int i = 0; i < 4; i++)
-                    leftLengthAtCorner.Add(edgeLength[i] / 2 + edgeLength[(4 + i -1) % 4] / 2);
+                    leftLengthAtCorner.Add(edgeLength[i] / 2 + edgeLength[(4 + i - 1) % 4] / 2);
 
                 cornerIndices.Sort((a, b) => leftLengthAtCorner[a].CompareTo(leftLengthAtCorner[b]));
 
@@ -1518,7 +1648,7 @@ namespace TuringAndCorbusier
                 List<double> targetEdgeL = new List<double>();
                 for (int i = 0; i < 4; i++)
                 {
-                  
+
                     if (edgeStart[i] < minCornerUnitEdgeLength)
                         edgeStart[i] = minCornerUnitEdgeLength;
 
@@ -1583,12 +1713,12 @@ namespace TuringAndCorbusier
         }
         private List<double> valMapper(double centerRectWidth, double centerRectHeight, List<double> startToHouseEndPtLengths)
         {
-            double centerRectLength = 2*(centerRectWidth + centerRectHeight);
+            double centerRectLength = 2 * (centerRectWidth + centerRectHeight);
             List<double> mappedValue = new List<double>();
             for (int i = 0; i < startToHouseEndPtLengths.Count; i++)
             {
-                int rectHalfIndex = (int)(startToHouseEndPtLengths[i] / (centerRectLength/2))%2;
-                double halfStartToHouseEndPt = startToHouseEndPtLengths[i] - (centerRectLength/2) * rectHalfIndex;
+                int rectHalfIndex = (int)(startToHouseEndPtLengths[i] / (centerRectLength / 2)) % 2;
+                double halfStartToHouseEndPt = startToHouseEndPtLengths[i] - (centerRectLength / 2) * rectHalfIndex;
                 double endParamOnCurrentLine = 0;
                 int lineParamOnHalf = 0;
 

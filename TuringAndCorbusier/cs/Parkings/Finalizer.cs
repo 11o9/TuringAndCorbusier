@@ -22,7 +22,7 @@ namespace TuringAndCorbusier
         private double ugpRequired = 0;
 
         //enum
-        private enum FARstatus { Lack, Suit ,Over, Undefined } 
+        private enum FARstatus { Lack, Suit, Over, Undefined }
 
         //constructor
         public Finalizer(Apartment apt)
@@ -128,7 +128,7 @@ namespace TuringAndCorbusier
 
                 return finalizer.Finalize();
             }
-                        
+
 
             if (farStatus == FARstatus.Lack)
             {
@@ -207,14 +207,14 @@ namespace TuringAndCorbusier
             {
                 parkingCount = apt.ParkingLotOnEarth.ParkingLines[0].Count + apt.ParkingLotUnderGround.Count;
             }
-            
+
             double parkingRequired = apt.GetLegalParkingLotofHousing() + apt.GetLegalParkingLotOfCommercial();
 
             if (parkingCount >= parkingRequired)
                 return true;
             else
             {
-                ugpRequired = parkingRequired - parkingCount < 10? 10 : parkingRequired - parkingCount;
+                ugpRequired = parkingRequired - parkingCount < 10 ? 10 : parkingRequired - parkingCount;
                 return false;
             }
         }
@@ -228,7 +228,7 @@ namespace TuringAndCorbusier
 
             if (apt.Core.Count == 0 || apt.Core[0].Count == 0)
                 return apt;
-            
+
             ParameterSet temp = apt.ParameterSet;
             temp.using1F = true;
             temp.fixedCoreType = apt.Core[0][0].CoreType;
@@ -260,7 +260,7 @@ namespace TuringAndCorbusier
                 default:
                     return apt;
             }
-           
+
         }
 
         Apartment SetBack(Apartment apt)
@@ -309,7 +309,7 @@ namespace TuringAndCorbusier
                 if (targetFA > currentFA)
                     return aptOverFAR;
 
-               
+
                 //initial setting
                 double toReduceArea = currentFA - targetFA;
                 double aptWidth = aptOverFAR.ParameterSet.Parameters[2];
@@ -333,7 +333,7 @@ namespace TuringAndCorbusier
                 Curve courtInnerLine = courtCenterLine.Offset(Plane.WorldXY, aptWidth / 2, 1, CurveOffsetCornerStyle.Sharp)[0];
                 courtInnerLine.Translate(Vector3d.ZAxis * (currentCoreZ - courtInnerLine.PointAtStart.Z));
 
-                List <Interval> entranceIntervals = new List<Interval>();
+                List<Interval> entranceIntervals = new List<Interval>();
 
                 for (int i = 0; i < topFloorCore.Count; i++)
                 {
@@ -388,7 +388,7 @@ namespace TuringAndCorbusier
 
                     int currentCoreCount = topFloorCore.Count;
 
-                    if (toReduceArea > 0 && topFloorCore.First().Area * currentCoreCount> toReduceArea)
+                    if (toReduceArea > 0 && topFloorCore.First().Area * currentCoreCount > toReduceArea)
                     {
                         if (topFloorHouseholds.Count == 0)
                             break;
@@ -405,17 +405,17 @@ namespace TuringAndCorbusier
                         if (Math.Abs(firstHouse.YLengthB) > 0.5)
                             houseEnd = endHouse.Origin - endHouse.XDirection * endHouse.XLengthB;
 
-                        
+
                         double houseStartParam, houseEndParam;
                         courtInnerLine.ClosestPoint(houseStart, out houseStartParam);
                         courtInnerLine.ClosestPoint(houseEnd, out houseEndParam);
 
                         Interval houseInterval = new Interval(houseStartParam, houseEndParam);
-                 
+
 
                         for (int j = 0; j < currentCoreCount; j++)
                         {
-                            int indexFromLastCore = currentCoreCount - 1- j;
+                            int indexFromLastCore = currentCoreCount - 1 - j;
                             Core currentCore = topFloorCore[indexFromLastCore];
                             Interval currentInterval = entranceIntervals[indexFromLastCore];
 

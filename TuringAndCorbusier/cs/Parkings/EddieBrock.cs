@@ -33,7 +33,7 @@ namespace TuringAndCorbusier
         public static double[] WithinRadius { get { return new double[] { 5000, 6000 }; } }
     }
 
-    
+
 
     class ParkingDistributor
     {
@@ -122,7 +122,7 @@ namespace TuringAndCorbusier
 
         //끝
 
-            //something changed = true
+        //something changed = true
         public bool OverlapCheck(ref Apartment apt)
         {
             ParkingLotOnEarth gp = apt.ParkingLotOnEarth;
@@ -205,7 +205,7 @@ namespace TuringAndCorbusier
                         double offsetTick = 100;//roads[i].GetLength() / 10;
                         if (l * offsetTick > roads[i].GetLength())
                             break;
-                        Curve tempRamp = DrawLineRamp(roads[i], lineAxis, j, scale,l*offsetTick);
+                        Curve tempRamp = DrawLineRamp(roads[i], lineAxis, j, scale, l * offsetTick);
                         if (tempRamp == null)
                             continue;
                         bool collCheck = CollisionCheck(tempRamp, obstacles);
@@ -215,11 +215,11 @@ namespace TuringAndCorbusier
                             return tempRamp;
                         }
                     }
-                
+
                 }
             }
 
-            
+
             //for curvedramp
             for (int i = 0; i < roads.Count; i++)
             {
@@ -233,7 +233,7 @@ namespace TuringAndCorbusier
                             if (l * offsetTick > roads[i].GetLength())
                                 break;
                             double beforeRamp = 10000 - k * 1000;
-                            Curve tempRamp = DrawCurvedRamp(roads[i], lineAxis, j, scale, beforeRamp, l*offsetTick);
+                            Curve tempRamp = DrawCurvedRamp(roads[i], lineAxis, j, scale, beforeRamp, l * offsetTick);
                             if (tempRamp == null)
                                 continue;
                             bool collCheck = CollisionCheck(tempRamp, obstacles);
@@ -255,8 +255,8 @@ namespace TuringAndCorbusier
         {
             for (int i = 0; i < obstacles.Count; i++)
             {
-                if (Curve.PlanarCurveCollision(tempRamp, obstacles[i], Plane.WorldXY, 0) 
-                    || Curve.PlanarClosedCurveRelationship(obstacles[i],tempRamp,Plane.WorldXY,0) == RegionContainment.AInsideB)
+                if (Curve.PlanarCurveCollision(tempRamp, obstacles[i], Plane.WorldXY, 0)
+                    || Curve.PlanarClosedCurveRelationship(obstacles[i], tempRamp, Plane.WorldXY, 0) == RegionContainment.AInsideB)
                 {
                     //has collision or contains
                     return false;
@@ -266,7 +266,7 @@ namespace TuringAndCorbusier
             return true;
         }
 
-        private Curve DrawLineRamp(Curve road,Vector3d axis, int onStart,RampScale scale , double offset)
+        private Curve DrawLineRamp(Curve road, Vector3d axis, int onStart, RampScale scale, double offset)
         {
             Point3d start;
             Vector3d vx;
@@ -334,13 +334,13 @@ namespace TuringAndCorbusier
             }
 
             Point3d second = start + vx * UnderGroundParkingConsts.LinearRampWidth[(int)scale];
-            Point3d third = second + vy * (20000+UnderGroundParkingConsts.WithinRadius[(int)scale]);
+            Point3d third = second + vy * (20000 + UnderGroundParkingConsts.WithinRadius[(int)scale]);
             Point3d forth = third - vx * UnderGroundParkingConsts.LinearRampWidth[(int)scale];
 
             PolylineCurve plc = new PolylineCurve(new Point3d[] { start, second, third, forth, start });
             return plc;
         }
-        private Curve DrawCurvedRamp(Curve road,Vector3d axis, int onStart, RampScale scale, double beforeRamp, double offset)
+        private Curve DrawCurvedRamp(Curve road, Vector3d axis, int onStart, RampScale scale, double beforeRamp, double offset)
         {
             Point3d start;
             Vector3d vx;
@@ -423,22 +423,45 @@ namespace TuringAndCorbusier
             Point3d eighth = seventh - vx * outerArcR - vy * outerArcR;
             Point3d ninth = start;
             //polyline1
-            PolylineCurve plc1 = new PolylineCurve(new Point3d[] { start, second, third});
+            Polyline plc1 = new Polyline(new Point3d[] { start, second, third });
             ArcCurve arc1 = new ArcCurve(new Arc(third, vy, forth));
-            PolylineCurve plc2 = new PolylineCurve(new Point3d[] { forth,fifth, sixth, seventh });
+            Polyline arc1plc = ArcToPolyline(arc1);
+            Polyline plc2 = new Polyline(new Point3d[] { forth, fifth, sixth, seventh });
             ArcCurve arc2 = new ArcCurve(new Arc(seventh, -vx, eighth));
-            PolylineCurve plc3 = new PolylineCurve(new Point3d[] { eighth, ninth });
-            Curve[] curvesToJoin = new Curve[] { plc1, arc1, plc2, arc2, plc3 };
+            Polyline arc2plc = ArcToPolyline(arc2);
+            Polyline plc3 = new Polyline(new Point3d[] { eighth, ninth });
+            Polyline[] polysToJoin = new Polyline[] { plc1, arc1plc, plc2, arc2plc, plc3 };
             //Rhino.RhinoDoc.ActiveDoc.Objects.Add(Curve.JoinCurves(curvesToJoin)[0]);
-            var joined = Curve.JoinCurves(curvesToJoin);
-            if (joined.Length > 0)
-                return joined[0];
-            else
-                return null;
+            return JoinPolys(polysToJoin);
 
             //return plc;
         }
 
+        private Polyline ArcToPolyline(ArcCurve arc)
+        {
+            List<Point3d> points = new List<Point3d>();
+            for (int i = 0; i < 10; i++)
+            {
+                points.Add(arc.PointAtNormalizedLength(i * 0.1));
+            }
+            points.Add(arc.PointAtEnd);
+            return new Polyline(points);
+        }
+
+        private PolylineCurve JoinPolys(Polyline[] polys)
+        {
+            List<Point3d> merged = new List<Point3d>();
+            for (int i = 0; i < polys.Length; i++)
+            {
+                for (int j = 0; j < polys[i].Count; j++)
+                {
+                    if (i != 0 && j == 0)
+                        continue;
+                    merged.Add(polys[i][j]);
+                }
+            }
+            return new PolylineCurve(merged);
+        }
 
         public bool Calculate()
         {
@@ -446,7 +469,7 @@ namespace TuringAndCorbusier
             {
                 return false;
             }
-            
+
             double maximumCount = Math.Floor(isothetic.GetArea() * UnderGroundParkingConsts.ParkingPerArea);
 
             double requiredFloor = Math.Ceiling(require / maximumCount);
@@ -466,7 +489,7 @@ namespace TuringAndCorbusier
                 return false;
             if (isothetic == null)
                 return false;
-            
+
 
             //대지면적의 80%가 500m2 이하
             if (boundary.GetArea() * 0.8 < UnderGroundParkingConsts.MinimumArea)
@@ -572,14 +595,14 @@ namespace TuringAndCorbusier
             if (!convertResult)
                 return false;
 
-            InnerIsoDrawer noConcave = new InnerIsoDrawer(poly,2000,0);
+            InnerIsoDrawer noConcave = new InnerIsoDrawer(poly, 2000, 0);
             noConcave.MaxAspectRatio = 4;
             Isothetic iso1 = noConcave.Draw();
 
             InnerIsoDrawer oneConcave = new InnerIsoDrawer(poly, 2000, 1);
             Isothetic iso2 = oneConcave.Draw();
 
-            isothetic = iso1.Outline.GetArea()>iso2.Outline.GetArea()? iso1.Outline.ToNurbsCurve() : iso2.Outline.ToNurbsCurve();
+            isothetic = iso1.Outline.GetArea() > iso2.Outline.GetArea() ? iso1.Outline.ToNurbsCurve() : iso2.Outline.ToNurbsCurve();
             return true;
         }
 

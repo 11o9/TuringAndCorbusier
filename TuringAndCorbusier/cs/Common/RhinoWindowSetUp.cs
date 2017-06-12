@@ -259,9 +259,8 @@ namespace TuringAndCorbusier
             
             
 
-            RhinoApp.WriteLine("PROJECT BOUNDLESS-X");
-            RhinoApp.WriteLine("BY BOUNDLESS");
-            RhinoApp.WriteLine("Ver 2.10 For SH");
+
+            RhinoApp.WriteLine("Ver 3.10 For SH");
             RhinoApp.WriteLine("Load Complete");
 
             //
@@ -310,9 +309,8 @@ namespace TuringAndCorbusier
 
                             if (english_name == "Shaded")
                             {
- 
                                 vp.DisplayMode = Rhino.Display.DisplayModeDescription.FindByName(dms[j].EnglishName);
-
+                                vp.DisplayMode.DisplayAttributes.ShowCurves = true;
                             }
 
                         }

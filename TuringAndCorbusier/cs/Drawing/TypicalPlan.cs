@@ -58,39 +58,46 @@ namespace TuringAndCorbusier
             return this.OutLine.BoundingBox;
         }
 
-        public static typicalPlan DrawTypicalPlan(Plot plot, Rectangle3d outLine, List<Curve> surroundingSite, Apartment agOutput, List<FloorPlanLibrary> fpls, int targetFloor)
+        public static typicalPlan DrawTypicalPlan(Plot plot, Rectangle3d outLine, List<Curve> surroundingSite, Apartment agOutput, List<FloorPlanLibrary> fpls, int targetFloor , bool drawParking)
         {
             List<CorePlan> tempCorePlans = new List<CorePlan>();
             List<FloorPlan> tempUnitPlans = new List<FloorPlan>();
             List<Curve> tempParkingLines = new List<Curve>();
 
-
-
-            foreach (List<Core> i in agOutput.Core)
+            if (targetFloor == 0)
             {
-                foreach (Core j in i)
-                {
-                    if (j.Stories + 2 > targetFloor)
-                        tempCorePlans.Add(new CorePlan(j));
-                }
+                tempCorePlans = agOutput.Core.First().Select(n => new CorePlan(n)).ToList();
+                tempUnitPlans = new List<FloorPlan>();
             }
 
-            for (int i = 0; i < agOutput.Household[targetFloor-1].Count(); i++)
+            else
             {
-                try
+                foreach (List<Core> i in agOutput.Core)
                 {
-                    if (agOutput.Household[targetFloor-1][i] != null)
+                    foreach (Core j in i)
                     {
-                        for(int j = 0; j < agOutput.Household[targetFloor-1][i].Count;j++)
-                        tempUnitPlans.Add(new FloorPlan(agOutput.Household[targetFloor- 1][i][j], fpls, agOutput.AGtype));
+                        if (j.Stories + 2 > targetFloor)
+                            tempCorePlans.Add(new CorePlan(j));
+                    }
+                }
+
+                for (int i = 0; i < agOutput.Household[targetFloor - 1].Count(); i++)
+                {
+                    try
+                    {
+                        if (agOutput.Household[targetFloor - 1][i] != null)
+                        {
+                            for (int j = 0; j < agOutput.Household[targetFloor - 1][i].Count; j++)
+                                tempUnitPlans.Add(new FloorPlan(agOutput.Household[targetFloor - 1][i][j], fpls, agOutput.AGtype));
+                        }
+
+                    }
+                    catch (Exception)
+                    {
+                        continue;
                     }
 
                 }
-                catch (Exception)
-                {
-                    continue;
-                }
-
             }
 
             List<List<Curve>> nonResidentials = new List<List<Curve>>();
@@ -144,7 +151,7 @@ namespace TuringAndCorbusier
 
             List<Text3d> roadWithText = GetRoadWidthFromPlot(plot);
 
-            if (targetFloor == 1)
+            if (drawParking)
             {
                 for (int i = 0; i < agOutput.ParkingLotOnEarth.ParkingLines.Count(); i++)
                     for (int j = 0; j < agOutput.ParkingLotOnEarth.ParkingLines[i].Count(); j++)

@@ -277,60 +277,108 @@ namespace TuringAndCorbusier
 
             NumOfParking.Text = (agOutput.ParkingLotOnEarth.GetCount() + agOutput.ParkingLotUnderGround.Count).ToString() + "대";
 
+            var sttstcs = agOutput.HouseholdStatistics.OrderBy(n=>n.ExclusiveArea).ToList();
 
-            List<double> firstFloorHHArea = new List<double>();
-            for (int i = 0; i < agOutput.Household[0].Count; i++)
-            {
-                for (int j = 0; j < agOutput.Household[0][i].Count; j++)
-                {
-                    double round = Math.Round(agOutput.Household[0][i][j].ExclusiveArea / 1000000);
-                    if (!firstFloorHHArea.Contains(round))
-                        firstFloorHHArea.Add(round);
-                }
-            }
-            var ta = firstFloorHHArea.OrderBy(n=>n).ToList();
-            int[] type = new int[ta.Count];
-            type = type.Select(n => 0).ToArray();
-            foreach (var hh in agOutput.Household)
-            {
-                foreach (var h in hh)
-                {
-                    foreach (var x in h)
-                    {
-                        for (int i = 0; i < ta.Count; i++)
-                        {
-                            double round = Math.Round(x.ExclusiveArea / 1000000);
-                            if (round == ta[i])
-                            {
-                                type[i]++;
-                                break;
-                            }
-                        }
-                    }
-                }
+          
+            //List<double> firstFloorHHArea = new List<double>();
+            //for (int i = 0; i < agOutput.Household[0].Count; i++)
+            //{
+            //    for (int j = 0; j < agOutput.Household[0][i].Count; j++)
+            //    {
+            //        double round = Math.Round(agOutput.Household[0][i][j].ExclusiveArea / 1000000);
+            //        if (!firstFloorHHArea.Contains(round))
+            //            firstFloorHHArea.Add(round);
+            //    }
+            //}
+            //var ta = firstFloorHHArea.OrderBy(n=>n).ToList();
+            //int[] type = new int[ta.Count];
+            //type = type.Select(n => 0).ToArray();
+            //foreach (var hh in agOutput.Household)
+            //{
+            //    foreach (var h in hh)
+            //    {
+            //        foreach (var x in h)
+            //        {
+            //            for (int i = 0; i < ta.Count; i++)
+            //            {
+            //                double round = Math.Round(x.ExclusiveArea / 1000000);
+            //                if (round == ta[i])
+            //                {
+            //                    type[i]++;
+            //                    break;
+            //                }
+            //            }
+            //        }
+            //    }
 
-            }
+            //}
 
             TextBlock[] title = new TextBlock[] { most1,    most2,    most3,    most4,    most5    };
             TextBlock[] count = new TextBlock[] { nummost1, nummost2, nummost3, nummost4, nummost5 };
 
 
-            for (int i = 0; i < title.Length; i++)
-            {
-                if (i < ta.Count)
-                {
-                    title[i].Text = ta[i].ToString() + " m2 형";
-                    count[i].Text = type[i].ToString();
-                }
 
+            double similarTolerance = 0.1;
+            double lastSttArea = 0;
+            int accCount = 0;
+            int listIndex = 0;
+            for (int i = 0; i < sttstcs.Count; i++)
+            {
+                //변형된 유닛, 비슷한 정형 유닛 카운트에 추가
+                if (sttstcs[i].Count < 3)
+                {
+                    accCount += sttstcs[i].Count;
+                    lastSttArea = sttstcs[i].ExclusiveArea;
+                    continue;
+                }
+                if (lastSttArea / sttstcs[i].ExclusiveArea < similarTolerance)
+                {
+                    title[listIndex].Text = Math.Round(sttstcs[i].ExclusiveArea / 1000000) + " m2 형";
+                    count[listIndex].Text = (sttstcs[i].Count + accCount).ToString();
+                    listIndex++;
+                    accCount = 0;
+                    lastSttArea = 0;
+                }
                 else
                 {
-                    title[i].Text = "";
-                    count[i].Text = "";
+                    title[listIndex].Text = Math.Round(lastSttArea / 1000000) + " m2 형";
+                    count[listIndex].Text = accCount.ToString();
+                    accCount = 0;
+                    lastSttArea = 0;
+                    listIndex++;
+
+                    if (listIndex >= title.Length)
+                        break;
+
+                    title[listIndex].Text = Math.Round(sttstcs[i].ExclusiveArea / 1000000) + " m2 형";
+                    count[listIndex].Text = (sttstcs[i].Count + accCount).ToString();
+                    listIndex++;
+                    accCount = 0;
+                    lastSttArea = 0;
                 }
+                if (listIndex >= title.Length)
+                    break;
             }
 
-          
+
+
+
+            //for (int i = 0; i < title.Length; i++)
+            //{
+            //    if (i < ta.Count)
+            //    {
+            //        title[i].Text = ta[i].ToString() + " m2 형";
+            //        count[i].Text = type[i].ToString();
+            //    }
+
+            //    else
+            //    {
+            //        title[i].Text = "";
+            //        count[i].Text = "";
+            //    }
+            //}
+
+
 
 
         }

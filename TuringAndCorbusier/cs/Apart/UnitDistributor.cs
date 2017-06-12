@@ -180,8 +180,6 @@ namespace TuringAndCorbusier
                     }
                 }
             }
-
-            aptLines = aptLines;
         }
 
         //not used
@@ -496,7 +494,7 @@ namespace TuringAndCorbusier
             Queue<int> coreIndex = new Queue<int>();
             for (int i = 0; i < rooms.Count; i++)
             {
-                stack+=rooms[i];
+                stack += rooms[i];
                 if (i % 2 == 0)
                     coreIndex.Enqueue(domain[0] + stack);
             }
@@ -710,7 +708,7 @@ namespace TuringAndCorbusier
         public bool AreaFixed { get; set; }
         public int Required { get; set; }
         public int Supplied { get; set; }
-        public double CoreArea { get ; set; }
+        public double CoreArea { get; set; }
 
         public Unit(UnitType type)
         {
@@ -734,7 +732,7 @@ namespace TuringAndCorbusier
 
         public Unit()
         {
-           
+
         }
 
         public void Initialize()
@@ -744,7 +742,7 @@ namespace TuringAndCorbusier
             else
                 Type = UnitType.Tower;
 
-            Supplied = 0; 
+            Supplied = 0;
         }
 
         public Unit GetFixed(bool areaLock)
@@ -776,7 +774,7 @@ namespace TuringAndCorbusier
                 return length;
 
             double width = Area / Length;
-            double expandable = (Maximum - Area)/width;
+            double expandable = (Maximum - Area) / width;
             if (expandable <= length)
             {
                 //면적변경
@@ -806,7 +804,7 @@ namespace TuringAndCorbusier
                 return length;
 
             double width = Area / Length;
-            double contractable = (Area - Minimum)/width;
+            double contractable = (Area - Minimum) / width;
             if (contractable <= length)
             {
                 Area = Minimum;
@@ -879,7 +877,7 @@ namespace TuringAndCorbusier
             temp.XDirection = XDirection;
             temp.YDirection = YDirection;
             temp.XLengthA = Length;
-            
+
             switch (type)
             {
                 case UnitType.Corridor:

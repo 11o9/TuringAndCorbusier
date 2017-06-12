@@ -10,7 +10,7 @@ namespace TuringAndCorbusier
     public class DataManager
     {
         public string savepath = @"C:\Program Files (x86)\Boundless\TuringAndCorbusier\DataBase\save";
-        
+
         public DataManager()
         {
             DirectoryInfo dir = new DirectoryInfo(savepath);
@@ -32,7 +32,7 @@ namespace TuringAndCorbusier
             else
             {
                 //해당 파일이 없으면 txt파일 생성
-                
+
                 FileStream fs = new FileStream(savepath + @"\" + data.projectName + ".txt", FileMode.CreateNew);
                 StreamWriter w = new StreamWriter(fs);
                 w.Write(Helper.Serialize<ProjectData>(data));
@@ -46,15 +46,15 @@ namespace TuringAndCorbusier
         public ProjectData LoadData(string projectName)
         {
             ProjectData result = null;
-            
-            FileStream fs = new FileStream(projectName,FileMode.Open);
+
+            FileStream fs = new FileStream(projectName, FileMode.Open);
             StreamReader r = new StreamReader(fs);
             result = Helper.Desirialize<ProjectData>(r.ReadToEnd());
             r.Close();
             r.Dispose();
             fs.Close();
             fs.Dispose();
-          
+
             return result;
         }
 
@@ -178,7 +178,7 @@ namespace TuringAndCorbusier
             StringReader reader = new StringReader(toDeserialize);
             return (T)xml.Deserialize(reader);
 
-            
+
         }
 
         public static void Add(this Rhino.Collections.ArchivableDictionary d, System.Object obj)

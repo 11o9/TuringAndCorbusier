@@ -5,7 +5,7 @@ using Rhino.Commands;
 using Rhino.Geometry;
 using Rhino.Input.Custom;
 using TuringAndCorbusier;
-
+using TuringAndCorbusier.Utility;
 using Rhino;
 using System.Linq;
 using System.Collections.Generic;
@@ -439,7 +439,9 @@ namespace TuringAndCorbusier
             if (System.Math.Abs(plotArea_Manual - plotArea_CAD / 1000000) / plotArea_Manual >= 0.03)
             {
                 var location = System.Windows.Forms.Control.MousePosition;
-                plotAreaError tempPlotAreaError = new plotAreaError("(공부상면적 : " + System.Math.Round(plotArea_Manual, 0).ToString() + ", 캐드파일 면적 : " + System.Math.Round(plotArea_CAD , 0).ToString() + ")");
+                plotAreaError tempPlotAreaError = new plotAreaError("");
+                tempPlotAreaError.Area.Text = System.Math.Round(plotArea_Manual, 2).ToString();
+                tempPlotAreaError.CadArea.Text = System.Math.Round(plotArea_CAD, 2).ToString();
 
                 tempPlotAreaError.Left = location.X - tempPlotAreaError.Width / 2;
                 tempPlotAreaError.Top = location.Y - tempPlotAreaError.Height / 2;
@@ -489,7 +491,8 @@ namespace TuringAndCorbusier
                 }
                 else
                 {
-
+                    double area = boundary.GetArea();
+                    manualPlotArea.Text = System.Math.Round(boundary.GetArea(), 2).ToString();
                     SetCurve2(boundary, 1000);
 
                     //KDGinfo tempKDGinfo = new KDGinfo(boundary, 1000, false);

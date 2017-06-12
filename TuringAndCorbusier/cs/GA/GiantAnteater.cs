@@ -61,7 +61,7 @@ namespace TuringAndCorbusier
             //}
 
             double otherAngles = population * initialBoost;//(population - 1) * initialBoost;
-            
+
             for (int i = 0; i < (int)otherAngles; i++)
             {
                 CoreType tempCoreType = ag.GetRandomCoreType();
@@ -107,7 +107,7 @@ namespace TuringAndCorbusier
             int genCount = 0;
             List<ParameterSet> bestGenes = new List<ParameterSet>();
             List<Apartment> bestOutputs = new List<Apartment>();
-           
+
 
             while (endCondition)
             {
@@ -116,7 +116,7 @@ namespace TuringAndCorbusier
                 List<double> fitnessValues = evaluateFitness(plot, ag, target, offspringGenes, fitnessFactor, previewOn, out apartments);
 
                 //check is maxGeneration
-               
+
                 if (genCount == maxGen)
                 {
                     endCondition = false;
@@ -132,8 +132,27 @@ namespace TuringAndCorbusier
                     List<ParameterSet> distinctGenes = paramRList.Distinct().ToList();
                     ApartComaperer comparer = new ApartComaperer();
                     List<Apartment> distinctApartment = apartRList.Distinct(comparer).ToList();
-                    bestGenes.AddRange(distinctGenes.Take(2));
-                    bestOutputs.AddRange(distinctApartment.Take(2));
+                   // bestGenes.AddRange(distinctGenes.Take(2));
+                    //bestOutputs.AddRange(distinctApartment.Take(2));
+
+
+                    //반환값 조정
+                    double legalFAR = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio;
+                    var fars = distinctApartment.Select(n => n.GetGrossAreaRatio()).ToList();
+                    var suits = distinctApartment.Where(n => n.GetGrossAreaRatio() < legalFAR && n.ParameterSet != null).ToList();
+
+                    var normals = suits.Where(n => !n.ParameterSet.setback && !n.ParameterSet.using1F).ToList();
+                    var using1fs = suits.Where(n => n.ParameterSet.using1F).ToList();
+                    var setbacks = suits.Where(n => n.ParameterSet.setback).ToList();
+
+                    if(normals.Count>0)
+                        bestOutputs.Add(normals[0]);
+
+                    if (using1fs.Count > 0)
+                        bestOutputs.Add(using1fs[0]);
+
+                    if (setbacks.Count > 0)
+                        bestOutputs.Add(setbacks[0]);
 
                     GC.Collect();
                     break;
@@ -172,7 +191,7 @@ namespace TuringAndCorbusier
                     tempGenes.Add(newOffspring);
                 }
                 offspringGenes = tempGenes;
-     
+
                 //Rhino.RhinoApp.Wait();
             }
 
@@ -314,11 +333,11 @@ namespace TuringAndCorbusier
             {
                 double point = 0;
                 if (grossAreaRatio[r] < MaxFAR && grossAreaRatio[r] > MaxFAR - 5)
-                    point = 1 + (5 - (MaxFAR - grossAreaRatio[r]))/MaxFAR ;
+                    point = 1 + (5 - (MaxFAR - grossAreaRatio[r])) / MaxFAR;
                 else if (grossAreaRatio[r] > MaxFAR)
-                    point = 1 - (grossAreaRatio[r] - MaxFAR) /MaxFAR /10;
+                    point = 1 - (grossAreaRatio[r] - MaxFAR) / MaxFAR / 10;
                 else
-                    point = 1 - (MaxFAR - grossAreaRatio[r]) /MaxFAR;
+                    point = 1 - (MaxFAR - grossAreaRatio[r]) / MaxFAR;
                 points.Add(point);
             }
 
@@ -336,13 +355,13 @@ namespace TuringAndCorbusier
 
 
             double targetWeight = 0.4;
-    
+
             //fitnessvalue rate
             //연면적 1 : 주차율(?) 0.3 : 유닛정확도 : 0.4
 
             for (int j = 0; j < gene.Count; j++)
             {
-                double farfitnessVal = points[j]*10;
+                double farfitnessVal = points[j] * 10;
                 double parkkingfitnessVal = parkinglotRatio[j];
                 double axisfitnessVal = axisAccuracy[j];
 
@@ -352,13 +371,13 @@ namespace TuringAndCorbusier
 
                 //firstfloor test
                 double firstfloorBonus = 0;
-                //if (gene[j].using1F)
+                // if (gene[j].using1F)
                 //    firstfloorBonus = 1000;
                 //setback test
                 double setbackBonus = 0;
                 //if (gene[j].setback)
                 //    setbackBonus = 1000;
-                fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal+ setbackBonus + firstfloorBonus);
+                fitness.Add(farfitnessVal + parkkingfitnessVal + axisfitnessVal + setbackBonus + firstfloorBonus);
             }
 
             TuringAndCorbusierPlugIn.InstanceClass.page3.updateProGressBar(TuringAndCorbusierPlugIn.InstanceClass.page3.currentProgressFactor.ToString() + "/" + TuringAndCorbusierPlugIn.InstanceClass.page3.currentWorkQuantity.ToString() + " 완료");
@@ -446,13 +465,13 @@ namespace TuringAndCorbusier
                 double mutatedParameter = gene.Parameters[i] + parameterDomainLength * fitThreeSigma;
                 mutatedParameter = Math.Max(ag.MinInput[i], mutatedParameter);
                 mutatedParameter = Math.Min(ag.MaxInput[i], mutatedParameter);
-                if(i <= 1)
+                if (i <= 1)
                     mutatedParameter = Math.Floor(mutatedParameter);
                 //width - 100 씩
                 if (i == 2)
                     mutatedParameter = Math.Round(mutatedParameter / 100) * 100;
                 newGene.Add(mutatedParameter);
-                
+
             }
             ParameterSet resultGene = new ParameterSet(newGene.ToArray());
             return resultGene;

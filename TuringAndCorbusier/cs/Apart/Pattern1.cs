@@ -6,13 +6,12 @@ using Rhino.Geometry;
 using System.Collections;
 using Rhino.Collections;
 
-
 namespace TuringAndCorbusier
 {
     class AG1 : ApartmentGeneratorBase
     {
         CurveConduit regulationDebug = new CurveConduit(System.Drawing.Color.Red);
-        
+
 
 
         public override Apartment generator(Plot plot, ParameterSet parameterSet, Target target)
@@ -78,12 +77,12 @@ namespace TuringAndCorbusier
             //최고층수 추가, 목표세대수 / 층수 해서 라인 수 찾으려고.
             List<Unit> units = target.ToUnit(width, corearea, storiesHigh);
 
-         
+
 
             //#######################################################################################################################
             if (parameterSet.using1F && !parameterSet.setback)
             {
-               
+
                 if (regulationHigh.byLightingCurve(plot, angleRadian).Length == 0 || regulationHigh.fromNorthCurve(plot).Length == 0)
                 {
                     return null;
@@ -123,9 +122,9 @@ namespace TuringAndCorbusier
                     }
                     else
                         break;
-                   
+
                 }
-        
+
             }
 
             ///////////////////////////
@@ -152,7 +151,7 @@ namespace TuringAndCorbusier
             ///////////////////////////////////////////
             //////////  additional settings  //////////
             ///////////////////////////////////////////
-            
+
             //법규 : 인접대지경계선(채광창)
             Curve[] lightingHigh = regulationHigh.byLightingCurve(plot, angleRadian);
             Curve[] lightingLow = regulationLow.byLightingCurve(plot, angleRadian);
@@ -201,8 +200,8 @@ namespace TuringAndCorbusier
             #region UnitPacking
             List<List<UnitType>> isclearance;
             List<List<double>> lengths = AptPacking(units, aptLines.Select(n => n.GetLength()).ToList(), width, corearea, storiesHigh, plot.GetArea(), out isclearance);
-            
-            
+
+
             //shorten
             for (int i = 0; i < aptLines.Count; i++)
             {
@@ -307,8 +306,8 @@ namespace TuringAndCorbusier
                         c.CoreType = CoreType.Parallel;
                         c.Depth = CoreType.Parallel.GetDepth();
                         c.Width = CoreType.Parallel.GetWidth();
-                        c.Origin += c.XDirection * - c.Width;
-                        c.Origin += c.YDirection * - c.Depth;
+                        c.Origin += c.XDirection * -c.Width;
+                        c.Origin += c.YDirection * -c.Depth;
                         corridorCores.Add(c);
                     }
                     //clearance
@@ -331,7 +330,7 @@ namespace TuringAndCorbusier
             List<List<Core>> cpss = new List<List<Core>>();
 
             cps.AddRange(corridorCores);
-           
+
 
             for (int i = 0; i < Low.Count; i++)
             {
@@ -432,14 +431,10 @@ namespace TuringAndCorbusier
             List<List<List<Household>>> hhps = new List<List<List<Household>>>();
             for (int i = 0; i < storiesHigh; i++)
             {
-
-         
                 double tempStoryHeight = pilotiHeight + i * Consts.FloorHeight;
                 Regulation tempStoryReg = new Regulation(i);
                 Curve[] Reg = wholeRegulationHigh;
 
-                if (Reg.Length == 0)
-                { bool ohno = true; }
                 List<List<Household>> tempfloor = new List<List<Household>>();
 
                 foreach (var xx in Low)
@@ -470,7 +465,7 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < storiesHigh + 2; i++)
             {
-    
+
                 //1층 사용시 필로티코어 만들지 않음.
                 if (parameterSet.using1F && i == 0)
                     continue;
@@ -537,7 +532,7 @@ namespace TuringAndCorbusier
                             foreach (var hh in hhps.Last())
                             {
                                 List<int> toRemove = new List<int>();
-                                
+
                                 foreach (var h in hh)
                                 {
                                     Curve outline = h.GetOutline();
@@ -563,7 +558,7 @@ namespace TuringAndCorbusier
                                     }
                                 }
 
-                                toRemove = toRemove.OrderBy(n=>n).ToList();
+                                toRemove = toRemove.OrderBy(n => n).ToList();
 
                                 for (int j = toRemove.Count - 1; j >= 0; j--)
                                 {
@@ -713,7 +708,7 @@ namespace TuringAndCorbusier
             Apartment result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, new ParkingLotUnderGround(), new List<List<Curve>>(), aptLines);
 
             //#######################################################################################################################
-            if (parameterSet.using1F||parameterSet.setback)
+            if (parameterSet.using1F || parameterSet.setback)
             {
 
             }
@@ -724,7 +719,7 @@ namespace TuringAndCorbusier
                 Finalizer finalizer = new Finalizer(result);
                 result = finalizer.Finalize();
             }
-            
+
             //ParkingDistributor.Distribute(ref result);
             //하아..
             //var result = new Apartment(GetAGType, plot, buildingType, parameterSet, target, cpss, hhps, parkingLot, parkingLotUnderGroud, new List<List<Curve>>(), aptLines);
@@ -743,11 +738,13 @@ namespace TuringAndCorbusier
         //Parameter 최소값 ~ 최대값 {storiesHigh, storiesLow, width, angle, moveFactor}
         private double[] minInput = { 3, 3, 5000, 0, 0 };
         //private double[] minInput = { 6, 6, 10500, 0, 0 };
-        private double[] maxInput = { TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors-1, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, 13000, 2 * Math.PI, 1 };
+        private double[] maxInput = { TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, 13000, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
-        //private double[] GAparameterset = { 0.1, 0.05, 3, 120, 2, 3, 1 }; //원본
-        private double[] GAparameterset = { 0.1, 0.05, 3, 10, 2, 3, 1 };                                                                 //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
+        private double[] GAparameterset = { 0.1, 0.05, 3, 120, 2, 3, 1 }; //원본
+                                                                          //private double[] GAparameterset = { 0.1, 0.05, 3, 10, 2, 3, 1 };                                                                 //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
+                                                                          // private double[] GAparameterset = { 0.1, 0.05, 3, 120, 2, 3, 1 }; //원본
+                                                                          //private double[] GAparameterset = { 0.1, 0.05, 1, 10, 1, 3, 1 };                                                                 //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
 
 
         //private double[] GAparameterset = { 0.2, 0.03, 1, 100, 5, 3, 1 };
@@ -819,7 +816,7 @@ namespace TuringAndCorbusier
                     continue;
 
                 var colK = Curve.PlanarCurveCollision(h.GetOutline(), hh[k].GetOutline(), Plane.WorldXY, 0);
-                if(colK)
+                if (colK)
                 {
                     nextIndex = k;
                     indexes.Add(nextIndex);
@@ -849,7 +846,7 @@ namespace TuringAndCorbusier
             else
             {
                 bool result = FindContacts(hh, cores, hh[nextIndex], ref indexes);
-                                 
+
                 return result;
             }
 
@@ -1238,11 +1235,12 @@ namespace TuringAndCorbusier
             //면적 초과분 (1층코어 + 각 층 면적)  -  기준 면적 (1층코어 + 각 층 면적) = 오차 면적 (각 층 면적 d) / 층수 = d
             //코어개수는 변하지 않으므로.
 
-            double legalFA = ((TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio*0.999) / 100) * plotArea;
+            double legalFA = ((TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio * 0.999) / 100) * plotArea;
 
             //3종에서 용적률 오차 맞춰주기위함   252%정도로 나오니까 249로 강제 변환
             if (TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio == 250)
                 legalFA *= (double)249 / 252;
+
 
 
             if (expectedFA >= legalFA)
@@ -1259,7 +1257,7 @@ namespace TuringAndCorbusier
                 //service
                 lengthToReduce *= Consts.balconyRate_Tower;
 
-                foreach(ApartLine line in distributor.aptLines)
+                foreach (ApartLine line in distributor.aptLines)
                 {
                     //line 에 lengthToReduce 넣고 뺌
 
@@ -1268,10 +1266,6 @@ namespace TuringAndCorbusier
                     if (lengthToReduce <= 0.1) //tolerance
                         break;
                 }
-
-                if (lengthToReduce >=0.1)
-                    lengthToReduce = lengthToReduce;
-                 
             }
 
 
@@ -1514,5 +1508,5 @@ namespace TuringAndCorbusier
 
 
     }
-        
+
 }

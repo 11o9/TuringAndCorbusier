@@ -127,7 +127,7 @@ namespace TuringAndCorbusier
             //길이 수정
             alignCurve[0] = new LineCurve(alignCurve[0].PointAtStart, alignCurve[0].PointAtLength(alignCurve[0].GetLength() - width / 2));
             //중간커브 돌림
-            alignCurve[1] = new LineCurve(alignCurve[1].PointAtLength(alignCurve[1].GetLength()-width/2), alignCurve[1].PointAtLength(width/2));
+            alignCurve[1] = new LineCurve(alignCurve[1].PointAtLength(alignCurve[1].GetLength() - width / 2), alignCurve[1].PointAtLength(width / 2));
             alignCurve[2] = new LineCurve(alignCurve[2].PointAtLength(width / 2), alignCurve[2].PointAtEnd);
 
             for (int i = 0; i < alignCurve.Count; i++)
@@ -317,7 +317,7 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < plotArrExtended.Length; i++)
             {
-                plotArrExtended[i] = plotArrExtended[i].Extend(CurveEnd.Both, plot.Boundary.GetBoundingBox(false).Diagonal.Length*1000, CurveExtensionStyle.Line);
+                plotArrExtended[i] = plotArrExtended[i].Extend(CurveEnd.Both, plot.Boundary.GetBoundingBox(false).Diagonal.Length * 1000, CurveExtensionStyle.Line);
             }
             //
 
@@ -431,7 +431,7 @@ namespace TuringAndCorbusier
                     //Curve northLow = Regulation.fromNorthCurve(plot, regulationLow, plotArr);
 
                     //법규 : 인접대지경계선(채광창)
-                    Curve[] lighting1 = regulationHigh.byLightingCurve(plot,angles[i]);
+                    Curve[] lighting1 = regulationHigh.byLightingCurve(plot, angles[i]);
                     Curve[] lighting2 = regulationHigh.byLightingCurve(plot, angles[i] + Math.PI / 2);
                     Curve[] lightingHigh = CommonFunc.JoinRegulations(new Curve[] { plot.Boundary }, lighting1, lighting2);
 
@@ -466,9 +466,9 @@ namespace TuringAndCorbusier
 
                     Curve outline = wholeRegulationHigh.OrderByDescending(n => AreaMassProperties.Compute(n).Area).ToList()[0];
 
-                 
 
-         
+
+
                     //Rhino.RhinoDoc.ActiveDoc.Objects.Add(outline);
 
                     //make boundingbox
@@ -736,7 +736,7 @@ namespace TuringAndCorbusier
                     double tempLength = pts[i].DistanceTo(pts[j])
                       + Math.Abs(verticalDists[i]) + Math.Abs(verticalDists[j]);
 
-                    bool windowDistOK = pts[i].DistanceTo(pts[j]) > regulation.DistanceLL+aptWidth;
+                    bool windowDistOK = pts[i].DistanceTo(pts[j]) > regulation.DistanceLL + aptWidth;
                     bool regulationOK = (Math.Sign(verticalDists[i]) != Math.Sign(verticalDists[j])) || windowDistOK;
                     if (regulationOK && tempLength > polyLength)
                     {
@@ -913,7 +913,7 @@ namespace TuringAndCorbusier
 
             List<double> coreEndVals = new List<double>();
             List<Point3d> coreEndPoints = new List<Point3d>();
-            
+
             List<int> coreType = new List<int>();
             List<Point3d> corePoint = new List<Point3d>();
             List<Vector3d> coreVecX = new List<Vector3d>();
@@ -972,17 +972,17 @@ namespace TuringAndCorbusier
                         centerLineValue += centerLines[j].Length;
 
                         if (centerLineValue < preValue)
-                            preLineIndex = j+1;
+                            preLineIndex = j + 1;
 
                         if (centerLineValue < currentValue)
-                            currentLineIndex = j+1;
+                            currentLineIndex = j + 1;
                     }
 
                     if (currentLineIndex > preLineIndex)
                         isCorner = true;
                     else
                         isCorner = false;
-          
+
 
                     //add values
                     if (isCorner)
@@ -992,7 +992,7 @@ namespace TuringAndCorbusier
                             currentLineValue += centerLines[j].Length;
 
                         double postEdgeLength = currentValue - currentLineValue;
-                        double preEdgeLength =  currentLineValue - preValue;
+                        double preEdgeLength = currentLineValue - preValue;
 
                         double lengthToExtend = 0;
 
@@ -1002,18 +1002,18 @@ namespace TuringAndCorbusier
 
                         if (!isPreSecured)
                         {
-                            if(!isPostEnoughSecured)
-                                lengthToExtend = width / 2 + shortEdgeLimit  - postEdgeLength;
+                            if (!isPostEnoughSecured)
+                                lengthToExtend = width / 2 + shortEdgeLimit - postEdgeLength;
                         }
 
                         else
                         {
-                            if(!isPostSecured)
+                            if (!isPostSecured)
                                 lengthToExtend = width / 2 - postEdgeLength;
                         }
 
                         currentValue += lengthToExtend;
-            
+
 
                         //extend corner and adjust next unit
                         if (i != unallocated.Count - 1)
@@ -1030,8 +1030,8 @@ namespace TuringAndCorbusier
 
                     else
                     {
-                        if(i != unallocated.Count - 1)
-                        nextLength = stretchedLength[unallocated[i + 1]];
+                        if (i != unallocated.Count - 1)
+                            nextLength = stretchedLength[unallocated[i + 1]];
                     }
 
                     houseEndVals.Add(currentValue);
@@ -1090,7 +1090,7 @@ namespace TuringAndCorbusier
 
                 List<double> mappedVals = new List<double>(valMapper(centerLines, houseEndVals));
 
-                for (int i = 0; i < mappedVals.Count-1; i++)
+                for (int i = 0; i < mappedVals.Count - 1; i++)
                 {
                     if ((int)mappedVals[i] == (int)(mappedVals[(i + 1)] - 0.001))  //is not corner
                     {
@@ -1101,8 +1101,8 @@ namespace TuringAndCorbusier
 
                         //코너 빼기 판정용
                         Point3d currentLineEnd = centerline.PointAt(Math.Ceiling(mappedVals[i + 1]));
-                        double eOriToLineEnd = eOri.DistanceTo(currentLineEnd); 
-                        bool isToLineEndEnough = eOriToLineEnd + width/2> cornerShortEdgeLimit;
+                        double eOriToLineEnd = eOri.DistanceTo(currentLineEnd);
+                        bool isToLineEndEnough = eOriToLineEnd + width / 2 > cornerShortEdgeLimit;
 
                         Vector3d midVec = centerline.TangentAt(avrg);
                         Vector3d verticalVec = midVec;
@@ -1143,6 +1143,13 @@ namespace TuringAndCorbusier
 
                             if (i % 3 == 0) //if it is formerPart
                             {
+                                if (!isToLineEndEnough)
+                                {
+                                    IsNextPartDrawable = false;
+                                    currentUnitIndex++;
+                                    continue;
+                                }
+
                                 allocated.Add(unallocated[currentUnitIndex]);
                                 homeOri.Add(eOri);
                                 currentUnitIndex++;
@@ -1165,7 +1172,7 @@ namespace TuringAndCorbusier
                             wallFactors.Add(new List<double>(new double[] { 1, 1, 1, 0.5 }));
                             exclusiveArea.Add(exclusiveAreaCalculatorAG4Edge(xa[xa.Count - 1], xb[xb.Count - 1], ya[ya.Count - 1], yb[yb.Count - 1], Consts.balconyDepth));
 
-                            if (!isToLineEndEnough && i%3!=0)
+                            if (!isToLineEndEnough && i % 3 != 0)
                             {
                                 IsNextPartDrawable = false;
                                 continue;
@@ -1175,6 +1182,47 @@ namespace TuringAndCorbusier
                         }
                     }
 
+                    else if ((int)mappedVals[i] + 2 == (int)(mappedVals[(i + 1)] - 0.001)) //if mapped over fold
+                    {
+                        Point3d checkP1 = centerLines[(int)mappedVals[i]].PointAt(1);
+                        Point3d checkP2 = centerLines[(int)mappedVals[(i + 1)]].PointAt(0);
+                        Point3d sOri = centerline.PointAt(mappedVals[i]);
+
+                        Vector3d v1 = new Vector3d(sOri - checkP1);
+                        Vector3d v2 = new Vector3d(checkP2 - checkP1);
+                        double l1 = v1.Length;
+                        double l2 = v2.Length;
+
+                        v1.Unitize();
+                        v2.Unitize();
+
+                        if (i % 3 == 1) //if it is core
+                        {
+                            if (!IsNextPartDrawable)
+                            {
+                                IsNextPartDrawable = false;
+                                continue;
+                            }
+
+                            sOri.Transform(Transform.Translation(-v2 * width / 2));
+                            corePoint.Add(sOri);
+                            coreVecX.Add(Vector3d.Multiply(-v1, 1));
+                            coreVecY.Add(Vector3d.Multiply(-v2, -1));
+                            IsNextPartDrawable = false;
+                            continue;
+                        }
+
+                        //if it is not core
+                        if (currentUnitIndex >= mappedHouseholdCount)
+                        {
+                            canLoop = false;
+                            break;
+                        }
+
+
+                        IsNextPartDrawable = true;
+                        currentUnitIndex++;
+                    }
 
                     else //if it is corner
                     {
@@ -1214,15 +1262,15 @@ namespace TuringAndCorbusier
                             break;
                         }
 
-                            if (!IsNextPartDrawable || !isAspectRatioReasonable)
-                            {
-                                IsNextPartDrawable = true;
-                                currentUnitIndex++;
-                                continue;
-                            }
-
-                            allocated.Add(unallocated[currentUnitIndex]);
+                        if (!IsNextPartDrawable || !isAspectRatioReasonable)
+                        {
+                            IsNextPartDrawable = true;
                             currentUnitIndex++;
+                            continue;
+                        }
+
+                        allocated.Add(unallocated[currentUnitIndex]);
+                        currentUnitIndex++;
 
                         checkP.Transform(Transform.Translation(v1 * width / 2 + v2 * width / 2));
                         homeOri.Add(checkP);
@@ -1402,7 +1450,7 @@ namespace TuringAndCorbusier
 
             //core properties
             core = new List<List<Core>>();
-            for(int i =0; i<storiesHigh+2; i++)
+            for (int i = 0; i < storiesHigh + 2; i++)
             {
                 double tempStoryHeight = (i == 0) ? 0 : Consts.PilotiHeight + Consts.FloorHeight * (i - 1);
                 List<Core> cpB = new List<Core>();
