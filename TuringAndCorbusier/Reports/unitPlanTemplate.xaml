@@ -10,6 +10,8 @@
         <Canvas x:Name="unitPlanTemplateCanvas" Background="White" Height="759" Margin="0,0,0,56" Width="1240">
             <Rectangle Fill="White"/>
             <Canvas x:Name="UnitCanvas" Width="913" Height="298" VerticalAlignment="Top" Canvas.Left="157" />
+
+            <TextBlock  Text="단위 : mm" FontSize="10" VerticalAlignment="Top" TextAlignment="Center" Canvas.Left="1010" Canvas.Top="273" FontFamily="NanumSquareOTF" />
             <!-- 3.0-->
             <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="261" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
             <Path Stroke="Black" Data="F1 M 150,730 L 1090,730" StrokeThickness="3.0" Fill="Black" Canvas.Top="299" Height="75" Stretch="Fill" Width="212" Canvas.Left="157"/>
