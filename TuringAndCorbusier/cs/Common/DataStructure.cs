@@ -1678,6 +1678,8 @@ namespace TuringAndCorbusier
                 return 2500;
             else if (this.coreType == CoreType.CourtShortEdge.ToString())
                 return 7600;
+            else if (this.coreType == CoreType.CourtShortEdge2.ToString())
+                return 6700;
             else
                 return 0;
 
@@ -1697,6 +1699,8 @@ namespace TuringAndCorbusier
                 return 7920;
             else if (this.coreType == CoreType.CourtShortEdge.ToString())
                 return 2700;
+            else if (this.coreType == CoreType.CourtShortEdge2.ToString())
+                return 2700;
             else
                 return 0;
         }
@@ -1715,6 +1719,7 @@ namespace TuringAndCorbusier
         public static CoreType Folded { get { return new CoreType("Folded"); } }
         public static CoreType Vertical_AG1 { get { return new CoreType("Vertical_AG1"); } }
         public static CoreType CourtShortEdge { get { return new CoreType("CourtShortEdge"); } }
+        public static CoreType CourtShortEdge2 { get { return new CoreType("CourtShortEdge2"); } }
     }
 
     public class Core

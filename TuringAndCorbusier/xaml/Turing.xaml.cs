@@ -553,6 +553,27 @@ namespace TuringAndCorbusier
                 }
                 //page2 건축개요
                 // 배치도 테스트
+
+                List<List<List<Household>>> householdTripleList = MainPanel_AGOutputList[tempIndex].Household;
+
+                List<Household> householdList = new List<Household>();
+                List<double> numOfHouseInEachFloorList = new List<double>();
+
+                for (int i = 0; i < householdTripleList.Count; i++)
+                {
+                    double numOfHouseInEachFloor = 0;
+                    for (int j = 0; j < householdTripleList[i].Count; j++)
+                    {
+                        numOfHouseInEachFloor += householdTripleList[i][j].Count;
+                        for (int k = 0; k < householdTripleList[i][j].Count; k++)
+                        {
+                            householdList.Add(householdTripleList[i][j][k]);
+                        }
+                    }
+                    numOfHouseInEachFloorList.Add(numOfHouseInEachFloor);
+                }
+
+
                 List<HouseholdStatistics> uniqueHouseHoldProperties = MainPanel_AGOutputList[tempIndex].HouseholdStatistics.ToList();
                 BoundingBox tempBBox = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect.GetBoundingBox(true);
                 Rectangle3d tempRectangle = new Rectangle3d(Plane.WorldXY, tempBBox.Min, tempBBox.Max);
@@ -588,7 +609,7 @@ namespace TuringAndCorbusier
                         newCoreList.Add(core);
                     }
                 }
-                xmlBuildingInfo.SetHouseOutline(coreOutline, houseOutline, tempTypicalPlan_FL0, newCoreList, NumberOfHouses, uniqueHouseHoldProperties, agType,aptLineList, currentParamSet, MainPanel_AGOutputList[tempIndex]);
+                xmlBuildingInfo.SetHouseOutline(numOfHouseInEachFloorList, coreOutline, houseOutline, tempTypicalPlan_FL0, newCoreList, NumberOfHouses, uniqueHouseHoldProperties, agType,aptLineList, currentParamSet, MainPanel_AGOutputList[tempIndex]);
 
                 fps.Add(xmlBuildingInfo.fixedPage);
                 pagename.Add("buildingReport");
@@ -689,25 +710,7 @@ namespace TuringAndCorbusier
                 //JHL:2017.5.30:17:14 평면도 시작점
                 //1층 활성화되는지 가져오기
                 bool isUsing1F = MainPanel_AGOutputList[tempIndex].ParameterSet.using1F;
-                List<List<List<Household>>> householdTripleList = MainPanel_AGOutputList[tempIndex].Household;
-
-                List<Household> householdList = new List<Household>();
-                List<double> numOfHouseInEachFloorList = new List<double>();
-
-                for (int i = 0; i < householdTripleList.Count; i++)
-                {
-                        double numOfHouseInEachFloor = 0;
-                    for (int j = 0; j < householdTripleList[i].Count; j++)
-                    {
-                            numOfHouseInEachFloor += householdTripleList[i][j].Count;
-                        for (int k = 0; k < householdTripleList[i][j].Count; k++)
-                        {
-                            householdList.Add(householdTripleList[i][j][k]);
-                        }
-                    }
-                        numOfHouseInEachFloorList.Add(numOfHouseInEachFloor);
-                }
-
+               
 
                 bool isTopFloorDifferent = false;
                 bool isTopFloorSetBack = false;
@@ -752,7 +755,7 @@ namespace TuringAndCorbusier
                         {
                             TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i + 1);
                             Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
-                            floorPlanDrawing.SetCoreOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1), newCoreList);
+                            floorPlanDrawing.SetCoreOutline(numOfHouseInEachFloorList,MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1), newCoreList);
                             fps.Add(floorPlanDrawing.fixedPage);
                             pagename.Add("floorPlanDrawingPage" + i.ToString());
                         }

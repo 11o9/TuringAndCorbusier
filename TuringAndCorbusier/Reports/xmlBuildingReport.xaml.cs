@@ -181,10 +181,13 @@ namespace Reports
         }
 
         //--------JHL
-        public void SetHouseOutline(List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics, string agType, List<Curve> aptLineList, ParameterSet paramSet, Apartment apartment)
+        public void SetHouseOutline(List<double> numOfHouseInEachFloor,List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics, string agType, List<Curve> aptLineList, ParameterSet paramSet, Apartment apartment)
         {
             System.Windows.Media.SolidColorBrush SCBGray = new SolidColorBrush();
             SCBGray.Color = System.Windows.Media.Color.FromRgb(235, 235, 235);
+
+            System.Windows.Media.SolidColorBrush SCBDarkGray = new SolidColorBrush();
+            SCBGray.Color = System.Windows.Media.Color.FromRgb(225, 225, 225);
 
             System.Windows.Media.SolidColorBrush SCBCorridor = new SolidColorBrush();
             SCBCorridor.Color = System.Windows.Media.Color.FromRgb(242, 242, 242);
@@ -224,6 +227,14 @@ namespace Reports
                     {
                         pointString = GetSimplifiedCoreString(CoreType.CourtShortEdge);
                         coreType[i] = CoreType.CourtShortEdge;
+                    }
+                }
+                else if (coreType[i] == CoreType.CourtShortEdge)
+                {
+                    if (newCoreList[i].depth == 2700 && newCoreList[i].width != 7600)
+                    {
+                        pointString = GetSimplifiedCoreString(CoreType.CourtShortEdge2);
+                        coreType[i] = CoreType.CourtShortEdge2;
                     }
                 }
 
@@ -278,17 +289,22 @@ namespace Reports
             }
 
 
-            for (int i = 0; i < houseOutline.Count; i++)
+            for (int i = 0; i <houseOutlineList.Count-(int)numOfHouseInEachFloor.Last(); i++)
             {
 
                 {
-                    PlanDrawingFunction.drawBackGround(rectangleToFit, houseOutline[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBGray);
+                    PlanDrawingFunction.drawBackGround(rectangleToFit, houseOutline[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBDarkGray);
                     PlanDrawingFunction.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
                 }
 
             }
+            for(int i = houseOutlineList.Count - (int)numOfHouseInEachFloor.Last(); i < houseOutlineList.Count; i++)
+            {
+                PlanDrawingFunction.drawBackGround(rectangleToFit, houseOutline[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBGray);
+                PlanDrawingFunction.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
+            }
 
-            for (int i = 0; i < balconyLines.Count; i++)
+            for (int i = balconyLines.Count-(int)numOfHouseInEachFloor.Last(); i < balconyLines.Count; i++)
             {
                 if (balconyLines[i].Count > 1) {
                 PlanDrawingFunction.drawDashedPlan(rectangleToFit, balconyLines[i][1], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
@@ -407,6 +423,21 @@ namespace Reports
                     }
 
                 }
+                else if (coreType[i] == CoreType.CourtShortEdge2)
+                {
+
+                    Vector3d v1 = coreList[i].YDirection;
+                    Vector3d v2 = new Vector3d(coreDetail[i][0].PointAtStart - coreDetail[i][0].PointAtEnd);
+
+                    for (int j = 0; j < coreDetail[i].Count; j++)
+                    {
+                        double radian = Vector3d.VectorAngle(v2, v1, Plane.WorldXY);
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Rotation(radian, coreList[i].Origin));
+                        coreDetail[i][j].Transform(Rhino.Geometry.Transform.Translation(coreList[i].YDirection * coreList[i].depth));
+
+                    }
+
+                }
             }
         }
 
@@ -449,6 +480,10 @@ namespace Reports
             else if (coreType == CoreType.CourtShortEdge)
             {
                 return "{0,0,0}/{2700,0,0}/{2700,0,0}/{2700,-1300,0}/{2700,-1300,0}/{2700,-4000,0}/{2700,-4000,0}/{2700,-5300,0}/{2700,-5300,0}/{2700,-7600,0}/{2700,-7600,0}/{0,-7600,0}/{0,-7600,0}/{0,0,0}/{2700,-1300,0}/{0,-1300,0}/{2700,-4000,0}/{0,-4000,0}/{2700,-5300,0}/{0,-5300,0}/{0,-7600,0}/{2700,-5300,0}/{2700,-7600,0}/{0,-5300,0}/{1350,-4000,0}/{1350,-1300,0}/{2700,-1600,0}/{0,-1600,0}/{2700,-1900,0}/{0,-1900,0}/{2700,-2200,0}/{0,-2200,0}/{2700,-2500,0}/{0,-2500,0}/{2700,-2800,0}/{0,-2800,0}/{2700,-3100,0}/{0,-3100,0}/{2700,-3400,0}/{0,-3400,0}/{2700,-3700,0}/{0,-3700,0}";
+            }
+            else if (coreType == CoreType.CourtShortEdge2)
+            {
+                return "{0,0,0}/{2700,0,0}/{0,0,0}/{0,-6500,0}/{2700,0,0}/{2700,-1250,0}/{2700,-1250,0}/{2700,-3490,0}/{2700,-3490,0}/{2700,-4740,0}/{2700,-4740,0}/{0,-4740,0}/{2700,-1250,0}/{0,-1250,0}/{2700,-3490,0}/{0,-3490,0}/{1350,-1250,0}/{1350,-3490,0}/{2700,-3210,0}/{0,-3210,0}/{2700,-2930,0}/{0,-2930,0}/{2700,-2650,0}/{0,-2650,0}/{2700,-2370,0}/{0,-2370,0}/{2700,-2090,0}/{0,-2090,0}/{2700,-1810,0}/{0,-1810,0}/{2700,-1530,0}/{0,-1530,0}/{0,-6700,0}/{2700,-6700,0}/{2700,-6700,0}/{2700,-4740,0}/{0,-6700,0}/{0,-6500,0}/{2700,-4740,0}/{0,-6700,0}/{0,-4740,0}/{2700,-6700,0}";
             }
             else
             {
