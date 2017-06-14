@@ -1077,6 +1077,11 @@ namespace TuringAndCorbusier
 
             return output;
         }
+        public void UpdateStatistics()
+        {
+            this.HouseholdStatistics = getHouseholdStatistics(Household);
+        }
+
 
         private bool isHHPequal(Household a, Household b)
         {
@@ -1095,7 +1100,7 @@ namespace TuringAndCorbusier
         {
             double aa = a.GetExclusiveArea();
             double bb = b.GetExclusiveArea();
-            if (Math.Round(aa) == Math.Round(bb))
+            if (Math.Round(aa,2) == Math.Round(bb,2))
                 return true;
             else
                 return false;

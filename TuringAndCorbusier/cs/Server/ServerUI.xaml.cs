@@ -61,7 +61,7 @@ namespace TuringAndCorbusier
             string comm = QueryBuilder.GetSiDoCode();
             try
             {
-                Sis = ServerConnection.MetaCon<NameCode>(conn, comm);
+                Sis = ServerConnection.MetaCon<NameCode>(ServerConnection.DATATYPE.SI, "");
                 si.ItemsSource = Sis.Select(n => n.name);
             }
             catch (Exception e)
@@ -92,7 +92,7 @@ namespace TuringAndCorbusier
 
             string conn = ConnectionStringBuilder.GetConnectionString(SERVER.Azure);
             string comm = QueryBuilder.GetGuDataWithSiCode(SiDoCode, SERVER.Azure);
-            Gus = ServerConnection.MetaCon<NameCode>(conn, comm);
+            Gus = ServerConnection.MetaCon<NameCode>(ServerConnection.DATATYPE.GU, SiDoCode);
             gu.ItemsSource = Gus.Select(n => n.name);
 
             Refresh();
@@ -112,7 +112,7 @@ namespace TuringAndCorbusier
 
             string conn = ConnectionStringBuilder.GetConnectionString(SERVER.Azure);
             string comm = QueryBuilder.GetDongDataWithGuCode(GuCode, SERVER.Azure);
-            Dongs = ServerConnection.MetaCon<NameCode>(conn, comm);
+            Dongs = ServerConnection.MetaCon<NameCode>(ServerConnection.DATATYPE.DONG, GuCode);
             dong.ItemsSource = Dongs.Select(n => n.name);
 
             Refresh();
@@ -132,7 +132,7 @@ namespace TuringAndCorbusier
 
             string conn = ConnectionStringBuilder.GetConnectionString(SERVER.Azure);
             string comm = QueryBuilder.GetPiljiDataWithDongCode(DongCode);
-            Piljis = ServerConnection.MetaCon<Pilji>(conn, comm);
+            Piljis = ServerConnection.MetaCon<Pilji>(ServerConnection.DATATYPE.PILJI, DongCode);
 
             Refresh();
 
