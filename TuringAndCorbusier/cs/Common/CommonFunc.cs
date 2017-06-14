@@ -156,17 +156,29 @@ namespace TuringAndCorbusier
                 var surr = plot.SimplifiedSurroundings;
 
                 List<Curve> result = new List<Curve>();
+                Regulation reg = new Regulation(stories, using1f);
+                var topheight = reg.height;
 
                 for (int i = 0; i <= stories; i++)
                 {
-                    Regulation reg = new Regulation(i,using1f);
-       
-                        var tempfloorsurr = reg.fromSurroundingsCurve(plot);
-                        foreach (var n in tempfloorsurr)
-                            n.Transform(Transform.Translation(Vector3d.ZAxis * reg.height));
-                        result.AddRange(tempfloorsurr);
-   
+                    double tempheight = topheight - Consts.FloorHeight * i;
+                    //if(i == stories)
+                    //    if (!using1f)
+                    //        tempheight -= Consts.PilotiHeight - Consts.FloorHeight;
+
+                    var tempfloorsurr = reg.fromSurroundingsCurve(plot);
+                    foreach (var n in tempfloorsurr)
+                        n.Transform(Transform.Translation(Vector3d.ZAxis * tempheight));
+                    result.AddRange(tempfloorsurr);
                 }
+
+                //for (int i = 0; i <= stories; i++)
+                //{
+                //    var tempfloorsurr = reg.fromSurroundingsCurve(plot);
+                //    foreach (var n in tempfloorsurr)
+                //        n.Transform(Transform.Translation(Vector3d.ZAxis * i*Consts.FloorHeight));
+                //    result.AddRange(tempfloorsurr);
+                //}
                 return result;
             }
 

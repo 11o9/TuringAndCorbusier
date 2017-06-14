@@ -453,8 +453,8 @@ namespace TuringAndCorbusier
                             var intersect = Rhino.Geometry.Intersect.Intersection.CurveCurve(r, outline, 0, 0);
                             if (intersect.Count > 1)
                                 newhhp.Origin = Point3d.Origin;
-
-                            newline.Add(newhhp);
+                            else
+                                newline.Add(newhhp);
                         }
                     }
 
@@ -466,7 +466,6 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < storiesHigh + 2; i++)
             {
-    
                 //1층 사용시 필로티코어 만들지 않음.
                 if (parameterSet.using1F && i == 0)
                     continue;
@@ -1248,6 +1247,7 @@ namespace TuringAndCorbusier
                 //fordebug
                 double expectedFAR = expectedFA / plotArea;
                 double legalFAR = legalFA / plotArea;
+                
                 //area
                 double lengthToReduce = expectedFA - legalFA;
                 //eachfloor
