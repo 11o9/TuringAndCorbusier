@@ -186,9 +186,6 @@ namespace Reports
             System.Windows.Media.SolidColorBrush SCBGray = new SolidColorBrush();
             SCBGray.Color = System.Windows.Media.Color.FromRgb(235, 235, 235);
 
-            System.Windows.Media.SolidColorBrush SCBDarkGray = new SolidColorBrush();
-            SCBGray.Color = System.Windows.Media.Color.FromRgb(225, 225, 225);
-
             System.Windows.Media.SolidColorBrush SCBCorridor = new SolidColorBrush();
             SCBCorridor.Color = System.Windows.Media.Color.FromRgb(242, 242, 242);
 
@@ -229,9 +226,9 @@ namespace Reports
                         coreType[i] = CoreType.CourtShortEdge;
                     }
                 }
-                else if (coreType[i] == CoreType.CourtShortEdge)
+                if (coreType[i] == CoreType.CourtShortEdge)
                 {
-                    if (newCoreList[i].depth == 2700 && newCoreList[i].width != 7600)
+                    if (newCoreList[i].Depth == 2700 && newCoreList[i].Width != 7600)
                     {
                         pointString = GetSimplifiedCoreString(CoreType.CourtShortEdge2);
                         coreType[i] = CoreType.CourtShortEdge2;
@@ -293,7 +290,7 @@ namespace Reports
             {
 
                 {
-                    PlanDrawingFunction.drawBackGround(rectangleToFit, houseOutline[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBDarkGray);
+                    PlanDrawingFunction.drawBackGround(rectangleToFit, houseOutline[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, SCBCorridor);
                     PlanDrawingFunction.drawPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 1);
                 }
 

@@ -277,6 +277,14 @@ namespace Reports
                         coreType[i] = CoreType.CourtShortEdge;
                     }
                 }
+                else if (coreType[i] == CoreType.CourtShortEdge)
+                {
+                    if (newCoreList[i].depth == 2700 && newCoreList[i].width != 7600)
+                    {
+                        pointString = GetSimplifiedCoreString(CoreType.CourtShortEdge2);
+                        coreType[i] = CoreType.CourtShortEdge2;
+                    }
+                }
 
                 List<Curve> coreDetail = GetCoreDetail(pointString);
                 coreDetailDoubleList.Add(coreDetail);
