@@ -776,11 +776,6 @@ namespace TuringAndCorbusier
         //visible regulation
         public Curve[] topReg { get; set; }
 
-        public void UpdateStatistics()
-        {
-            this.HouseholdStatistics = getHouseholdStatistics(Household);
-        }
-
         //Constructor, 생성자
         public Apartment(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<Core>> core, List<List<List<Household>>> household, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<List<Curve>> buildingOutline, List<Curve> aptLines)
         {

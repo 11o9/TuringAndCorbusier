@@ -9,7 +9,7 @@ namespace TuringAndCorbusier
     {
         public string Version = "1.010608";
         public string Company = "SPACEWALK";
-        public string MessageURL = @"Data Source=spacewalk.koreasouth.cloudapp.azure.com,1433;Initial Catalog=mssql_System;USER ID=sa;PASSWORD=building39!";
+        private string MessageURL = @"Data Source=spwk-vm.koreacentral.cloudapp.azure.com,1433;Initial Catalog=mssql_System;USER ID=spwk_dvlp;PASSWORD=building39!";
         
         public string Message = "";
 

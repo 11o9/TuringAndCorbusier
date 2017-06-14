@@ -56,9 +56,6 @@ namespace TuringAndCorbusier
                 //MessageBox.Show("서버 연결 에러");
                 return;
             }
-
-            string conn = ConnectionStringBuilder.GetConnectionString(SERVER.Azure);
-            string comm = QueryBuilder.GetSiDoCode();
             try
             {
                 Sis = ServerConnection.MetaCon<NameCode>(ServerConnection.DATATYPE.SI, "");
@@ -90,8 +87,6 @@ namespace TuringAndCorbusier
             SiDo = Sis[si.SelectedIndex].name;
             SiDoCode = Sis[si.SelectedIndex].code;
 
-            string conn = ConnectionStringBuilder.GetConnectionString(SERVER.Azure);
-            string comm = QueryBuilder.GetGuDataWithSiCode(SiDoCode, SERVER.Azure);
             Gus = ServerConnection.MetaCon<NameCode>(ServerConnection.DATATYPE.GU, SiDoCode);
             gu.ItemsSource = Gus.Select(n => n.name);
 
@@ -110,8 +105,6 @@ namespace TuringAndCorbusier
             Gu = Gus[gu.SelectedIndex].name;
             GuCode = Gus[gu.SelectedIndex].code;
 
-            string conn = ConnectionStringBuilder.GetConnectionString(SERVER.Azure);
-            string comm = QueryBuilder.GetDongDataWithGuCode(GuCode, SERVER.Azure);
             Dongs = ServerConnection.MetaCon<NameCode>(ServerConnection.DATATYPE.DONG, GuCode);
             dong.ItemsSource = Dongs.Select(n => n.name);
 
@@ -130,8 +123,6 @@ namespace TuringAndCorbusier
             Dong = Dongs[dong.SelectedIndex].name;
             DongCode = Dongs[dong.SelectedIndex].code;
 
-            string conn = ConnectionStringBuilder.GetConnectionString(SERVER.Azure);
-            string comm = QueryBuilder.GetPiljiDataWithDongCode(DongCode);
             Piljis = ServerConnection.MetaCon<Pilji>(ServerConnection.DATATYPE.PILJI, DongCode);
 
             Refresh();
