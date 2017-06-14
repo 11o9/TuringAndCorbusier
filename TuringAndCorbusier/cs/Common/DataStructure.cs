@@ -1082,6 +1082,11 @@ namespace TuringAndCorbusier
 
             return output;
         }
+        public void UpdateStatistics()
+        {
+            this.HouseholdStatistics = getHouseholdStatistics(Household);
+        }
+
 
         private bool isHHPequal(Household a, Household b)
         {
@@ -2729,10 +2734,10 @@ namespace TuringAndCorbusier
 
         public Regulation(double stories, bool using1F)
         {
-                this.using1f = using1F;
-                this.height = using1F? Consts.FloorHeight * stories: Consts.PilotiHeight + Consts.FloorHeight * stories;
-                Init(stories);
-                totalheight = stories;
+            this.using1f = using1F;
+            this.height = using1F? Consts.FloorHeight * stories: Consts.PilotiHeight + Consts.FloorHeight * stories;
+            Init(stories);
+            totalheight = stories;
         }
 
         private void Init(double stories)
@@ -2815,7 +2820,7 @@ namespace TuringAndCorbusier
                 
                 double paramA;
                 double paramB;
-                var intersect = Rhino.Geometry.Intersect.Intersection.LineLine(li, lj, out paramA, out paramB, 0, false);
+                var intersect = Rhino.Geometry.Intersect.Intersection.LineLine(li, lj, out paramA, out paramB, 1, false);
 
                 // 교점이 A 선 위에 있음
                 bool isparamAonA = paramA >= 0 && paramA <= 1 ? true : false;
@@ -2864,7 +2869,7 @@ namespace TuringAndCorbusier
 
             var tempcurve = new PolylineCurve(topoly);
             var rotation = tempcurve.ClosedCurveOrientation(Vector3d.ZAxis);
-            var selfintersection = Rhino.Geometry.Intersect.Intersection.CurveSelf(tempcurve, 0);
+            var selfintersection = Rhino.Geometry.Intersect.Intersection.CurveSelf(tempcurve, 1);
 
             var parameters = selfintersection.Select(n => n.ParameterA).ToList();
 
@@ -2943,7 +2948,7 @@ namespace TuringAndCorbusier
 
                 ///<summary>20160826 수정분 (접하는 2개 커브가 평행하고 하나는 대지와 하나는 도로와 면할때 Intersection이 생기지 않아 문제발생 >> 수정완료)</summary>
                 {
-                    var intersection = Rhino.Geometry.Intersect.Intersection.CurveCurve(curveH, curveI, 0, 0);
+                    var intersection = Rhino.Geometry.Intersect.Intersection.CurveCurve(curveH, curveI, 1, 0);
 
                     if (intersection.Count == 0)
                     {
@@ -3054,7 +3059,7 @@ namespace TuringAndCorbusier
             }
             tps.Add(new TypeParam(wholeCurve.Domain.Max, false));
 
-            var self = Rhino.Geometry.Intersect.Intersection.CurveSelf(wholeCurve, 0);
+            var self = Rhino.Geometry.Intersect.Intersection.CurveSelf(wholeCurve, 1);
             foreach (var e in self)
             {
                 tps.Add(new TypeParam(e.ParameterA, true));
@@ -3093,11 +3098,11 @@ namespace TuringAndCorbusier
             Curve resultA = new PolylineCurve(GroupA.Select(n => wholeCurve.PointAt(n)));
             Curve resultB = new PolylineCurve(GroupB.Select(n => wholeCurve.PointAt(n)));
 
-            var checkSelfA = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultA, 0);
+            var checkSelfA = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultA, 1);
             if(checkSelfA.Count == 0)
                 return new Curve[] { resultA };
 
-            var checkSelfB = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultB, 0);
+            var checkSelfB = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultB, 1);
             if (checkSelfB.Count == 0)
                 return new Curve[] { resultB };
             //tempRoadLine = GroupA.Count > GroupB.Count?new PolylineCurve(GroupA.Select(n=>tempRoadLine.PointAt(n))):new PolylineCurve(GroupB.Select(n => tempRoadLine.PointAt(n)));
@@ -3228,7 +3233,7 @@ namespace TuringAndCorbusier
                 Line lj = new Line(plotArrExtended[j].PointAtStart, plotArrExtended[j].PointAtEnd);
                 double paramA;
                 double paramB;
-                var intersect = Rhino.Geometry.Intersect.Intersection.LineLine(li, lj, out paramA, out paramB, 0,false);
+                var intersect = Rhino.Geometry.Intersect.Intersection.LineLine(li, lj, out paramA, out paramB, 1,false);
 
                 topoly.Add(li.PointAt(paramA)); 
             }
@@ -3244,7 +3249,7 @@ namespace TuringAndCorbusier
             }
             tps.Add(new TypeParam(wholeCurve.Domain.Max, false));
 
-            var self = Rhino.Geometry.Intersect.Intersection.CurveSelf(wholeCurve, 0);
+            var self = Rhino.Geometry.Intersect.Intersection.CurveSelf(wholeCurve, 1);
             foreach (var e in self)
             {
                 tps.Add(new TypeParam(e.ParameterA, true));
@@ -3288,11 +3293,11 @@ namespace TuringAndCorbusier
             Curve test = new PolylineCurve();
             //Rhino.RhinoDoc.ActiveDoc.Objects.Add(resultA);
             //Rhino.RhinoDoc.ActiveDoc.Objects.Add(resultB);
-            var checkSelfA = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultA, 0);
+            var checkSelfA = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultA, 1);
             if (GroupA.Count>0)
                 return new Curve[] { resultA };
 
-            var checkSelfB = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultB, 0);
+            var checkSelfB = Rhino.Geometry.Intersect.Intersection.CurveSelf(resultB, 1);
             if (GroupB.Count > 0)
                 return new Curve[] { resultB };
             //tempRoadLine = GroupA.Count > GroupB.Count?new PolylineCurve(GroupA.Select(n=>tempRoadLine.PointAt(n))):new PolylineCurve(GroupB.Select(n => tempRoadLine.PointAt(n)));
@@ -3352,9 +3357,9 @@ namespace TuringAndCorbusier
                 offsetCoefficient = distanceLL;
 
             if(using1f)
-                return offsetCoefficient * (height - fakeHeight);
+                return offsetCoefficient * (height);
 
-            return offsetCoefficient * ((height - fakeHeight) - Consts.PilotiHeight);
+            return offsetCoefficient * ((height) - Consts.PilotiHeight);
         }
         //Property, 속성
 

@@ -1549,6 +1549,16 @@ namespace TuringAndCorbusier
 
             ProjectData pd = dm.LoadData(outname);
             Plot plot = pd.plot.ToPlot();
+
+            //draw boundary
+            //var sel = RhinoDoc.ActiveDoc.Objects.Add(plot.Boundary);
+            //RhinoDoc.ActiveDoc.Objects.Select(sel);
+            //RhinoApp.RunScript("Explode",false);
+            //RhinoApp.RunScript("Join", false);
+            //var objs = RhinoDoc.ActiveDoc.Objects.GetSelectedObjects(false, false);
+            //var crvs = objs.Select(n => n.Geometry).Where(n=>n is Curve).Select(n=> n as Curve).ToList();
+            //plot.Boundary = crvs[0];
+
             TuringAndCorbusierPlugIn.InstanceClass.plot = plot;
             Rhino.RhinoApp.WriteLine(pd.projectName + "로드됨");
 
@@ -1600,13 +1610,34 @@ namespace TuringAndCorbusier
             ProjectAddress.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.Address;
             ProjectArea.Text = Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea).ToString();
 
+            var norths = CommonFunc.LawLineDrawer.North(TuringAndCorbusierPlugIn.InstanceClass.plot, 7, false);
+
+            Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
+            att.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
+            att.ObjectColor = System.Drawing.Color.Red;
+            
+            foreach (var c in norths)
+            {
+                RhinoDoc.ActiveDoc.Objects.Add(c, att);
+            }
+
+            var near = CommonFunc.LawLineDrawer.NearPlot(TuringAndCorbusierPlugIn.InstanceClass.plot, 7, false);
+
+            Rhino.DocObjects.ObjectAttributes att2 = new Rhino.DocObjects.ObjectAttributes();
+            att2.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
+            att2.ObjectColor = System.Drawing.Color.Green;
+
+            foreach (var c in near)
+            {
+                RhinoDoc.ActiveDoc.Objects.Add(c, att2);
+            }
             //MainPanel_building2DPreview.CurveToDisplay = tempCurves;
             //MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLines(plot, 6, true);
             //MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLines(plot, 6, false);
             //MainPanel_LawPreview_Lighting.CurveToDisplay = new List<Curve>() { new Regulation(6).RoadCenterLines(plot) };//CommonFunc.LawbyLighting(plot,6);
             //MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLines(plot, 6);
-            
-           // string widthlog;
+
+            // string widthlog;
             //MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.ApartDistance(MainPanel_AGOutputList[tempIndex], out widthlog);
             //MainPanel_LawPreview_ApartDistance.dimension = widthlog;
             //MainPanel_LawPreview_ApartDistance.dimPoint = MainPanel_LawPreview_ApartDistance.CurveToDisplay[0].
