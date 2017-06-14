@@ -29,7 +29,9 @@ namespace Reports
         }
         public void SetUnitTypePlan(Reports.unitPlanTemplate planForCanvas1, Reports.unitPlanTemplate planForCanvas2)
         {
+
             unitPlanCanvasControl1.Content = planForCanvas1;
+
             unitPlanCanvasControl2.Content = planForCanvas2;
         }
 

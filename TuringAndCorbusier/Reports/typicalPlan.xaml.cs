@@ -896,18 +896,19 @@ namespace Reports
                 }
             }
 
-
-            //draw the core
-            //foreach (Curve detail in coreDetailList)
-            //{
-            //    PlanDrawingFunction_90degree.drawPlan(rectangleToFit, detail, scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.075);
-            //}
             //draw houseoutline with dashlines
+            List<Curve> validOutline = new List<Curve>();
             for(int i = (int)numOfHouseEachFloor[0]; i < numOfHouseEachFloor[0] + numOfHouseEachFloor[1]; i++)
             {
-                PlanDrawingFunction_90degree.drawDashedPlan(rectangleToFit, houseOutlineList[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray, 0.075);
-                
+                validOutline.Add(houseOutlineList[i]);
+
             }
+            List<Curve> validHouseOutline = Rhino.Geometry.Curve.CreateBooleanUnion(validOutline).ToList();
+            for(int i = 0; i < validHouseOutline.Count; i++)
+            {
+                PlanDrawingFunction_90degree.drawDashedPlan(rectangleToFit, validHouseOutline[i], scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.LightGray, 0.075);
+            }
+
 
             foreach (Curve parkingLine in parkinglineList)
             {

@@ -536,6 +536,17 @@ namespace Reports
             System.Windows.Media.FontFamily family = new System.Windows.Media.FontFamily("NanumSquareOTF");
             for (int i = 0; i < exclusiveArea.Count; i++)
             {
+                if (exclusiveArea.Count > 8)
+                {
+                    TextBlock textBlock1 = new TextBlock();
+                    textBlock1.Text = Math.Round(exclusiveArea[i] / 1000000, 0).ToString() + "m\xB2 외 "+(exclusiveArea.Count-1).ToString()+"세대";
+                    textBlock1.FontFamily = family;
+                    buildingCanvas.Children.Add(textBlock1);
+                    textBlock1.FontSize = size;
+                    Canvas.SetTop(textBlock1, previousTop);
+                    Canvas.SetLeft(textBlock1, previousLeft);
+                    break;
+                }
                 TextBlock textBlock = new TextBlock();
                 textBlock.Text = Math.Round(exclusiveArea[i] / 1000000, 0).ToString() + "m\xB2";
                 textBlock.FontFamily = family;

@@ -776,6 +776,11 @@ namespace TuringAndCorbusier
         //visible regulation
         public Curve[] topReg { get; set; }
 
+        public void UpdateStatistics()
+        {
+            this.HouseholdStatistics = getHouseholdStatistics(Household);
+        }
+
         //Constructor, 생성자
         public Apartment(string AGType, Plot plot, BuildingType buildingType, ParameterSet parameterSet, Target target, List<List<Core>> core, List<List<List<Household>>> household, ParkingLotOnEarth parkingOnEarth, ParkingLotUnderGround parkingUnderGround, List<List<Curve>> buildingOutline, List<Curve> aptLines)
         {
@@ -1095,7 +1100,7 @@ namespace TuringAndCorbusier
         {
             double aa = a.GetExclusiveArea();
             double bb = b.GetExclusiveArea();
-            if (Math.Round(aa) == Math.Round(bb))
+            if (Math.Round(aa,2) == Math.Round(bb,2))
                 return true;
             else
                 return false;
@@ -1987,6 +1992,8 @@ namespace TuringAndCorbusier
         private enum EdgeOrientation { Front, Side, Back, Undefined }
         private List<EdgeOrientation> edgeOrientations = new List<EdgeOrientation>();
         private List<int> edgeLightingIndex = new List<int>();
+
+       
 
         public Household(Point3d origin, Vector3d xDirection, Vector3d yDirection, double xLengthA, double xLengthB, double yLengthA, double yLengthB, int householdSizeType, double exclusiveArea, List<Line> lightingEdge, Point3d entrancePoint, List<double> wallFactor)
         {

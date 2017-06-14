@@ -438,7 +438,7 @@ namespace TuringAndCorbusier
                     aptOverFAR.Household.RemoveAt(aptOverFAR.Household.Count - 1);
                     aptOverFAR.Core.RemoveAt(aptOverFAR.Core.Count - 1);
                 }
-
+                aptOverFAR.UpdateStatistics();
                 return aptOverFAR;
             }
 
@@ -483,9 +483,10 @@ namespace TuringAndCorbusier
                     aptOverFAR.Household.RemoveAt(aptOverFAR.Household.Count - 1);
                     aptOverFAR.Core.RemoveAt(aptOverFAR.Core.Count - 1);
                 }
+                aptOverFAR.UpdateStatistics();
                 return aptOverFAR;
             }
-
+            aptOverFAR.UpdateStatistics();
             return aptOverFAR;
         }
     }

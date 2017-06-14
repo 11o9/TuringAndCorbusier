@@ -667,21 +667,29 @@ namespace TuringAndCorbusier
                 }
                 else
                 {
-                    for (int i = 0; i <= multipleUnitPlanList.Count; i += 2)
+                    for (int i = 0; i <= multipleUnitPlanList.Count; i +=2)
                     {
-                        if (i == multipleUnitPlanList.Count && multipleUnitPlanList.Count % 2 != 0)
+                        try
                         {
-                            Reports.xmlUnitReport unitReport1 = new Reports.xmlUnitReport();
-                            unitReport1.SetFirstUnitTypePlan(multipleUnitPlanList[i]);
-                            fps.Add(unitReport1.fixedPage);
-                            pagename.Add("newUnitReport" + (i + 1).ToString());
-                        }
-                        if (i <= multipleUnitPlanList.Count - 2)
+                        if (i<=multipleUnitPlanList.Count)
                         {
                             Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport();
                             unitReport.SetUnitTypePlan(multipleUnitPlanList[i], multipleUnitPlanList[i + 1]);
                             fps.Add(unitReport.fixedPage);
                             pagename.Add("newUnitReport" + (i + 1).ToString());
+                        }
+                        }catch(Exception ex)
+                        {
+                           // System.Windows.MessageBox.Show("여기서 오류");
+                           if(multipleUnitPlanList.Count-i > 0)
+                            {
+                            Reports.xmlUnitReport unitReport1 = new Reports.xmlUnitReport();
+                            unitReport1.SetFirstUnitTypePlan(multipleUnitPlanList[i]);
+                            fps.Add(unitReport1.fixedPage);
+                            pagename.Add("newUnitReport" + (i + 43564).ToString());
+
+                            }
+                            continue;
                         }
                     }
                 }
