@@ -43,7 +43,6 @@ namespace TuringAndCorbusier
             if (Contain(selected))
             {
                 selectedPilji.Remove(selected);
-
             }
             //포함되지않는것 - 추가
             else
@@ -69,7 +68,7 @@ namespace TuringAndCorbusier
             bool result = false;
             foreach (var p in selectedPilji)
             {
-                if (selected.Code == p.Code)
+                if (selected.Name == p.Name)
                 {
                     result = true;
                     break;

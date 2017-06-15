@@ -1610,27 +1610,30 @@ namespace TuringAndCorbusier
             ProjectAddress.Text = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.Address;
             ProjectArea.Text = Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotArea).ToString();
 
-            var norths = CommonFunc.LawLineDrawer.North(TuringAndCorbusierPlugIn.InstanceClass.plot, 7, false);
+            //법규선 테스트용
+            //var norths = CommonFunc.LawLineDrawer.North(TuringAndCorbusierPlugIn.InstanceClass.plot, 7, false);
 
-            Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
-            att.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
-            att.ObjectColor = System.Drawing.Color.Red;
+            //Rhino.DocObjects.ObjectAttributes att = new Rhino.DocObjects.ObjectAttributes();
+            //att.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
+            //att.ObjectColor = System.Drawing.Color.Red;
             
-            foreach (var c in norths)
-            {
-                RhinoDoc.ActiveDoc.Objects.Add(c, att);
-            }
+            //foreach (var c in norths)
+            //{
+            //    RhinoDoc.ActiveDoc.Objects.Add(c, att);
+            //}
 
-            var near = CommonFunc.LawLineDrawer.NearPlot(TuringAndCorbusierPlugIn.InstanceClass.plot, 7, false);
+            //var near = CommonFunc.LawLineDrawer.NearPlot(TuringAndCorbusierPlugIn.InstanceClass.plot, 7, false);
 
-            Rhino.DocObjects.ObjectAttributes att2 = new Rhino.DocObjects.ObjectAttributes();
-            att2.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
-            att2.ObjectColor = System.Drawing.Color.Green;
+            //Rhino.DocObjects.ObjectAttributes att2 = new Rhino.DocObjects.ObjectAttributes();
+            //att2.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
+            //att2.ObjectColor = System.Drawing.Color.Green;
 
-            foreach (var c in near)
-            {
-                RhinoDoc.ActiveDoc.Objects.Add(c, att2);
-            }
+            //foreach (var c in near)
+            //{
+            //    RhinoDoc.ActiveDoc.Objects.Add(c, att2);
+            //}
+
+
             //MainPanel_building2DPreview.CurveToDisplay = tempCurves;
             //MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLines(plot, 6, true);
             //MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLines(plot, 6, false);
