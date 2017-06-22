@@ -146,6 +146,13 @@ namespace TuringAndCorbusier
             RhinoWindowSetUp.SetUIForTC(Rhino.RhinoDoc.ActiveDoc);
             ///~6.3
             Rhino.RhinoApp.WriteLine("InitComplete");
+
+
+            SPWK_AutoUpdateClient.MainWindow updt = new SPWK_AutoUpdateClient.MainWindow();
+            updt.Topmost = true;
+            updt.Show();
+            updt.Run("SH");
+
         }
 
         public bool isAdministrator()
