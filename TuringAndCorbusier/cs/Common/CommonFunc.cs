@@ -3223,7 +3223,7 @@ namespace TuringAndCorbusier
                     p_BUILDING_TYPE_CD.ParameterName = "p_BUILDING_TYPE_CD";
 
                     p_BUILDING_SCALE.DbType = System.Data.DbType.String;
-                    p_BUILDING_SCALE.Value = GetBuildingScale(Math.Max((int)agOutput.ParameterSet.Parameters[0], (int)agOutput.ParameterSet.Parameters[1]), agOutput.ParkingLotUnderGround.Floors);
+                    p_BUILDING_SCALE.Value = GetBuildingScale(agOutput.Household.Count + ((agOutput.ParameterSet.using1F)?0:1), agOutput.ParkingLotUnderGround.Floors);
                     p_BUILDING_SCALE.ParameterName = "p_BUILDING_SCALE";
 
                     p_STRUCTURE.DbType = System.Data.DbType.String;
