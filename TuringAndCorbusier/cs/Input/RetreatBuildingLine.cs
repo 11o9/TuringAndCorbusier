@@ -58,24 +58,24 @@ namespace TuringAndCorbusier
             return buildingLines;
         }
 
-        public List<Line> NewBuildingLineConversion(List<Line> buildingLine)
-        {
-            List<Point3d> newBldLinePoints = new List<Point3d>();
-            for (int i = 0; i < buildingLine.Count; i++)
-            {
-                double a, b;
-                Line l1 = buildingLine[i];
-                Line l2 = buildingLine[(i + 1) % buildingLine.Count];
-                Rhino.Geometry.Intersect.Intersection.LineLine(l1, l2, out a, out b, 0, false);
-                newBldLinePoints.Add(l1.PointAt(a));
-            }
-            newBldLinePoints.Add(newBldLinePoints[0]);
+        //public List<Line> NewBuildingLineConversion(List<Line> buildingLine)
+        //{
+        //    List<Point3d> newBldLinePoints = new List<Point3d>();
+        //    for (int i = 0; i < buildingLine.Count; i++)
+        //    {
+        //        double a, b;
+        //        Line l1 = buildingLine[i];
+        //        Line l2 = buildingLine[(i + 1) % buildingLine.Count];
+        //        Rhino.Geometry.Intersect.Intersection.LineLine(l1, l2, out a, out b, 0, false);
+        //        newBldLinePoints.Add(l1.PointAt(a));
+        //    }
+        //    newBldLinePoints.Add(newBldLinePoints[0]);
 
-            Curve retreatedBldLine = new Polyline(newBldLinePoints).ToNurbsCurve();
-            Curve[] segments = retreatedBldLine.DuplicateSegments();
-            Gagak gagak = new Gagak();
-            List<Line> newBldLines = gagak.LineConversion(segments);
-            return newBldLines;
-        }
+        //    Curve retreatedBldLine = new Polyline(newBldLinePoints).ToNurbsCurve();
+        //    Curve[] segments = retreatedBldLine.DuplicateSegments();
+        //    Gagak gagak = new Gagak();
+        //    List<Line> newBldLines = gagak.LineConversion(segments);
+        //    return newBldLines;
+        //}
     }
 }

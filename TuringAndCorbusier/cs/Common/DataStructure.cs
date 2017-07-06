@@ -206,17 +206,7 @@ namespace TuringAndCorbusier
                 newPoints.Add(limitLines[i].PointAtStart);
             }
             newPoints.Add(limitLines[limitLines.Count - 1].PointAtEnd);
-            Curve newLand = new Polyline(newPoints).ToNurbsCurve();
 
-            Gagak gagak = new Gagak();
-            gagak.RefineEdge(newLand, roadWidth);
-
-            OriginalBoundary = boundary;
-            OriginalRoadwidths = surroundings.Select(n => (double)n).ToList();
-
-            boundary = gagak.finalLand;
-            surroundings = gagak.newRoadWidth.Select(n => (int)n).ToArray();
-            Adjusted = true;
         }
 
         public void AlignBoundary()
