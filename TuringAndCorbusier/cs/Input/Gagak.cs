@@ -100,11 +100,13 @@ namespace TuringAndCorbusier
         //도로모퉁이 거리 구하기
         public List<int> GetGagak(List<Gagak> parcel)
         {
+            var roadWidth = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
             List<int> cuttingLength = new List<int>();
             for (int i = 0; i < parcel.Count; i++)
             {
                 var segment1 = parcel[i];
                 var segment2 = parcel[(i + parcel.Count - 1) % parcel.Count];
+                var segment3 = parcel[(i + parcel.Count - 2) % parcel.Count];
 
                 //conditon1
                 int min = GetMin(segment1.roadWidth, segment2.roadWidth);
@@ -113,10 +115,14 @@ namespace TuringAndCorbusier
                     if (segment1.innerAngle >= 90 && segment1.innerAngle < 120)
                     {
                         cuttingLength.Add(2000);
+                        var widerRoad = segment1.roadWidth >= segment3.roadWidth ? segment1.roadWidth : segment3.roadWidth;
+                        roadWidth.Insert(i,widerRoad);
                     }
                     else if (segment1.innerAngle < 90)
                     {
                         cuttingLength.Add(3000);
+                        var widerRoad = segment1.roadWidth >= segment3.roadWidth ? segment1.roadWidth : segment3.roadWidth;
+                        roadWidth.Insert(i, widerRoad);
                     }
                 }
                 else if (min > 4000 && min < 8000)
@@ -124,10 +130,14 @@ namespace TuringAndCorbusier
                     if (segment1.innerAngle >= 90 && segment1.innerAngle < 120)
                     {
                         cuttingLength.Add(3000);
+                        var widerRoad = segment1.roadWidth >= segment3.roadWidth ? segment1.roadWidth : segment3.roadWidth;
+                        roadWidth.Insert(i, widerRoad);
                     }
                     else if (segment1.innerAngle < 90)
                     {
                         cuttingLength.Add(4000);
+                        var widerRoad = segment1.roadWidth >= segment3.roadWidth ? segment1.roadWidth : segment3.roadWidth;
+                        roadWidth.Insert(i, widerRoad);
                     }
                 }
 
@@ -146,17 +156,23 @@ namespace TuringAndCorbusier
                 if (parcel[i].roadWidth == 0)
                 {
                     cuttingLength[i] = 0;
+                    roadWidth.RemoveAt(i);
                     cuttingLength[(i + 1) % cuttingLength.Count] = 0;
+                    roadWidth.RemoveAt((i + 1) % cuttingLength.Count);
                 }
                 if (parcel[i].isConvex != true)
                 {
                     cuttingLength[i] = 0;
+                    roadWidth.RemoveAt(i);
                 }
                 if (parcel[i].roadLength < 2000)
                 {
                     cuttingLength[i] = 0;
+                    roadWidth.RemoveAt(i);
                     cuttingLength[(i + 1) % cuttingLength.Count] = 0;
+                    roadWidth.RemoveAt((i + 1) % cuttingLength.Count);
                     cuttingLength[(i + parcel.Count - 1) % parcel.Count] = 0;
+                    roadWidth.RemoveAt((i + parcel.Count - 1) % parcel.Count);
                 }
             }
             return cuttingLength;
