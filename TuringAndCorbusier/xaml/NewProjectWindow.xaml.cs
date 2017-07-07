@@ -82,7 +82,7 @@ namespace TuringAndCorbusier
             this.maxFloorAreaRatio.Text = "150";
             this.maxBuildingCoverage.Text = "60";
             this.maxFloors.Text = "4";
-            Rhino.RhinoApp.WriteLine(plotType2.ToString());
+           // Rhino.RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
         private void PlotType_2_Click(object sender, RoutedEventArgs e)
@@ -97,7 +97,7 @@ namespace TuringAndCorbusier
             this.maxFloorAreaRatio.Text = "200";
             this.maxBuildingCoverage.Text = "60";
             this.maxFloors.Text = "7";
-            RhinoApp.WriteLine(plotType2.ToString());
+          //  RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
         private void PlotType_3_Click(object sender, RoutedEventArgs e)
@@ -112,7 +112,7 @@ namespace TuringAndCorbusier
             this.maxFloorAreaRatio.Text = "250";
             this.maxBuildingCoverage.Text = "50";
             this.maxFloors.Text = "10";
-            RhinoApp.WriteLine(plotType2.ToString());
+          //  RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
         private void Commercial_Click(object sender, RoutedEventArgs e)
@@ -127,7 +127,7 @@ namespace TuringAndCorbusier
             this.maxFloorAreaRatio.Text = "1300";
             this.maxBuildingCoverage.Text = "80";
             this.maxFloors.Text = "30";
-            RhinoApp.WriteLine(plotType2.ToString());
+         //   RhinoApp.WriteLine(plotType2.ToString());
             SpecialCase.IsChecked = true;
         }
         private void EasterEgg_Click(object sender, RoutedEventArgs e)
@@ -580,7 +580,7 @@ namespace TuringAndCorbusier
             UIManager.getInstance().HideWindow(this, UIManager.WindowType.Basic);
         }
 
-        private void Btn_GetGagak_Click(object sender, RoutedEventArgs e)
+        private void Btn_TrimCorner_Click(object sender, RoutedEventArgs e)
         {
 
             if (TuringAndCorbusierPlugIn.InstanceClass.plot == null)
@@ -620,41 +620,12 @@ namespace TuringAndCorbusier
                 gagakList.Add(tempGagak);
             }
 
-            for(int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].order.ToString()+" | ");
 
-            }
-                RhinoApp.WriteLine();
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].roadWidth.ToString() + " | ");
-            }
-                RhinoApp.WriteLine();
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].roadLength.ToString() + " | ");
-            }
-                RhinoApp.WriteLine();
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].isConvex.ToString() + " | ");
-            }
-                RhinoApp.WriteLine();
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].innerAngle.ToString() + " | ");
-            }
-                RhinoApp.WriteLine();
             Gagak gagak = new Gagak();
             Curve originalBoundary = boundary;
 
             List<int> cuttingLength = gagak.GetGagak(gagakList);
-            for(int i = 0; i < cuttingLength.Count; i++)
-            {
-                RhinoApp.Write(cuttingLength[i].ToString());
-            }
-            RhinoApp.WriteLine();
+
             bool isCuttable = true;
             int sum = 0;
             for (int i = 0; i < cuttingLength.Count; i++)
@@ -667,25 +638,103 @@ namespace TuringAndCorbusier
             }
             if (isCuttable)
             {
-                originalBoundary = df.Simplification(boundaryList.ToArray(), 1000, roadWidth);
+             originalBoundary = df.Simplification(boundary,1000,roadWidth);
+            }
+            List<Gagak> newGagakList = new List<Gagak>();
+
+            List<bool> newIsConvex = new List<bool>();
+            List<double> newInnerAngle = df.GetBoundaryInnerAngle(ref originalBoundary, out newIsConvex);
+            List<int> newRoadWidth = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
+            List<Curve> newBoundaryList = originalBoundary.DuplicateSegments().ToList();
+
+            for (int i = 0; i < newBoundaryList.Count; i++)
+            {
+                Gagak tempGagak = new Gagak();
+                tempGagak.innerAngle = newInnerAngle[i];
+                tempGagak.isConvex = newIsConvex[i];
+                tempGagak.order = i;
+                tempGagak.roadLength = new Line(newBoundaryList[i].PointAtStart, newBoundaryList[i].PointAtEnd).Length;
+                tempGagak.roadWidth = newRoadWidth[i];
+                tempGagak.segment = newBoundaryList[i];
+                newGagakList.Add(tempGagak);
+            }
+            List<int> newCuttingLength = new List<int>();
+            newCuttingLength = gagak.GetGagak(newGagakList);
+
+            for(int i = 0; i < newGagakList.Count; i++)
+            {
+                RhinoApp.Write(newGagakList[i].order.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for (int i = 0; i < newGagakList.Count; i++)
+            {
+                RhinoApp.Write(newGagakList[i].roadWidth.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for (int i = 0; i < newGagakList.Count; i++)
+            {
+                RhinoApp.Write(newGagakList[i].roadLength.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for (int i = 0; i < newGagakList.Count; i++)
+            {
+                RhinoApp.Write(newGagakList[i].isConvex.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for (int i = 0; i < newGagakList.Count; i++)
+            {
+                RhinoApp.Write(newGagakList[i].innerAngle.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for(int i = 0; i < newCuttingLength.Count; i++)
+            {
+                RhinoApp.Write(newCuttingLength[i].ToString()+" | ");
             }
 
-            TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary = originalBoundary;
 
 
-            List<Point3d> validPoints = gagak.CutBoundary(cuttingLength, gagakList);
+            List<Point3d> validPoints = gagak.CutBoundary(newCuttingLength, originalBoundary);
 
             List<Point3d> finalPoints = gagak.ReOrderPointList(originalBoundary, validPoints);
 
             Curve finalBoundary = new Polyline(finalPoints).ToNurbsCurve();
 
 
+
             TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary = finalBoundary.DuplicateCurve();
             gagak.DrawSimplifiedBoundary();
+            gagak.SortRoadWidth(newCuttingLength, newGagakList);
 
+
+
+
+            //for(int i = 0; i < cuttingLength.Count; i++)
+            //{
+            //    RhinoApp.Write(cuttingLength[i].ToString());
+            //}
+            //RhinoApp.WriteLine();
+            //bool isCuttable = true;
+            //int sum = 0;
+            //for (int i = 0; i < cuttingLength.Count; i++)
+            //{
+            //    sum = cuttingLength[i];
+            //}
+            //if (sum == 0)
+            //{
+            //    isCuttable = false;
+            //}
+            //if (isCuttable)
+            //{
+            //    originalBoundary = df.Simplification(boundaryList.ToArray(), 1000, roadWidth);
+            //}
+
+
+
+    
+          //  gagak.SortRoadWidth(cuttingLength,gagakList);
         }
 
-        private void Btn_SetWidth_Click(object sender, RoutedEventArgs e)
+        private void Btn_SetRoadWidth_Click(object sender, RoutedEventArgs e)
         {
 
             ButtonStateCheck(ButtonState.GetWidth);
@@ -763,60 +812,6 @@ namespace TuringAndCorbusier
 
             Curve[] boundarysegs = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.boundary.DuplicateSegments();
 
-     
-            /////대지경계선후퇴적용
-            //for (int i = 0; i < Corbusier.RoadWidth.Count; i++)
-            //{
-
-            //    if (Corbusier.RoadWidth[i] < 4 && Corbusier.RoadWidth[i] >= 0)
-            //    {
-
-            //        Vector3d curvev = boundarysegs[i].PointAtEnd - boundarysegs[i].PointAtStart;
-            //        curvev.Rotate(RhinoMath.ToRadians(-90), Vector3d.ZAxis);
-            //        curvev.Unitize();
-
-            //        boundarysegs[i].Translate(curvev * ((Corbusier.RoadWidth[i] - 4) * 500));
-            //        boundarysegs[i].Extend(CurveEnd.Both, 1000, CurveExtensionStyle.Line);
-
-            //        LoadManager.getInstance().DrawObjectWithSpecificLayer(boundarysegs[i], LoadManager.NamedLayer.Guide);
-
-
-            //    }       
-            //}
-
-            //for (int i = 0; i < boundarysegs.Length; i++)
-            //{
-            //    int i2 = (i + 1) % boundarysegs.Length;
-            //    var intersection = Rhino.Geometry.Intersect.Intersection.CurveCurve(boundarysegs[i], boundarysegs[i2], 0, 0);
-            //    foreach (var x in intersection)
-            //    {
-            //        if (x.ParameterA != 1)
-            //            boundarysegs[i] = boundarysegs[i].Split(x.ParameterA)[0];
-
-            //        if (x.ParameterB != 1)
-            //            boundarysegs[i2] = boundarysegs[i2].Split(x.ParameterB)[1];
-            //    }
-
-            //}
-
-
-            //List<Curve> tojoin = new List<Curve>();
-
-            //for (int i = 0; i < boundarysegs.Length; i++)
-            //{
-
-
-            //}
-
-            //Curve[] joined = Curve.JoinCurves(boundarysegs);
-
-           
-
-            //TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.setbackBoundary = joined[0];
-            //대지경계선후퇴 끝
-            //kdginfoset 의 setbackBoundary에 저장.
-            
-            //LoadManager.getInstance().DrawObjectWithSpecificLayer(TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.setbackBoundary, LoadManager.NamedLayer.Model);
 
             Corbusier.conduitLineDisplay.Enabled = false;
             TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings = Corbusier.conduitLines.Select(n => n.RoadWidth * 1000).ToArray();      //    .RoadWidth.Select(n=>n*1000).ToArray();
@@ -853,9 +848,9 @@ namespace TuringAndCorbusier
         
 
 
-        private void Btn_GetPlot_Copy1_Click(object sender, RoutedEventArgs e)
+        private void Btn_InsertNewBuildingLine_Click(object sender, RoutedEventArgs e)
         {
-            Btn_GetPlot_Copy1.Click -= Btn_GetPlot_Copy1_Click;
+            Btn_InsertNewBuildingLine.Click -= Btn_InsertNewBuildingLine_Click;
             //var gcc = new GetObject();
             //gcc.SetCommandPrompt("select closed curve");
             //gcc.GeometryFilter = Rhino.DocObjects.ObjectType.Curve;
@@ -888,7 +883,7 @@ namespace TuringAndCorbusier
             else
             {
                 Show();
-                Btn_GetPlot_Copy1.Click += Btn_GetPlot_Copy1_Click;
+                Btn_InsertNewBuildingLine.Click += Btn_InsertNewBuildingLine_Click;
                 return;
             }
 
@@ -1056,7 +1051,7 @@ namespace TuringAndCorbusier
             }
         }
 
-        private void Btn_GetSlope_Copy_Click(object sender, RoutedEventArgs e)
+        private void Btn_SetSlope_Click(object sender, RoutedEventArgs e)
         {
             ButtonStateCheck(ButtonState.GetHeight);
 

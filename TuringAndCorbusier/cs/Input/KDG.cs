@@ -49,7 +49,7 @@ namespace TuringAndCorbusier
 
             //split surface
 
-
+            //drawing(주변건물 그리는지 안그리는지 bool)
             if (drawing)
             {
                 var objectsToHide = Rhino.RhinoDoc.ActiveDoc.Objects.FindByObjectType(Rhino.DocObjects.ObjectType.AnyObject);
@@ -207,13 +207,13 @@ namespace TuringAndCorbusier
         /// <param name="c"></param>
         /// <returns></returns>
 
-        public PolylineCurve OutRect(Curve c)
+        public PolylineCurve OutRect(Curve c)//c = boundary
         {
 
 
 
-            Point3d Center = CenterPoint(c);
-            center = Center;
+            Point3d Center = CenterPoint(c); // 중심점 구하기
+            center = Center; 
             //Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(Center);
 
             double MX = 0;
