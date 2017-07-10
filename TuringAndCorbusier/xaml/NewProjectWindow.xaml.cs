@@ -621,10 +621,44 @@ namespace TuringAndCorbusier
             }
 
 
+            for (int i = 0; i < gagakList.Count; i++)
+            {
+                RhinoApp.Write(gagakList[i].order.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for (int i = 0; i < gagakList.Count; i++)
+            {
+                RhinoApp.Write(gagakList[i].roadWidth.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for (int i = 0; i < gagakList.Count; i++)
+            {
+                RhinoApp.Write(gagakList[i].roadLength.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for (int i = 0; i < gagakList.Count; i++)
+            {
+                RhinoApp.Write(gagakList[i].isConvex.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+            for (int i = 0; i < gagakList.Count; i++)
+            {
+                RhinoApp.Write(gagakList[i].innerAngle.ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
+
+
+
             Gagak gagak = new Gagak();
             Curve originalBoundary = boundary;
 
             List<int> cuttingLength = gagak.GetGagak(gagakList);
+
+            for (int i = 0; i < cuttingLength.Count; i++)
+            {
+                RhinoApp.Write(cuttingLength[i].ToString() + " | ");
+            }
+            RhinoApp.WriteLine();
 
             bool isCuttable = true;
             int sum = 0;
@@ -708,7 +742,7 @@ namespace TuringAndCorbusier
 
 
 
-            //for(int i = 0; i < cuttingLength.Count; i++)
+            //for(int i = 0; i < cuttingLength.Count; i++) 
             //{
             //    RhinoApp.Write(cuttingLength[i].ToString());
             //}

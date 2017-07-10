@@ -28,23 +28,31 @@ namespace TuringAndCorbusier
             var guid = LoadManager.getInstance().DrawObjectWithSpecificLayer(test, LoadManager.NamedLayer.Guide);
             RhinoDoc.ActiveDoc.Objects.Select(guid);
             RhinoDoc.ActiveDoc.Objects.Delete(this.previousBoundary,true);
-
+            RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
 
-        public void SortRoadWidth(List<int> cuttingLength,List<Gagak> gagakList)
+        public void SortRoadWidth(List<int> cuttingLength, List<Gagak> gagakList)
         {
             var roadWidth = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
-            
-            for (int i = 0; i < cuttingLength.Count; i++)
+            try
             {
-                var gagak1 = gagakList[i].roadWidth;
-                var gagak2 = gagakList[(i + gagakList.Count - 2) % gagakList.Count].roadWidth;
-                if (cuttingLength[i] != 0)
+                for (int i = 0; i < cuttingLength.Count; i++)
                 {
-                    var widerRoad = gagak1 >= gagak2 ? gagak1 : gagak2;
-                    roadWidth.Insert(i, widerRoad);
+                    var gagak1 = gagakList[i].roadWidth;
+                    var gagak2 = gagakList[(i + gagakList.Count - 2) % gagakList.Count].roadWidth;
+
+                    if (cuttingLength[i] != 0)
+                    {
+                        var widerRoad = gagak1 >= gagak2 ? gagak1 : gagak2;
+                        roadWidth.Insert(i, widerRoad);
+                    }
                 }
+
+            }
+            catch(Exception e)
+            {
+                RhinoApp.WriteLine(e.ToString());
             }
             TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings = roadWidth.ToArray();
             TuringAndCorbusierPlugIn.InstanceClass.plot.UpdateSimplifiedSurroundings();
@@ -94,12 +102,12 @@ namespace TuringAndCorbusier
                 parameter.Add(param);
             }
             parameter.Sort();
-            for (int i = 0; i < parameter.Count; i++)
-            {
+            //for (int i = 0; i < parameter.Count; i++)
+            //{
 
-                RhinoApp.WriteLine(parameter[i].ToString());
+            //    RhinoApp.WriteLine(parameter[i].ToString());
 
-            }
+            //}
             List<Point3d> finalPoints = new List<Point3d>();
             for (int i = 0; i < parameter.Count; i++)
             {
@@ -114,6 +122,10 @@ namespace TuringAndCorbusier
                 }
             }
             finalPoints.Add(finalPoints[0]);
+            for(int i = 0; i < finalPoints.Count; i++)
+            {
+                RhinoApp.WriteLine("finalPoints : "+i.ToString()+" : "+finalPoints[i].ToString());
+            }
             return finalPoints;
         }
 
@@ -129,11 +141,11 @@ namespace TuringAndCorbusier
 
                 //conditon1
                 int min = GetMin(segment1.roadWidth, segment2.roadWidth);
-                if (min <= 4000)
+                if (min == 4000)
                 {
-                    if (segment1.innerAngle >= 90 && segment1.innerAngle < 120)
+                    if (segment1.innerAngle >= 90)
                     {
-                        cuttingLength.Add(2000);;
+                        cuttingLength.Add(2000);
                     }
                     else if (segment1.innerAngle < 90)
                     {
@@ -142,7 +154,7 @@ namespace TuringAndCorbusier
                 }
                 else if (min > 4000 && min < 8000)
                 {
-                    if (segment1.innerAngle >= 90 && segment1.innerAngle < 120)
+                    if (segment1.innerAngle >= 90)
                     {
                         cuttingLength.Add(3000);
                     }
@@ -156,10 +168,7 @@ namespace TuringAndCorbusier
                 {
                     cuttingLength.Add(0);
                 }
-                if (segment1.innerAngle >= 120)
-                {
-                    cuttingLength.Add(0);
-                }
+
             }
 
             for (int i = 0; i < parcel.Count; i++)
@@ -176,15 +185,19 @@ namespace TuringAndCorbusier
                     cuttingLength[i] = 0;
        
                 }
-                //if (parcel[i].roadLength < 7000)
-                //{
-                //    cuttingLength[i] = 0;
- 
-                //    cuttingLength[(i + 1) % cuttingLength.Count] = 0;
+                if (parcel[i].roadLength < 7000)
+                {
+                    cuttingLength[i] = 0;
 
-                //    cuttingLength[(i + cuttingLength.Count - 1) % cuttingLength.Count] = 0;
-    
-                //}
+                    cuttingLength[(i + 1) % cuttingLength.Count] = 0;
+
+                    //cuttingLength[(i + cuttingLength.Count - 1) % cuttingLength.Count] = 0;
+
+                }
+                if (parcel[i].innerAngle >= 120)
+                {
+                    cuttingLength[i] = 0;
+                }
             }
             return cuttingLength;
         }
