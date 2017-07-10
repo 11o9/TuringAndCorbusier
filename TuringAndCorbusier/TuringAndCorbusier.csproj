@@ -54,12 +54,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoUpdateModule">
-      <HintPath>..\..\BuildingAutomation\AutoUpdateModule\AutoUpdateModule\bin\Debug\AutoUpdateModule.dll</HintPath>
-    </Reference>
-    <Reference Include="Grasshopper">
-      <HintPath>..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
     <Reference Include="Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL" />
     <Reference Include="PdfSharp-WPF">
       <HintPath>..\..\..\PdfSharpXpsBin\PdfSharp-WPF.dll</HintPath>
@@ -94,6 +89,15 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoUpdateModule\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AutoUpdateModule\UpdateListDataSet1.Designer.cs">
+      <DependentUpon>UpdateListDataSet.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="AutoUpdateModule\Updater.cs" />
     <Compile Include="cs\Common\DataManager.cs" />
     <Compile Include="cs\NotUsed\Egg.cs" />
     <Compile Include="cs\NotUsed\FinalizeApartmentGeneratorOutput.cs" />
@@ -111,6 +115,14 @@
     <Compile Include="cs\NotUsed\CalculateScore.cs" />
     <Compile Include="cs\Apart\UnitDistributor.cs" />
     <Compile Include="cs\Parkings\EddieBrock.cs" />
+    <Compile Include="GISData\GisDataStruct.cs" />
+    <Compile Include="GISData\PiljiDrawer.cs" />
+    <Compile Include="GISData\PiljiScrapper.cs" />
+    <Compile Include="GISData\PlotPreviewer.cs" />
+    <Compile Include="GISData\QueryBuilder.cs" />
+    <Compile Include="GISData\ServerConnection.cs" />
+    <Compile Include="GISData\SiteCounter.cs" />
+    <Compile Include="GISData\SiteParser.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -163,6 +175,7 @@
     <Compile Include="Utility\RectangleTools.cs" />
     <Compile Include="Utility\VectorSet.cs" />
     <Compile Include="Utility\VectorTools.cs" />
+    <Compile Include="Utility\XamlTools.cs" />
     <Compile Include="xaml\Corbusier.xaml.cs">
       <DependentUpon>Corbusier.xaml</DependentUpon>
     </Compile>
@@ -230,6 +243,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="AutoUpdateModule\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Reports\birdeye.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -338,6 +355,17 @@
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
+    <None Include="AutoUpdateModule\UpdateListDataSet.xsc">
+      <DependentUpon>UpdateListDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="AutoUpdateModule\UpdateListDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>UpdateListDataSet1.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="AutoUpdateModule\UpdateListDataSet.xss">
+      <DependentUpon>UpdateListDataSet.xsd</DependentUpon>
+    </None>
     <None Include="Resources\Icon1.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -390,6 +418,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="xaml\ViewModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shVersion.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -138,7 +138,15 @@ namespace TuringAndCorbusier
 
             Rhino.RhinoApp.Wait();
 
-            LoadManager.getInstance().importFileWithAdress();
+
+            string message = string.Format("{0} 대지의 캐드파일을 불러오시겠습니까?", InstanceClass.turing.ProjectAddress.Text);
+            var result = System.Windows.MessageBox.Show(message, "CAD 파일 불러오기", System.Windows.MessageBoxButton.YesNo);
+
+            if(result == System.Windows.MessageBoxResult.Yes)
+              LoadManager.getInstance().importFileWithAdress();
+
+
+
             LoadManager.getInstance().LayerSetting();
 
 
@@ -147,11 +155,17 @@ namespace TuringAndCorbusier
             ///~6.3
             Rhino.RhinoApp.WriteLine("InitComplete");
 
-
-            SPWK_AutoUpdateClient.MainWindow updt = new SPWK_AutoUpdateClient.MainWindow();
-            updt.Topmost = true;
-            updt.Show();
-            updt.Run("SH");
+            try
+            {
+                SPWK_AutoUpdateClient.MainWindow updt = new SPWK_AutoUpdateClient.MainWindow();
+                updt.Topmost = true;
+                updt.Show();
+                updt.Run("SH");
+            }
+            catch (Exception e)
+            {
+                RhinoApp.WriteLine(e.Message);
+            }
 
         }
 
