@@ -31,6 +31,32 @@ namespace TuringAndCorbusier
             RhinoDoc.ActiveDoc.Views.Redraw();
         }
 
+        public void SortSimplifiedRoadWidth(Curve simplifiedBoundary,Curve originalBoundary,List<Gagak> gagakList)
+        {
+            var roadWidth = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
+            List<Curve> simplifiedBoundarySegments = simplifiedBoundary.DuplicateSegments().ToList();
+            List<Curve> originalBoundarySegments = originalBoundary.DuplicateSegments().ToList();
+
+            List<int> simplifiedIndex = new List<int>();
+            List<int> newlyAddIndex = new List<int>();
+            try
+            {
+                for (int i = 0; i < originalBoundarySegments.Count; i++)
+                {
+                    Point3d originalStartPoint = originalBoundarySegments[i].PointAtStart;
+                    Point3d originalEndPoint = originalBoundarySegments[i].PointAtEnd;
+                    Point3d simplifiedStartPoint = simplifiedBoundarySegments[i].PointAtStart;
+                    Point3d simplifiedEndPoint = simplifiedBoundarySegments[i].PointAtEnd;
+                    if(originalStartPoint!=simplifiedStartPoint)
+                }
+
+            }
+            catch (Exception e)
+            {
+                RhinoApp.WriteLine(e.ToString());
+            }
+
+        }
 
         public void SortRoadWidth(List<int> cuttingLength, List<Gagak> gagakList)
         {
