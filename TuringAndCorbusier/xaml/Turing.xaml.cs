@@ -62,6 +62,8 @@ namespace TuringAndCorbusier
 
             Calculate.Click += Btn_SetInputValues;
 
+            gis.Content = new ServerUI();
+
 
             try
             {

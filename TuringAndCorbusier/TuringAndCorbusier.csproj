@@ -121,6 +121,9 @@
     <Compile Include="GISData\PlotPreviewer.cs" />
     <Compile Include="GISData\QueryBuilder.cs" />
     <Compile Include="GISData\ServerConnection.cs" />
+    <Compile Include="GISData\ServerUI.xaml.cs">
+      <DependentUpon>ServerUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GISData\SiteCounter.cs" />
     <Compile Include="GISData\SiteParser.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -244,6 +247,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="AutoUpdateModule\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="GISData\ServerUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
