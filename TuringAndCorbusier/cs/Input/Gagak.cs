@@ -35,27 +35,52 @@ namespace TuringAndCorbusier
         public void SortRoadWidth(List<int> cuttingLength, List<Gagak> gagakList)
         {
             var roadWidth = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
-            try
-            {
-                for (int i = 0; i < cuttingLength.Count; i++)
+            Dictionary<int, int> additionalRoadWidth = new Dictionary<int, int>();
+            List<int> finalRoadWidth = new List<int>();
+
+
+                for (int i = 0; i < gagakList.Count; i++)
                 {
                     var gagak1 = gagakList[i].roadWidth;
-                    var gagak2 = gagakList[(i + gagakList.Count - 2) % gagakList.Count].roadWidth;
+                    var gagak2 = gagakList[(i + gagakList.Count - 1) % gagakList.Count].roadWidth;
 
                     if (cuttingLength[i] != 0)
                     {
                         var widerRoad = gagak1 >= gagak2 ? gagak1 : gagak2;
-                        roadWidth.Insert(i, widerRoad);
+                        additionalRoadWidth.Add(i, widerRoad);
                     }
+                }
+            try
+            {
+                for (int i = 0; i < roadWidth.Count; i++)
+                {
+                    if (additionalRoadWidth.ContainsKey(i))
+                    {
+                        finalRoadWidth.Add(additionalRoadWidth[i]);
+                    }
+                    finalRoadWidth.Add(roadWidth[i]);
                 }
 
             }
-            catch(Exception e)
-            {
+            catch (Exception e) {
                 RhinoApp.WriteLine(e.ToString());
             }
-            TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings = roadWidth.ToArray();
-            TuringAndCorbusierPlugIn.InstanceClass.plot.UpdateSimplifiedSurroundings();
+            List<int> sortedRoadWidth = new List<int>();
+            if (additionalRoadWidth.ContainsKey(0))
+            {
+                for (int i = 0; i < finalRoadWidth.Count; i++)
+                {
+                    sortedRoadWidth.Add(finalRoadWidth[(i + 1) % finalRoadWidth.Count]);
+                }
+
+            }
+            else
+            {
+                sortedRoadWidth = finalRoadWidth;
+            }
+            TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings = sortedRoadWidth.ToArray();
+                TuringAndCorbusierPlugIn.InstanceClass.plot.UpdateSimplifiedSurroundings();
+
         }
 
         //도로 모퉁이 건축선
@@ -141,38 +166,48 @@ namespace TuringAndCorbusier
 
                 //conditon1
                 int min = GetMin(segment1.roadWidth, segment2.roadWidth);
-                if (min == 4000)
+                if (min <= 4999)
                 {
                     if (segment1.innerAngle >= 90)
                     {
-                        cuttingLength.Add(2000);
+                       cuttingLength.Add(2000);
+                       // cuttingLength.Add(1111);
                     }
                     else if (segment1.innerAngle < 90)
                     {
-                        cuttingLength.Add(3000);
+                       cuttingLength.Add(3000);
+                       // cuttingLength.Add(2222);
                     }
                 }
-                else if (min > 4000 && min < 8000)
+                else if (min > 4999 && min < 8000)
                 {
                     if (segment1.innerAngle >= 90)
                     {
                         cuttingLength.Add(3000);
+                       // cuttingLength.Add(3333);
                     }
                     else if (segment1.innerAngle < 90)
                     {
-                        cuttingLength.Add(4000);
+                       cuttingLength.Add(4000);
+                       // cuttingLength.Add(4444);
                     }
                 }
 
-                if (segment1.roadWidth >= 8000 || segment2.roadWidth >= 8000)
+                if (min >= 8000)
                 {
-                    cuttingLength.Add(0);
+                   cuttingLength.Add(0);
+                  //  cuttingLength.Add(5555);
                 }
 
             }
 
             for (int i = 0; i < parcel.Count; i++)
             {
+                if (parcel[i].roadWidth >= 8000)
+                {
+                    cuttingLength[i] = 0;
+                    cuttingLength[(i + 1) % cuttingLength.Count] = 0;
+                }
                 if (parcel[i].roadWidth == 0)
                 {
                     cuttingLength[i] = 0;
@@ -205,6 +240,10 @@ namespace TuringAndCorbusier
         //2개의 도로중 더 짧은 도로 찾기
         public int GetMin(int roadWidth1, int roadWidth2)
         {
+            if (roadWidth1 >= 8000 || roadWidth2 >= 8000)
+            {
+                return roadWidth1 >= roadWidth2 ? roadWidth1 : roadWidth2;
+            }
             if (roadWidth1 > roadWidth2)
             {
                 return roadWidth2;

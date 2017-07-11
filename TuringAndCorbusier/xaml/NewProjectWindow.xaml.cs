@@ -7,6 +7,7 @@ using Rhino.Input.Custom;
 using TuringAndCorbusier;
 using TuringAndCorbusier.Utility;
 using Rhino;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -621,50 +622,26 @@ namespace TuringAndCorbusier
             }
 
 
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].order.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].roadWidth.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].roadLength.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].isConvex.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for (int i = 0; i < gagakList.Count; i++)
-            {
-                RhinoApp.Write(gagakList[i].innerAngle.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-
-
-
             Gagak gagak = new Gagak();
             Curve originalBoundary = boundary;
 
-            List<int> cuttingLength = gagak.GetGagak(gagakList);
+            List<int> cuttingLength = new List<int>();
 
-            for (int i = 0; i < cuttingLength.Count; i++)
+            try
             {
-                RhinoApp.Write(cuttingLength[i].ToString() + " | ");
+            cuttingLength = gagak.GetGagak(gagakList);
+
+            }catch(Exception exe)
+            {
+                RhinoApp.WriteLine(exe.ToString());
             }
-            RhinoApp.WriteLine();
+
 
             bool isCuttable = true;
             int sum = 0;
             for (int i = 0; i < cuttingLength.Count; i++)
             {
-                sum = cuttingLength[i];
+                sum += cuttingLength[i];
             }
             if (sum == 0)
             {
@@ -672,7 +649,8 @@ namespace TuringAndCorbusier
             }
             if (isCuttable)
             {
-             originalBoundary = df.Simplification(boundary,1000,roadWidth);
+             originalBoundary = df.Simplification(boundary,500);
+   
             }
             List<Gagak> newGagakList = new List<Gagak>();
 
@@ -693,39 +671,20 @@ namespace TuringAndCorbusier
                 newGagakList.Add(tempGagak);
             }
             List<int> newCuttingLength = new List<int>();
+            try{
+
             newCuttingLength = gagak.GetGagak(newGagakList);
 
-            for(int i = 0; i < newGagakList.Count; i++)
+            }catch(Exception ex)
             {
-                RhinoApp.Write(newGagakList[i].order.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for (int i = 0; i < newGagakList.Count; i++)
-            {
-                RhinoApp.Write(newGagakList[i].roadWidth.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for (int i = 0; i < newGagakList.Count; i++)
-            {
-                RhinoApp.Write(newGagakList[i].roadLength.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for (int i = 0; i < newGagakList.Count; i++)
-            {
-                RhinoApp.Write(newGagakList[i].isConvex.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for (int i = 0; i < newGagakList.Count; i++)
-            {
-                RhinoApp.Write(newGagakList[i].innerAngle.ToString() + " | ");
-            }
-            RhinoApp.WriteLine();
-            for(int i = 0; i < newCuttingLength.Count; i++)
-            {
-                RhinoApp.Write(newCuttingLength[i].ToString()+" | ");
+                RhinoApp.WriteLine(ex.ToString());
             }
 
 
+            if (isCuttable)
+            {
+            gagak.SortRoadWidth(newCuttingLength, newGagakList);
+            }
 
             List<Point3d> validPoints = gagak.CutBoundary(newCuttingLength, originalBoundary);
 
@@ -734,10 +693,9 @@ namespace TuringAndCorbusier
             Curve finalBoundary = new Polyline(finalPoints).ToNurbsCurve();
 
 
-
+            var testingForNewRoadWidthOrder = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
             TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary = finalBoundary.DuplicateCurve();
             gagak.DrawSimplifiedBoundary();
-            gagak.SortRoadWidth(newCuttingLength, newGagakList);
 
 
 
