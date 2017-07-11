@@ -1053,9 +1053,13 @@ namespace TuringAndCorbusier
 
         }
 
-      
+        private void Btn_SelectPlot_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
+    
 
     /// <summary>
     /// 경사 입력에 사용되는 점 클래스
