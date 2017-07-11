@@ -1,0 +1,45 @@
+﻿<Window x:Class="SPWK_AutoUpdateClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SPWK_AutoUpdateClient"
+        mc:Ignorable="d"
+        Title="Auto Updater" Height="350" Width="525">
+
+
+    <Grid x:Name="grid" Background="Black">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image x:Name="background" Grid.RowSpan="5" Grid.ColumnSpan="5" Stretch="Fill" />
+        <TextBlock x:Name="localVersion" FontSize="8" TextAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="4" Foreground="White" VerticalAlignment="Center" Margin="0,21,0,32">설치된 버전</TextBlock>
+        <TextBlock x:Name="remoteVersion" FontSize="8" TextAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="4" Foreground="White" VerticalAlignment="Center" Margin="0,33,0,21">최신 버전</TextBlock>
+        <TextBlock FontSize="8" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="White" Margin="0,21,0,32" >설치된 버전</TextBlock>
+        <TextBlock FontSize="8" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="White" Margin="0,33,0,21" >최신 버전</TextBlock>
+        <ProgressBar x:Name="pb" Grid.Row="3" Grid.ColumnSpan="5" Margin="5,58,5,0" Background="{x:Null}" Foreground="#FF0CC500">
+            <ProgressBar.BorderBrush>
+                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="#FFB2B2B2" Offset="0"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </LinearGradientBrush>
+            </ProgressBar.BorderBrush>
+        </ProgressBar>
+        <TextBlock x:Name="fileName" Grid.Row="4" Grid.ColumnSpan="5" VerticalAlignment="Top" TextAlignment="Left" Margin="10,5,-10,0" Foreground="White" FontSize="8">파일 이름</TextBlock>
+        <TextBlock x:Name="progress" Grid.Row="4" Grid.ColumnSpan="5" VerticalAlignment="Bottom" TextAlignment="Left" Margin="10,0,-10,35" Foreground="White" FontSize="8">진행 / 완료  ( x of n )</TextBlock>
+
+
+    </Grid>
+</Window>

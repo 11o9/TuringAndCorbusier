@@ -598,14 +598,16 @@ namespace TuringAndCorbusier
 
         public static string GetApartmentType(Apartment agOutput)
         {
-            if (agOutput.AGtype == "PT-1")
-                return "판상형";
-            else if (agOutput.AGtype == "PT-3")
-                return "중정형";
-            else if (agOutput.AGtype == "PT-4")
-                return "ㄷ자형";
-            else
-                return "null";
+            //if (agOutput.AGtype == "PT-1")
+            //    return "판상형";
+            //else if (agOutput.AGtype == "PT-3")
+            //    return "중정형";
+            //else if (agOutput.AGtype == "PT-4")
+            //    return "ㄷ자형";
+            //else
+            //    return "null";
+
+            return GetApartmentType(agOutput.AGtype);
         }
 
         public static string GetApartmentType(string PatternName)
@@ -3157,6 +3159,11 @@ namespace TuringAndCorbusier
                 return "지상 " + maxStories.ToString() + "층";
         }
 
+        public static int MaxFloor(Apartment agOutput)
+        {
+            return agOutput.Household.Count + ((agOutput.ParameterSet.using1F) ? 0 : 1);
+        }
+
         public static void AddDesignDetail(List<string> idColumnName, List<string> idColumnCode, string userID, Apartment agOutput, out int REGI_PRE_DESIGN_NO)
         {
             //////20160516_수정완료, 지하주차장 데이터 입력할 필요가 있음
@@ -3219,11 +3226,11 @@ namespace TuringAndCorbusier
                     p_DESIGN_FXD_AT.ParameterName = "p_DESIGN_FXD_AT";
 
                     p_BUILDING_TYPE_CD.DbType = System.Data.DbType.String;
-                    p_BUILDING_TYPE_CD.Value = GetBuildingTypeCode(Math.Max((int)agOutput.ParameterSet.Parameters[0], (int)agOutput.ParameterSet.Parameters[1]));
+                    p_BUILDING_TYPE_CD.Value = GetBuildingTypeCode(MaxFloor(agOutput));
                     p_BUILDING_TYPE_CD.ParameterName = "p_BUILDING_TYPE_CD";
 
                     p_BUILDING_SCALE.DbType = System.Data.DbType.String;
-                    p_BUILDING_SCALE.Value = GetBuildingScale(agOutput.Household.Count + ((agOutput.ParameterSet.using1F)?0:1), agOutput.ParkingLotUnderGround.Floors);
+                    p_BUILDING_SCALE.Value = GetBuildingScale(MaxFloor(agOutput), agOutput.ParkingLotUnderGround.Floors);
                     p_BUILDING_SCALE.ParameterName = "p_BUILDING_SCALE";
 
                     p_STRUCTURE.DbType = System.Data.DbType.String;
@@ -3251,7 +3258,7 @@ namespace TuringAndCorbusier
                     p_STORIES_UNDERGROUND.ParameterName = "p_STORIES_UNDERGROUND";
 
                     p_STORIES_ON_EARTH.DbType = System.Data.DbType.Decimal;
-                    p_STORIES_ON_EARTH.Value = (Math.Max((int)agOutput.ParameterSet.Parameters[0], (int)agOutput.ParameterSet.Parameters[1]) + 1).ToString();
+                    p_STORIES_ON_EARTH.Value = (MaxFloor(agOutput)).ToString();
                     p_STORIES_ON_EARTH.ParameterName = "p_STORIES_ON_EARTH";
 
                     p_BALCONY_AREA.DbType = System.Data.DbType.Decimal;

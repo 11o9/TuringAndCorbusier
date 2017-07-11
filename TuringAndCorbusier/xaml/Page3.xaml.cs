@@ -255,7 +255,7 @@ namespace TuringAndCorbusier
         {
             BuildingType.Text = "공동주택(" + agOutput.BuildingType.ToString() + ")";
 
-            BuildingScale.Text = "지상 1층 ~ " + (agOutput.ParameterSet.Stories + 1).ToString() + "층";
+            BuildingScale.Text = "지상 1층 ~ " + (agOutput.Household.Count + ((agOutput.ParameterSet.using1F) ? 0 : 1)).ToString() + "층";
 
             BuildingArea.Text = Math.Round(agOutput.GetBuildingArea() / 1000000, 2).ToString() + " m\xB2";
             BuildingArea_Py.Text = "(" + Math.Round(agOutput.GetBuildingArea() / 1000000 / 3.3, 2).ToString() + " 평)";

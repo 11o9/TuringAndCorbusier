@@ -54,7 +54,7 @@ namespace Reports
 
         private string buildingScaleForReport(Apartment AGoutput)
         {
-            return "지상 1층부터 지상 " + (AGoutput.ParameterSet.Stories + 1).ToString() + "층";
+            return "지상 1층부터 지상 " + (AGoutput.Household.Count + ((AGoutput.ParameterSet.using1F) ? 0 : 1)).ToString() + "층";
         }
 
 
