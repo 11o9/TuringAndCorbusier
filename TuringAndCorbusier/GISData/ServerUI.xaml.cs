@@ -132,6 +132,9 @@ namespace TuringAndCorbusier
 
             Piljis = ServerConnection.MetaCon<Pilji>(ServerConnection.DATATYPE.PILJI, DongCode);
 
+            Piljis.ForEach(n => n.Scale(0.001));
+
+
             Refresh();
 
         }

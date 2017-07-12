@@ -31,6 +31,11 @@ namespace GISData.DataStruct
         {
             return shape.OutBounds.Select(n => n.ToNurbsCurve() as Curve).ToList();
         }
+
+        public void Scale(double k)
+        {
+            Shape.Scale(k);
+        }
     }
 
     public class Pilji : District
@@ -216,6 +221,11 @@ namespace GISData.DataStruct
             polygons.ForEach(n => result.AddRange(n.Shape));
             return result;
         }
+
+        public void Scale(double k)
+        {
+            Polygons.ForEach(n => n.Scale(k));
+        }
     }
 
     public class Polygon
@@ -252,6 +262,13 @@ namespace GISData.DataStruct
             if (result.Count == 0)
                 result.Add(outbound);
             return result;
+        }
+
+        public void Scale(double k)
+        {
+            outbound = new Polyline(outbound.Select(n => n * k));
+            for (int i = 0; i < subtractors.Count; i++)
+                subtractors[i] = new Polyline(subtractors[i].Select(n => n * k));
         }
 
     }

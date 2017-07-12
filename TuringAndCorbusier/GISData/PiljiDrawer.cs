@@ -71,6 +71,13 @@ namespace GISData.Extract
             //올일은 없겠지만.
             return null;
         }
+
+        public void Hide()
+        {
+            drawn.ForEach(n => n.Delete());
+            drawn.Clear();
+        }
+
     }
 
     public class PiljiObj
@@ -102,7 +109,7 @@ namespace GISData.Extract
             BoundingBox bb = new BoundingBox(points);
             Point3d center = bb.Center;
 
-            Text3d name = new Text3d(piljiData.Name,new Plane(center,Vector3d.XAxis,Vector3d.YAxis),1000);
+            Text3d name = new Text3d(piljiData.Name,new Plane(center,Vector3d.XAxis,Vector3d.YAxis),1);
             att.Mode = ObjectMode.Normal;
             drawnObj.Add(RhinoDoc.ActiveDoc.Objects.AddText(name, att));
         }
@@ -124,6 +131,14 @@ namespace GISData.Extract
                 return piljiData;
             else
                 return null;
+        }
+
+        public void Hide()
+        {
+            ObjectAttributes att = new ObjectAttributes();
+            att.Mode = ObjectMode.Normal;
+            drawnObj.ForEach(n => RhinoDoc.ActiveDoc.Objects.ModifyAttributes(n, att, true));
+            drawnObj.ForEach(n => RhinoDoc.ActiveDoc.Objects.Hide(n, true));
         }
 
     }

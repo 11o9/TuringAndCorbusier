@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rhino.Geometry;
+using TuringAndCorbusier.Utility;
 
 namespace TuringAndCorbusier
 {
@@ -254,7 +255,17 @@ namespace TuringAndCorbusier
             var spltd = merged.Split(parameters);
             var joined = CommonFunc.NewJoin(spltd);
 
-            return joined.Where(n => n.ClosedCurveOrientation(Plane.WorldXY) == ot).ToList()[0];
+            var output = joined.Where(n => n.ClosedCurveOrientation(Plane.WorldXY) == ot).ToList()[0];
+
+            if (output.GetArea() <= boundary.GetArea())
+            {
+                return output;
+            }
+            else
+            {
+                return InnerLoop(boundary, -offsetDistance);
+            }
+        
 
 
         }

@@ -191,33 +191,6 @@ namespace TuringAndCorbusier
         public Curve outrect;
         //Method, 메소드
 
-        public void Adjust()
-        {
-            if (Adjusted)
-                return;
-
-
-            //새로 지정한 대지선으로 다시 커브 그리기
-            List<Curve> limitLines = boundary.DuplicateSegments().ToList();
-            List<double> roadWidth = surroundings.Select(n => (double)n).ToList();
-            List<Point3d> newPoints = new List<Point3d>();
-            for (int i = 0; i < limitLines.Count; i++)
-            {
-                newPoints.Add(limitLines[i].PointAtStart);
-            }
-            newPoints.Add(limitLines[limitLines.Count - 1].PointAtEnd);
-            Curve newLand = new Polyline(newPoints).ToNurbsCurve();
-
-            Gagak gagak = new Gagak();
-            gagak.RefineEdge(newLand, roadWidth);
-
-            OriginalBoundary = boundary;
-            OriginalRoadwidths = surroundings.Select(n => (double)n).ToList();
-
-            boundary = gagak.finalLand;
-            surroundings = gagak.newRoadWidth.Select(n => (int)n).ToArray();
-            Adjusted = true;
-        }
 
         public void AlignBoundary()
         {

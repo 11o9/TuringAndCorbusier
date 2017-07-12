@@ -9,224 +9,312 @@ namespace TuringAndCorbusier
 {
     public class Gagak
     {
-        public List<double> newRoadWidth { get; set; }
-        public Curve finalLand { get; set; }
-        public double finalArea { get; set; }
+        public Gagak() { }
 
-        public void RefineEdge(Curve land,List<double> roadWidth)
+        public int order { get; set; }
+        public Curve segment { get; set; }
+        public int roadWidth { get; set; }
+        public double innerAngle { get; set; }
+        public double roadLength { get; set; }
+        public bool isConvex { get; set; }
+        public Guid previousBoundary { get; set; }
+
+        public double GetAdjustedAreaDifference(Curve originalBoundary,Curve AdjustedBoundary) {
+
+
+            double originalArea = Rhino.Geometry.AreaMassProperties.Compute(originalBoundary).Area;
+            double adjustedArea = Rhino.Geometry.AreaMassProperties.Compute(AdjustedBoundary).Area;
+            double areaDifference = adjustedArea / originalArea;
+
+            return areaDifference;
+        }
+
+        public void DrawSimplifiedBoundary()
         {
-            //대지 중심
-            Point3d landCentroid = AreaMassProperties.Compute(land).Centroid;
-            Curve[] segments = land.DuplicateSegments();
-            List<Line> lineSegments = LineConversion(segments);
+            Curve test = TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.DuplicateCurve();
+            
+            RhinoApp.WriteLine("DrawSimplification clicked");
+            var guid = LoadManager.getInstance().DrawObjectWithSpecificLayer(test, LoadManager.NamedLayer.Guide);
+            RhinoDoc.ActiveDoc.Objects.Select(guid);
+           // RhinoDoc.ActiveDoc.Objects.Delete(this.previousBoundary,true);
+            RhinoDoc.ActiveDoc.Views.Redraw();
+        }
 
-            Point3d[] segmentspoints = segments.Select(n => n.PointAtStart).ToArray();
-            Point3d[] linepoints = lineSegments.Select(n => n.From).ToArray();
+        public List<int> SortSimplifiedRoadWidth(Curve simplifiedBoundary, Curve originalBoundary)
+        {
+            DouglasFucker df = new DouglasFucker();
+            var roadWidth = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
+            List<Line> simplifiedBoundarySegments = df.LineConversion(simplifiedBoundary.DuplicateSegments());
+            List<Line> originalBoundarySegments = df.LineConversion(originalBoundary.DuplicateSegments());
 
-            //건축선 후퇴(막다른길 제외)
-            List<double> expendDistance = new List<double>();
-            List<Vector3d> retreatDirection = new List<Vector3d>();
-            bool isExpendable = true;
-            RetreatBuildingLine rbl = new RetreatBuildingLine();
-            //후퇴할때 필요한 후퇴 길이와 후퇴방향 구하기
-            //rbl.RetreatBuildingLineUtil(isExpendable,roadWidth,landCentroid,lineSegments,out expendDistance,out retreatDirection);
-            //후퇴 방향으로 건축선 후퇴하기
-            //List<Line> buildingLines = rbl.RetrieveRoad(lineSegments,retreatDirection);
-            //후퇴가 있었다면 새로 후퇴된 line segment로 바꾸기
-            //List<Line> retreatedBldLines = rbl.NewBuildingLineConversion(buildingLines);
-
-            List<Line> retreatedBldLines = lineSegments;
-
-
-            //이유는 모르겠지만.. rbl 1씩 밀어봄
-            //retreatedBldLines.Insert(0, retreatedBldLines.Last());
-            //retreatedBldLines.RemoveAt(retreatedBldLines.Count - 1);
- 
-            //내각 구하기
-            List<double> innerAngles = InnerAngles(lineSegments);
-            List<double> parameter = new List<double>();
-            for (int i = 0; i < retreatedBldLines.Count; i++)
+            List<int> remainingSegmentIndex = new List<int>();
+            List<int> deletedSegmentIndex = new List<int>();
+            try
             {
-                double param = 0;
-                double road1 = roadWidth[i];
-                double road2 = roadWidth[(i + 1) % roadWidth.Count];
-                double min, max;
-                MinValue(road1, road2, out min, out max);
-                //90도 미만
-                if (innerAngles[i] < 90)
+                for (int i = 0; i < simplifiedBoundarySegments.Count; i++)
                 {
-                    //8미터 미만 도로
-                    if (min < 8000 && max < 8000)
+                    for (int j = 0; j < originalBoundarySegments.Count; j++)
                     {
-                        //4미터 이상 6미터 미만이면 3미터
-                        if (min >= 4000 && min < 6000)
+                        if (originalBoundarySegments[j].Length == simplifiedBoundarySegments[i].Length)
                         {
-                            param = 3000;
+                            remainingSegmentIndex.Add(j);
                         }
-                        //6미터 이상 8미터 미만이면 4미터
-                        else if (min >= 6000 && min < 8000)
-                        {
-                            param = 4000;
-                        }
-                    }
-                    //90도 미만 8미터 이상이면 
-                    else
-                    {
-                        param = 0;
+                        deletedSegmentIndex.Add(j);
                     }
                 }
-                //90도 이상 120도 미만
-                if (innerAngles[i] >= 90 && innerAngles[i] < 120)
-                {
-                    //8미터 미만 도로
-                    if (min < 8000 && max < 8000)
-                    {
-                        if (min >= 4000 && min < 6000)
-                        {
-                            param = 2000;
-                        }
-                        else if (min >= 6000 && min < 8000)
-                        {
-                            param = 3000;
-                        }
-                    }
-                    else
-                    {
-                        param = 0;
-                    }
-                }
-                //120도 이상 8미터 이상 도로
-                if (innerAngles[i] >= 120 || max>=8000)
-                {
-                    param = 0;
-                }
-                parameter.Add(param);
             }
+            catch (Exception e)
+            {
+                RhinoApp.WriteLine(e.ToString());
+            }
+            List<int> distinctDeletedSegmentIndexes = deletedSegmentIndex.Distinct().ToList();
+   
+            for (int i = 0; i < remainingSegmentIndex.Count; i++)
+            {
+                for(int j = 0; j < distinctDeletedSegmentIndexes.Count; j++)
+                {
+                    if (remainingSegmentIndex[i] == distinctDeletedSegmentIndexes[j])
+                    {
+                        distinctDeletedSegmentIndexes[distinctDeletedSegmentIndexes[j]] = 1234;
+                    }
+                }
+            }
+            List<int> finalIndex = new List<int>();
+            for(int i = 0; i < distinctDeletedSegmentIndexes.Count; i++)
+            {
+                if (distinctDeletedSegmentIndexes[i] != 1234)
+                {
+                    finalIndex.Add(distinctDeletedSegmentIndexes[i]);
+                }
+            }
+            return finalIndex;
+        }
 
-            List<Point3d> validPoints = CutCorner(parameter, retreatedBldLines, roadWidth);
+        public void SortRoadWidth(List<int> cuttingLength, List<Gagak> gagakList)
+        {
+            var roadWidth = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
+            Dictionary<int, int> additionalRoadWidth = new Dictionary<int, int>();
+            List<int> finalRoadWidth = new List<int>();
 
-            this.finalLand = new Polyline(validPoints).ToNurbsCurve();
 
-            var finaltest = finalLand.DuplicateSegments().Select(n => n.PointAtStart).ToArray();
-            this.finalArea = AreaMassProperties.Compute(this.finalLand).Area;
+                for (int i = 0; i < gagakList.Count; i++)
+                {
+                    var gagak1 = gagakList[i].roadWidth;
+                    var gagak2 = gagakList[(i + gagakList.Count - 1) % gagakList.Count].roadWidth;
+
+                    if (cuttingLength[i] != 0)
+                    {
+                        var widerRoad = gagak1 >= gagak2 ? gagak1 : gagak2;
+                        additionalRoadWidth.Add(i, widerRoad);
+                    }
+                }
+            try
+            {
+                for (int i = 0; i < roadWidth.Count; i++)
+                {
+                    if (additionalRoadWidth.ContainsKey(i))
+                    {
+                        finalRoadWidth.Add(additionalRoadWidth[i]);
+                    }
+                    finalRoadWidth.Add(roadWidth[i]);
+                }
+
+            }
+            catch (Exception e) {
+                RhinoApp.WriteLine(e.ToString());
+            }
+            List<int> sortedRoadWidth = new List<int>();
+            if (additionalRoadWidth.ContainsKey(0))
+            {
+                for (int i = 0; i < finalRoadWidth.Count; i++)
+                {
+                    sortedRoadWidth.Add(finalRoadWidth[(i + 1) % finalRoadWidth.Count]);
+                }
+
+            }
+            else
+            {
+                sortedRoadWidth = finalRoadWidth;
+            }
+            TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings = sortedRoadWidth.ToArray();
+                TuringAndCorbusierPlugIn.InstanceClass.plot.UpdateSimplifiedSurroundings();
 
         }
 
-
-        //코너 자르기
-        public List<Point3d> CutCorner(List<double> param, List<Line> lineSegments, List<double> roadWidth)
+        //도로 모퉁이 건축선
+        public List<Point3d> CutBoundary(List<int> cuttingLength, Curve originalBoundary)
         {
-            //새로 산정된 대지를 그리기 위한 유효 포인트
             List<Point3d> validPoints = new List<Point3d>();
-            //새로 생긴 segment와 기존에 존재하는 도로 폭 리스트
-            this.newRoadWidth = new List<double>();
-            for (int i = 0; i < lineSegments.Count; i++)
+            List<Curve> boundary = originalBoundary.DuplicateSegments().ToList();
+            for (int i = 0; i < boundary.Count; i++)
             {
-                //가각정리가 필요 없는 곳에는 기존에 존재하는 도록폭 그대로 추가
-                newRoadWidth.Add(roadWidth[i]);
-                Line l1 = lineSegments[i];
-                Line l2 = lineSegments[(i + 1) % lineSegments.Count];
-                double a, b;
+                Line line1 = new Line(boundary[i].PointAtStart, boundary[i].PointAtEnd);
+                Line line2 = new Line(boundary[(i + boundary.Count - 1) % boundary.Count].PointAtEnd, boundary[(i + boundary.Count - 1) % boundary.Count].PointAtStart);
+
                 Vector3d v1, v2;
-                //대지가 꺾인 부분마다 벡터 방향 다시 조정
-                Rhino.Geometry.Intersect.Intersection.LineLine(l1, l2, out a, out b, 0, false);
-                if (a > 0 && b <= 0)
+                v1 = line1.UnitTangent;
+                v2 = line2.UnitTangent;
+
+                Line finalLine1 = new Line(line1.From, v1, cuttingLength[i]);
+                Line finalLine2 = new Line(line2.From, v2, cuttingLength[i]);
+
+                if (finalLine1.To != finalLine2.To)
                 {
-                    v1 = lineSegments[i].UnitTangent * -1;
-                    v2 = lineSegments[(i + 1) % lineSegments.Count].UnitTangent;
-                }
-                else if (b > 0 && a <= 0)
-                {
-                    v1 = lineSegments[i].UnitTangent;
-                    v2 = lineSegments[(i + 1) % lineSegments.Count].UnitTangent * -1;
-                }
-                else if (b > 0 && a > 0)
-                {
-                    v1 = lineSegments[i].UnitTangent * -1;
-                    v2 = lineSegments[(i + 1) % lineSegments.Count].UnitTangent * -1;
+                    validPoints.Add(finalLine1.To);
+                    validPoints.Add(finalLine2.To);
                 }
                 else
                 {
-                    v1 = lineSegments[i].UnitTangent;
-                    v2 = lineSegments[(i + 1) % lineSegments.Count].UnitTangent;
+                    validPoints.Add(finalLine1.To);
                 }
-                Line line1 = new Line(l1.To, v1, param[i]);
-                Line line2 = new Line(l2.From, v2, param[i]);
-                //새로 생긴 segment에 도로폭은 양쪽으로 더 큰 도로폭으로 
-                double min, max;
-                MinValue(roadWidth[i], roadWidth[(i + 1) % roadWidth.Count], out min, out max);
-                //가각정리가 된곳에 도로폭 추가
-                if (param[i] != 0)
-                {
-                    //int insertIndex = newRoadWidth.Count > 2 ? newRoadWidth.Count - 2 : 0;
-                    //newRoadWidth.Insert(newRoadWidth.Count-2, max);
-                    newRoadWidth.Add(max);
-                }
-                validPoints.Add(new Point3d(line1.To));
-                validPoints.Add(new Point3d(line2.To));
             }
-            validPoints.Add(validPoints[0]);
             return validPoints;
         }
 
-        //curve배열 line 리스트로 변환
-        public List<Line> LineConversion(Curve[] segments)
+        //포인트 재정렬
+        public List<Point3d> ReOrderPointList(Curve boundary, List<Point3d> validPoints)
         {
-            List<Line> lineSegments = new List<Line>();
-            for (int i = 0; i < segments.Length; i++)
+            List<double> parameter = new List<double>();
+            List<Curve> segments = boundary.DuplicateSegments().ToList();
+            Point3d originPoint = segments[0].PointAtStart;
+
+            for (int i = 0; i < validPoints.Count; i++)
             {
-                Line line = new Line(segments[i].PointAtStart, segments[i].PointAtEnd);
-                lineSegments.Add(line);
+                double param;
+                boundary.ClosestPoint(validPoints[i], out param);
+                parameter.Add(param);
             }
-            return lineSegments;
+            parameter.Sort();
+            //for (int i = 0; i < parameter.Count; i++)
+            //{
+
+            //    RhinoApp.WriteLine(parameter[i].ToString());
+
+            //}
+            List<Point3d> finalPoints = new List<Point3d>();
+            for (int i = 0; i < parameter.Count; i++)
+            {
+                for (int j = 0; j < validPoints.Count; j++)
+                {
+                    double param;
+                    boundary.ClosestPoint(validPoints[j], out param);
+                    if (parameter[i] == param)
+                    {
+                        finalPoints.Add(validPoints[j]);
+                    }
+                }
+            }
+            finalPoints.Add(finalPoints[0]);
+            for(int i = 0; i < finalPoints.Count; i++)
+            {
+                RhinoApp.WriteLine("finalPoints : "+i.ToString()+" : "+finalPoints[i].ToString());
+            }
+            return finalPoints;
         }
 
-        //내각 구하기
-        public List<double> InnerAngles(List<Line> lineSegments)
+        //도로모퉁이 거리 구하기
+        public List<int> GetGagak(List<Gagak> parcel)
         {
-            List<double> innerAngles = new List<double>();
-            for (int i = 0; i < lineSegments.Count; i++)
+            var roadWidth = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.ToList();
+            List<int> cuttingLength = new List<int>();
+            for (int i = 0; i < parcel.Count; i++)
             {
-                Line l1 = lineSegments[i];
-                Line l2 = lineSegments[(i + 1) % lineSegments.Count];
-                double a, b;
-                Vector3d v1, v2;
-                Rhino.Geometry.Intersect.Intersection.LineLine(l1, l2, out a, out b, 0, false);
-                if (a > 0 && b <= 0)
+                var segment1 = parcel[i];
+                var segment2 = parcel[(i + parcel.Count - 1) % parcel.Count];
+
+                //conditon1
+                int min = GetMin(segment1.roadWidth, segment2.roadWidth);
+                if (min <= 4999)
                 {
-                    v1 = lineSegments[i].UnitTangent * -1;
-                    v2 = lineSegments[(i + 1) % lineSegments.Count].UnitTangent;
+                    if (segment1.innerAngle >= 90)
+                    {
+                       cuttingLength.Add(2000);
+                       // cuttingLength.Add(1111);
+                    }
+                    else if (segment1.innerAngle < 90)
+                    {
+                       cuttingLength.Add(3000);
+                       // cuttingLength.Add(2222);
+                    }
                 }
-                else if (b > 0 && a <= 0)
+                else if (min > 4999 && min < 8000)
                 {
-                    v1 = lineSegments[i].UnitTangent;
-                    v2 = lineSegments[(i + 1) % lineSegments.Count].UnitTangent * -1;
+                    if (segment1.innerAngle >= 90)
+                    {
+                        cuttingLength.Add(3000);
+                       // cuttingLength.Add(3333);
+                    }
+                    else if (segment1.innerAngle < 90)
+                    {
+                       cuttingLength.Add(4000);
+                       // cuttingLength.Add(4444);
+                    }
                 }
-                else if (b > 0 && a > 0)
+
+                if (min >= 8000)
                 {
-                    v1 = lineSegments[i].UnitTangent * -1;
-                    v2 = lineSegments[(i + 1) % lineSegments.Count].UnitTangent * -1;
+                   cuttingLength.Add(0);
+                  //  cuttingLength.Add(5555);
                 }
-                else
-                {
-                    v1 = lineSegments[i].UnitTangent;
-                    v2 = lineSegments[(i + 1) % lineSegments.Count].UnitTangent;
-                }
-                double innerAngle = RhinoMath.ToDegrees(Vector3d.VectorAngle(v2, v1,Plane.WorldXY));
-                innerAngles.Add(innerAngle);
+
             }
-            return innerAngles;
+
+            for (int i = 0; i < parcel.Count; i++)
+            {
+                if (parcel[i].roadWidth >= 8000)
+                {
+                    cuttingLength[i] = 0;
+                    cuttingLength[(i + 1) % cuttingLength.Count] = 0;
+                }
+                if (parcel[i].roadWidth == 0)
+                {
+                    cuttingLength[i] = 0;
+
+                    cuttingLength[(i + 1) % cuttingLength.Count] = 0;
+    
+                }
+                if (parcel[i].isConvex != true)
+                {
+                    cuttingLength[i] = 0;
+       
+                }
+                if (parcel[i].roadLength < 7000)
+                {
+                    cuttingLength[i] = 0;
+
+                    cuttingLength[(i + 1) % cuttingLength.Count] = 0;
+
+                    //cuttingLength[(i + cuttingLength.Count - 1) % cuttingLength.Count] = 0;
+
+                }
+                if (parcel[i].innerAngle >= 120)
+                {
+                    cuttingLength[i] = 0;
+                }
+            }
+            return cuttingLength;
         }
 
-        //도로폭 중에서 좁은 도로와 넓은 도로 구분하기
-        public void MinValue(double a, double b, out double min, out double max)
+        //2개의 도로중 더 짧은 도로 찾기
+        public int GetMin(int roadWidth1, int roadWidth2)
         {
-            List<double> c = new List<double>();
-            c.Add(a);
-            c.Add(b);
-            c.Sort();
-            min = c[0];
-            max = c[c.Count - 1];
+            if (roadWidth1 >= 8000 || roadWidth2 >= 8000)
+            {
+                return roadWidth1 >= roadWidth2 ? roadWidth1 : roadWidth2;
+            }
+            if (roadWidth1 > roadWidth2)
+            {
+                return roadWidth2;
+            }
+            if (roadWidth1 < roadWidth2)
+            {
+                return roadWidth1;
+            }
+            else
+            {
+                return roadWidth1;
+            }
         }
+
     }// gagak class
 }//prototype namespace

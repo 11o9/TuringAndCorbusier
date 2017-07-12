@@ -99,6 +99,7 @@
     </Compile>
     <Compile Include="AutoUpdateModule\Updater.cs" />
     <Compile Include="cs\Common\DataManager.cs" />
+    <Compile Include="cs\Input\DouglasFucker.cs" />
     <Compile Include="cs\NotUsed\Egg.cs" />
     <Compile Include="cs\NotUsed\FinalizeApartmentGeneratorOutput.cs" />
     <Compile Include="cs\Parkings\Finalizer.cs" />
@@ -108,7 +109,6 @@
     <Compile Include="cs\NotUsed\ParkingLineMaker.cs" />
     <Compile Include="cs\Parkings\PeterParker.cs" />
     <Compile Include="cs\NotUsed\RegulationCheck.cs" />
-    <Compile Include="cs\Input\RetreatBuildingLine.cs" />
     <Compile Include="cs\Drawing\SectionDrawer.cs" />
     <Compile Include="cs\Drawing\TypicalPlan.cs" />
     <Compile Include="cs\Common\UIManager.cs" />

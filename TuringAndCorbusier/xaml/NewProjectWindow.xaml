@@ -70,13 +70,13 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="320"/>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="30*"/>
+            <RowDefinition Height="347"/>
+            <RowDefinition Height="27*"/>
+            <RowDefinition Height="27*"/>
+            <RowDefinition Height="27*"/>
+            <RowDefinition Height="27*"/>
+            <RowDefinition Height="28*"/>
+            <RowDefinition Height="27*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220*"/>
@@ -125,7 +125,7 @@
             </Grid>
         </Button>
 
-        <Button x:Name="Btn_Ok" Click="Btn_Ok_Click" Content="확인" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="0,6,17,0" Background="#FF4E4F4F" HorizontalAlignment="Right" Width="75"  Height="21" VerticalAlignment="Top" Grid.Row="6"/>
+        <Button x:Name="Btn_Ok" Click="Btn_Ok_Click" Content="확인" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="0,6,17,0" Background="#FF4E4F4F" HorizontalAlignment="Right" Width="75"  Height="20" VerticalAlignment="Top" Grid.Row="6"/>
 
         <TextBlock FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="13,47,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"><Run Text="프로젝트"/><Run Text=" "/><Run Text="명"/></TextBlock>
         <TextBox  x:Name="projectName" Text="프로젝트 명을 입력하세요" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="81,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="243" FontSize="13.333"/>
@@ -136,7 +136,7 @@
         <TextBlock Text="대지면적" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="27,109,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
         <TextBox  x:Name="manualPlotArea" Text="0" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="81,108,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="65" FontSize="13.333"/>
 
-        <Path Stroke="Black" StrokeThickness="1" />
+        <Path Stroke="Black" StrokeThickness="1" Margin="0,0,0,27" />
 
         <TextBlock  Text="건폐율" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="39,180,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" RenderTransformOrigin="0.697,2.704"/>
         <TextBox x:Name="maxBuildingCoverage" Style="{StaticResource textBoxStyle}" Margin="81,178,0,0" TextWrapping="Wrap" Text="60" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="41" TextAlignment="Right"/>
@@ -153,9 +153,11 @@
         <TextBlock x:Name="textBlock_Copy5" Text="대지 입력" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,258,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
 
         <Button x:Name="Btn_GetPlot" Visibility="Hidden" Content="대지 경계 입력" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="204,257,0,0" Background="#FF767676"  HorizontalAlignment="Left" Width="120" Height="21" VerticalAlignment="Top" FontSize="10.667" />
-        <Button x:Name="Btn_GetSlant_Copy" Content="대지 경사 설정" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="204,289,0,0" Background="#FF767676" Height="21" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120" Click="Btn_GetSlope_Copy_Click" FontSize="10.667"/>
-        <Button x:Name="Btn_GetPlot_Copy1" Content="새로운 경계 입력" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="81,257,0,0" Background="#FF767676"  HorizontalAlignment="Left" Width="120" Height="21" VerticalAlignment="Top" Click="Btn_GetPlot_Copy1_Click" FontSize="10.667" />
-        <Button x:Name="Btn_GetPlot_Copy" Content="인접 도로 폭 설정" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="81,289,0,0" Background="#FF767676" Height="21" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120" Click="Btn_SetWidth_Click" FontSize="10.667"/>
+        <Button x:Name="Btn_GetPlotGIS" Content="대지 경계 입력(GIS)" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="204,257,0,0" Background="#FF767676"  HorizontalAlignment="Left" Width="120" Height="21" VerticalAlignment="Top" FontSize="10.667" Click="GetPlot"/>
+        <Button x:Name="Btn_SetSlant" Content="대지 경사 설정" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="204,289,0,0" Background="#FF767676" Height="21" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120" Click="Btn_SetSlope_Click" FontSize="10.667"/>
+        <Button x:Name="Btn_InsertNewBuildingLine" Content="새로운 경계 입력" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="81,257,0,0" Background="#FF767676"  HorizontalAlignment="Left" Width="120" Height="21" VerticalAlignment="Top" Click="Btn_InsertNewBuildingLine_Click" FontSize="10.667" />
+        <Button x:Name="Btn_SetRoadWidth" Content="인접 도로 폭 설정" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="81,289,0,0" Background="#FF767676" Height="21" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120" Click="Btn_SetRoadWidth_Click" FontSize="10.667"/>
+        <Button x:Name="Btn_TrimCorners" Content="가각정리" Foreground="White" Style="{StaticResource MyButtonStyle}"  Margin="81,315,0,0" Background="#FF767676" Height="21" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120" Click="Btn_TrimCorner_Click" FontSize="10.667"/>
         <TextBlock x:Name="textBlock_Copy" Text="주변 환경" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,291,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
 
         <Grid HorizontalAlignment="Left" Height="86" Margin="160,146,0,0" VerticalAlignment="Top" Width="164">
@@ -198,21 +200,21 @@
         </Grid>
         <TextBlock x:Name="Reg" Text="완화제한" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="25,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Grid.Row="1"/>
         <TextBlock  Text="주거층수" Grid.Row="1" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="163,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
-        <TextBox x:Name="easeFloor" Style="{StaticResource textBoxStyle}" Grid.Row="1" Width="40" Height="20" Margin="261,10,39,2"></TextBox>
+        <TextBox x:Name="easeFloor" Style="{StaticResource textBoxStyle}" Grid.Row="1" Width="40" Height="20" Margin="261,10,39,24" Grid.RowSpan="2"></TextBox>
 
-        <CheckBox x:Name="NorthCheck" Content="일조 사선 무시" HorizontalAlignment="Left" Margin="81,3,0,0" Grid.Row="3" VerticalAlignment="Top" Visibility="Hidden"/>
+        <CheckBox x:Name="NorthCheck" Content="일조 사선 무시" HorizontalAlignment="Left" Margin="81,3,0,0" Grid.Row="2" VerticalAlignment="Top" Visibility="Hidden"/>
         <CheckBox x:Name="SpecialCase" Content="채광방향 높이제한 특례 적용 (높이 * 1/4)" HorizontalAlignment="Left" Margin="89,8,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
         <TextBlock  Text="대지안의공지" Grid.Row="2" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
         <TextBlock  Text="인접대지로부터" Grid.Row="2" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="163,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
-        <TextBox x:Name="fromSurr" Style="{StaticResource textBoxStyle}" Grid.Row="2" Width="40" Height="20" Margin="261,10,39,2"></TextBox>
+        <TextBox x:Name="fromSurr" Style="{StaticResource textBoxStyle}" Grid.Row="2" Width="40" Height="20" Margin="261,10,39,24" Grid.RowSpan="2"></TextBox>
         <TextBlock  Text="인접도로로부터" Grid.Row="3" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="163,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
-        <TextBox x:Name="fromRoad" Style="{StaticResource textBoxStyle}" Grid.Row="3" Width="40" Height="20" Margin="261,10,39,2"></TextBox>
+        <TextBox x:Name="fromRoad" Style="{StaticResource textBoxStyle}" Grid.Row="3" Width="40" Height="20" Margin="261,10,39,24" Grid.RowSpan="2"></TextBox>
         <TextBlock  Text="채광창높이제한" Grid.Row="4" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
         <TextBlock  Text="건물높이의" Grid.Row="4" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="187,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
-        <TextBox x:Name="fromLighting" Style="{StaticResource textBoxStyle}" Grid.Row="4" Width="40" Height="20" Margin="261,8,39,4"></TextBox>
+        <TextBox x:Name="fromLighting" Style="{StaticResource textBoxStyle}" Grid.Row="4" Width="40" Height="20" Margin="261,8,39,27" Grid.RowSpan="2"></TextBox>
         <TextBlock  Text="인동거리" Grid.Row="5" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="24,8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
         <TextBlock  Text="건물높이의" Grid.Row="5" FontFamily="Noto Sans CJK KR Regular Regular" HorizontalAlignment="Left" Margin="187,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right"/>
-        <TextBox x:Name="fromOtherBuilding" Style="{StaticResource textBoxStyle}" Grid.Row="5" Width="40" Height="20" Margin="261,8,39,4"></TextBox>
+        <TextBox x:Name="fromOtherBuilding" Style="{StaticResource textBoxStyle}" Grid.Row="5" Width="40" Height="20" Margin="261,8,39,0"></TextBox>
 
 
     </Grid>
