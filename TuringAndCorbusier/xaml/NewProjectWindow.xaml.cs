@@ -584,7 +584,7 @@ namespace TuringAndCorbusier
 
         private void Btn_TrimCorner_Click(object sender, RoutedEventArgs e)
         {
-
+            Btn_TrimCorners.Click -= Btn_TrimCorner_Click;
             if (TuringAndCorbusierPlugIn.InstanceClass.plot == null)
             {
                 MessageBox.Show("먼저 커브를 선택하세요");
@@ -630,9 +630,9 @@ namespace TuringAndCorbusier
 
             try
             {
-            cuttingLength = gagak.GetGagak(gagakList);
-
-            }catch(Exception exe)
+                cuttingLength = gagak.GetGagak(gagakList);
+            }
+            catch (Exception exe)
             {
                 RhinoApp.WriteLine(exe.ToString());
             }
@@ -659,7 +659,17 @@ namespace TuringAndCorbusier
             List<bool> newIsConvex = new List<bool>();
             List<double> newInnerAngle = df.GetBoundaryInnerAngle(ref originalBoundary, out newIsConvex);
 
-            List<Curve> newBoundaryList = originalBoundary.DuplicateSegments().ToList();
+            List<Curve> newBoundaryList = new List<Curve>();
+            if (isCuttable)
+            {
+
+              newBoundaryList =   originalBoundary.DuplicateSegments().ToList();
+            }
+            else
+            {
+                newBoundaryList = boundaryList;
+            }
+
             List<int> tempRoadWidth = new List<int>();
             foreach(int i in roadWidth)
             {
@@ -717,7 +727,7 @@ namespace TuringAndCorbusier
                 tempGagak.innerAngle = newInnerAngle[i];
                 tempGagak.isConvex = newIsConvex[i];
                 tempGagak.order = i;
-                tempGagak.roadLength = new Line(newBoundaryList[(i+1)%newBoundaryList.Count].PointAtStart, newBoundaryList[(i + 1) % newBoundaryList.Count].PointAtEnd).Length;
+                tempGagak.roadLength = new Line(newBoundaryList[i].PointAtStart, newBoundaryList[i].PointAtEnd).Length;
                 tempGagak.roadWidth = newRoadWidth[i];
                 tempGagak.segment = newBoundaryList[(i+1)%newBoundaryList.Count];
                 newGagakList.Add(tempGagak);

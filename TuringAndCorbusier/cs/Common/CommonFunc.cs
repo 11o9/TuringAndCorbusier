@@ -2246,7 +2246,7 @@ namespace TuringAndCorbusier
 
         public static int GetLastPreDesignNo(List<string> idColumnName, List<string> idColumnCode)
         {
-            const string connectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
+            string connectionString = Consts.connectionString;//"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
 
             List<int> PRE_DESIGN_NO_INDEX = new List<int>();
 
@@ -2921,7 +2921,7 @@ namespace TuringAndCorbusier
             idColumnCodeCopy.Add("REGI_PRE_DESIGN_NO");
             idColumnCodeCopy.Add(REGI_PRE_DESIGN_NO.ToString());
 
-            const string connectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
+            string connectionString = Consts.connectionString;// "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
 
             List<int> PLAN_TYPE_NO_INDEX = new List<int>();
 
@@ -3664,7 +3664,7 @@ namespace TuringAndCorbusier
             List<string> landCodeSet = new List<string>();
             string address = "";
 
-            const string connectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
+            string connectionString = Consts.connectionString; // "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
 
             string sql = "select * FROM TN_PREV_ASSET";
 
@@ -3728,7 +3728,7 @@ namespace TuringAndCorbusier
         {
             List<string> output = new List<string>();
 
-            const string connectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
+            string connectionString = Consts.connectionString;
 
             string sql = "select * FROM " + tableName;
 

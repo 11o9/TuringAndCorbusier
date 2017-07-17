@@ -34,7 +34,8 @@ namespace TuringAndCorbusier
         {
             get
             {
-                return "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
+                //return "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle3.ejudata.co.kr)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID = oracle3)));User Id=whruser_sh;Password=ejudata;";
+                return "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db.i-sh.co.kr)(PORT=1522))(CONNECT_DATA=(SERVER=DEDICATED)(SID = smdc-DB)));User Id=autosd;Password=autosd;";
             }
         }
         public static double exWallThickness { get { return 300; } }
