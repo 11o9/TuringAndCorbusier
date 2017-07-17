@@ -280,8 +280,8 @@ namespace TuringAndCorbusier
                 return;
             }
 
-           
 
+            SetCam();
 
             /// <summary>
             /// 0518 민호 계산 시작시 newprojectwindow가 열려있으면 닫음
@@ -1541,7 +1541,57 @@ namespace TuringAndCorbusier
             //RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(Rhino.RhinoDoc.ActiveDoc.Layers.Find("Default", true), true);
 
         }
+        private void SetCam()
+        {
+            SetView();
+            RhinoApp.RunScript("SelAll", false);
+            RhinoApp.RunScript("ZSA", false);
+            RhinoDoc.ActiveDoc.Objects.UnselectAll();
+        }
 
+        private void SetView()
+        {
+            Rhino.DocObjects.Tables.ViewTable viewinfo = RhinoDoc.ActiveDoc.Views;
+            foreach (Rhino.Display.RhinoView i in viewinfo)
+            {
+                Rhino.Display.RhinoViewport vp = i.ActiveViewport;
+                Guid dpmguid = Guid.Empty;
+
+                if (vp.Name == "Perspective")
+                {
+                    //currentview.Add(i)
+
+                    vp.WorldAxesVisible = false;
+                    vp.ParentView.Maximized = true;
+                    Rhino.Display.DisplayModeDescription dm = vp.DisplayMode;
+                    if (dm.EnglishName != "Shaded")
+                    {
+                        Rhino.Display.DisplayModeDescription[] dms = Rhino.Display.DisplayModeDescription.GetDisplayModes();
+
+                        for (int j = 0; j < dms.Length; j++)
+                        {
+                            string english_name = dms[j].EnglishName;
+                            english_name = english_name.Replace("_", "");
+                            english_name = english_name.Replace(" ", "");
+                            english_name = english_name.Replace("-", "");
+                            english_name = english_name.Replace(",", "");
+                            english_name = english_name.Replace(".", "");
+
+                            if (english_name == "Shaded")
+                            {
+                                vp.DisplayMode = Rhino.Display.DisplayModeDescription.FindByName(dms[j].EnglishName);
+                                vp.DisplayMode.DisplayAttributes.ShowCurves = true;
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    //   i.Close();
+                }
+            }
+        }
 
         //private void Btn_Export3D_Copy_Click(object sender, RoutedEventArgs e)
         //{

@@ -25,6 +25,14 @@ namespace GISData.Extract
             }
         }
 
+        public void Unlock()
+        {
+            for (int i = 0; i < drawn.Count; i++)
+            {
+                drawn[i].UnLock();
+            }
+        }
+
         private void Delete()
         {
             foreach (var d in drawn)
@@ -119,6 +127,8 @@ namespace GISData.Extract
             foreach (var obj in drawnObj)
             {
                 var robj = RhinoDoc.ActiveDoc.Objects.Find(obj);
+                if (robj == null)
+                    continue;
                 robj.Attributes.Mode = ObjectMode.Normal;
                 robj.CommitChanges();
                 RhinoDoc.ActiveDoc.Objects.Delete(obj, true);
@@ -139,6 +149,13 @@ namespace GISData.Extract
             att.Mode = ObjectMode.Normal;
             drawnObj.ForEach(n => RhinoDoc.ActiveDoc.Objects.ModifyAttributes(n, att, true));
             drawnObj.ForEach(n => RhinoDoc.ActiveDoc.Objects.Hide(n, true));
+        }
+
+        public void UnLock()
+        {
+            ObjectAttributes att = new ObjectAttributes();
+            att.Mode = ObjectMode.Normal;
+            drawnObj.ForEach(n => RhinoDoc.ActiveDoc.Objects.ModifyAttributes(n, att, true));
         }
 
     }

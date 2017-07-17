@@ -135,7 +135,7 @@ namespace GISData.Extract
             {
                 //RhinoDoc.ActiveDoc.Objects.Add(found[i]);
 
-                if (found[i].GetLength() < 10)
+                if (found[i].GetLength() < 0.01)
                 {
                     roadwidth[i] = 0;
                     continue;
@@ -148,7 +148,7 @@ namespace GISData.Extract
 
 
                 v.Rotate(-Math.PI / 2, Vector3d.ZAxis);
-                Curve cross = new LineCurve(found[i].PointAtNormalizedLength(0.5) + v * -100, found[i].PointAtNormalizedLength(0.5) + v * 100000);
+                Curve cross = new LineCurve(found[i].PointAtNormalizedLength(0.5) + v * -0.1, found[i].PointAtNormalizedLength(0.5) + v * 100);
                 //RhinoDoc.ActiveDoc.Objects.Add(cross);
                 List<double> distances = new List<double>();
                 foreach (var obj in notdo)
@@ -167,15 +167,14 @@ namespace GISData.Extract
                 {
                     roadwidth[i] = 0;
                 }
-                else if (distances[0] < 500)
+                else if (distances[0] < 0.5)
                 {
                     roadwidth[i] = 0;
                 }
                 else
                 {
-                    double temp = Math.Round(distances[0] - 100);
-                    double tempper1000 = temp / 1000;
-                    double roundtemp = Math.Round(tempper1000);
+                    double temp = Math.Round(distances[0] - 0.1);
+                    double roundtemp = Math.Round(temp);
                     double tempmult1000 = roundtemp * 1000;
 
                     roadwidth[i] = tempmult1000;

@@ -385,13 +385,14 @@ namespace TuringAndCorbusier
 
         private void SetCurve2(Curve boundary, double scalefactor)
         {
+
             KDGinfo tempKDGinfo = new KDGinfo(boundary, scalefactor, false);
             TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet = tempKDGinfo;
 
             Curve scaledBoundary = tempKDGinfo.boundary;
 
             var objectsToHide = Rhino.RhinoDoc.ActiveDoc.Objects.FindByObjectType(Rhino.DocObjects.ObjectType.AnyObject);
-
+           
             foreach (var objectToHide in objectsToHide)
             {
                 Rhino.RhinoDoc.ActiveDoc.Objects.Hide(objectToHide.Id, true);
@@ -424,6 +425,7 @@ namespace TuringAndCorbusier
             RhinoDoc.ActiveDoc.Views.Redraw();
             //RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(Rhino.RhinoDoc.ActiveDoc.Layers.Find("Default", true), true);
             TuringAndCorbusierPlugIn.InstanceClass.plot = new TuringAndCorbusier.Plot(scaledBoundary);
+            
             TuringAndCorbusierPlugIn.InstanceClass.plot.PlotType = this.plotType2;
         }
 
@@ -1051,8 +1053,6 @@ namespace TuringAndCorbusier
             var serverUI = (TuringAndCorbusierPlugIn.InstanceClass.turing.gis.Content as ServerUI);
             MultiPolygon merged = previewer.MergedPlot;
 
-
-
             Btn_GetPlotGIS.Content = "대지 경계 입력(GIS)";
             Btn_GetPlotGIS.Click += GetPlot;
             Btn_GetPlotGIS.Click -= GetPlotFinish;
@@ -1062,7 +1062,7 @@ namespace TuringAndCorbusier
             {
                 return;
             }
-
+            
 
             if (merged.OutBounds.Count != 1)
             {
@@ -1070,7 +1070,7 @@ namespace TuringAndCorbusier
                 return;
             }
 
-            serverUI.drawer.Hide();
+
 
             double maximumArea = previewer.SelectedPilji.Max(n => n.Outbound[0].GetArea());
             address.Text = serverUI.Address + previewer.SelectedPilji.Where(n => n.Outbound[0].GetArea() == maximumArea).ToList()[0].Name + "일대";
@@ -1080,8 +1080,11 @@ namespace TuringAndCorbusier
 
             if (bound.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.Clockwise)
                 bound.Reverse();
-
+            double[] roadWidths = GISData.Extract.SiteParser.GetRoadWidths(bound, serverUI.Piljis);
+            serverUI.drawer.Unlock();
             SetCurve(bound);
+            TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings = roadWidths.Select(n=>(int)n).ToArray();
+            serverUI.drawer.Hide();
         }
 
 

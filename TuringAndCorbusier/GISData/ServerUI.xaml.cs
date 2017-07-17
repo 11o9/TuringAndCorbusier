@@ -222,25 +222,70 @@ namespace TuringAndCorbusier
         }
         private void SetCam(BoundingBox bb)
         {
-            
+            SetView();
             Rhino.RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(new Point3d(bb.Center.X, bb.Center.Y, bb.Diagonal.Length * 1.5), false);
             Rhino.RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(new Vector3d(0, 0, -1), false);
             Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
         }
         private void SetCam(IEnumerable<Guid> guid)
         {
+            SetView();
             RhinoDoc.ActiveDoc.Objects.Select(guid);
             RhinoApp.RunScript("ZSA", false);
             RhinoDoc.ActiveDoc.Objects.UnselectAll();
         }
         private void SetCam()
         {
+            SetView();
             RhinoApp.RunScript("SelAll", false);
             RhinoApp.RunScript("ZSA", false);
             RhinoDoc.ActiveDoc.Objects.UnselectAll();
         }
 
+        private void SetView()
+        {
+            Rhino.DocObjects.Tables.ViewTable viewinfo = RhinoDoc.ActiveDoc.Views;
+            foreach (Rhino.Display.RhinoView i in viewinfo)
+            {
+                Rhino.Display.RhinoViewport vp = i.ActiveViewport;
+                Guid dpmguid = Guid.Empty;
 
+                if (vp.Name == "Top")
+                {
+                    //currentview.Add(i)
+
+                    vp.WorldAxesVisible = false;
+                    vp.ParentView.Maximized = true;
+                    Rhino.Display.DisplayModeDescription dm = vp.DisplayMode;
+                    if (dm.EnglishName != "Shaded")
+                    {
+                        Rhino.Display.DisplayModeDescription[] dms = Rhino.Display.DisplayModeDescription.GetDisplayModes();
+
+                        for (int j = 0; j < dms.Length; j++)
+                        {
+                            string english_name = dms[j].EnglishName;
+                            english_name = english_name.Replace("_", "");
+                            english_name = english_name.Replace(" ", "");
+                            english_name = english_name.Replace("-", "");
+                            english_name = english_name.Replace(",", "");
+                            english_name = english_name.Replace(".", "");
+
+                            if (english_name == "Shaded")
+                            {
+                                vp.DisplayMode = Rhino.Display.DisplayModeDescription.FindByName(dms[j].EnglishName);
+                                vp.DisplayMode.DisplayAttributes.ShowCurves = true;
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    //   i.Close();
+                }
+            }
+        }
+     
         public void OnSelectPilji(object sender, Rhino.DocObjects.RhinoObjectSelectionEventArgs e)
         {
             foreach (var obj in e.RhinoObjects)

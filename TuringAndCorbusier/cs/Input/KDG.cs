@@ -289,7 +289,14 @@ namespace TuringAndCorbusier
             outrect = rect;
             //long mem1 = GC.GetTotalMemory(false);
             //GC.Collect();
-            var objects = Rhino.RhinoDoc.ActiveDoc.Objects.Where(n => n.Geometry.ObjectType == Rhino.DocObjects.ObjectType.Curve);
+
+
+
+            var objects = Rhino.RhinoDoc.ActiveDoc.Objects.FindByObjectType(Rhino.DocObjects.ObjectType.Curve);
+            foreach (var o in objects)
+            {
+                Rhino.RhinoDoc.ActiveDoc.Objects.Unlock(o,true);
+            }
             //long mem2 = GC.GetTotalMemory(false);
             //GC.Collect();
             var texts = Rhino.RhinoDoc.ActiveDoc.Objects.FindByObjectType(Rhino.DocObjects.ObjectType.Annotation);
