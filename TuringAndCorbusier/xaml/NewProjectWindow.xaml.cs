@@ -403,7 +403,7 @@ namespace TuringAndCorbusier
             gagak.previousBoundary = guid;
             //Rhino.RhinoDoc.ActiveDoc.Layers.SetCurrentLayerIndex(Rhino.RhinoDoc.ActiveDoc.Layers.Find("ZC304", true), true);
             //var guid = RhinoDoc.ActiveDoc.Objects.AddCurve(scaledBoundary);
-            LoadManager.getInstance().DrawObjectWithSpecificLayer(tempKDGinfo.outrect, LoadManager.NamedLayer.Model);
+            LoadManager.getInstance().DrawObjectWithSpecificLayer(tempKDGinfo.outrect, LoadManager.NamedLayer.ETC);
             //var rectguid = RhinoDoc.ActiveDoc.Objects.AddCurve(tempKDGinfo.outrect);
             int index = TuringAndCorbusierPlugIn.InstanceClass.turing.stackPanel.Children.Count;
 
@@ -411,7 +411,7 @@ namespace TuringAndCorbusier
             /// checkpoint 테스트용
             /// 
 
-            LoadManager.getInstance().DrawObjectWithSpecificLayer(tempKDGinfo.surrbuildings, LoadManager.NamedLayer.Model);
+            LoadManager.getInstance().DrawObjectWithSpecificLayer(tempKDGinfo.surrbuildings, LoadManager.NamedLayer.ETC);
 
             //foreach (var surrcurve in TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings)
             //{

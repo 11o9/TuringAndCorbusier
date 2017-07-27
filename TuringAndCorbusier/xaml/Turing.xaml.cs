@@ -58,6 +58,8 @@ namespace TuringAndCorbusier
 
         public Turing()
         {
+            
+
             InitializeComponent();
 
             Calculate.Click += Btn_SetInputValues;
@@ -280,6 +282,7 @@ namespace TuringAndCorbusier
                 return;
             }
 
+            
 
             SetCam();
 
@@ -1305,7 +1308,7 @@ namespace TuringAndCorbusier
 
                 RhinoApp.Wait();
                 string path = "";
-                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(940, 665), Rhino.Display.DisplayModeDescription.FindByName("Shaded")))
+                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(940, 665), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
                 {
 
                     path = dirinfo.FullName + "test" + i.ToString() + ".jpeg";
@@ -1564,7 +1567,7 @@ namespace TuringAndCorbusier
                     vp.WorldAxesVisible = false;
                     vp.ParentView.Maximized = true;
                     Rhino.Display.DisplayModeDescription dm = vp.DisplayMode;
-                    if (dm.EnglishName != "Shaded")
+                    if (dm.EnglishName != "Rendered")
                     {
                         Rhino.Display.DisplayModeDescription[] dms = Rhino.Display.DisplayModeDescription.GetDisplayModes();
 
@@ -1577,9 +1580,10 @@ namespace TuringAndCorbusier
                             english_name = english_name.Replace(",", "");
                             english_name = english_name.Replace(".", "");
 
-                            if (english_name == "Shaded")
+                            if (english_name == "Rendered")
                             {
                                 vp.DisplayMode = Rhino.Display.DisplayModeDescription.FindByName(dms[j].EnglishName);
+                                vp.DisplayMode.DisplayAttributes.CurveColor = System.Drawing.Color.Black;
                                 vp.DisplayMode.DisplayAttributes.ShowCurves = true;
                             }
 

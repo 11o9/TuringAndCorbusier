@@ -382,13 +382,13 @@ namespace TuringAndCorbusier
 
             foreach (var item in Rhino.RhinoDoc.ActiveDoc.Layers)
             {
-                item.Color = System.Drawing.Color.White;
+                item.Color = System.Drawing.Color.Black;
                 item.CommitChanges();
             }
 
             Rhino.DocObjects.Layer[] newLayers = { modelLayer, etcLayer, guideLayer };
             layerarray = newLayers;
-            System.Drawing.Color[] layerColors = { System.Drawing.Color.White, System.Drawing.Color.DarkGray, System.Drawing.Color.Red };
+            System.Drawing.Color[] layerColors = { System.Drawing.Color.White, System.Drawing.Color.Black, System.Drawing.Color.Red };
 
             int layerCount;
 

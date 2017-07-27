@@ -5,6 +5,7 @@ using System.Text;
 using Rhino.Geometry;
 using System.IO;
 using System.Xml.Serialization;
+
 namespace TuringAndCorbusier
 {
     public class DataManager
@@ -181,10 +182,6 @@ namespace TuringAndCorbusier
 
         }
 
-        public static void Add(this Rhino.Collections.ArchivableDictionary d, System.Object obj)
-        {
-
-        }
     }
 
 }
