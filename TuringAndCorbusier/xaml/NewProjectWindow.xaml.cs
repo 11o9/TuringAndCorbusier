@@ -10,6 +10,7 @@ using Rhino;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Security.Permissions;
 using System.Windows.Input;
 using Reports;
 using TuringAndCorbusier.Datastructure_Settings;
@@ -604,7 +605,9 @@ namespace TuringAndCorbusier
             //set line fields
             Curve boundary = TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.DuplicateCurve();
             if (boundary.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.CounterClockwise)
+            {
                 boundary.Reverse();
+            }
             List<Curve> boundaryList = TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.DuplicateSegments().ToList();
 
             List<Gagak> gagakList = new List<Gagak>();
@@ -816,9 +819,38 @@ namespace TuringAndCorbusier
                 return;
             }
 
-            if (TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.CounterClockwise)
-                TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.Reverse();
-      
+
+
+            if (TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.ClosedCurveOrientation(Plane.WorldXY) != CurveOrientation.CounterClockwise)
+            {
+                try
+                {
+
+                    Polyline poly;
+                    TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.TryGetPolyline(out poly);
+                    PolyLog(poly);
+                    poly.Reverse();
+                    PolyLog(poly);
+
+                    Polyline reverse;
+                    TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.Reverse();
+                    TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.TryGetPolyline(out reverse);
+                    PolyLog(reverse);
+
+                    TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary = new PolylineCurve(poly);
+                    TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings = TuringAndCorbusierPlugIn.InstanceClass.plot.Surroundings.Reverse().ToArray();
+                    string orientation = TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.ClosedCurveOrientation(Vector3d.ZAxis).ToString();
+                    CommonFunc.CheckOrientation("SetPlotWidth", orientation);
+                }
+                catch ( Exception ex)
+                {
+                    RhinoApp.WriteLine(ex.Message);
+                }
+               
+
+                
+            }
+
             List<Curve> inputList = TuringAndCorbusierPlugIn.InstanceClass.plot.Boundary.DuplicateSegments().ToList();
             List<ConduitLine> tempConduitLine = new List<ConduitLine>();
 
@@ -867,12 +899,6 @@ namespace TuringAndCorbusier
                     break;
             }
 
-
-            if (TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.boundary.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.CounterClockwise)
-                TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.boundary.Reverse();
-
-
-
             Curve[] boundarysegs = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.boundary.DuplicateSegments();
 
 
@@ -900,7 +926,14 @@ namespace TuringAndCorbusier
             this.maxFloors.Text = "7";
         }
 
+        private void PolyLog(Polyline poly)
+        {
+            foreach (var p in poly)
+            {
+                RhinoApp.WriteLine("{0},{1},{2}" , p.X,p.Y,p.Z);
+            }
 
+        }
         /// <summary>
         /// 새로운 경계 입력 함수
         /// </summary>
@@ -1078,8 +1111,16 @@ namespace TuringAndCorbusier
 
             Curve bound = merged.OutBounds[0].ToNurbsCurve();
 
+            string orientation = bound.ClosedCurveOrientation(Vector3d.ZAxis).ToString();
+
+            CommonFunc.CheckOrientation("GetPlotFinish, getCurveFromGISMP",orientation);
+
             if (bound.ClosedCurveOrientation(Plane.WorldXY) == CurveOrientation.Clockwise)
+            {
                 bound.Reverse();
+                orientation = bound.ClosedCurveOrientation(Vector3d.ZAxis).ToString();
+                CommonFunc.CheckOrientation("GetPlotFinish, alignbound", orientation);
+            }
             double[] roadWidths = GISData.Extract.SiteParser.GetRoadWidths(bound, serverUI.Piljis);
             serverUI.drawer.Unlock();
             SetCurve(bound);

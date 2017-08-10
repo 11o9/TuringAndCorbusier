@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using GISData.DataStruct;
 using Microsoft.SqlServer.Types;
 using System.Text.RegularExpressions;
+using Rhino;
 using Rhino.Geometry;
 namespace GISData
 {
@@ -120,6 +121,7 @@ namespace GISData
 
             try
             {
+
                 List<T> result = new List<T>();
                 using (SqlConnection conn = new SqlConnection(con))
                 {
@@ -185,23 +187,34 @@ namespace GISData
 
         private static Pilji ConvertToGaroPilji(SqlDataReader rdr)
         {
-            string s = rdr["A5"] as string;
-            string code = rdr["A0"] as string;
-            string jimok = rdr["A7"] as string;
-            string usage = "알수없음";
-            SqlGeometry geo = rdr["geom"] as SqlGeometry;   // this is null.
-            var check = rdr["geom"];    // type is geodata...??
-            string checkString = rdr["geom"].ToString();    // geometry expressed as string, as expected. use this one.
-                                                            //RhinoApp.WriteLine(s);
-            var outlineParsed = ParseTextToGeometry(checkString);
-            var piljimult = new MultiPolygon(outlineParsed);
-            Pilji temp = new Pilji(piljimult, code, s);
-            temp.Jimok = jimok;
-            temp.Usage = usage;
+            try
+            {
+                string s = rdr["StreetNum"] as string;
+                string code = rdr["UniqueNum"] as string;
+                string jimok = rdr["LotCategory"] as string;
+                jimok = jimok.Substring(jimok.Length - 1, 1);
+                string usage = "알수없음";
+                SqlGeometry geo = rdr["geom"] as SqlGeometry;   // this is null.
+                var check = rdr["geom"];    // type is geodata...??
+                string checkString = rdr["geom"].ToString();    // geometry expressed as string, as expected. use this one.
+                //RhinoApp.WriteLine(s);
+                var outlineParsed = ParseTextToGeometry(checkString);
+                var piljimult = new MultiPolygon(outlineParsed);
+                Pilji temp = new Pilji(piljimult, code, s);
+                temp.Jimok = jimok;
+                temp.Usage = usage;
 
-            //RhinoApp.WriteLine(s);
+                //RhinoApp.WriteLine(s);
 
-            return temp;
+                return temp;
+            }
+            catch (Exception e)
+            {
+                RhinoApp.WriteLine(e.Message);
+            }
+
+            return null;
+
         }
 
         private static Building ConverToBuilding(SqlDataReader rdr)

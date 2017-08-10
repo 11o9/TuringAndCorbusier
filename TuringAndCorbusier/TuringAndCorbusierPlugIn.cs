@@ -56,6 +56,7 @@ namespace TuringAndCorbusier
 
             public static bool isfirst = true;
 
+            public static bool testing = false;
         }
 
         public TuringAndCorbusierPlugIn()
@@ -121,6 +122,8 @@ namespace TuringAndCorbusier
             else
                 Rhino.RhinoApp.WriteLine("NotAdmin");
 
+
+
             try
             {
                 UIManager.getInstance().init();
@@ -132,11 +135,20 @@ namespace TuringAndCorbusier
 
             Rhino.ApplicationSettings.GeneralSettings.NewObjectIsoparmCount = -1;
 
-            InstanceClass.turing.ProjectAddress.Text = CommonFunc.getAddressFromServer(InstanceClass.turing.CurrentDataIdName.ToList(), InstanceClass.turing.CurrentDataId.ToList());
 
-            Rhino.RhinoApp.Wait();
+            //디버그시에 체크
+            //InstanceClass.testing = true;
 
-            Rhino.RhinoApp.Wait();
+            if(!InstanceClass.testing)
+                InstanceClass.turing.ProjectAddress.Text = CommonFunc.getAddressFromServer(InstanceClass.turing.CurrentDataIdName.ToList(), InstanceClass.turing.CurrentDataId.ToList());
+            else
+            {
+                InstanceClass.turing.ProjectAddress.Text = "";
+                RhinoApp.WriteLine("ok");
+            }
+            //Rhino.RhinoApp.Wait();
+
+            //Rhino.RhinoApp.Wait();
 
 
             string message = string.Format("{0} 대지의 캐드파일을 불러오시겠습니까?", InstanceClass.turing.ProjectAddress.Text);

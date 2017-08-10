@@ -69,12 +69,19 @@ namespace TuringAndCorbusier
 
             try
             {
-                this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER", CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
-                
-                this.ProjectAddress.Text = CommonFunc.getAddressFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList());
+                if (!TuringAndCorbusierPlugIn.InstanceClass.testing)
+                {
+                    this.ProjectName.Text = CommonFunc.getStringFromServer("REGI_BIZNS_NM", "TN_REGI_MASTER",
+                        CurrentDataIdName.ToList(), CurrentDataId.ToList())[0];
 
-                
-                this.ProjectArea.Text = Math.Round(CommonFunc.GetManualAreaFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList()), 2).ToString();
+                    this.ProjectAddress.Text =
+                        CommonFunc.getAddressFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList());
+
+
+                    this.ProjectArea.Text = Math
+                        .Round(CommonFunc.GetManualAreaFromServer(CurrentDataIdName.ToList(), CurrentDataId.ToList()),
+                            2).ToString();
+                }
             }
             catch (System.Exception)
             {
@@ -142,8 +149,12 @@ namespace TuringAndCorbusier
 
         private void MainPaenl_StackButton_Click(object sender, RoutedEventArgs e)
         {
+
+
             if (previousClickedButtonIndex != -1)
+            {
                 (stackPanel.Children[previousClickedButtonIndex] as Button).Background = previousClickedButtonBrush;
+            }
 
             this.previousClickedButtonIndex = stackPanel.Children.IndexOf(sender as Button);
             this.previousClickedButtonBrush = (sender as Button).Background;

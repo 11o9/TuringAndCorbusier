@@ -38,12 +38,13 @@ namespace GISData.Extract
 
         public void Update(Pilji selected)
         {
-
+            //Rhino.RhinoApp.WriteLine(selectedPilji.Count.ToString());
+            //Rhino.RhinoApp.WriteLine(selected.Name + "has been Selected");
             //포함되는것 - 제거
             if (Contain(selected))
             {
                 selectedPilji.Remove(selected);
-
+               // Rhino.RhinoApp.WriteLine(selected.Name + "has been Removeed");
             }
             //포함되지않는것 - 추가
             else
@@ -52,11 +53,13 @@ namespace GISData.Extract
                 if (Border(selected))
                 {
                     selectedPilji.Add(selected);
+                    //Rhino.RhinoApp.WriteLine(selected.Name + "has been Added");
                 }
                 else
                 {
                     selectedPilji.Clear();
                     selectedPilji.Add(selected);
+                    //Rhino.RhinoApp.WriteLine(selected.Name + "has been Added after Clear");
                 }
             }
 
@@ -69,13 +72,16 @@ namespace GISData.Extract
             bool result = false;
             foreach (var p in selectedPilji)
             {
-                if (selected.Code == p.Code)
+                //Rhino.RhinoApp.WriteLine("{0} : {1} ",selected.Name, p.Name);
+                if (selected.Name == p.Name)
                 {
                     result = true;
+                    //Rhino.RhinoApp.WriteLine(selected.Name + "Contain");
                     break;
                 }
+                //Rhino.RhinoApp.WriteLine(selected.Name + "Exclude");
             }
-
+            
             return result;
         }
 

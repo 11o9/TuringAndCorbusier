@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using System.IO.Ports;
 using Oracle.ManagedDataAccess.Client;
+using Rhino;
 using Rhino.Collections;
 
 using TuringAndCorbusier.Utility;
@@ -16,8 +17,33 @@ using TuringAndCorbusier.Utility;
 namespace TuringAndCorbusier
 {
 
+    
+
     class CommonFunc
     {
+        public static void LogError(Exception e)
+        {
+            string message = "";
+            string caption = "Exception Log";
+
+            //Exception tempException = e;
+            //while (tempException.InnerException != null)
+            //{
+            //    message += tempException.Message;
+            //    message += Environment.NewLine;
+            //    tempException = tempException.InnerException;
+            //}
+            message = e.Message;
+            MessageBox.Show(message, caption);
+
+        }
+
+        public static void CheckOrientation(string spot, string orientaion)
+        {
+            if(TuringAndCorbusierPlugIn.InstanceClass.testing)
+                RhinoApp.WriteLine("CHANGEDSPOT : {0} , ORIENTATION CHANGED TO {1}" , spot,orientaion);
+        }
+
         public static List<Curve> NewJoin(IEnumerable<Curve> spl)
         {
             Queue<Curve> q = new Queue<Curve>(spl);

@@ -279,107 +279,58 @@ namespace TuringAndCorbusier
 
             NumOfParking.Text = (agOutput.ParkingLotOnEarth.GetCount() + agOutput.ParkingLotUnderGround.Count).ToString() + "대";
 
-            var sttstcs = agOutput.HouseholdStatistics.OrderBy(n=>n.ExclusiveArea).ToList();
+            List<double> firstFloorHHArea = new List<double>();
+            for (int i = 0; i < agOutput.Household[0].Count; i++)
+            {
+                for (int j = 0; j < agOutput.Household[0][i].Count; j++)
+                {
+                    double round = Math.Round(agOutput.Household[0][i][j].ExclusiveArea / 1000000);
+                    if (!firstFloorHHArea.Contains(round))
+                        firstFloorHHArea.Add(round);
+                }
+            }
+            var ta = firstFloorHHArea.OrderBy(n => n).ToList();
+            int[] type = new int[ta.Count];
+            int areaTolerance = 5;
+            type = type.Select(n => 0).ToArray();
+            foreach (var hh in agOutput.Household)
+            {
+                foreach (var h in hh)
+                {
+                    foreach (var x in h)
+                    {
+                        for (int i = 0; i < ta.Count; i++)
+                        {
+                            double round = Math.Round(x.ExclusiveArea / 1000000);
+                            if (round <= ta[i] && round > ta[i] - areaTolerance)
+                            {
+                                type[i]++;
+                                break;
+                            }
+                        }
+                    }
+                }
 
-          
-            //List<double> firstFloorHHArea = new List<double>();
-            //for (int i = 0; i < agOutput.Household[0].Count; i++)
-            //{
-            //    for (int j = 0; j < agOutput.Household[0][i].Count; j++)
-            //    {
-            //        double round = Math.Round(agOutput.Household[0][i][j].ExclusiveArea / 1000000);
-            //        if (!firstFloorHHArea.Contains(round))
-            //            firstFloorHHArea.Add(round);
-            //    }
-            //}
-            //var ta = firstFloorHHArea.OrderBy(n=>n).ToList();
-            //int[] type = new int[ta.Count];
-            //type = type.Select(n => 0).ToArray();
-            //foreach (var hh in agOutput.Household)
-            //{
-            //    foreach (var h in hh)
-            //    {
-            //        foreach (var x in h)
-            //        {
-            //            for (int i = 0; i < ta.Count; i++)
-            //            {
-            //                double round = Math.Round(x.ExclusiveArea / 1000000);
-            //                if (round == ta[i])
-            //                {
-            //                    type[i]++;
-            //                    break;
-            //                }
-            //            }
-            //        }
-            //    }
+            }
 
-            //}
-
-            TextBlock[] title = new TextBlock[] { most1,    most2,    most3,    most4,    most5    };
+            TextBlock[] title = new TextBlock[] { most1, most2, most3, most4, most5 };
             TextBlock[] count = new TextBlock[] { nummost1, nummost2, nummost3, nummost4, nummost5 };
 
 
-
-            double similarTolerance = 0.1;
-            double lastSttArea = 0;
-            int accCount = 0;
-            int listIndex = 0;
-            for (int i = 0; i < sttstcs.Count; i++)
+            for (int i = 0; i < title.Length; i++)
             {
-                //변형된 유닛, 비슷한 정형 유닛 카운트에 추가
-                if (sttstcs[i].Count < 3)
+                if (i < ta.Count)
                 {
-                    accCount += sttstcs[i].Count;
-                    lastSttArea = sttstcs[i].ExclusiveArea;
-                    continue;
+                    title[i].Text = ta[i].ToString() + " m2 형";
+                    count[i].Text = type[i].ToString();
                 }
-                if (lastSttArea / sttstcs[i].ExclusiveArea < similarTolerance)
-                {
-                    title[listIndex].Text = Math.Round(sttstcs[i].ExclusiveArea / 1000000) + " m2 형";
-                    count[listIndex].Text = (sttstcs[i].Count + accCount).ToString();
-                    listIndex++;
-                    accCount = 0;
-                    lastSttArea = 0;
-                }
+
                 else
                 {
-                    title[listIndex].Text = Math.Round(lastSttArea / 1000000) + " m2 형";
-                    count[listIndex].Text = accCount.ToString();
-                    accCount = 0;
-                    lastSttArea = 0;
-                    listIndex++;
-
-                    if (listIndex >= title.Length)
-                        break;
-
-                    title[listIndex].Text = Math.Round(sttstcs[i].ExclusiveArea / 1000000) + " m2 형";
-                    count[listIndex].Text = (sttstcs[i].Count + accCount).ToString();
-                    listIndex++;
-                    accCount = 0;
-                    lastSttArea = 0;
+                    title[i].Text = "";
+                    count[i].Text = "";
                 }
-                if (listIndex >= title.Length)
-                    break;
             }
-
-
-
-
-            //for (int i = 0; i < title.Length; i++)
-            //{
-            //    if (i < ta.Count)
-            //    {
-            //        title[i].Text = ta[i].ToString() + " m2 형";
-            //        count[i].Text = type[i].ToString();
-            //    }
-
-            //    else
-            //    {
-            //        title[i].Text = "";
-            //        count[i].Text = "";
-            //    }
-            //}
-
 
 
 
@@ -387,100 +338,108 @@ namespace TuringAndCorbusier
 
         private void Btn_Calculate_Click(object sender, RoutedEventArgs e)
         {
-            currentProgressFactor = 0;
-
-            //building3DPreview.BrepToDisplay = new List<Brep>();
-            Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
-            RhinoApp.Wait();
-
-            List<ApartmentGeneratorBase> agSet = new List<ApartmentGeneratorBase>();
-
-            agSet.Add(new AG1());
-            agSet.Add(new AG3());
-            agSet.Add(new AG4());
-
-            if (TuringAndCorbusierPlugIn.InstanceClass.plot == null)
+            try
             {
-                return;
-            }
+                currentProgressFactor = 0;
 
-            Plot tempPlot = TuringAndCorbusierPlugIn.InstanceClass.plot;
-            Target tempTarget = TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Target;
+                //building3DPreview.BrepToDisplay = new List<Brep>();
+                Rhino.RhinoDoc.ActiveDoc.Views.Redraw();
+                RhinoApp.Wait();
 
-            List<ApartmentGeneratorBase> usingAGSet = new List<ApartmentGeneratorBase>();
+                List<ApartmentGeneratorBase> agSet = new List<ApartmentGeneratorBase>();
 
-            for (int i = 0; i < agSet.Count(); i++)
-            {
-                if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse[i])
+                agSet.Add(new AG1());
+                agSet.Add(new AG3());
+                agSet.Add(new AG4());
+
+                if (TuringAndCorbusierPlugIn.InstanceClass.plot == null)
                 {
-                    if (i > 0 && !TuringAndCorbusierPlugIn.InstanceClass.page2.isAG34Valid)
-                        return;
-                    usingAGSet.Add(agSet[i]);
+                    return;
                 }
-            }
 
-            if (usingAGSet.Count() == 0)
-                usingAGSet.Add(new AG1());
+                Plot tempPlot = TuringAndCorbusierPlugIn.InstanceClass.plot;
+                Target tempTarget = TuringAndCorbusierPlugIn.InstanceClass.page2Settings.Target;
 
-            this.calcWorkQuantity(usingAGSet);
+                List<ApartmentGeneratorBase> usingAGSet = new List<ApartmentGeneratorBase>();
 
-
-            if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse.IndexOf(true) == -1)
-            {
-                try
+                for (int i = 0; i < agSet.Count(); i++)
                 {
-                    AG1 tempAG = new AG1();
-
-                    List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, tempAG, tempTarget, !this.Preview_Toggle.IsChecked.Value);
-
-                    string tempAGname = GetConvertedAGName(tempAG);
-
-                    for (int i = 0; i < tempTempOutputs.Count; i++)
+                    if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse[i])
                     {
-                        bool addResult = this.AddButtonToStackPanel(tempTempOutputs[i]);
-                        if (addResult)
-                        {
-                            this.tempOutput.Add(tempTempOutputs[i]);
-                            this.tempAGName.Add(tempAGname);
-                        }
+                        if (i > 0 && !TuringAndCorbusierPlugIn.InstanceClass.page2.isAG34Valid)
+                            return;
+                        usingAGSet.Add(agSet[i]);
                     }
-            }
-                catch (Exception ex)
-            {
-                RhinoApp.WriteLine(ex.Message);
-            }
-        }
+                }
+
+                if (usingAGSet.Count() == 0)
+                    usingAGSet.Add(new AG1());
+
+                this.calcWorkQuantity(usingAGSet);
 
 
-            for (int i = 0; i < agSet.Count(); i++)
-            {
-                if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse[i])
+                if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse.IndexOf(true) == -1)
                 {
+                    try
+                    {
+                        AG1 tempAG = new AG1();
 
+                        List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, tempAG, tempTarget, !this.Preview_Toggle.IsChecked.Value);
 
-                    //try
-                    //{
-                        List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
+                        string tempAGname = GetConvertedAGName(tempAG);
 
-
-
-                        string tempAGname = GetConvertedAGName(agSet[i]);
-
-                        if (tempTempOutputs == null)
-                            continue;
-
-                        for (int k = 0; k < tempTempOutputs.Count; k++)
+                        for (int i = 0; i < tempTempOutputs.Count; i++)
                         {
-
-                            bool addResult = this.AddButtonToStackPanel(tempTempOutputs[k]);
+                            bool addResult = this.AddButtonToStackPanel(tempTempOutputs[i]);
                             if (addResult)
                             {
-                                this.tempOutput.Add(tempTempOutputs[k]);
+                                this.tempOutput.Add(tempTempOutputs[i]);
                                 this.tempAGName.Add(tempAGname);
                             }
-
                         }
                 }
+                    catch (Exception ex)
+                {
+                    RhinoApp.WriteLine(ex.Message);
+                }
+            }
+
+
+                for (int i = 0; i < agSet.Count(); i++)
+                {
+                    if (TuringAndCorbusierPlugIn.InstanceClass.page2Settings.WhichAGToUse[i])
+                    {
+
+
+                        //try
+                        //{
+                            List<Apartment> tempTempOutputs = GiantAnteater.giantAnteater(tempPlot, agSet[i], tempTarget, !this.Preview_Toggle.IsChecked.Value);
+
+
+
+                            string tempAGname = GetConvertedAGName(agSet[i]);
+
+                            if (tempTempOutputs == null)
+                                continue;
+
+                            for (int k = 0; k < tempTempOutputs.Count; k++)
+                            {
+
+                                bool addResult = this.AddButtonToStackPanel(tempTempOutputs[k]);
+                                if (addResult)
+                                {
+                                    this.tempOutput.Add(tempTempOutputs[k]);
+                                    this.tempAGName.Add(tempAGname);
+                                }
+
+                            }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                CommonFunc.LogError(ex);
             }
         }
 

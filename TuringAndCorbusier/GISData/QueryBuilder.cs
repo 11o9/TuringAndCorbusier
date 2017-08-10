@@ -196,7 +196,7 @@ namespace GISData
             string sido = dongcode.Substring(0, 2);
             AZURE_Mssql_GIS_Tables_shp db = (AZURE_Mssql_GIS_Tables_shp)int.Parse(sido);
 
-            query = "SELECT * FROM mssql_RoK_GIS_05302017.dbo." + GetServerName(db) + " WHERE A0 LIKE '" + dongcode + "%' " ;
+            query = "SELECT * FROM mssql_RoK_GIS_05302017.dbo." + GetServerName(db) + " WHERE UniqueNum LIKE '" + dongcode + "%' " ;
 
             return query;
         }

@@ -197,9 +197,13 @@ namespace TuringAndCorbusier
         {
             if (boundary.ClosedCurveOrientation(Plane.WorldXY) != CurveOrientation.CounterClockwise)
             {
+                
                 Curve x = boundary.DuplicateCurve();
                 x.Reverse();
                 boundary = x;
+
+                string orientation = boundary.ClosedCurveOrientation(Vector3d.ZAxis).ToString();
+                CommonFunc.CheckOrientation("AlignBoundary In Plot Constructor", orientation);
             }
         }
 
@@ -2737,13 +2741,18 @@ namespace TuringAndCorbusier
         {
             //plot 의 boundary 와 roads 를 사용.
             Curve boundaryCopy = plot.Boundary.DuplicateCurve();
+            int[] surroundingCopy = plot.Surroundings;
 
-            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.Clockwise)
+            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) != CurveOrientation.CounterClockwise)
+            {
                 boundaryCopy.Reverse();
-
+                surroundingCopy = surroundingCopy.Reverse().ToArray();
+                string orientation = boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis).ToString();
+                CommonFunc.CheckOrientation("CenterLine",orientation);
+            }
             var segments = boundaryCopy.DuplicateSegments();
 
-            var roadwidths = plot.SimplifiedSurroundings.ToList();
+            var roadwidths = surroundingCopy.ToList();
 
             for (int i = 0; i < segments.Length; i++)
             {
@@ -2842,10 +2851,14 @@ namespace TuringAndCorbusier
             //법규적용(대지안의 공지)
 
             Curve boundaryCopy = plot.Boundary.DuplicateCurve();
-
-            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.Clockwise)
+            int[] surroundingCopy = plot.Surroundings;
+            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) != CurveOrientation.CounterClockwise)
+            {
                 boundaryCopy.Reverse();
-
+                surroundingCopy = surroundingCopy.Reverse().ToArray();
+                string orientation = boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis).ToString();
+                CommonFunc.CheckOrientation("CenterLine", orientation);
+            }
             Curve[] plotArr = boundaryCopy.DuplicateSegments();
             //extend plotArr
             Curve[] plotArrExtended = new Curve[plotArr.Length];
@@ -2863,9 +2876,9 @@ namespace TuringAndCorbusier
 
             for (int i = 0; i < plotArr.Length; i++)
             {
-                if (plot.SimplifiedSurroundings[i] > 0)
+                if (surroundingCopy[i] > 0)
                     distanceFromSurroundings[i] = distanceFromRoad;
-                else if (plot.SimplifiedSurroundings[i] == 0)
+                else if (surroundingCopy[i] == 0)
                     distanceFromSurroundings[i] = DistanceFromPlot;
             }
 
@@ -2952,10 +2965,13 @@ namespace TuringAndCorbusier
             double tempHeight = height - fakeHeight;
 
             Curve boundaryCopy = plot.Boundary.DuplicateCurve();
+            int[] surroundingCopy = plot.Surroundings;
 
             if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.Clockwise)
+            {
                 boundaryCopy.Reverse();
-
+                surroundingCopy.Reverse();
+            }
             var tempRoadLine = boundaryCopy.DuplicateSegments();
 
             for (int i = 0; i < tempRoadLine.Length; i++)
@@ -2963,7 +2979,7 @@ namespace TuringAndCorbusier
                 if (tempRoadLine[i].TangentAtStart.X <= 0)
                     continue;
 
-                double roadCenter = plot.Surroundings[i] / 2;
+                double roadCenter = surroundingCopy[i] / 2;
                 double moveDistance = roadCenter * t;
 
                 if (tempHeight < 9000)//숫자 -> 나중에 변수로
@@ -2974,7 +2990,7 @@ namespace TuringAndCorbusier
                 if (moveDistance < 0)
                     moveDistance = 0;
 
-                if (plot.Surroundings[i] == 21000)
+                if (surroundingCopy[i] == 21000)
                     moveDistance = 0;
 
 
@@ -3095,10 +3111,14 @@ namespace TuringAndCorbusier
 
 
             Curve boundaryCopy = plot.Boundary.DuplicateCurve();
-
-            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) == CurveOrientation.Clockwise)
+            int[] surroundingCopy = plot.Surroundings;
+            if (boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis) != CurveOrientation.CounterClockwise)
+            {
                 boundaryCopy.Reverse();
-
+                surroundingCopy = surroundingCopy.Reverse().ToArray();
+                string orientation = boundaryCopy.ClosedCurveOrientation(Vector3d.ZAxis).ToString();
+                CommonFunc.CheckOrientation("CenterLine", orientation);
+            }
             Curve[] plotArr = boundaryCopy.DuplicateSegments(); //roadCenter.DuplicateSegments();
 
             //대지 경계선을 구성 선분들로 분할합니다.
@@ -3121,7 +3141,7 @@ namespace TuringAndCorbusier
             for (int i = 0; i < plotArrExtended.Length; i++)
             {
                 int k = 1;
-                double roadWidth = plot.Surroundings[i] / 2;
+                double roadWidth = surroundingCopy[i] / 2;
                 if (roadWidth == 21000)
                     k = 0;
                 double eachDistance = (distance - roadWidth) * k;
