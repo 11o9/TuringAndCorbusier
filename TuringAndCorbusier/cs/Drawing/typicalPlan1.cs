@@ -8,14 +8,9 @@ using Rhino.Collections;
 
 namespace TuringAndCorbusier
 {
-    public class TypicalPlan
+    public class typicalPlan
     {
-        public TypicalPlan()
-        {
-
-        }
-        //2층이상 평면도
-        private TypicalPlan(Curve boundary, Rectangle3d outLine, List<Text3d> roadWidthText, List<FloorPlan> unitPlans, List<CorePlan> corePlans, List<Curve> surroundingSite, int floor)
+        private typicalPlan(Curve boundary, Rectangle3d outLine, List<Text3d> roadWidthText, List<FloorPlan> unitPlans, List<CorePlan> corePlans, List<Curve> surroundingSite, int floor)
         {
             this.Boundary = boundary;
             this.OutLine = outLine;
@@ -25,8 +20,8 @@ namespace TuringAndCorbusier
             this.SurroundingSite = surroundingSite;
             this.Floor = floor;
         }
-        //1층 평면도
-        private TypicalPlan(Curve boundary, Rectangle3d outLine, List<Text3d> roadWidthText, List<FloorPlan> unitPlans, List<CorePlan> corePlans, List<List<Curve>> nonresidentials, List<Curve> parkingLines, List<Curve> surroundingSite, int floor)
+
+        private typicalPlan(Curve boundary, Rectangle3d outLine, List<Text3d> roadWidthText, List<FloorPlan> unitPlans, List<CorePlan> corePlans, List<List<Curve>> nonresidentials, List<Curve> parkingLines, List<Curve> surroundingSite, int floor)
         {
             this.Boundary = boundary;
             this.OutLine = outLine;
@@ -63,83 +58,113 @@ namespace TuringAndCorbusier
             return this.OutLine.BoundingBox;
         }
 
-        ////-------------------------------------------------------------List<FloorPlanLibrary> fpls 나중에 삭제--------------------------------------------------//
-        public static TypicalPlan DrawTypicalPlan(Plot plot, Rectangle3d outLine, List<Curve> surroundingSite, Apartment agOutput, List<FloorPlanLibrary> fpls, int targetFloor)
+        public static typicalPlan DrawTypicalPlan(Plot plot, Rectangle3d outLine, List<Curve> surroundingSite, Apartment agOutput, List<FloorPlanLibrary> fpls, int targetFloor, bool drawParking)
         {
             List<CorePlan> tempCorePlans = new List<CorePlan>();
             List<FloorPlan> tempUnitPlans = new List<FloorPlan>();
             List<Curve> tempParkingLines = new List<Curve>();
-            foreach (List<Core> i in agOutput.Core)
-            {
-                foreach (Core j in i)
-                {
-                    if (j.Stories + 2 > targetFloor)
-                        tempCorePlans.Add(new CorePlan(j));
 
-                }
-            }
-            for (int i = 0; i < agOutput.Household[targetFloor - 1].Count(); i++)
+            if (targetFloor == 0)
             {
-                try
+                tempCorePlans = agOutput.Core.First().Select(n => new CorePlan(n)).ToList();
+                tempUnitPlans = new List<FloorPlan>();
+            }
+
+            else
+            {
+                foreach (List<Core> i in agOutput.Core)
                 {
-                    if (agOutput.Household[targetFloor - 1][i] != null)
+                    foreach (Core j in i)
                     {
-                        for (int j = 0; j < agOutput.Household[targetFloor - 1][i].Count; j++)
-                            tempUnitPlans.Add(new FloorPlan(agOutput.Household[targetFloor - 1][i][j], fpls, agOutput.AGtype));
+                        if (j.Stories + 2 > targetFloor)
+                            tempCorePlans.Add(new CorePlan(j));
+                    }
+                }
+
+                for (int i = 0; i < agOutput.Household[targetFloor - 1].Count(); i++)
+                {
+                    try
+                    {
+                        if (agOutput.Household[targetFloor - 1][i] != null)
+                        {
+                            for (int j = 0; j < agOutput.Household[targetFloor - 1][i].Count; j++)
+                                tempUnitPlans.Add(new FloorPlan(agOutput.Household[targetFloor - 1][i][j], fpls, agOutput.AGtype));
+                        }
+
+                    }
+                    catch (Exception)
+                    {
+                        continue;
                     }
 
                 }
-                catch (Exception)
-                {
-                    continue;
-                }
-
             }
+
             List<List<Curve>> nonResidentials = new List<List<Curve>>();
+
             foreach (NonResidential i in agOutput.Commercial)
             {
+
                 if (i == null)
                     continue;
+
                 List<Curve> tempCurves = new List<Curve>();
+
                 Curve OutLine = i.ToNurbsCurve();
+
+
+
                 if (OutLine.ClosedCurveOrientation(Vector3d.ZAxis) != CurveOrientation.CounterClockwise)
                     OutLine.Reverse();
                 //임시수정
                 if (OutLine.Offset(Plane.WorldXY, Consts.exWallThickness, 0, CurveOffsetCornerStyle.None).Count() == 0)
                     break;
                 Curve InnerCurve = OutLine.Offset(Plane.WorldXY, Consts.exWallThickness, 0, CurveOffsetCornerStyle.None)[0];
+
                 tempCurves.Add(OutLine);
                 tempCurves.Add(InnerCurve);
+
                 nonResidentials.Add(tempCurves);
             }
+
             foreach (NonResidential i in agOutput.PublicFacility)
             {
                 if (i == null)
                     continue;
+
+
                 List<Curve> tempCurves = new List<Curve>();
+
                 Curve OutLine = i.ToNurbsCurve();
+
                 if (OutLine.ClosedCurveOrientation(Vector3d.ZAxis) != CurveOrientation.CounterClockwise)
                     OutLine.Reverse();
+
                 Curve InnerCurve = OutLine.Offset(Plane.WorldXY, Consts.exWallThickness, 0, CurveOffsetCornerStyle.None)[0];
+
                 tempCurves.Add(OutLine);
                 tempCurves.Add(InnerCurve);
+
                 nonResidentials.Add(tempCurves);
             }
+
+
             List<Text3d> roadWithText = GetRoadWidthFromPlot(plot);
-            if (targetFloor == 1)
+
+            if (drawParking)
             {
                 for (int i = 0; i < agOutput.ParkingLotOnEarth.ParkingLines.Count(); i++)
                     for (int j = 0; j < agOutput.ParkingLotOnEarth.ParkingLines[i].Count(); j++)
                         tempParkingLines.Add(agOutput.ParkingLotOnEarth.ParkingLines[i][j].Boundary.ToNurbsCurve());
 
-                return new TypicalPlan(plot.Boundary, outLine, roadWithText, tempUnitPlans, tempCorePlans, nonResidentials, tempParkingLines, surroundingSite, targetFloor);
+                return new typicalPlan(plot.Boundary, outLine, roadWithText, tempUnitPlans, tempCorePlans, nonResidentials, tempParkingLines, surroundingSite, targetFloor);
             }
             else
             {
-                return new TypicalPlan(plot.Boundary, outLine, roadWithText, tempUnitPlans, tempCorePlans, surroundingSite, targetFloor);
+                return new typicalPlan(plot.Boundary, outLine, roadWithText, tempUnitPlans, tempCorePlans, surroundingSite, targetFloor);
             }
-        }
 
+        }
 
         private static List<Text3d> GetRoadWidthFromPlot(Plot plot)
         {

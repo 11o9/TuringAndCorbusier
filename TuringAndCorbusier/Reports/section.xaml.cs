@@ -22,7 +22,7 @@ namespace Reports
             SetTitle();
         }
 
-        private typicalPlan typicalPlanValue;
+        private TypicalPlan typicalPlanValue;
         private double scaleFactor = 0;
         private System.Windows.Point origin = new System.Windows.Point();
 

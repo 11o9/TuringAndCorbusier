@@ -40,7 +40,7 @@ namespace TuringAndCorbusier
         bool endWhileLoop = false;
         List<System.Guid> spguids = new List<System.Guid>();
         ButtonState buttonstate = ButtonState.None;
-        public string plotType = "제 2종 일반 주거지역";
+        public string plotType = "제 2 종일반주거지역";
         public PlotType plotType2 = PlotType.제2종일반주거지역;
         
         /// <summary>
@@ -80,7 +80,7 @@ namespace TuringAndCorbusier
 
             (sender as Button).Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 204, 17));
             (sender as Button).Foreground = System.Windows.Media.Brushes.Black;
-            this.plotType = "제 1종 일반 주거지역";
+            this.plotType = "제 1 종일반주거지역";
             plotType2 = PlotType.제1종일반주거지역;
             this.maxFloorAreaRatio.Text = "150";
             this.maxBuildingCoverage.Text = "60";
@@ -95,7 +95,7 @@ namespace TuringAndCorbusier
 
             (sender as Button).Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 204, 17));
             (sender as Button).Foreground = System.Windows.Media.Brushes.Black;
-            this.plotType = "제 2종 일반 주거지역";
+            this.plotType = "제 2 종일반주거지역";
             plotType2 = PlotType.제2종일반주거지역;
             this.maxFloorAreaRatio.Text = "200";
             this.maxBuildingCoverage.Text = "60";
@@ -110,7 +110,7 @@ namespace TuringAndCorbusier
 
             (sender as Button).Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 204, 17));
             (sender as Button).Foreground = System.Windows.Media.Brushes.Black;
-            this.plotType = "제 3종 일반 주거지역";
+            this.plotType = "제 3 종일반주거지역";
             plotType2 = PlotType.제3종일반주거지역;
             this.maxFloorAreaRatio.Text = "250";
             this.maxBuildingCoverage.Text = "50";

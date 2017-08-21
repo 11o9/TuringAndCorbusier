@@ -123,7 +123,7 @@ namespace TuringAndCorbusier
             }
 
             TuringAndCorbusierPlugIn.InstanceClass.turing = mainWindow;
-            TuringAndCorbusierPlugIn.InstanceClass.page1Settings = new Datastructure_Settings.Settings_Page1(ProjectName.Text, ProjectAddress.Text, "제 2종 일반 주거지역", double.Parse(ProjectArea.Text.Replace("m2","")), 200, 60, 7);
+            TuringAndCorbusierPlugIn.InstanceClass.page1Settings = new Datastructure_Settings.Settings_Page1(ProjectName.Text, ProjectAddress.Text, "제 2 종일반주거지역", double.Parse(ProjectArea.Text.Replace("m2","")), 200, 60, 7);
             List<System.Guid> dummy = new List<System.Guid>();
             Dictionary<string, string> pathdummy = new Dictionary<string, string>();
             for (int i = 0; i < 10; i++)
@@ -503,59 +503,129 @@ namespace TuringAndCorbusier
                 List<System.Windows.Documents.FixedPage> FixedPageList = new List<System.Windows.Documents.FixedPage>();
 
                 FixedDocument currentDoc = new FixedDocument();
-                currentDoc.DocumentPaginator.PageSize = new Size(1240, 1753);
+                currentDoc.DocumentPaginator.PageSize = new Size(1240, 175);
 
                 List<Page> pagesToVIew = new List<Page>();
 
-                //page1 표지
+                ////page1 표지
 
-                Reports.xmlcover cover = new Reports.xmlcover();
-                cover.SetTitle = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName;
+                //Reports.xmlcover cover = new Reports.xmlcover();
+                //cover.SetTitle = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName;
+                //fps.Add(cover.fixedPage);
+                //pagename.Add("Cover");
 
-                fps.Add(cover.fixedPage);
-                pagename.Add("Cover");
-
-                //page1.5 조감도
-
-                Reports.ImagePage imagepage = new Reports.ImagePage();
-
-
+                //JHL:2017.8.21 리포트 커버 페이지
+                Reports.ReportCover reportCover = new Reports.ReportCover();
+                var hasImage = reportCover.setImage("test0.jpeg");
+                string projectNameStr = TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName;
+                reportCover.SetTitle(projectNameStr);
+                reportCover.SetPublishDate();
 
 
-                var bool1 = imagepage.setImage1("Export\\test\\test0.jpg");
+                //표지에 넣을 정보 값 리스트에 넣기
+                Reports.xmlBuildingReport xmlBuildingInfo = new Reports.xmlBuildingReport(MainPanel_AGOutputList[tempIndex]);
 
-                var bool2 = imagepage.setImage2("Export\\test\\test1.jpg");
+                List<string> coverBuildingInfoList = new List<string>();
 
-                if (bool1 && bool2)
+                coverBuildingInfoList.Add(xmlBuildingInfo.projectName.Text);
+                coverBuildingInfoList.Add(xmlBuildingInfo.address.Text);
+                coverBuildingInfoList.Add(xmlBuildingInfo.plotType.Text);
+                coverBuildingInfoList.Add(xmlBuildingInfo.plotArea_Usable.Text);
+
+                string buildingCoverage = xmlBuildingInfo.buildingCoverage.Text;
+                buildingCoverage += xmlBuildingInfo.buildingCoverage_legal.Text;
+
+                string floorAreaRatio = xmlBuildingInfo.floorAreaRatio.Text;
+                floorAreaRatio += xmlBuildingInfo.floorAreaRatio_legal.Text;
+
+                coverBuildingInfoList.Add(buildingCoverage);
+                coverBuildingInfoList.Add(floorAreaRatio);
+                coverBuildingInfoList.Add(xmlBuildingInfo.numOfHouseHolds.Text);
+
+                reportCover.SetCoverBuildingInfo(coverBuildingInfoList);
+
+                if (hasImage)
                 {
-                    fps.Add(imagepage.fixedPage);
-                    pagename.Add("Birdeye");
+                    fps.Add(reportCover.fixedPage);
+                    pagename.Add("mainCover");
                 }
 
 
+                //조감도
+                Reports.Perspective persPage = new Reports.Perspective();
+                var persImage1 = persPage.setImage1("test2.jpeg");
+                var persImage2 = persPage.setImage2("test3.jpeg");
+                if (persImage1 && persImage2)
+                {
+                    fps.Add(persPage.fixedPage);
+                    pagename.Add("perspective");
+                }
+
 
                 //page2 건축개요
-
-                Reports.xmlBuildingReport buildingReport = new Reports.xmlBuildingReport(MainPanel_AGOutputList[tempIndex]);
-
-
                 // 배치도 테스트
+                List<List<List<Household>>> householdTripleList = MainPanel_AGOutputList[tempIndex].Household;
 
+                List<Household> householdList = new List<Household>();
+                List<double> numOfHouseInEachFloorList = new List<double>();
+
+                for (int i = 0; i < householdTripleList.Count; i++)
+                {
+                    double numOfHouseInEachFloor = 0;
+                    for (int j = 0; j < householdTripleList[i].Count; j++)
+                    {
+                        numOfHouseInEachFloor += householdTripleList[i][j].Count;
+                        for (int k = 0; k < householdTripleList[i][j].Count; k++)
+                        {
+                            householdList.Add(householdTripleList[i][j][k]);
+                        }
+                    }
+                    numOfHouseInEachFloorList.Add(numOfHouseInEachFloor);
+                }
+
+
+                List<HouseholdStatistics> uniqueHouseHoldProperties = MainPanel_AGOutputList[tempIndex].HouseholdStatistics.ToList();
                 BoundingBox tempBBox = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.outrect.GetBoundingBox(true);
                 Rectangle3d tempRectangle = new Rectangle3d(Plane.WorldXY, tempBBox.Min, tempBBox.Max);
+                TypicalPlan tempTypicalPlan_FL0 = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2);
 
-                typicalPlan tempTypicalPlan_FL0 = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, 2 , false);
+                List<Curve> coreOutline = MainPanel_AGOutputList[tempIndex].drawEachCore();
 
-                buildingReport.SetTypicalPlan = tempTypicalPlan_FL0;
+                List<Curve> houseOutline = MainPanel_AGOutputList[tempIndex].drawEachHouse();
+                List<Curve> aptLineList = MainPanel_AGOutputList[tempIndex].AptLines;
+                ParameterSet currentParamSet = MainPanel_AGOutputList[tempIndex].ParameterSet;
+                string agType = MainPanel_AGOutputList[tempIndex].AGtype;
 
-                fps.Add(buildingReport.fixedPage);
+                List<Household> houseNumByFloor = new List<Household>();
+                for (int i = 0; i < MainPanel_AGOutputList[tempIndex].Household.Count; i++)
+                {
+                    for (int j = 0; j < MainPanel_AGOutputList[tempIndex].Household[2].Count; j++)
+                    {
+                        for (int k = 0; k < MainPanel_AGOutputList[tempIndex].Household[2][j].Count; k++)
+                        {
+                            houseNumByFloor.Add(MainPanel_AGOutputList[tempIndex].Household[2][j][k]);
+                        }
+                    }
+                }
+
+                double NumberOfHouses = houseNumByFloor.Count / MainPanel_AGOutputList[tempIndex].ParameterSet.Stories + 1;
+
+                List<List<Core>> coreDoubleList = MainPanel_AGOutputList[tempIndex].Core;
+                List<Core> newCoreList = new List<Core>();
+                foreach (List<Core> coreList in coreDoubleList)
+                {
+                    foreach (Core core in coreList)
+                    {
+                        newCoreList.Add(core);
+                    }
+                }
+                xmlBuildingInfo.SetHouseOutline(numOfHouseInEachFloorList, coreOutline, houseOutline, tempTypicalPlan_FL0, newCoreList, NumberOfHouses, uniqueHouseHoldProperties, agType, aptLineList, currentParamSet, MainPanel_AGOutputList[tempIndex]);
+
+                fps.Add(xmlBuildingInfo.fixedPage);
                 pagename.Add("buildingReport");
 
 
                 //page3~ 세대타입별 개요
-
-                List<HouseholdStatistics> uniqueHouseHoldProperties = MainPanel_AGOutputList[tempIndex].HouseholdStatistics.ToList();
-
                 List<string> typeString = MainPanel_AGOutputList[tempIndex].AreaTypeString();
                 double coreAreaSum = MainPanel_AGOutputList[tempIndex].GetCoreAreaSum();
                 double UGParkingLotAreaSum = MainPanel_AGOutputList[tempIndex].ParkingLotUnderGround.ParkingArea;
@@ -599,13 +669,13 @@ namespace TuringAndCorbusier
                     bool drawParking = false;
                     if (!MainPanel_AGOutputList[tempIndex].ParameterSet.using1F)
                     {
-                    
+
                         if (i == 1)
-                            drawParking = true; 
+                            drawParking = true;
                         try
                         {
                             Reports.wpfTypicalPlan testTypicalPlanPage = new Reports.wpfTypicalPlan(new Interval(i, i));
-                            typicalPlan testTypicalPlan = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i-1, drawParking);
+                            typicalPlan testTypicalPlan = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i - 1, drawParking);
                             testTypicalPlanPage.SetTypicalPlan = testTypicalPlan;
                             fps.Add(testTypicalPlanPage.fixedPage);
                             pagename.Add("typicalPlanPage" + i.ToString());
@@ -620,9 +690,9 @@ namespace TuringAndCorbusier
 
                     }
 
-                
+
                     if (MainPanel_AGOutputList[tempIndex].ParameterSet.using1F && i == 1)
-                        drawParking = true; 
+                        drawParking = true;
 
 
                     try
@@ -644,7 +714,7 @@ namespace TuringAndCorbusier
 
 
 
-       
+
 
 
                 Reports.wpfSection testSectionPage = new Reports.wpfSection();
@@ -1226,7 +1296,7 @@ namespace TuringAndCorbusier
 
 
         }
-   
+
         private void BirdEye_Click(object sender, RoutedEventArgs e)
         {
             bool is64 = Environment.Is64BitOperatingSystem;
@@ -1267,12 +1337,23 @@ namespace TuringAndCorbusier
 
                 RhinoApp.Wait();
 
-                var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(940, 665), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
-                string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
-                bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
-                string key = "BIRDEYE" + (i + 1).ToString();
-                MainPanel_reportspaths[tempIndex].Add(key, path);
-
+                //-----------JHL 조감도 ---------------//
+                if (i == 0)
+                {
+                    var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038, 812), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
+                    string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
+                    bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    string key = "BIRDEYE" + (i + 1).ToString();
+                    MainPanel_reportspaths[tempIndex].Add(key, path);
+                }
+                if (i > 0)
+                {
+                    var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1075, 695), Rhino.Display.DisplayModeDescription.FindByName("Rendered"));
+                    string path = dirinfo.FullName + "\\test" + i.ToString() + ".jpeg";
+                    bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    string key = "BIRDEYE" + (i + 1).ToString();
+                    MainPanel_reportspaths[tempIndex].Add(key, path);
+                }
             }
             MainPanel_building2DPreview.Enabled = true;
             RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(backupPoint, false);
@@ -1290,6 +1371,7 @@ namespace TuringAndCorbusier
             string dir32 = "C://Program Files//Boundless//TuringAndCorbusier//DataBase//temp//";
 
 
+
             if (is64)
                 dirinfo = new DirectoryInfo(dir64);
             else
@@ -1298,63 +1380,122 @@ namespace TuringAndCorbusier
             if (!dirinfo.Exists)
                 dirinfo.Create();
 
+
+
+            RhinoDoc.ActiveDoc.Objects.Select(MainPanel_building3DPreview[tempIndex], true);
+            RhinoApp.RunScript("ZSA", false);
+            RhinoDoc.ActiveDoc.Objects.UnselectAll();
+
+
             Point3d backupPoint = RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.CameraLocation;
             Vector3d backupDir = RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.CameraDirection;
             MainPanel_building2DPreview.Enabled = false;
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 Point3d center = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.center;
                 Point3d tempcampos = TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.campos[i] + Vector3d.ZAxis * new Vector3d(center - TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.campos[i]).Length;
                 Vector3d tempdir = new Vector3d(center - tempcampos);
-                tempcampos = tempcampos - 2 * tempdir;
+                tempcampos = tempcampos - 3 * tempdir;
+                tempcampos += Vector3d.ZAxis * 2000;
                 if (MainPanel_AGOutputList[tempIndex].Plot.PlotType == PlotType.상업지역)
-                    tempcampos = tempcampos - 6 * tempdir;
+                    tempcampos = tempcampos - 9 * tempdir;
+
+
                 RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(tempcampos, false);
+                RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(new Vector3d(center - tempcampos), false);
+
+                RhinoDoc.ActiveDoc.Objects.Select(MainPanel_building3DPreview[tempIndex], true);
+                RhinoApp.RunScript("ZSA", false);
+                RhinoDoc.ActiveDoc.Objects.UnselectAll();
                 //RhinoDoc.ActiveDoc.Objects.AddLine(new Line(tempcampos, tempdir * 3));
                 RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
-                RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(new Vector3d(center - tempcampos), false);
+
 
                 RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
 
                 RhinoApp.Wait();
                 string path = "";
-                using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(940, 665), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                //screenshot
+                if (i < 1)
                 {
+                    using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(1038 * 3, 812 * 3), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                    {
 
-                    path = dirinfo.FullName + "test" + i.ToString() + ".jpeg";
-                    //var files = dirinfo.GetFiles("test*.jpeg");
-                    //foreach (var f in files)
-                    //    f.Delete();
-                    System.Drawing.Bitmap newbitmap = new System.Drawing.Bitmap(bitmap);
-                    bitmap.Dispose();
+                        TypicalPlan typicalPlan = new TypicalPlan();
+                        Rectangle3d rec = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
 
-                    //var file = dirinfo.GetFiles("test" + i.ToString() + ".jpeg");
+                        path = dirinfo.FullName + "test" + i.ToString() + ".jpeg";
+                        //var files = dirinfo.GetFiles("test*.jpeg");
+                        //foreach (var f in files)
+                        //    f.Delete();
+                        System.Drawing.Bitmap newbitmap = new System.Drawing.Bitmap(bitmap);
+                        bitmap.Dispose();
+
+                        //var file = dirinfo.GetFiles("test" + i.ToString() + ".jpeg");
 
 
 
-                    newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    newbitmap.Dispose();
+                        newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Tiff);
+                        newbitmap.Dispose();
+
+                    }
+                    RhinoApp.Wait();
+
+
+                    string key = "BIRDEYE" + (i + 1).ToString();
+
+
+                    if (MainPanel_reportspaths[tempIndex].ContainsKey(key))
+                        MainPanel_reportspaths[tempIndex].Remove(key);
+                    MainPanel_reportspaths[tempIndex].Add(key, path);
+                    MainPanel_building2DPreview.Enabled = true;
+                    RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(backupPoint, false);
+                    RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(backupDir, false);
+                    RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
 
                 }
-                RhinoApp.Wait();
+                else if (i > 1)
+                {
+                    using (var bitmap = RhinoDoc.ActiveDoc.Views.ActiveView.CaptureToBitmap(new System.Drawing.Size(929 * 3, 685 * 3), Rhino.Display.DisplayModeDescription.FindByName("Rendered")))
+                    {
+                        TypicalPlan typicalPlan = new TypicalPlan();
+                        Rectangle3d rec = new Rectangle3d(Plane.WorldXY, typicalPlan.GetBoundingBox().Min, typicalPlan.GetBoundingBox().Max);
+
+                        path = dirinfo.FullName + "test" + i.ToString() + ".jpeg";
+                        //var files = dirinfo.GetFiles("test*.jpeg");
+                        //foreach (var f in files)
+                        //    f.Delete();
+                        System.Drawing.Bitmap newbitmap = new System.Drawing.Bitmap(bitmap);
+                        bitmap.Dispose();
+
+                        //var file = dirinfo.GetFiles("test" + i.ToString() + ".jpeg");
 
 
-                string key = "BIRDEYE" + (i + 1).ToString();
+
+                        newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Tiff);
+                        newbitmap.Dispose();
+
+                    }
+                    RhinoApp.Wait();
 
 
-                if (MainPanel_reportspaths[tempIndex].ContainsKey(key))
-                    MainPanel_reportspaths[tempIndex].Remove(key);
-                MainPanel_reportspaths[tempIndex].Add(key, path);
+                    string key = "BIRDEYE" + (i + 1).ToString();
+
+
+                    if (MainPanel_reportspaths[tempIndex].ContainsKey(key))
+                        MainPanel_reportspaths[tempIndex].Remove(key);
+                    MainPanel_reportspaths[tempIndex].Add(key, path);
+                    MainPanel_building2DPreview.Enabled = true;
+                    RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(backupPoint, false);
+                    RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(backupDir, false);
+                    RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
+                }
 
             }
-            MainPanel_building2DPreview.Enabled = true;
-            RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraLocation(backupPoint, false);
-            RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.SetCameraDirection(backupDir, false);
-            RhinoDoc.ActiveDoc.Views.ActiveView.Redraw();
         }
 
-        
+
 
         private void Btn_LawBoundary_Click(object sender, RoutedEventArgs e)
         {

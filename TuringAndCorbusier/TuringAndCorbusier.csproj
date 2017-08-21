@@ -99,6 +99,7 @@
     </Compile>
     <Compile Include="AutoUpdateModule\Updater.cs" />
     <Compile Include="cs\Common\DataManager.cs" />
+    <Compile Include="cs\Drawing\typicalPlan1.cs" />
     <Compile Include="cs\Input\DouglasFucker.cs" />
     <Compile Include="cs\NotUsed\Egg.cs" />
     <Compile Include="cs\NotUsed\FinalizeApartmentGeneratorOutput.cs" />
@@ -134,6 +135,9 @@
     <Compile Include="Reports\birdeye.xaml.cs">
       <DependentUpon>birdeye.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Reports\Perspective.xaml.cs">
+      <DependentUpon>Perspective.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Reports\PlanDrawingFunction _90degree.cs" />
     <Compile Include="Reports\PlanDrawingFunction.cs" />
     <Compile Include="Reports\realReportBase.xaml.cs">
@@ -149,6 +153,12 @@
     </Compile>
     <Compile Include="Reports\typicalPlan.xaml.cs">
       <DependentUpon>typicalPlan.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\reportCover.xaml.cs">
+      <DependentUpon>reportCover.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\wpfTypicalPlan.xaml.cs">
+      <DependentUpon>wpfTypicalPlan.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reports\xmlBuildingReport.xaml.cs">
       <DependentUpon>xmlBuildingReport.xaml</DependentUpon>
@@ -258,6 +268,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Reports\Perspective.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Reports\section.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -269,6 +283,14 @@
     <Page Include="Reports\typicalPlan.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Reports\reportCover.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Reports\wpfTypicalPlan.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Reports\xmlBuildingReport.xaml">
       <Generator>MSBuild:Compile</Generator>
