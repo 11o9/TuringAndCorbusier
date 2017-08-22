@@ -431,9 +431,6 @@ namespace Reports
                     continue;
                 }
             }
-
-
-
         }
 
         public void SetFirstFloorHouseOutline(Apartment apartment, List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Household> householdList, int numOfFloors, List<double> numOfHouseList, List<Core> newCoreList)

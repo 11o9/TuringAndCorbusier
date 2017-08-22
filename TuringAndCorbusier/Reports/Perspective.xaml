@@ -18,7 +18,6 @@
             <Rectangle Height="695" Width="940" Canvas.Left="150" Canvas.Top="890" Stroke="Black"/>
             <Image  x:Name="perspective1"  VerticalAlignment="Bottom" Canvas.Left="155" Canvas.Top="155" Width="929" Height="685"  />
             <Image  x:Name="perspective2"  VerticalAlignment="Bottom" Canvas.Left="155" Canvas.Top="895" Width="929" Height="685"  />
-            <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="Din Alternate" FontWeight="Bold" />
         </Canvas>
 
     </FixedPage>

@@ -100,7 +100,6 @@
                     <Canvas x:Name="UnitPlanCanvas" Width="1080" Height="861" VerticalAlignment="Top" Canvas.Left="80" Canvas.Top="720" />
                 </Canvas>
             </Grid>
-            <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="NanumSquareOTF" FontWeight="Bold" />
         </Canvas>
 
     </FixedPage>

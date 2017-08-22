@@ -27,27 +27,27 @@ namespace Reports
 
             this.AreaType.Text = Math.Round(houseHoldProperty.ExclusiveArea / 1000000, 0).ToString() + "m\xB2 " + typeString + "타입";
             this.NumberOfThisType.Text = numOfThisType.ToString() + "세대";
-            this.exclusiveArea.Text = Math.Round(houseHoldProperty.GetExclusiveArea() / 1000000, 2).ToString() + "m\xB2";
+            this.exclusiveArea.Text = String.Format("{0:0.00}",Math.Round(houseHoldProperty.GetExclusiveArea() / 1000000, 2)).ToString() + "m\xB2";
             this.exclusiveArea_Py.Text = Math.Round(houseHoldProperty.GetExclusiveArea() / 1000000 / 3.3, 2).ToString() + "평";
-            this.wallArea.Text = Math.Round(houseHoldProperty.GetWallArea() / 1000000, 2).ToString() + "m\xB2";
+            this.wallArea.Text = String.Format("{0:0.00}",Math.Round(houseHoldProperty.GetWallArea() / 1000000, 2)).ToString() + "m\xB2";
             this.wallArea_Py.Text = Math.Round(houseHoldProperty.GetWallArea() / 1000000 / 3.3, 2).ToString() + "평";
-            this.coreArea.Text = Math.Round(coreArea / 1000000, 2).ToString() + "m\xB2";
+            this.coreArea.Text = String.Format("{0:0.00}",Math.Round(coreArea / 1000000, 2)).ToString() + "m\xB2";
             this.coreArea_Py.Text = Math.Round(coreArea / 1000000 / 3.3, 2).ToString() + "평";
-            this.commonLivingArea.Text = Math.Round((houseHoldProperty.GetWallArea() + coreArea) / 1000000, 2).ToString() + "m\xB2";
+            this.commonLivingArea.Text = String.Format("{0:0.00}",Math.Round((houseHoldProperty.GetWallArea() + coreArea) / 1000000, 2)).ToString() + "m\xB2";
             this.commonLivingArea_Py.Text = Math.Round((houseHoldProperty.GetWallArea() + coreArea) / 1000000 / 3.3, 2).ToString() + "평";
-            this.providedArea.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea) / 1000000, 2).ToString() + "m\xB2";
-            this.providedArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea) / 1000000 / 3.3, 2).ToString() + "평";
-            this.publicFacilityArea.Text = Math.Round(publicFacilityArea / 1000000, 2) + "m\xB2";
+            this.providedArea.Text = String.Format("{0:0.00}",Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea) / 1000000, 2)).ToString() + "m\xB2";
+            this.providedArea_Py.Text = String.Format("{0:0.00}",Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea) / 1000000 / 3.3, 2)).ToString() + "평";
+            this.publicFacilityArea.Text = String.Format("{0:0.00}",Math.Round(publicFacilityArea / 1000000, 2)) + "m\xB2";
             this.publicFacilityArea_Py.Text = Math.Round(publicFacilityArea / 1000000 / 3.3, 2) + "평";
-            this.ServiceArea.Text = Math.Round(serviceArea / 1000000, 2) + "m\xB2";
+            this.ServiceArea.Text = String.Format("{0:0.00}", Math.Round(serviceArea / 1000000, 2)) + "m\xB2";
             this.ServiceArea_Py.Text = Math.Round(serviceArea / 1000000 / 3.3, 2) + "평";
-            this.ParkingLotArea.Text = Math.Round(parkingLotArea / 1000000, 2).ToString() + "m\xB2";
+            this.ParkingLotArea.Text = String.Format("{0:0.00}", Math.Round(parkingLotArea / 1000000, 2)).ToString() + "m\xB2";
             this.ParkingLotArea_Py.Text = Math.Round(parkingLotArea / 1000000 / 3.3, 2).ToString() + "평";
-            this.ContractArea.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea + publicFacilityArea + serviceArea + parkingLotArea) / 1000000).ToString() + "m\xB2";
+            this.ContractArea.Text = String.Format("{0:0.00}", Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea + publicFacilityArea + serviceArea + parkingLotArea) / 1000000)).ToString() + "m\xB2";
             this.ContractArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetWallArea() + coreArea + publicFacilityArea + serviceArea + parkingLotArea) / 1000000 / 3.3).ToString() + "평";
-            this.balconyArea.Text = Math.Round(houseHoldProperty.GetBalconyArea() / 1000000, 2).ToString() + "m\xB2";
+            this.balconyArea.Text = String.Format("{0:0.00}", Math.Round(houseHoldProperty.GetBalconyArea() / 1000000, 2)).ToString() + "m\xB2";
             this.balconyArea_Py.Text = Math.Round(houseHoldProperty.GetBalconyArea() / 1000000 / 3.3, 2).ToString() + "평";
-            this.usableArea.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea() + houseHoldProperty.GetWallArea()) / 1000000, 2).ToString() + "m\xB2";
+            this.usableArea.Text = String.Format("{0:0.00}", Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea() + houseHoldProperty.GetWallArea()) / 1000000, 2)).ToString() + "m\xB2";
             this.usableArea_Py.Text = Math.Round((houseHoldProperty.GetExclusiveArea() + houseHoldProperty.GetBalconyArea() + houseHoldProperty.GetWallArea()) / 1000000 / 3.3, 2).ToString() + "평";
         }
 

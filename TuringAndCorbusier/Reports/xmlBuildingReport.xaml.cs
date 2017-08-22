@@ -181,7 +181,7 @@ namespace Reports
         }
 
         //--------JHL
-        public void SetHouseOutline(List<double> numOfHouseInEachFloor, List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics, string agType, List<Curve> aptLineList, ParameterSet paramSet, Apartment apartment)
+        public void SetHouseOutline(List<Household> houseHoldList,List<double> numOfHouseInEachFloor, List<Curve> coreOutline, List<Curve> houseOutline, TypicalPlan typicalPlan, List<Core> newCoreList, double numberOfHouses, List<HouseholdStatistics> uniqueHouseStatistics, string agType, List<Curve> aptLineList, ParameterSet paramSet, Apartment apartment)
         {
             System.Windows.Media.SolidColorBrush SCBGray = new SolidColorBrush();
             SCBGray.Color = System.Windows.Media.Color.FromRgb(235, 235, 235);
@@ -323,7 +323,53 @@ namespace Reports
 
             }
 
+            List<string> roundedStringExclusiveAreaList = new List<string>();
+            //List<double> distinctRoundedExclusiveArea = new List<double>();
+            foreach (Household household in houseHoldList)
+            {
+                roundedStringExclusiveAreaList.Add(ProcessExclusiveArea(household.GetExclusiveArea()));
+            }
+
+            //JHL 글씨 넣기 위해 중심 점 구함 
+            for (int i = 0; i < houseOutlineList.Count; i++)
+            {
+                houseOutlinesCentroid.Add(Rhino.Geometry.AreaMassProperties.Compute(houseOutlineList[i]).Centroid);
+            }
+
+            for (int i = houseOutlinesCentroid.Count - 1; i > (houseOutlinesCentroid.Count - 1) - (int)numOfHouseInEachFloor.Last(); i--)
+            {
+                System.Windows.Point newCentroid = PlanDrawingFunction.pointConverter(rectangleToFit, houseOutlinesCentroid[i], scaleFactor, initialOriginPoint);
+                try
+                {
+                    this.AddAreaTypeToHouseOutline(newCentroid, roundedStringExclusiveAreaList[i]);
+
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
+            }
+
+
+
             PlanDrawingFunction.drawPlan(rectangleToFit, typicalPlan.OutLine.ToNurbsCurve(), scaleFactor, initialOriginPoint, ref this.typicalPlanCanvas, System.Windows.Media.Brushes.Black, 0.5);
+        }
+        private void AddAreaTypeToHouseOutline(System.Windows.Point newCentroid, string areaTypeInText)
+        {
+            double size = 10;
+            TextBlock areaType = new TextBlock();
+            areaType.Text = areaTypeInText;
+            areaType.FontSize = size;
+            typicalPlanCanvas.Children.Add(areaType);
+
+            Canvas.SetLeft(areaType, newCentroid.X - (10));
+            Canvas.SetTop(areaType, newCentroid.Y - (5));
+
+        }
+        private string ProcessExclusiveArea(double unRoundedExclusiveArea)
+        {
+            string roundedStringExclusiveArea = Math.Round(unRoundedExclusiveArea / 1000000, 0).ToString() + "m\xB2 ";
+            return roundedStringExclusiveArea;
         }
 
         private void RotateToFit(ref List<List<Curve>> coreDetail, List<Core> coreList, List<CoreType> coreType, List<Curve> coreOutline)

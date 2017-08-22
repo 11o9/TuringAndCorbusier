@@ -55,7 +55,7 @@
             <TextBlock x:Name="title" Canvas.Left="95" Text="Title" TextWrapping="Wrap" Canvas.Top="199" FontSize="36" FontFamily="NanumSquareOTF" />
             <TextBlock x:Name="publishDate" Text="Date" Canvas.Left="95" TextWrapping="Wrap" Canvas.Top="285" FontSize="30" FontFamily="NanumSquareOTF" />
 
-            <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="NanumSquareOTF" FontWeight="Bold" />
+            
             <Rectangle Height="812" Canvas.Left="97" Stroke="Black" Canvas.Top="656" Width="1038"/>
         </Canvas>
 

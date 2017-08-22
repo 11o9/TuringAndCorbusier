@@ -118,7 +118,6 @@
 
             <Canvas x:Name="typicalPlanCanvas" Canvas.Left="95" Canvas.Top="914" Width="1050" Height="566">
             </Canvas>
-            <TextBlock Text="PLANNED BY SPACEWALK ENGINE" Canvas.Left="982" TextWrapping="Wrap" Canvas.Top="1619" FontSize="10" FontFamily="Din Alternate" FontWeight="Bold" />
         </Canvas>
 
     </FixedPage>

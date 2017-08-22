@@ -143,7 +143,7 @@ namespace TuringAndCorbusier
                         for (int l = 0; l < baseFloorHouses[i][j].LightingEdge.Count; l++)
                         {
                             Line tempLighting = baseFloorHouses[i][j].LightingEdge[l];
-                            Curve ligtingBox = DrawLightingBox(tempLighting, outline, distance);
+                            Curve ligtingBox = DrawLightingBox(tempLighting, outline, distance,Consts.FloorHeight);
                             result.Add(ligtingBox);
                         }
                     }
@@ -154,6 +154,40 @@ namespace TuringAndCorbusier
                 result.Add(roadcenter);
 
                 return result;
+            }
+            public static List<Curve> LightingDimPlacementCurve(Plot plot, double stories, Apartment output, bool using1f,out List<string> lightDistance)
+            {
+                double height = output.Household.Count * Consts.FloorHeight;
+                double posz = height + Consts.PilotiHeight;
+                if (using1f)
+                    posz = height;
+
+                double k = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting;
+                k = output.Household.Count > TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor ? 0.5 : k;  //0.5 = 기본, 변수화해야.
+                double distance = height * k;
+
+                lightDistance = new List<string>();
+                lightDistance.Add("채광거리 : "+Math.Round(distance,6).ToString());
+
+                List<Curve> result = new List<Curve>();
+                List<List<Household>> baseFloorHouses = output.Household[output.Household.Count - 2];
+
+                for (int i = 0; i < baseFloorHouses.Count; i++)
+                {
+                    for (int j = 0; j < baseFloorHouses[i].Count; j++)
+                    {
+                        var outline = baseFloorHouses[i][j].GetOutline();
+                        for (int l = 0; l < baseFloorHouses[i][j].LightingEdge.Count; l++)
+                        {
+                            Line tempLighting = baseFloorHouses[i][j].LightingEdge[l];
+                            Curve ligtingBox = DrawLightingBox(tempLighting, outline, distance, Consts.FloorHeight);
+                            result.Add(ligtingBox);
+                        }
+                    }
+                }
+                List<Curve> placementCurve = new List<Curve>();
+                placementCurve.Add(result[result.Count-1]);
+                return placementCurve;
             }
 
 
@@ -227,7 +261,7 @@ namespace TuringAndCorbusier
            
 
             //sub
-            private static Curve DrawLightingBox(Line lightingEdge, Curve outline, double distance)
+            private static Curve DrawLightingBox(Line lightingEdge, Curve outline, double distance, double householdHeight)
             {
                 Line currentLighting = lightingEdge;
                 Point3d windowMidPt = currentLighting.From + currentLighting.Direction / 2;
@@ -242,12 +276,20 @@ namespace TuringAndCorbusier
                 if (outline.Contains(testPt) == PointContainment.Inside)
                     perp = -perp;
 
+
+
                 Point3d p1 = currentLighting.From;
                 Point3d p2 = p1 + algin * currentLighting.Length;
                 Point3d p3 = p2 + perp * distance;
                 Point3d p4 = p1 + perp * distance;
 
+                p1.Z += householdHeight;
+                p2.Z += householdHeight;
+                p3.Z += householdHeight;
+                p4.Z += householdHeight;
+
                 Polyline lightingBox = new Polyline { p1, p2, p3, p4, p1 };
+
                 Curve ligtingCurve = lightingBox.ToNurbsCurve();
 
                 return ligtingCurve;
@@ -342,13 +384,13 @@ namespace TuringAndCorbusier
 
                         if (dimLine1.Length > 0.5)
                         {
-                            dim.Add(dimLine1.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine1.Length.ToString());
                             result.Add(dimLine1.ToNurbsCurve());
                         }
 
                         else
                         {
-                            dim.Add(dimLine1sub.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine1sub.Length.ToString());
                             result.Add(dimLine1sub.ToNurbsCurve());
                         }
 
@@ -358,13 +400,13 @@ namespace TuringAndCorbusier
 
                         if (dimLine2.Length > 0.5)
                         {
-                            dim.Add(dimLine2.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine2.Length.ToString());
                             result.Add(dimLine2.ToNurbsCurve());
                         }
 
                         else
                         {
-                            dim.Add(dimLine2sub.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine2sub.Length.ToString());
                             result.Add(dimLine2sub.ToNurbsCurve());
                         }
 
@@ -379,13 +421,13 @@ namespace TuringAndCorbusier
 
                         if (dimLine1.Length > 0.5)
                         {
-                            dim.Add(dimLine1.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine1.Length.ToString());
                             result.Add(dimLine1.ToNurbsCurve());
                         }
 
                         else
                         {
-                            dim.Add(dimLine1sub.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine1sub.Length.ToString());
                             result.Add(dimLine1sub.ToNurbsCurve());
                         }
 
@@ -402,7 +444,7 @@ namespace TuringAndCorbusier
                         double interEscapeLength = escapeToEscape * firstEscapeCore.YDirection;
                         Line dimLine2 = new Line(escOrigin1, escOrigin1 + firstEscapeCore.YDirection * interEscapeLength);
 
-                        dim.Add(dimLine2.Length.ToString());
+                        dim.Add("인동거리 : " + dimLine2.Length.ToString());
                         result.Add(dimLine2.ToNurbsCurve());
 
                         //add WW
@@ -414,12 +456,12 @@ namespace TuringAndCorbusier
                         Line dimLine3sub = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, -dimBaseCore.XDirection);
                         if (dimLine3.Length > 0.5)
                         {
-                            dim.Add(dimLine3.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine3.Length.ToString());
                             result.Add(dimLine3.ToNurbsCurve());
                         }
                         else
                         {
-                            dim.Add(dimLine3sub.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine3sub.Length.ToString());
                             result.Add(dimLine3sub.ToNurbsCurve());
                         }
 
@@ -450,7 +492,7 @@ namespace TuringAndCorbusier
 
                             if (dimLine1.Length > 0.5)
                             {
-                                dim.Add(dimLine1.Length.ToString());
+                                dim.Add("인동거리 : " + dimLine1.Length.ToString());
                                 result.Add(dimLine1.ToNurbsCurve());
                             }
                         }
@@ -465,7 +507,7 @@ namespace TuringAndCorbusier
                         double interCore = coreToCore * dimBaseCore.YDirection;
 
                         Line dimLine2 = new Line(dimOrigin2, dimOrigin2 + dimBaseCore.YDirection * interCore);
-                        dim.Add(dimLine2.Length.ToString());
+                        dim.Add("인동거리 : " + dimLine2.Length.ToString());
                         result.Add(dimLine2.ToNurbsCurve());
 
                         //WW
@@ -474,12 +516,12 @@ namespace TuringAndCorbusier
                         Line dimLine3sub = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, innerRectPoly.SegmentAt(0).UnitTangent);
                         if (dimLine3.Length >0.5)
                         {
-                            dim.Add(dimLine3.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine3.Length.ToString());
                             result.Add(dimLine3.ToNurbsCurve());
                         }
                         else
                         {
-                            dim.Add(dimLine3sub.Length.ToString());
+                            dim.Add("인동거리 : " + dimLine3sub.Length.ToString());
                             result.Add(dimLine3sub.ToNurbsCurve());
                         }
                         return result;
@@ -494,7 +536,7 @@ namespace TuringAndCorbusier
 
                             if (dimLine1.Length > 0.5)
                             {
-                                dim.Add(dimLine1.Length.ToString());
+                                dim.Add("인동거리 : " + dimLine1.Length.ToString());
                                 result.Add(dimLine1.ToNurbsCurve());
                             }
                         }
@@ -512,7 +554,7 @@ namespace TuringAndCorbusier
                         double interEscapeLength = escapeToEscape * firstEscapeCore.YDirection;
                         Line dimLine2 = new Line(escOrigin1, escOrigin1 + firstEscapeCore.YDirection * interEscapeLength);
 
-                        dim.Add(dimLine2.Length.ToString());
+                        dim.Add("인동거리 : " + dimLine2.Length.ToString());
                         result.Add(dimLine2.ToNurbsCurve());
 
                         //add LL
@@ -523,7 +565,7 @@ namespace TuringAndCorbusier
 
                         Line dimLine3 = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, dimBaseCore.XDirection);
 
-                        dim.Add(dimLine3.Length.ToString());
+                        dim.Add("인동거리 : "+dimLine3.Length.ToString());
                         result.Add(dimLine3.ToNurbsCurve());
 
                         return result;
@@ -572,7 +614,7 @@ namespace TuringAndCorbusier
 
                     LineCurve line = new LineCurve(onSeg0, onSeg0 + dir * length);
                     result.Add(line);
-                    dim.Add(Math.Round(length).ToString());
+                    dim.Add("인동거리 : "+Math.Round(length).ToString());
                 }
 
                 return result;

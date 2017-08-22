@@ -198,16 +198,20 @@ namespace TuringAndCorbusier
             Plot tempPlot = tempoutput.Plot;
             bool using1f = tempoutput.ParameterSet.using1F;
             int tempStories = tempoutput.Household.Count;
-
+            List<string> lightDistance = new List<string>();
             MainPanel_building2DPreview.CurveToDisplay = tempCurves;
             MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLineDrawer.North(tempPlot, tempStories, using1f);
             MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot(tempPlot, tempStories, using1f);
             MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLineDrawer.Lighting(tempPlot, tempStories, tempoutput, using1f);
+            MainPanel_LawPreview_Lighting_DimPlacement.CurveToDisplay = CommonFunc.LawLineDrawer.LightingDimPlacementCurve(tempPlot, tempStories, tempoutput, using1f,out lightDistance);
             MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLineDrawer.Boundary(tempPlot, tempStories, using1f);
 
             List<string> widthlog;
             MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.LawLineDrawer.ApartDistance(tempoutput, out widthlog);
             MainPanel_LawPreview_ApartDistance.dimension = widthlog;
+
+
+            MainPanel_LawPreview_Lighting_DimPlacement.dimension = lightDistance;
             //MainPanel_LawPreview_ApartDistance.dimPoint = MainPanel_LawPreview_ApartDistance.CurveToDisplay[0].
             // CommonFunc.JoinRegulation(tempoutput.Plot, tempoutput.Household.Count, tempoutput);
             MainPanel_building2DPreview.Enabled = true;
@@ -619,7 +623,7 @@ namespace TuringAndCorbusier
                         newCoreList.Add(core);
                     }
                 }
-                xmlBuildingInfo.SetHouseOutline(numOfHouseInEachFloorList, coreOutline, houseOutline, tempTypicalPlan_FL0, newCoreList, NumberOfHouses, uniqueHouseHoldProperties, agType, aptLineList, currentParamSet, MainPanel_AGOutputList[tempIndex]);
+                xmlBuildingInfo.SetHouseOutline(householdList, numOfHouseInEachFloorList, coreOutline, houseOutline, tempTypicalPlan_FL0, newCoreList, NumberOfHouses, uniqueHouseHoldProperties, agType, aptLineList, currentParamSet, MainPanel_AGOutputList[tempIndex]);
 
                 fps.Add(xmlBuildingInfo.fixedPage);
                 pagename.Add("buildingReport");
@@ -661,89 +665,139 @@ namespace TuringAndCorbusier
                     pagename.Add("unitReport" + (i + 1).ToString());
                 }
 
+                //JHL:2017.5.30:17:14 평면도 시작점
+                //1층 활성화되는지 가져오기
+                bool isUsing1F = MainPanel_AGOutputList[tempIndex].ParameterSet.using1F;
 
 
-                for (int i = 1; i < MainPanel_AGOutputList[tempIndex].Household.Count + 2; i++)
+                bool isTopFloorDifferent = false;
+                bool isTopFloorSetBack = false;
+                if (numOfHouseInEachFloorList[1] != numOfHouseInEachFloorList.Last())
                 {
-
-                    bool drawParking = false;
-                    if (!MainPanel_AGOutputList[tempIndex].ParameterSet.using1F)
-                    {
-
-                        if (i == 1)
-                            drawParking = true;
-                        try
-                        {
-                            Reports.wpfTypicalPlan testTypicalPlanPage = new Reports.wpfTypicalPlan(new Interval(i, i));
-                            typicalPlan testTypicalPlan = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i - 1, drawParking);
-                            testTypicalPlanPage.SetTypicalPlan = testTypicalPlan;
-                            fps.Add(testTypicalPlanPage.fixedPage);
-                            pagename.Add("typicalPlanPage" + i.ToString());
-
-                            continue;
-                        }
-                        catch (System.Exception EX)
-                        {
-                            continue;
-                            //MessageBox.Show(EX.ToString());
-                        }
-
-                    }
+                    isTopFloorDifferent = true;
+                }
+                if (MainPanel_AGOutputList[tempIndex].ParameterSet.setback == true)
+                {
+                    isTopFloorSetBack = true;
+                }
+                //for (int i = houseOutline.Count - 1; i > (houseOutline.Count - 1) - (int)numOfHouseInEachFloorList.Last(); i--)
+                //{
+                //    topArea += Rhino.Geometry.AreaMassProperties.Compute(houseOutline[i]).Area;
+                //}
+                //double firstArea = 0;
+                //for (int i = 0; i < numOfHouseInEachFloorList[1]; i++)
+                //{
+                //    firstArea += Rhino.Geometry.AreaMassProperties.Compute(houseOutline[i]).Area;
+                //}
+                //if (Math.Round(topArea, 2) != Math.Round(firstArea, 2))
+                //{
+                //    isTopFloorSetBack = true;
+                //}
 
 
-                    if (MainPanel_AGOutputList[tempIndex].ParameterSet.using1F && i == 1)
-                        drawParking = true;
+                double totalNumOfFloors = 0;
+                if (isUsing1F == true)
+                {
+                    totalNumOfFloors = MainPanel_AGOutputList[tempIndex].Household.Count + 2;
+                }
+                else if (isUsing1F == false)
+                {
+                    totalNumOfFloors = MainPanel_AGOutputList[tempIndex].Household.Count + 2;
+                }
 
+                isUsing1F = false; //임시 사용 안함
 
+                for (int i = 0; i < totalNumOfFloors; i++)
+                {
                     try
                     {
-                        Reports.wpfTypicalPlan testTypicalPlanPage = new Reports.wpfTypicalPlan(new Interval(i, i));
-                        typicalPlan testTypicalPlan = typicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i, drawParking);
-
-                        testTypicalPlanPage.SetTypicalPlan = testTypicalPlan;
-
-                        fps.Add(testTypicalPlanPage.fixedPage);
-                        pagename.Add("typicalPlanPage" + i.ToString());
+                        //1층 일 경우
+                        if (isUsing1F == false && i == 0)
+                        {
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i + 1);
+                            Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
+                            floorPlanDrawing.SetCoreOutline(numOfHouseInEachFloorList, MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, new Interval(1, 1), newCoreList);
+                            fps.Add(floorPlanDrawing.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                        }
+                        else if (i == 0 && isUsing1F == true)
+                        {
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i + 1);
+                            Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(1);
+                            floorPlanDrawing.SetFirstFloorHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            fps.Add(floorPlanDrawing.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                        }
+                        else if (isUsing1F == false && isTopFloorDifferent == false)
+                        {
+                            if (isTopFloorSetBack == false)
+                            {
+                                TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                                Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F);
+                                floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                                fps.Add(floorPlanDrawing.fixedPage);
+                                pagename.Add("floorPlanDrawingPage" + i.ToString());
+                                break;
+                            }
+                            else if (isTopFloorSetBack == true)
+                            {
+                                TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                                Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
+                                Reports.floorPlanDrawingPage topFloorPlanDrawing = new Reports.floorPlanDrawingPage(totalNumOfFloors, "topFloor");
+                                floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                                topFloorPlanDrawing.SetTopHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                                fps.Add(floorPlanDrawing.fixedPage);
+                                pagename.Add("floorPlanDrawingPage" + i.ToString());
+                                fps.Add(topFloorPlanDrawing.fixedPage);
+                                pagename.Add("topFloorPlanDrawingPage" + i.ToString());
+                                break;
+                            }
+                        }
+                        else if (isUsing1F == false && isTopFloorDifferent == true)
+                        {
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                            Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
+                            Reports.floorPlanDrawingPage topFloorPlanDrawing = new Reports.floorPlanDrawingPage(totalNumOfFloors, "topFloor");
+                            floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            topFloorPlanDrawing.SetTopHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            fps.Add(floorPlanDrawing.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                            fps.Add(topFloorPlanDrawing.fixedPage);
+                            pagename.Add("topFloorPlanDrawingPage" + i.ToString());
+                            break;
+                        }
+                        else if (isUsing1F == true && isTopFloorDifferent == false && i != 0)
+                        {
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                            Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
+                            floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            fps.Add(floorPlanDrawing.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                            break;
+                        }
+                        else if (isUsing1F == true && isTopFloorDifferent == true && i != 0)
+                        {
+                            TypicalPlan typicalCorePlan = TypicalPlan.DrawTypicalPlan(MainPanel_AGOutputList[tempIndex].Plot, tempRectangle, TuringAndCorbusierPlugIn.InstanceClass.kdgInfoSet.surrbuildings, MainPanel_AGOutputList[tempIndex], MainPanel_planLibraries, i);
+                            Reports.floorPlanDrawingPage floorPlanDrawing = new Reports.floorPlanDrawingPage(new Interval(2, totalNumOfFloors), isUsing1F, isTopFloorDifferent, isTopFloorSetBack);
+                            Reports.floorPlanDrawingPage topFloorPlanDrawing = new Reports.floorPlanDrawingPage(totalNumOfFloors, "topFloor");
+                            floorPlanDrawing.SetHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            topFloorPlanDrawing.SetTopHouseOutline(MainPanel_AGOutputList[tempIndex], coreOutline, houseOutline, typicalCorePlan, householdList, i, numOfHouseInEachFloorList, newCoreList);
+                            fps.Add(floorPlanDrawing.fixedPage);
+                            pagename.Add("floorPlanDrawingPage" + i.ToString());
+                            fps.Add(topFloorPlanDrawing.fixedPage);
+                            pagename.Add("topFloorPlanDrawingPage" + i.ToString());
+                            break;
+                        }
                     }
-                    catch (System.Exception EX)
+                    catch (Exception ex)
                     {
                         continue;
-                        //MessageBox.Show(EX.ToString());
                     }
                 }
-
-
-
-
-
-
-                Reports.wpfSection testSectionPage = new Reports.wpfSection();
-                //DrawSection drawsection = new DrawSection(MainPanel_AGOutputList[tempIndex]);
-
-                try
-                {
-                    //testSectionPage.setPlan(drawsection.Draw());
-                    //fps.Add(testSectionPage.fixedPage);
-                    //pagename.Add("sectionPage");
-                }
-                catch (Exception df)
-                {
-
-                }
-                finally
-                {
-
-                }
-
-
-
 
 
 
                 var a = TuringAndCorbusierPlugIn.InstanceClass.showmewindow.showmeinit(fps, pagename, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.ProjectName, MainPanel_AGOutputList[tempIndex], ref MainPanel_reportspaths, tempIndex);
-
-
-
 
             }
             catch (System.Exception ex)
@@ -1522,23 +1576,38 @@ namespace TuringAndCorbusier
             ChangeColor(sender as Button, 4);
         }
 
-        bool[] lawlineActivated = new bool[] { false, false, false, false,false };
+        bool[] lawlineActivated = new bool[] { false, false, false, false,false,false };
         SolidColorBrush[] brushes = new SolidColorBrush[] { Brushes.White, Brushes.Red, Brushes.Gold, Brushes.Green, Brushes.HotPink };
         public CurveConduit MainPanel_LawPreview_North = new CurveConduit(System.Drawing.Color.Red);
         public CurveConduit MainPanel_LawPreview_NearPlot = new CurveConduit(System.Drawing.Color.Gold);
         public CurveConduit MainPanel_LawPreview_Lighting = new CurveConduit(System.Drawing.Color.Green);
+        public CurveConduit MainPanel_LawPreview_Lighting_DimPlacement = new CurveConduit(System.Drawing.Color.Green);
         public CurveConduit MainPanel_LawPreview_Boundary = new CurveConduit(System.Drawing.Color.White);
         public CurveConduit MainPanel_LawPreview_ApartDistance = new CurveConduit(System.Drawing.Color.HotPink);
         
         private void ChangeColor(Button sender, int index)
         {
-            CurveConduit[] conduits = new CurveConduit[] { MainPanel_LawPreview_Boundary, MainPanel_LawPreview_North, MainPanel_LawPreview_NearPlot, MainPanel_LawPreview_Lighting , MainPanel_LawPreview_ApartDistance };
+            CurveConduit[] conduits = new CurveConduit[] { MainPanel_LawPreview_Boundary, MainPanel_LawPreview_North, MainPanel_LawPreview_NearPlot, MainPanel_LawPreview_Lighting, MainPanel_LawPreview_ApartDistance, MainPanel_LawPreview_Lighting_DimPlacement };
             lawlineActivated[index] = !lawlineActivated[index];
-            if (lawlineActivated[index])
+            if (lawlineActivated[index] && index != 3)
             {
                 sender.Background = brushes[index];
                 conduits[index].Enabled = true;
                 sender.Foreground = new SolidColorBrush(Color.FromRgb(64, 64, 64));
+            }
+            else if (index == 3 && lawlineActivated[index])
+            {
+                sender.Background = brushes[index];
+                conduits[index].Enabled = true;
+                conduits[conduits.Length - 1].Enabled = true;
+                sender.Foreground = new SolidColorBrush(Color.FromRgb(64, 64, 64));
+            }
+            else if (index == 3 && lawlineActivated[index] != true)
+            {
+                conduits[conduits.Length - 1].Enabled = false;
+                conduits[index].Enabled = false;
+                sender.Foreground = brushes[0];
+                sender.Background = new SolidColorBrush(Color.FromRgb(64, 64, 64));
             }
             else
             {
