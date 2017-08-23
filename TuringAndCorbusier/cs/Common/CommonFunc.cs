@@ -165,9 +165,8 @@ namespace TuringAndCorbusier
                 double k = TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceLighting;
                 k = output.Household.Count > TuringAndCorbusierPlugIn.InstanceClass.regSettings.EaseFloor ? 0.5 : k;  //0.5 = 기본, 변수화해야.
                 double distance = height * k;
-
                 lightDistance = new List<string>();
-                lightDistance.Add("채광거리 : "+Math.Round(distance,6).ToString());
+                lightDistance.Add(string.Format("채광 : h = {0}m, h * {1} = {2}m", height / 1000,k,distance/1000));
 
                 List<Curve> result = new List<Curve>();
                 List<List<Household>> baseFloorHouses = output.Household[output.Household.Count - 2];
@@ -210,6 +209,68 @@ namespace TuringAndCorbusier
                 return result;
             }
 
+            public static List<Curve> NorthDimPlacement(Plot plot, double stories, bool using1f,out List<string> topTwoIndex)
+            {
+                topTwoIndex = new List<string>();
+                var boundary = plot.SimplifiedBoundary;
+                var surr = plot.SimplifiedSurroundings;
+
+                List<Curve> result = new List<Curve>();
+                List<double> heights = new List<double>();
+                List<double> northDistances = new List<double>();
+
+                for (int i = 0; i <= stories; i++)
+                {
+                    Regulation reg = new Regulation(i, using1f);
+
+                    var tempfloornorth = reg.fromNorthCurve(plot);
+                    foreach (var n in tempfloornorth)
+                        n.Transform(Transform.Translation(Vector3d.ZAxis * reg.height));
+                    result.AddRange(tempfloornorth);
+                    double ratio = reg.DistanceFromNorth/reg.height;
+                    northDistances.Add(ratio);
+                    heights.Add(reg.height);
+                }
+                List<Curve> topTwoFloors = new List<Curve>();
+                topTwoFloors.Add(result[result.Count-2]);
+                topTwoFloors.Add(result[result.Count-1]);
+
+                double distance1 = Math.Round(northDistances[northDistances.Count - 1] * heights[heights.Count - 1],2);
+                double distance2 = Math.Round(northDistances[northDistances.Count - 2] * heights[heights.Count - 2], 2);
+
+                topTwoIndex.Add(String.Format("일조 : h = {0}m ,r = {1} , r * h = {2}m",heights[heights.Count-2]/1000,northDistances[northDistances.Count-2],distance2/1000));
+                topTwoIndex.Add(String.Format("일조 : h = {0}m ,r = {1} , r * h = {2}m", heights[heights.Count - 1]/1000, northDistances[northDistances.Count - 1], distance1/1000));
+                    
+         
+                List<Curve> mostNorthernCurve = new List<Curve>();
+                foreach (Curve c in topTwoFloors)
+                {
+                    List<Curve> segments = c.DuplicateSegments().ToList();
+                    Curve comparingSegment = segments[0];
+                    for (int i = 0; i < segments.Count; i++)
+                    {
+
+                        if (segments[i].PointAtNormalizedLength(0.5).Y > comparingSegment.PointAtNormalizedLength(0.5).Y)
+                        {
+                            comparingSegment = segments[i];
+                        }
+                    }
+                    mostNorthernCurve.Add(comparingSegment);
+
+                }
+
+                //foreach (Curve c in mostNorthernCurve)
+                //{
+                //    var color = new Rhino.DocObjects.ObjectAttributes();
+                //    color.ObjectColor = System.Drawing.Color.Aqua;
+                //    color.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
+                //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(c, color);
+                //}
+
+                return mostNorthernCurve;
+            }
+
+
             public static List<Curve> NearPlot(Plot plot, double stories, bool using1f)
             {
                 var boundary = plot.SimplifiedBoundary;
@@ -227,7 +288,83 @@ namespace TuringAndCorbusier
                         result.AddRange(tempfloorsurr);
    
                 }
-                return result;
+                List<Curve> finalResult = new List<Curve>();
+
+                for(int i = 0; i < result.Count; i++)
+                {
+                finalResult.Add(result[result.Count - 1].DuplicateCurve());
+                }
+
+                for (int i = 0; i < finalResult.Count; i++)
+                {
+                    Regulation reg = new Regulation(i, using1f);
+                    finalResult[i].Transform(Transform.Translation((Vector3d.ZAxis * -1) * reg.height));
+                }
+
+                return finalResult;
+            }
+
+            public static List<Curve> NearPlot_DimPlacement(Plot plot, double stories, bool using1f,out List<string> distanceFromSurrounding)
+            {
+                var boundary = plot.SimplifiedBoundary;
+                var surr = plot.SimplifiedSurroundings;
+
+                List<Curve> result = new List<Curve>();
+
+                for (int i = 0; i <= stories; i++)
+                {
+                    Regulation reg = new Regulation(i, using1f);
+
+                    var tempfloorsurr = reg.fromSurroundingsCurve(plot);
+                    foreach (var n in tempfloorsurr)
+                        n.Transform(Transform.Translation(Vector3d.ZAxis * reg.height));
+                    result.AddRange(tempfloorsurr);
+
+                }
+                List<Curve> finalResult = new List<Curve>();
+
+                for (int i = 0; i < result.Count; i++)
+                {
+                    finalResult.Add(result[result.Count - 1].DuplicateCurve());
+                }
+
+                for (int i = 0; i < finalResult.Count; i++)
+                {
+                    Regulation reg = new Regulation(i, using1f);
+                    finalResult[i].Transform(Transform.Translation((Vector3d.ZAxis * -1) * reg.height));
+                }
+                int[] surroundingDuplicate = plot.Surroundings;
+                distanceFromSurrounding = new List<string>();
+                Regulation reg1 = new Regulation(finalResult.Count-1, using1f);
+
+                for (int i = 0; i < finalResult[0].DuplicateSegments().Length; i++)
+                {
+                    
+                    if (surroundingDuplicate[i] > 0)
+                    {
+                        distanceFromSurrounding.Add(string.Format("{0}m", reg1.DistanceFromRoad/1000));
+                    }
+                    else if (surroundingDuplicate[i] == 0)
+                    {
+                        distanceFromSurrounding.Add(string.Format("{0}m", reg1.DistanceFromPlot/1000));
+                    }
+                }
+
+                //List<Curve> lowestSegments = new List<Curve>();
+                //foreach(Curve c in finalResult)
+                //{
+                //    List<Curve> segments = c.DuplicateSegments().ToList();
+                //    Curve lowestSegment = segments[0];
+                //    for (int i = 0; i < segments.Count;i++)
+                //    {
+                //        if (segments[i].PointAtNormalizedLength(0.5).Y < lowestSegment.PointAtNormalizedLength(0.5).Y)
+                //        {
+                //            lowestSegment = segments[i];
+                //        }
+                //    }
+                //    lowestSegments.Add(lowestSegment);
+                //}
+                return finalResult[0].DuplicateSegments().ToList();
             }
 
             public static List<Curve> ApartDistance(Apartment output, out List<string> log)
@@ -317,6 +454,7 @@ namespace TuringAndCorbusier
                     //height(total)
                     double pilotiHeight = output.ParameterSet.using1F ? 0 : Consts.PilotiHeight;
                     var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight - pilotiHeight;
+
                     //height(except pil)
 
                     var d3 = d2 * TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation;
@@ -332,7 +470,7 @@ namespace TuringAndCorbusier
                     result.Add(centerline);
                     //result.Add(anothercenterline);
 
-                    string log = string.Format("h = {0} m, h * {2} = {1} m ", Math.Round(d2) / 1000, Math.Round(d3) / 1000, TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation);
+                    string log = string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, Math.Round(d3) / 1000, TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation);
                     dim.Add(log);
                 }
 
@@ -365,7 +503,12 @@ namespace TuringAndCorbusier
                 double baseHeight = baseFloorCore.First().Origin.Z;
                 innerRect.Translate(Vector3d.ZAxis * (baseHeight - innerRect.PointAtStart.Z));
 
-                Polyline innerRectPoly = CurveTools.ToPolyline(innerRect); 
+                Polyline innerRectPoly = CurveTools.ToPolyline(innerRect);
+
+                //height(total)
+                double pilotiHeight = output.ParameterSet.using1F ? 0 : Consts.PilotiHeight;
+                var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight - pilotiHeight;
+
 
                 if (output.ParameterSet.fixedCoreType == CoreType.Folded)
                 {
@@ -384,13 +527,13 @@ namespace TuringAndCorbusier
 
                         if (dimLine1.Length > 0.5)
                         {
-                            dim.Add("인동거리 : " + dimLine1.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine1.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine1.ToNurbsCurve());
                         }
 
                         else
                         {
-                            dim.Add("인동거리 : " + dimLine1sub.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine1.Length/1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine1sub.ToNurbsCurve());
                         }
 
@@ -400,13 +543,13 @@ namespace TuringAndCorbusier
 
                         if (dimLine2.Length > 0.5)
                         {
-                            dim.Add("인동거리 : " + dimLine2.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine2.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine2.ToNurbsCurve());
                         }
 
                         else
                         {
-                            dim.Add("인동거리 : " + dimLine2sub.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine2.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine2sub.ToNurbsCurve());
                         }
 
@@ -421,13 +564,13 @@ namespace TuringAndCorbusier
 
                         if (dimLine1.Length > 0.5)
                         {
-                            dim.Add("인동거리 : " + dimLine1.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine1.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine1.ToNurbsCurve());
                         }
 
                         else
                         {
-                            dim.Add("인동거리 : " + dimLine1sub.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine1.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine1sub.ToNurbsCurve());
                         }
 
@@ -444,7 +587,7 @@ namespace TuringAndCorbusier
                         double interEscapeLength = escapeToEscape * firstEscapeCore.YDirection;
                         Line dimLine2 = new Line(escOrigin1, escOrigin1 + firstEscapeCore.YDirection * interEscapeLength);
 
-                        dim.Add("인동거리 : " + dimLine2.Length.ToString());
+                        dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine2.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                         result.Add(dimLine2.ToNurbsCurve());
 
                         //add WW
@@ -456,12 +599,12 @@ namespace TuringAndCorbusier
                         Line dimLine3sub = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, -dimBaseCore.XDirection);
                         if (dimLine3.Length > 0.5)
                         {
-                            dim.Add("인동거리 : " + dimLine3.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine3.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine3.ToNurbsCurve());
                         }
                         else
                         {
-                            dim.Add("인동거리 : " + dimLine3sub.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine3.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine3sub.ToNurbsCurve());
                         }
 
@@ -492,7 +635,7 @@ namespace TuringAndCorbusier
 
                             if (dimLine1.Length > 0.5)
                             {
-                                dim.Add("인동거리 : " + dimLine1.Length.ToString());
+                                dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine1.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                                 result.Add(dimLine1.ToNurbsCurve());
                             }
                         }
@@ -507,7 +650,7 @@ namespace TuringAndCorbusier
                         double interCore = coreToCore * dimBaseCore.YDirection;
 
                         Line dimLine2 = new Line(dimOrigin2, dimOrigin2 + dimBaseCore.YDirection * interCore);
-                        dim.Add("인동거리 : " + dimLine2.Length.ToString());
+                        dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine2.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                         result.Add(dimLine2.ToNurbsCurve());
 
                         //WW
@@ -516,12 +659,12 @@ namespace TuringAndCorbusier
                         Line dimLine3sub = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, innerRectPoly.SegmentAt(0).UnitTangent);
                         if (dimLine3.Length >0.5)
                         {
-                            dim.Add("인동거리 : " + dimLine3.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine3.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine3.ToNurbsCurve());
                         }
                         else
                         {
-                            dim.Add("인동거리 : " + dimLine3sub.Length.ToString());
+                            dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine3.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                             result.Add(dimLine3sub.ToNurbsCurve());
                         }
                         return result;
@@ -536,7 +679,7 @@ namespace TuringAndCorbusier
 
                             if (dimLine1.Length > 0.5)
                             {
-                                dim.Add("인동거리 : " + dimLine1.Length.ToString());
+                                dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine1.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                                 result.Add(dimLine1.ToNurbsCurve());
                             }
                         }
@@ -554,7 +697,7 @@ namespace TuringAndCorbusier
                         double interEscapeLength = escapeToEscape * firstEscapeCore.YDirection;
                         Line dimLine2 = new Line(escOrigin1, escOrigin1 + firstEscapeCore.YDirection * interEscapeLength);
 
-                        dim.Add("인동거리 : " + dimLine2.Length.ToString());
+                        dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine2.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                         result.Add(dimLine2.ToNurbsCurve());
 
                         //add LL
@@ -565,7 +708,7 @@ namespace TuringAndCorbusier
 
                         Line dimLine3 = PCXTools.PCXStrict(onRectOrigin, innerRectPoly, dimBaseCore.XDirection);
 
-                        dim.Add("인동거리 : "+dimLine3.Length.ToString());
+                        dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(dimLine3.Length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                         result.Add(dimLine3.ToNurbsCurve());
 
                         return result;
@@ -592,6 +735,9 @@ namespace TuringAndCorbusier
 
                 double width = output.ParameterSet.Parameters[2];
 
+                double pilotiHeight = output.ParameterSet.using1F ? 0 : Consts.PilotiHeight;
+                var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight - pilotiHeight;
+
                 if (Vector3d.VectorAngle(seg1v, seg2v) < 0.1)
                     return new List<Curve>();
 
@@ -614,7 +760,7 @@ namespace TuringAndCorbusier
 
                     LineCurve line = new LineCurve(onSeg0, onSeg0 + dir * length);
                     result.Add(line);
-                    dim.Add("인동거리 : "+Math.Round(length).ToString());
+                    dim.Add(string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, (Math.Round(length / 1000, 2)).ToString(), TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation));
                 }
 
                 return result;

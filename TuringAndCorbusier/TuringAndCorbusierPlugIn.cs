@@ -167,17 +167,17 @@ namespace TuringAndCorbusier
             ///~6.3
             Rhino.RhinoApp.WriteLine("InitComplete");
 
-            try
-            {
-                SPWK_AutoUpdateClient.MainWindow updt = new SPWK_AutoUpdateClient.MainWindow();
-                updt.Topmost = true;
-                updt.Show();
-                updt.Run("SH");
-            }
-            catch (Exception e)
-            {
-                RhinoApp.WriteLine(e.Message);
-            }
+            //try
+            //{
+            //    SPWK_AutoUpdateClient.MainWindow updt = new SPWK_AutoUpdateClient.MainWindow();
+            //    updt.Topmost = true;
+            //    updt.Show();
+            //    updt.Run("SH");
+            //}
+            //catch (Exception e)
+            //{
+            //    RhinoApp.WriteLine(e.Message);
+            //}
 
         }
 

@@ -200,8 +200,12 @@ namespace TuringAndCorbusier
             int tempStories = tempoutput.Household.Count;
             List<string> lightDistance = new List<string>();
             MainPanel_building2DPreview.CurveToDisplay = tempCurves;
+            List<string> topTwoIndex = new List<string>();
             MainPanel_LawPreview_North.CurveToDisplay = CommonFunc.LawLineDrawer.North(tempPlot, tempStories, using1f);
+            MainPanel_LawPreview_North_DimPlacement.CurveToDisplay = CommonFunc.LawLineDrawer.NorthDimPlacement(tempPlot, tempStories, using1f,out topTwoIndex);
             MainPanel_LawPreview_NearPlot.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot(tempPlot, tempStories, using1f);
+            List<string> distanceFromSurrounding = new List<string>();
+            MainPanel_LawPreview_NearPlot_DimPlacement.CurveToDisplay = CommonFunc.LawLineDrawer.NearPlot_DimPlacement(tempPlot, tempStories, using1f,out distanceFromSurrounding);
             MainPanel_LawPreview_Lighting.CurveToDisplay = CommonFunc.LawLineDrawer.Lighting(tempPlot, tempStories, tempoutput, using1f);
             MainPanel_LawPreview_Lighting_DimPlacement.CurveToDisplay = CommonFunc.LawLineDrawer.LightingDimPlacementCurve(tempPlot, tempStories, tempoutput, using1f,out lightDistance);
             MainPanel_LawPreview_Boundary.CurveToDisplay = CommonFunc.LawLineDrawer.Boundary(tempPlot, tempStories, using1f);
@@ -210,8 +214,10 @@ namespace TuringAndCorbusier
             MainPanel_LawPreview_ApartDistance.CurveToDisplay = CommonFunc.LawLineDrawer.ApartDistance(tempoutput, out widthlog);
             MainPanel_LawPreview_ApartDistance.dimension = widthlog;
 
-
+            MainPanel_LawPreview_North_DimPlacement.dimension = topTwoIndex;
             MainPanel_LawPreview_Lighting_DimPlacement.dimension = lightDistance;
+
+            MainPanel_LawPreview_NearPlot_DimPlacement.dimension = distanceFromSurrounding;
             //MainPanel_LawPreview_ApartDistance.dimPoint = MainPanel_LawPreview_ApartDistance.CurveToDisplay[0].
             // CommonFunc.JoinRegulation(tempoutput.Plot, tempoutput.Household.Count, tempoutput);
             MainPanel_building2DPreview.Enabled = true;
@@ -1579,7 +1585,9 @@ namespace TuringAndCorbusier
         bool[] lawlineActivated = new bool[] { false, false, false, false,false,false };
         SolidColorBrush[] brushes = new SolidColorBrush[] { Brushes.White, Brushes.Red, Brushes.Gold, Brushes.Green, Brushes.HotPink };
         public CurveConduit MainPanel_LawPreview_North = new CurveConduit(System.Drawing.Color.Red);
+        public CurveConduit MainPanel_LawPreview_North_DimPlacement = new CurveConduit(System.Drawing.Color.Red);
         public CurveConduit MainPanel_LawPreview_NearPlot = new CurveConduit(System.Drawing.Color.Gold);
+        public CurveConduit MainPanel_LawPreview_NearPlot_DimPlacement = new CurveConduit(System.Drawing.Color.Gold);
         public CurveConduit MainPanel_LawPreview_Lighting = new CurveConduit(System.Drawing.Color.Green);
         public CurveConduit MainPanel_LawPreview_Lighting_DimPlacement = new CurveConduit(System.Drawing.Color.Green);
         public CurveConduit MainPanel_LawPreview_Boundary = new CurveConduit(System.Drawing.Color.White);
@@ -1587,9 +1595,9 @@ namespace TuringAndCorbusier
         
         private void ChangeColor(Button sender, int index)
         {
-            CurveConduit[] conduits = new CurveConduit[] { MainPanel_LawPreview_Boundary, MainPanel_LawPreview_North, MainPanel_LawPreview_NearPlot, MainPanel_LawPreview_Lighting, MainPanel_LawPreview_ApartDistance, MainPanel_LawPreview_Lighting_DimPlacement };
+            CurveConduit[] conduits = new CurveConduit[] { MainPanel_LawPreview_Boundary, MainPanel_LawPreview_North, MainPanel_LawPreview_NearPlot, MainPanel_LawPreview_Lighting, MainPanel_LawPreview_ApartDistance, MainPanel_LawPreview_NearPlot_DimPlacement, MainPanel_LawPreview_North_DimPlacement, MainPanel_LawPreview_Lighting_DimPlacement};
             lawlineActivated[index] = !lawlineActivated[index];
-            if (lawlineActivated[index] && index != 3)
+            if (lawlineActivated[index] && index != 3&& index!=1&&index!=2)
             {
                 sender.Background = brushes[index];
                 conduits[index].Enabled = true;
@@ -1605,6 +1613,34 @@ namespace TuringAndCorbusier
             else if (index == 3 && lawlineActivated[index] != true)
             {
                 conduits[conduits.Length - 1].Enabled = false;
+                conduits[index].Enabled = false;
+                sender.Foreground = brushes[0];
+                sender.Background = new SolidColorBrush(Color.FromRgb(64, 64, 64));
+            }
+            else if (index == 1 && lawlineActivated[index])
+            {
+                sender.Background = brushes[index];
+                conduits[index].Enabled = true;
+                conduits[conduits.Length - 2].Enabled = true;
+                sender.Foreground = new SolidColorBrush(Color.FromRgb(64, 64, 64));
+            }
+            else if (index == 1 && lawlineActivated[index] != true)
+            {
+                conduits[conduits.Length - 2].Enabled = false;
+                conduits[index].Enabled = false;
+                sender.Foreground = brushes[0];
+                sender.Background = new SolidColorBrush(Color.FromRgb(64, 64, 64));
+            }
+            else if (index == 2 && lawlineActivated[index])
+            {
+                sender.Background = brushes[index];
+                conduits[index].Enabled = true;
+                conduits[conduits.Length - 3].Enabled = true;
+                sender.Foreground = new SolidColorBrush(Color.FromRgb(64, 64, 64));
+            }
+            else if (index == 2 && lawlineActivated[index] != true)
+            {
+                conduits[conduits.Length - 3].Enabled = false;
                 conduits[index].Enabled = false;
                 sender.Foreground = brushes[0];
                 sender.Background = new SolidColorBrush(Color.FromRgb(64, 64, 64));
