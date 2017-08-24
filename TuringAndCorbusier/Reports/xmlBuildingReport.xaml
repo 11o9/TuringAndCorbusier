@@ -104,7 +104,7 @@
             <TextBlock x:Name="grossArea_UnderGround" Text="지하층 연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="640" Canvas.Top="500" />
             <TextBlock x:Name="grossArea_OverGround" Text="지상층 연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="640" Canvas.Top="540" />
             <TextBlock x:Name="grossArea" Text="총 연면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="640" Canvas.Top="579" />
-            <TextBlock x:Name="BPR" Text="발코니" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="640" Canvas.Top="617" />
+            <TextBlock x:Name="BPR" Text="서비스 면적" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="640" Canvas.Top="617" />
             <TextBlock x:Name="buildingCoverage" Text="건폐율" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="640" Canvas.Top="660" />
             <TextBlock x:Name="floorAreaRatio" Text="용적률" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="640" Canvas.Top="699" />
             <TextBlock x:Name="numOfHouseHolds" Text="세대수" FontSize="18.667" VerticalAlignment="Top" TextAlignment="Center" FontFamily="NanumSquareOTF" Canvas.Left="640" Canvas.Top="738" />

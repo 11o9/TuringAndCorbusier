@@ -144,6 +144,14 @@ namespace TuringAndCorbusier
             Curve[] surroundingsHigh = regulationHigh.fromSurroundingsCurve(plot);
             Curve[] surroundingsLow = regulationLow.fromSurroundingsCurve(plot);
 
+            //foreach (Curve c in surroundingsHigh)
+            //{
+            //    var color = new Rhino.DocObjects.ObjectAttributes();
+            //    color.ObjectColor = System.Drawing.Color.Turquoise;
+            //    color.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject;
+            //    Rhino.RhinoDoc.ActiveDoc.Objects.AddCurve(c,color);
+            //}
+
             //법규 : 일조에 의한 높이제한
             Curve[] northHigh = regulationHigh.fromNorthCurve(plot);
             Curve[] northLow = regulationLow.fromNorthCurve(plot);

@@ -65,7 +65,7 @@ namespace Reports
             this.floorAreaRatio_legal.Text = "(법정 : " + Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio) + "%)";
             this.numOfHouseHolds.Text = AGoutput.GetHouseholdCount().ToString() + "세대";
             this.NumOfPakringLots.Text = (AGoutput.ParkingLotOnEarth.GetCount() + AGoutput.ParkingLotUnderGround.Count).ToString() + "대";
-            this.ParkingLotArea.Text = "(주차장면적 : " + (AGoutput.ParkingLotUnderGround.ParkingArea / 1000000).ToString() + "m\xB2)";
+            this.ParkingLotArea.Text = "(주차장면적 : " + String.Format("{0:0.00}", Math.Round(AGoutput.ParkingLotUnderGround.ParkingArea / 1000000, 2)).ToString() + "m\xB2)";
         }
 
         private string buildingScaleForReport(Apartment AGoutput)

@@ -36,12 +36,17 @@ namespace TuringAndCorbusier
             Color tempcolor = Color.Black;
             if (layercolor == Color.Black)
             
-                tempcolor = Color.White;
+                tempcolor = Color.Black;
            
 
             var matching_layers = (from layer in doc.Layers
                                    where layer.Color == layercolor
                                    select layer).ToList<Rhino.DocObjects.Layer>();
+
+            //임시적으로 선 색상 검정으로 바꿈
+            var layer01 = doc.Layers[1];
+            layer01.Color = Color.Black;
+            layer01.CommitChanges();
 
             Rhino.DocObjects.Layer layer_to_change = null;
             if (matching_layers.Count == 0)
@@ -60,11 +65,17 @@ namespace TuringAndCorbusier
 
                     if (matching_layers[i].Name == "Default")
                     {
-                        matching_layers[i].Color = Color.Gold;
+                        matching_layers[i].Color = Color.Black;
                         matching_layers[i].CommitChanges();
                         continue;
                     }
-                       
+                    if (matching_layers[i].Name == "Layer 02")
+                    {
+                        matching_layers[i].Color = Color.Black;
+                        matching_layers[i].CommitChanges();
+                        continue;
+                    }
+
 
 
                     layer_to_change = matching_layers[i];

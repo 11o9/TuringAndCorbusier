@@ -169,13 +169,13 @@ namespace TuringAndCorbusier
 
                 switch (TuringAndCorbusierPlugIn.InstanceClass.page1Settings.PlotType)
                 {
-                    case "제 1종 일반 주거지역":
+                    case "제 1 종일반주거지역":
                         PlotType_1_Click(PlotType_1, null);
                         break;
-                    case "제 2종 일반 주거지역":
+                    case "제 2 종일반주거지역":
                         PlotType_2_Click(PlotType_2, null);
                         break;
-                    case "제 3종 일반 주거지역":
+                    case "제 3 종일반주거지역":
                         PlotType_3_Click(PlotType_3, null);
                         break;
                     case "상업지역":

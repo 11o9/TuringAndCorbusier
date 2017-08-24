@@ -495,9 +495,10 @@ namespace TuringAndCorbusier
             {
                 GetBirdEye();
             }
-            catch
+            catch(Exception exc)
             {
                 RhinoApp.WriteLine("조감도 출력 실패");
+                RhinoApp.WriteLine(exc.ToString());
             }
 
             try
@@ -513,7 +514,7 @@ namespace TuringAndCorbusier
                 List<System.Windows.Documents.FixedPage> FixedPageList = new List<System.Windows.Documents.FixedPage>();
 
                 FixedDocument currentDoc = new FixedDocument();
-                currentDoc.DocumentPaginator.PageSize = new Size(1240, 175);
+                currentDoc.DocumentPaginator.PageSize = new Size(1240, 1750);
 
                 List<Page> pagesToVIew = new List<Page>();
 
@@ -1496,7 +1497,7 @@ namespace TuringAndCorbusier
 
 
 
-                        newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Tiff);
+                        newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
                         newbitmap.Dispose();
 
                     }
@@ -1533,7 +1534,7 @@ namespace TuringAndCorbusier
 
 
 
-                        newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Tiff);
+                        newbitmap.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
                         newbitmap.Dispose();
 
                     }

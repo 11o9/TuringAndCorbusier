@@ -245,6 +245,8 @@ namespace TuringAndCorbusier
                 List<Curve> mostNorthernCurve = new List<Curve>();
                 foreach (Curve c in topTwoFloors)
                 {
+                    try
+                    {
                     List<Curve> segments = c.DuplicateSegments().ToList();
                     Curve comparingSegment = segments[0];
                     for (int i = 0; i < segments.Count; i++)
@@ -256,6 +258,11 @@ namespace TuringAndCorbusier
                         }
                     }
                     mostNorthernCurve.Add(comparingSegment);
+
+                    }catch(Exception e)
+                    {
+                        RhinoApp.WriteLine(e.ToString());
+                    }
 
                 }
 
@@ -452,26 +459,34 @@ namespace TuringAndCorbusier
                     Curve back2 = back.DuplicateCurve();
 
                     //height(total)
-                    double pilotiHeight = output.ParameterSet.using1F ? 0 : Consts.PilotiHeight;
-                    var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight - pilotiHeight;
+                    try
+                    {
 
-                    //height(except pil)
+                        double pilotiHeight = output.ParameterSet.using1F ? 0 : Consts.PilotiHeight;
+                        var d2 = output.Household.Last()[0][0].Origin.Z + Consts.FloorHeight - pilotiHeight;
 
-                    var d3 = d2 * TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation;
-                    front2.Translate(v * d3);
-                    back2.Translate(v * d3 * -1);
+                        //height(except pil)
 
-                    var centerline = new LineCurve(front.PointAtNormalizedLength(0.5), front2.PointAtNormalizedLength(0.5));
-                    var anothercenterline = new LineCurve(back.PointAtNormalizedLength(0.5), back2.PointAtNormalizedLength(0.5));
+                        var d3 = d2 * TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation;
+                        front2.Translate(v * d3);
+                        back2.Translate(v * d3 * -1);
 
-                    centerline.Translate(Vector3d.ZAxis * d2);
-                    anothercenterline.Translate(Vector3d.ZAxis * d2);
+                        var centerline = new LineCurve(front.PointAtNormalizedLength(0.5), front2.PointAtNormalizedLength(0.5));
+                        var anothercenterline = new LineCurve(back.PointAtNormalizedLength(0.5), back2.PointAtNormalizedLength(0.5));
 
-                    result.Add(centerline);
-                    //result.Add(anothercenterline);
+                        centerline.Translate(Vector3d.ZAxis * d2);
+                        anothercenterline.Translate(Vector3d.ZAxis * d2);
 
-                    string log = string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, Math.Round(d3) / 1000, TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation);
-                    dim.Add(log);
+                        result.Add(centerline);
+                        //result.Add(anothercenterline);
+
+                        string log = string.Format("인동 : h = {0}m, h * {2} = {1}m ", Math.Round(d2) / 1000, Math.Round(d3) / 1000, TuringAndCorbusierPlugIn.InstanceClass.regSettings.DistanceIndentation);
+                        dim.Add(log);
+                    }
+                    catch (Exception e)
+                    {
+                        RhinoApp.WriteLine(e.ToString());
+                    }
                 }
 
                 return result;
