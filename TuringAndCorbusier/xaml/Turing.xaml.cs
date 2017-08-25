@@ -643,6 +643,41 @@ namespace TuringAndCorbusier
                 double publicFacilityArea = MainPanel_AGOutputList[tempIndex].GetPublicFacilityArea();
                 double serviceArea = -1000;
 
+                List<double> firstFloorHHArea = new List<double>();
+                for (int i = 0; i < MainPanel_AGOutputList[tempIndex].Household[0].Count; i++)
+                {
+                    for (int j = 0; j < MainPanel_AGOutputList[tempIndex].Household[0][i].Count; j++)
+                    {
+                        double round = Math.Round(MainPanel_AGOutputList[tempIndex].Household[0][i][j].ExclusiveArea / 1000000);
+                        if (!firstFloorHHArea.Contains(round))
+                            firstFloorHHArea.Add(round);
+                    }
+                }
+                var ta = firstFloorHHArea.OrderBy(n => n).ToList();
+                int[] type = new int[ta.Count];
+                int areaTolerance = 5;
+                type = type.Select(n => 0).ToArray();
+                foreach (var hh in MainPanel_AGOutputList[tempIndex].Household)
+                {
+                    foreach (var h in hh)
+                    {
+                        foreach (var x in h)
+                        {
+                            for (int i = 0; i < ta.Count; i++)
+                            {
+                                double round = Math.Round(x.ExclusiveArea / 1000000);
+                                if (round <= ta[i] && round > ta[i] - areaTolerance)
+                                {
+                                    type[i]++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+
                 List<FloorPlan> floorPlans = (from i in uniqueHouseHoldProperties
                                               select new FloorPlan(PlanDrawingFunction.alignHousholdProperties(i.ToHousehold()), MainPanel_planLibraries, MainPanel_AGOutputList[tempIndex].AGtype)).ToList();
 
@@ -653,7 +688,7 @@ namespace TuringAndCorbusier
 
                 double scaleFactor = PlanDrawingFunction.calculateMultipleScaleFactor(Reports.xmlUnitReport.GetCanvasRectangle(), boundingBoxes, out origins);
 
-                for (int i = 0; i < uniqueHouseHoldProperties.Count(); i++)
+                for (int i = 0; i < ta.Count(); i++)
                 {
                     Household i_Copy = new Household(uniqueHouseHoldProperties[i].ToHousehold());
 
@@ -665,7 +700,7 @@ namespace TuringAndCorbusier
                     double tempCoreArea = coreAreaSum * exclusiveTemp / exclusiveSum;
                     double tempParkingLotArea = UGParkingLotAreaSum / MainPanel_AGOutputList[tempIndex].GetExclusiveAreaSum() * i_Copy.GetExclusiveArea();
                     tempCoreArea += uniqueHouseHoldProperties[i].CorridorArea;
-                    Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport(i_Copy, typeString[i], tempCoreArea, tempParkingLotArea, publicFacilityArea, serviceArea, uniqueHouseHoldProperties[i].Count);
+                    Reports.xmlUnitReport unitReport = new Reports.xmlUnitReport(i_Copy, typeString[i], tempCoreArea, tempParkingLotArea, publicFacilityArea, serviceArea, type[i],ta[i]);
                     unitReport.setUnitPlan(uniqueHouseHoldProperties[i], floorPlans[i], scaleFactor, origins[i], MainPanel_AGOutputList[tempIndex].AGtype);
 
                     fps.Add(unitReport.fixedPage);

@@ -750,7 +750,7 @@ namespace TuringAndCorbusier
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation, fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
         private double[] GAparameterset = { 0.1, 0.05, 3, 120, 2, 3, 1 }; //원본
-       //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
+      // private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
                                                                           // private double[] GAparameterset = { 0.1, 0.05, 3, 120, 2, 3, 1 }; //원본
                                                                           //private double[] GAparameterset = { 0.1, 0.05, 1, 10, 1, 3, 1 };                                                                 //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 }; //테스트
 

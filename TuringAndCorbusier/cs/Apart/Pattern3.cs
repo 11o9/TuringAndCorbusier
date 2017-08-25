@@ -853,8 +853,8 @@ namespace TuringAndCorbusier
         private double[] maxInput = { TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloors - 1, 10500, 2 * Math.PI, 1 };
 
         //Parameter GA최적화 {mutation probability, elite percentage, initial boost, population, generation , fitness value, mutation factor(0에 가까울수록 변동 범위가 넓어짐)
-       // private double[] GAparameterset = { 0.8, 0.05, 1, 20, 4, 10, 1 };// 원본
-       // private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 };
+        //private double[] GAparameterset = { 0.8, 0.05, 1, 20, 4, 10, 1 };// 원본
+        //private double[] GAparameterset = { 0.2, 0.03, 1, 5, 1, 3, 1 };
         private double[] GAparameterset = { 0.2, 0.03, 1, 25, 1, 3, 1 };
 
         public override string GetAGType

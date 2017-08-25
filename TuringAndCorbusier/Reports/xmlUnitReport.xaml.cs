@@ -21,11 +21,11 @@ namespace Reports
 
         }
 
-        public xmlUnitReport(Household houseHoldProperty, string typeString, double coreArea, double parkingLotArea, double publicFacilityArea, double serviceArea, int numOfThisType)
+        public xmlUnitReport(Household houseHoldProperty, string typeString, double coreArea, double parkingLotArea, double publicFacilityArea, double serviceArea, int numOfThisType,double ta)
         {
             InitializeComponent();
 
-            this.AreaType.Text = Math.Round(houseHoldProperty.ExclusiveArea / 1000000, 0).ToString() + "m\xB2 " + typeString + "타입";
+            this.AreaType.Text = ta.ToString() + "m\xB2 " + typeString + "타입";
             this.NumberOfThisType.Text = numOfThisType.ToString() + "세대";
             this.exclusiveArea.Text = String.Format("{0:0.00}",Math.Round(houseHoldProperty.GetExclusiveArea() / 1000000, 2)).ToString() + "m\xB2";
             this.exclusiveArea_Py.Text = Math.Round(houseHoldProperty.GetExclusiveArea() / 1000000 / 3.3, 2).ToString() + "평";

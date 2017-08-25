@@ -47,7 +47,7 @@ namespace Reports
             //this.grossArea_OverGround_Py.Text = Math.Round(AGoutput.GetGrossArea() / 1000000 / 3.3, 2).ToString() + "평";
             this.grossArea.Text = String.Format("{0:0.00}", Math.Round((AGoutput.GetGrossArea() + 1) / 1000000, 2)).ToString() + "m\xB2";//////////////////////////////////////////////////////////////
             //this.grossArea_Py.Text = Math.Round((AGoutput.GetGrossArea() + 1) / 1000000 / 3.3, 2).ToString() + "평";//////////////////////////////////////////////////////////////
-            this.BPR.Text = String.Format("{0:0.00}", Math.Round((AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000, 2)).ToString() + "m\xB2";
+            this.BPR.Text = String.Format("{0:0.00}", Math.Round((AGoutput.GetBalconyArea()+ AGoutput.GetCoreAreaOnEarthSum()) / 1000000, 2)).ToString() + "m\xB2";
             //this.BPR_Py.Text = Math.Round((AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
             //this.ConstructionArea.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000, 2).ToString() + "m\xB2";
             //this.ConstructionArea_Py.Text = Math.Round((AGoutput.GetGrossArea() + AGoutput.GetBalconyArea() + AGoutput.ParkingLotUnderGround.ParkingArea + AGoutput.GetCoreAreaOnEarthSum()) / 1000000 / 3.3, 2).ToString() + "평";
@@ -58,14 +58,23 @@ namespace Reports
             double parking = AGoutput.ParkingLotUnderGround.ParkingArea;
             double core1f = AGoutput.GetCoreAreaOnEarthSum();
 
+            int numberOfHousing = 0;
+
+            foreach (List<List<Household>> i in AGoutput.Household)
+            {
+                foreach (List<Household> j in i)
+                {
+                    numberOfHousing += j.Count();
+                }
+            }
 
             this.buildingCoverage.Text = Math.Round(AGoutput.GetBuildingCoverage(), 2).ToString() + "%";
             this.buildingCoverage_legal.Text = "(법정 : " + Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxBuildingCoverage) + "%)";
             this.floorAreaRatio.Text = Math.Round(AGoutput.GetGrossAreaRatio(), 2).ToString() + "%";
             this.floorAreaRatio_legal.Text = "(법정 : " + Math.Round(TuringAndCorbusierPlugIn.InstanceClass.page1Settings.MaxFloorAreaRatio) + "%)";
-            this.numOfHouseHolds.Text = AGoutput.GetHouseholdCount().ToString() + "세대";
+            this.numOfHouseHolds.Text = numberOfHousing.ToString() + "세대";
             this.NumOfPakringLots.Text = (AGoutput.ParkingLotOnEarth.GetCount() + AGoutput.ParkingLotUnderGround.Count).ToString() + "대";
-            this.ParkingLotArea.Text = "(주차장면적 : " + String.Format("{0:0.00}", Math.Round(AGoutput.ParkingLotUnderGround.ParkingArea / 1000000, 2)).ToString() + "m\xB2)";
+            this.ParkingLotArea.Text = "(지하주차장 면적 : " + String.Format("{0:0.00}", Math.Round(AGoutput.ParkingLotUnderGround.ParkingArea / 1000000, 2)).ToString() + "m\xB2)";
         }
 
         private string buildingScaleForReport(Apartment AGoutput)

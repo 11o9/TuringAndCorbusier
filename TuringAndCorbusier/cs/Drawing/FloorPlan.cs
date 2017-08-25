@@ -67,8 +67,9 @@ namespace TuringAndCorbusier
                 //caps = capsTemp[0];
                 roomTags = GetRoomTag(householdProperty, fpl);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                RhinoApp.WriteLine(e.ToString());
                 Household hhp = new Household(householdProperty);
                 wallCurves = new List<List<Curve>>();
                 wallCurves.Add(exWallMaker(hhp.XLengthA, hhp.XLengthB, hhp.YLengthA, hhp.YLengthB, hhp.WallFactor, exWallThickness, inWallThickness));
